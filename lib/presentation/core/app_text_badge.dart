@@ -1,0 +1,27 @@
+part of 'widgets.dart';
+
+class AppTextBadge extends StatelessWidget {
+  final String text;
+  const AppTextBadge({
+    required this.text,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: const Color.fromARGB(255, 206, 232, 221),
+      ),
+      // constraints: BoxConstraints.tightFor(),
+
+      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+      child: AppText(
+        text: text,
+        size: AppSizes.bodySmallest,
+        color: AppColors.primary2,
+      ),
+    );
+  }
+}
