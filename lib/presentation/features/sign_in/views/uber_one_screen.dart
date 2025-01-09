@@ -133,7 +133,7 @@ class UberOneScreen extends StatelessWidget {
               callback: () {
                 navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
-                      builder: (context) => const MainScreen(),
+                      builder: (context) => const HomeScreen(),
                     ), (r) {
                   return false;
                 });

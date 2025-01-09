@@ -9,7 +9,7 @@ import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 import '../../../core/widgets.dart';
-import '../../home/home_screen.dart';
+import '../home_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   final List<Store> stores;

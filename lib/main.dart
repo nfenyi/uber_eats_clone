@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 
-import 'presentation/features/sign_in/views/get_started_screen.dart';
+import 'presentation/features/main_screen/screens/main_screen.dart';
 
 final Logger logger = Logger();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: UberEatsClone()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class UberEatsClone extends StatelessWidget {
+  const UberEatsClone({super.key});
 
   // This widget is the root of your application.
   @override

@@ -11,24 +11,25 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/search/screens/search_screen.dart';
+import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/address_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../constants/asset_names.dart';
 import '../../constants/other_constants.dart';
 import '../../constants/weblinks.dart';
+import '../store/store_screen.dart';
 import '../webview/webview_screen.dart';
 import 'map/map_screen.dart';
 
-class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({super.key});
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _MainScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _HomeScreenState();
 }
 
-class _MainScreenState extends ConsumerState<MainScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final webViewcontroller = WebViewControllerPlus();
 
   final _dropdownValues = ['1226 University Dr', 'placeholder'];
@@ -284,7 +285,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarIconBrightness: Brightness.dark,
-      statusBarColor: Colors.white, // status bar color
+      statusBarColor: Colors.white,
     ));
 
     _nationalBrands = _stores
@@ -318,271 +319,261 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   Widget build(BuildContext context) {
     TimeOfDay timeOfDayNow = TimeOfDay.now();
-    return Scaffold(
-      body: SafeArea(
-          child: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          Visibility(
-            visible: !_onFilterScreen,
-            replacement: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: AppSizes.horizontalPaddingSmall),
-                child: Column(
-                  children: [
-                    const Gap(157),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const AppText(
-                          size: AppSizes.body,
-                          text: '80 results',
-                          weight: FontWeight.w600,
-                        ),
-                        AppButton2(
-                          text: 'Reset',
-                          callback: () {
-                            setState(() {
-                              _selectedFilters = [];
-                              _onFilterScreen = false;
-                              _selectedDeliveryFeeIndex = null;
-                              _selectedRatingIndex = null;
-                              _selectedPrice = null;
-                              _selectedDietaryOptions = [];
-                              _selectedSort = null;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const Gap(10),
-                    InkWell(
-                      onTap: () =>
-                          navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => const MapScreen(),
-                      )),
-                      child: Ink(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Image.asset(AssetNames.map, width: double.infinity),
-                            Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(50)),
-                                child: const AppText(text: 'View map'))
-                          ],
-                        ),
+    return SafeArea(
+        child: Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        Visibility(
+          visible: !_onFilterScreen,
+          replacement: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmall),
+              child: Column(
+                children: [
+                  const Gap(157),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const AppText(
+                        size: AppSizes.body,
+                        text: '80 results',
+                        weight: FontWeight.w600,
+                      ),
+                      AppButton2(
+                        text: 'Reset',
+                        callback: () {
+                          setState(() {
+                            _selectedFilters = [];
+                            _onFilterScreen = false;
+                            _selectedDeliveryFeeIndex = null;
+                            _selectedRatingIndex = null;
+                            _selectedPrice = null;
+                            _selectedDietaryOptions = [];
+                            _selectedSort = null;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  const Gap(10),
+                  InkWell(
+                    onTap: () =>
+                        navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => const MapScreen(),
+                    )),
+                    child: Ink(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(AssetNames.map, width: double.infinity),
+                          Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: const AppText(text: 'View map'))
+                        ],
                       ),
                     ),
-                    const Gap(20),
-                    ListView.separated(
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          final store = _stores[index];
-                          final bool isClosed = timeOfDayNow.hour <
-                                  store.openingHour.hour ||
-                              (timeOfDayNow.hour >= store.closingHour.hour &&
-                                  timeOfDayNow.minute >=
-                                      store.closingHour.minute);
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      store.cardImage,
-                                      width: double.infinity,
-                                      height: 170,
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                  isClosed
-                                      ? Container(
-                                          color: Colors.black.withOpacity(0.5),
-                                          width: double.infinity,
-                                          height: 170,
-                                          child: const Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              AppText(
-                                                text: 'Closed',
-                                                color: Colors.white,
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : !store.delivery.canDeliver
-                                          ? Container(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              width: double.infinity,
-                                              height: 170,
-                                              child: const Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  AppText(
-                                                    text: 'Pick up',
-                                                    color: Colors.white,
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          : const SizedBox.shrink(),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 8.0, top: 8.0),
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Ink(
-                                        child: Icon(
-                                          store.isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_outline,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const Gap(5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  AppText(
-                                    text: store.name,
-                                    weight: FontWeight.w600,
-                                  ),
-                                  Container(
-                                      decoration: BoxDecoration(
-                                          color: AppColors.neutral200,
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5, vertical: 2),
-                                      child: AppText(
-                                          text: store.rating.toString()))
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Visibility(
-                                      visible: store.delivery.fee < 1,
-                                      child: Image.asset(
-                                        AssetNames.uberOneSmall,
-                                        height: 10,
-                                      )),
-                                  AppText(
-                                      text: isClosed
-                                          ? 'Closed • Available at ${store.openingHour}'
-                                          : '\$${store.delivery.fee} Delivery Fee',
-                                      color: store.delivery.fee < 1
-                                          ? const Color.fromARGB(
-                                              255, 163, 133, 42)
-                                          : null),
-                                  AppText(
-                                      text:
-                                          ' • ${store.estimatedDeliveryTime} min'),
-                                ],
-                              )
-                            ],
-                          );
-                        },
-                        separatorBuilder: (context, index) => const Gap(10),
-                        itemCount: _stores.length),
-                  ],
-                ),
-              ),
-            ),
-            child: NotificationListener<UserScrollNotification>(
-              onNotification: (UserScrollNotification userScrollNotification) {
-                if (userScrollNotification.direction ==
-                    ScrollDirection.reverse) {
-                  setState(() {
-                    _showFilters = false;
-                  });
-                } else if (userScrollNotification.direction ==
-                    ScrollDirection.forward) {
-                  setState(() {
-                    _showFilters = true;
-                  });
-                }
-                return true;
-              },
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const Gap(236),
-                    MainScreenTopic(
-                      title: 'Top 10 hottest this week',
-                      callback: () => navigatorKey.currentState!.push,
-                    ),
-                    SizedBox(
-                      height: 200,
-                      child: ListView.separated(
-                        cacheExtent: 300,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        separatorBuilder: (context, index) => const Gap(10),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 10,
-                        itemBuilder: (context, index) {
-                          final store = _hottestDeals[index];
-                          final bool isClosed = timeOfDayNow.hour <
-                                  store.openingHour.hour ||
-                              (timeOfDayNow.hour >= store.closingHour.hour &&
-                                  timeOfDayNow.minute >=
-                                      store.closingHour.minute);
-                          return SizedBox(
-                            width: 200,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  const Gap(20),
+                  ListView.separated(
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final store = _stores[index];
+                        final bool isClosed =
+                            timeOfDayNow.hour < store.openingHour.hour ||
+                                (timeOfDayNow.hour >= store.closingHour.hour &&
+                                    timeOfDayNow.minute >=
+                                        store.closingHour.minute);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Stack(
+                              alignment: Alignment.topRight,
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
-                                  child: Stack(
-                                    children: [
-                                      Image.network(
-                                        store.cardImage,
-                                        width: 200,
-                                        height: 120,
-                                        fit: BoxFit.fill,
+                                  child: Image.network(
+                                    store.cardImage,
+                                    width: double.infinity,
+                                    height: 170,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                                isClosed
+                                    ? Container(
+                                        color: Colors.black.withOpacity(0.5),
+                                        width: double.infinity,
+                                        height: 170,
+                                        child: const Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            AppText(
+                                              text: 'Closed',
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : !store.delivery.canDeliver
+                                        ? Container(
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            width: double.infinity,
+                                            height: 170,
+                                            child: const Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                AppText(
+                                                  text: 'Pick up',
+                                                  color: Colors.white,
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : const SizedBox.shrink(),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 8.0, top: 8.0),
+                                  child: InkWell(
+                                    onTap: () {},
+                                    child: Ink(
+                                      child: Icon(
+                                        store.isFavorite
+                                            ? Icons.favorite
+                                            : Icons.favorite_outline,
+                                        color: Colors.white,
                                       ),
-                                      isClosed
-                                          ? Container(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              width: 200,
-                                              height: 120,
-                                              child: const Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  AppText(
-                                                    text: 'Closed',
-                                                    color: Colors.white,
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          : !store.delivery.canDeliver
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            const Gap(5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AppText(
+                                  text: store.name,
+                                  weight: FontWeight.w600,
+                                ),
+                                Container(
+                                    decoration: BoxDecoration(
+                                        color: AppColors.neutral200,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 2),
+                                    child:
+                                        AppText(text: store.rating.toString()))
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Visibility(
+                                    visible: store.delivery.fee < 1,
+                                    child: Image.asset(
+                                      AssetNames.uberOneSmall,
+                                      height: 10,
+                                    )),
+                                AppText(
+                                    text: isClosed
+                                        ? 'Closed • Available at ${store.openingHour}'
+                                        : '\$${store.delivery.fee} Delivery Fee',
+                                    color: store.delivery.fee < 1
+                                        ? const Color.fromARGB(
+                                            255, 163, 133, 42)
+                                        : null),
+                                AppText(
+                                    text:
+                                        ' • ${store.estimatedDeliveryTime} min'),
+                              ],
+                            )
+                          ],
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Gap(10),
+                      itemCount: _stores.length),
+                ],
+              ),
+            ),
+          ),
+          child: NotificationListener<UserScrollNotification>(
+            onNotification: (UserScrollNotification userScrollNotification) {
+              if (userScrollNotification.direction == ScrollDirection.reverse) {
+                setState(() {
+                  _showFilters = false;
+                });
+              } else if (userScrollNotification.direction ==
+                  ScrollDirection.forward) {
+                setState(() {
+                  _showFilters = true;
+                });
+              }
+              return true;
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const Gap(236),
+                  HomeScreenTopic(
+                    title: 'Top 10 hottest this week',
+                    callback: () => navigatorKey.currentState!.push,
+                  ),
+                  SizedBox(
+                    height: 200,
+                    child: ListView.separated(
+                      cacheExtent: 300,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      separatorBuilder: (context, index) => const Gap(10),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 10,
+                      itemBuilder: (context, index) {
+                        final store = _hottestDeals[index];
+                        final bool isClosed =
+                            timeOfDayNow.hour < store.openingHour.hour ||
+                                (timeOfDayNow.hour >= store.closingHour.hour &&
+                                    timeOfDayNow.minute >=
+                                        store.closingHour.minute);
+                        return ClipRRect(
+                          child: InkWell(
+                            radius: 12,
+                            onTap: () {
+                              navigatorKey.currentState!.push(MaterialPageRoute(
+                                builder: (context) => const StoreScreen(),
+                              ));
+                            },
+                            child: Ink(
+                              // decoration: BoxDecoration(
+                              //   borderRadius: BorderRadius.circular(12),
+                              // ),
+                              child: SizedBox(
+                                width: 200,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
+                                      // borderRadius: BorderRadius.circular(12),
+                                      child: Stack(
+                                        children: [
+                                          Image.network(
+                                            store.cardImage,
+                                            width: 200,
+                                            height: 120,
+                                            fit: BoxFit.fill,
+                                          ),
+                                          isClosed
                                               ? Container(
                                                   color: Colors.black
                                                       .withOpacity(0.5),
@@ -597,683 +588,151 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                                             .center,
                                                     children: [
                                                       AppText(
-                                                        text: 'Pick up',
+                                                        text: 'Closed',
                                                         color: Colors.white,
                                                       ),
                                                     ],
                                                   ),
                                                 )
-                                              : const SizedBox.shrink(),
-                                    ],
-                                  ),
-                                ),
-                                const Gap(5),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    AppText(
-                                      text: store.name,
-                                      weight: FontWeight.w600,
+                                              : !store.delivery.canDeliver
+                                                  ? Container(
+                                                      color: Colors.black
+                                                          .withOpacity(0.5),
+                                                      width: 200,
+                                                      height: 120,
+                                                      child: const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          AppText(
+                                                            text: 'Pick up',
+                                                            color: Colors.white,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  : const SizedBox.shrink(),
+                                        ],
+                                      ),
                                     ),
-                                    Icon(
-                                      store.isFavorite
-                                          ? Icons.favorite
-                                          : Icons.favorite_outline,
-                                      color: AppColors.neutral600,
-                                    )
-                                  ],
-                                ),
-                                AppText(
-                                    text:
-                                        '\$${store.delivery.fee} Delivery Fee',
-                                    color: store.delivery.fee < 1
-                                        ? const Color.fromARGB(
-                                            255, 163, 133, 42)
-                                        : null),
-                                Row(
-                                  children: [
-                                    AppText(
-                                      text: '${store.rating}',
-                                    ),
-                                    const Icon(
-                                      Icons.star,
-                                      size: 10,
+                                    const Gap(5),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        AppText(
+                                          text: store.name,
+                                          weight: FontWeight.w600,
+                                        ),
+                                        Icon(
+                                          store.isFavorite
+                                              ? Icons.favorite
+                                              : Icons.favorite_outline,
+                                          color: AppColors.neutral600,
+                                        )
+                                      ],
                                     ),
                                     AppText(
                                         text:
-                                            '(${store.votes}+) • ${store.estimatedDeliveryTime} min'),
+                                            '\$${store.delivery.fee} Delivery Fee',
+                                        color: store.delivery.fee < 1
+                                            ? const Color.fromARGB(
+                                                255, 163, 133, 42)
+                                            : null),
+                                    Row(
+                                      children: [
+                                        AppText(
+                                          text: '${store.rating}',
+                                        ),
+                                        const Icon(
+                                          Icons.star,
+                                          size: 10,
+                                        ),
+                                        AppText(
+                                            text:
+                                                '(${store.votes}+) • ${store.estimatedDeliveryTime} min'),
+                                      ],
+                                    )
                                   ],
-                                )
-                              ],
+                                ),
+                              ),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
-                    MainScreenTopic(callback: () {}, title: 'Stores near you'),
-                    SizedBox(
-                      height: 100,
-                      child: ListView.separated(
-                        cacheExtent: 300,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        separatorBuilder: (context, index) => const Gap(10),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _stores.length,
-                        itemBuilder: (context, index) {
-                          final store = _stores[index];
-                          return SizedBox(
-                            // width: 200,
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(2),
-                                  decoration: BoxDecoration(
+                  ),
+                  HomeScreenTopic(callback: () {}, title: 'Stores near you'),
+                  SizedBox(
+                    height: 100,
+                    child: ListView.separated(
+                      cacheExtent: 300,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      separatorBuilder: (context, index) => const Gap(10),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _stores.length,
+                      itemBuilder: (context, index) {
+                        final store = _stores[index];
+                        return InkWell(
+                          onTap: () {
+                            navigatorKey.currentState!.push(MaterialPageRoute(
+                              builder: (context) => const StoreScreen(),
+                            ));
+                          },
+                          child: Ink(
+                            child: SizedBox(
+                              // width: 200,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        border: Border.all(
+                                            color: AppColors.neutral200)),
+                                    child: ClipRRect(
                                       borderRadius: BorderRadius.circular(50),
-                                      border: Border.all(
-                                          color: AppColors.neutral200)),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: Image.network(
-                                      store.logo,
-                                      width: 70,
-                                      height: 70,
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                ),
-                                const Gap(5),
-                                AppText(
-                                  text: store.name,
-                                  weight: FontWeight.w600,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    MainScreenTopic(callback: () {}, title: 'National Brands'),
-                    SizedBox(
-                      height: 200,
-                      child: ListView.separated(
-                        cacheExtent: 300,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        separatorBuilder: (context, index) => const Gap(10),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _nationalBrands.length,
-                        itemBuilder: (context, index) {
-                          final nationalBrand = _nationalBrands[index];
-                          return SizedBox(
-                            width: 200,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
                                       child: Image.network(
-                                        nationalBrand.cardImage,
-                                        width: 200,
-                                        height: 120,
+                                        store.logo,
+                                        width: 70,
+                                        height: 70,
                                         fit: BoxFit.fill,
                                       ),
                                     ),
-                                    (timeOfDayNow.hour <
-                                                nationalBrand
-                                                    .openingHour.hour ||
-                                            (timeOfDayNow.hour >=
-                                                    nationalBrand
-                                                        .closingHour.hour &&
-                                                timeOfDayNow.minute >=
-                                                    nationalBrand
-                                                        .closingHour.minute))
-                                        ? Container(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            width: 200,
-                                            height: 120,
-                                            child: const Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                AppText(
-                                                  text: 'Closed',
-                                                  color: Colors.white,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        : !nationalBrand.delivery.canDeliver
-                                            ? Container(
-                                                color: Colors.black
-                                                    .withOpacity(0.5),
-                                                width: 200,
-                                                height: 120,
-                                                child: const Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    AppText(
-                                                      text: 'Pick up',
-                                                      color: Colors.white,
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            : const SizedBox.shrink(),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 8.0, top: 8.0),
-                                      child: InkWell(
-                                        onTap: () {},
-                                        child: Ink(
-                                          child: Icon(
-                                            nationalBrand.isFavorite
-                                                ? Icons.favorite
-                                                : Icons.favorite_outline,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                const Gap(5),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    AppText(
-                                      text: nationalBrand.name,
-                                      weight: FontWeight.w600,
-                                    ),
-                                    Container(
-                                        decoration: BoxDecoration(
-                                            color: AppColors.neutral200,
-                                            borderRadius:
-                                                BorderRadius.circular(20)),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5, vertical: 2),
-                                        child: AppText(
-                                            text: nationalBrand.rating
-                                                .toString()))
-                                  ],
-                                ),
-                                AppText(
-                                    text:
-                                        '\$${nationalBrand.delivery.fee} Delivery Fee',
-                                    color: nationalBrand.delivery.fee == 0
-                                        ? const Color.fromARGB(
-                                            255, 163, 133, 42)
-                                        : null),
-                                AppText(
-                                    text:
-                                        '${nationalBrand.estimatedDeliveryTime} min')
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const Gap(10),
-                    SizedBox(
-                      height: 160,
-                      child: ListView(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          Container(
-                              width: Adaptive.w(80),
-                              height: 150,
-                              decoration: BoxDecoration(
-                                color: Colors.brown,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                AppText(
-                                                  color: Colors.white,
-                                                  text:
-                                                      '\$0 Delivery Fee + up to 10% off with Uber One',
-                                                ),
-                                                Gap(10),
-                                                AppText(
-                                                  color: Colors.white,
-                                                  text:
-                                                      'Save on your next ride',
-                                                ),
-                                              ]),
-                                          AppButton2(
-                                              text: 'Try free for 4 weeks',
-                                              callback: () {}),
-                                        ],
-                                      ),
-                                    ),
                                   ),
-                                  Expanded(
-                                      flex: 1,
-                                      child: ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                            topRight: Radius.circular(10),
-                                            bottomRight: Radius.circular(10)),
-                                        child: Image.asset(
-                                          height: double.infinity,
-                                          AssetNames.hamburger,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ))
+                                  const Gap(5),
+                                  AppText(
+                                    text: store.name,
+                                    weight: FontWeight.w600,
+                                  ),
                                 ],
-                              )),
-                          const Gap(10),
-                          Container(
-                              width: Adaptive.w(80),
-                              height: 150,
-                              decoration: BoxDecoration(
-                                color: Colors.black45,
-                                borderRadius: BorderRadius.circular(10),
                               ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                AppText(
-                                                  color: Colors.white,
-                                                  text:
-                                                      '\$0 Delivery Fee + up to 10% off with Uber One',
-                                                ),
-                                              ]),
-                                          AppButton2(
-                                              text: 'Request ride',
-                                              callback: () {}),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                      flex: 1,
-                                      child: ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                            topRight: Radius.circular(10),
-                                            bottomRight: Radius.circular(10)),
-                                        child: Image.asset(
-                                          height: double.infinity,
-                                          AssetNames.whiteCar,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ))
-                                ],
-                              )),
-                        ],
-                      ),
-                    ),
-                    MainScreenTopic(callback: () {}, title: 'Popular near you'),
-                    SizedBox(
-                      height: 200,
-                      child: ListView.separated(
-                        cacheExtent: 300,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        separatorBuilder: (context, index) => const Gap(10),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _nationalBrands.length,
-                        itemBuilder: (context, index) {
-                          final nationalBrand = _nationalBrands[index];
-                          return SizedBox(
-                            width: 200,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.network(
-                                        nationalBrand.cardImage,
-                                        width: 200,
-                                        height: 120,
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                    (timeOfDayNow.hour <
-                                                nationalBrand
-                                                    .openingHour.hour ||
-                                            (timeOfDayNow.hour >=
-                                                    nationalBrand
-                                                        .closingHour.hour &&
-                                                timeOfDayNow.minute >=
-                                                    nationalBrand
-                                                        .closingHour.minute))
-                                        ? Container(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            width: 200,
-                                            height: 120,
-                                            child: const Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                AppText(
-                                                  text: 'Closed',
-                                                  color: Colors.white,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        : !nationalBrand.delivery.canDeliver
-                                            ? Container(
-                                                color: Colors.black
-                                                    .withOpacity(0.5),
-                                                width: 200,
-                                                height: 120,
-                                                child: const Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    AppText(
-                                                      text: 'Pick up',
-                                                      color: Colors.white,
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            : const SizedBox.shrink(),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 8.0, top: 8.0),
-                                      child: InkWell(
-                                        onTap: () {},
-                                        child: Ink(
-                                          child: Icon(
-                                            nationalBrand.isFavorite
-                                                ? Icons.favorite
-                                                : Icons.favorite_outline,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Gap(5),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    AppText(
-                                      text: nationalBrand.name,
-                                      weight: FontWeight.w600,
-                                    ),
-                                    Container(
-                                        decoration: BoxDecoration(
-                                            color: AppColors.neutral200,
-                                            borderRadius:
-                                                BorderRadius.circular(20)),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5, vertical: 2),
-                                        child: AppText(
-                                            text: nationalBrand.rating
-                                                .toString()))
-                                  ],
-                                ),
-                                AppText(
-                                    text:
-                                        '\$${nationalBrand.delivery.fee} Delivery Fee',
-                                    color: nationalBrand.delivery.fee == 0
-                                        ? const Color.fromARGB(
-                                            255, 163, 133, 42)
-                                        : null),
-                                AppText(
-                                    text:
-                                        '${nationalBrand.estimatedDeliveryTime} min')
-                              ],
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
-                    MainScreenTopic(
-                        callback: () {},
-                        title: 'Prep brunch for Mum',
-                        subtitle: 'From ${_stores[6].name}',
-                        imageUrl: _stores[6].logo),
-                    SizedBox(
-                      height: 200,
-                      child: ListView.separated(
-                        cacheExtent: 300,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        separatorBuilder: (context, index) => const Gap(10),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _stores[6].products.length,
-                        itemBuilder: (context, index) {
-                          final product = _stores[6].products[index];
-                          return SizedBox(
-                            width: 100,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.network(
-                                        product.imageUrl,
-                                        width: 100,
-                                        height: 120,
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 8.0, top: 8.0),
-                                      child: InkWell(
-                                        onTap: () {},
-                                        child: Ink(
-                                          child: Container(
-                                            padding: const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                                boxShadow: const [
-                                                  BoxShadow(
-                                                    color: Colors.black12,
-                                                    offset: Offset(2, 2),
-                                                  )
-                                                ],
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(50)),
-                                            child: const Icon(
-                                              Icons.add,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                const Gap(5),
-                                AppText(
-                                  text: product.name,
-                                  weight: FontWeight.w600,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Row(
-                                  children: [
-                                    Visibility(
-                                      visible: product.promoPrice != null,
-                                      child: Row(
-                                        children: [
-                                          AppText(
-                                              text: '\$${product.initialPrice}',
-                                              color: Colors.green),
-                                          const Gap(5),
-                                        ],
-                                      ),
-                                    ),
-                                    AppText(
-                                      text: product.initialPrice.toString(),
-                                      decoration: product.promoPrice != null
-                                          ? TextDecoration.lineThrough
-                                          : TextDecoration.none,
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    MainScreenTopic(
-                        callback: () {},
-                        title: 'Beer',
-                        subtitle: 'From ${_stores[7].name}',
-                        imageUrl: _stores[7].logo),
-                    SizedBox(
-                      height: 200,
-                      child: ListView.separated(
-                        cacheExtent: 300,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        separatorBuilder: (context, index) => const Gap(10),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _stores[7].products.length,
-                        itemBuilder: (context, index) {
-                          final product = _stores[7].products[index];
-                          return SizedBox(
-                            width: 100,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.network(
-                                        product.imageUrl,
-                                        width: 100,
-                                        height: 120,
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 8.0, top: 8.0),
-                                      child: InkWell(
-                                        onTap: () {},
-                                        child: Ink(
-                                          child: Container(
-                                            padding: const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                                boxShadow: const [
-                                                  BoxShadow(
-                                                    color: Colors.black12,
-                                                    offset: Offset(2, 2),
-                                                  )
-                                                ],
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(50)),
-                                            child: const Icon(
-                                              Icons.add,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                const Gap(5),
-                                AppText(
-                                  text: product.name,
-                                  weight: FontWeight.w600,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Row(
-                                  children: [
-                                    Visibility(
-                                      visible: product.promoPrice != null,
-                                      child: Row(
-                                        children: [
-                                          AppText(
-                                              text: '\$${product.initialPrice}',
-                                              color: Colors.green),
-                                          const Gap(5),
-                                        ],
-                                      ),
-                                    ),
-                                    AppText(
-                                      text: product.initialPrice.toString(),
-                                      decoration: product.promoPrice != null
-                                          ? TextDecoration.lineThrough
-                                          : TextDecoration.none,
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    MainScreenTopic(callback: () {}, title: 'All Stores'),
-                    ListView.separated(
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          final store = _stores[index];
-                          final bool isClosed = timeOfDayNow.hour <
-                                  store.openingHour.hour ||
-                              (timeOfDayNow.hour >= store.closingHour.hour &&
-                                  timeOfDayNow.minute >=
-                                      store.closingHour.minute);
-                          return Column(
+                  ),
+                  HomeScreenTopic(callback: () {}, title: 'National Brands'),
+                  SizedBox(
+                    height: 200,
+                    child: ListView.separated(
+                      cacheExtent: 300,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      separatorBuilder: (context, index) => const Gap(10),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _nationalBrands.length,
+                      itemBuilder: (context, index) {
+                        final nationalBrand = _nationalBrands[index];
+                        return SizedBox(
+                          width: 200,
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Stack(
@@ -1282,17 +741,24 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: Image.network(
-                                      store.cardImage,
-                                      width: double.infinity,
-                                      height: 170,
+                                      nationalBrand.cardImage,
+                                      width: 200,
+                                      height: 120,
                                       fit: BoxFit.fill,
                                     ),
                                   ),
-                                  isClosed
+                                  (timeOfDayNow.hour <
+                                              nationalBrand.openingHour.hour ||
+                                          (timeOfDayNow.hour >=
+                                                  nationalBrand
+                                                      .closingHour.hour &&
+                                              timeOfDayNow.minute >=
+                                                  nationalBrand
+                                                      .closingHour.minute))
                                       ? Container(
                                           color: Colors.black.withOpacity(0.5),
-                                          width: double.infinity,
-                                          height: 170,
+                                          width: 200,
+                                          height: 120,
                                           child: const Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -1306,12 +772,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                             ],
                                           ),
                                         )
-                                      : !store.delivery.canDeliver
+                                      : !nationalBrand.delivery.canDeliver
                                           ? Container(
                                               color:
                                                   Colors.black.withOpacity(0.5),
-                                              width: double.infinity,
-                                              height: 170,
+                                              width: 200,
+                                              height: 120,
                                               child: const Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
@@ -1333,7 +799,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                       onTap: () {},
                                       child: Ink(
                                         child: Icon(
-                                          store.isFavorite
+                                          nationalBrand.isFavorite
                                               ? Icons.favorite
                                               : Icons.favorite_outline,
                                           color: Colors.white,
@@ -1349,7 +815,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   AppText(
-                                    text: store.name,
+                                    text: nationalBrand.name,
                                     weight: FontWeight.w600,
                                   ),
                                   Container(
@@ -1360,314 +826,898 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 5, vertical: 2),
                                       child: AppText(
-                                          text: store.rating.toString()))
+                                          text:
+                                              nationalBrand.rating.toString()))
                                 ],
+                              ),
+                              AppText(
+                                  text:
+                                      '\$${nationalBrand.delivery.fee} Delivery Fee',
+                                  color: nationalBrand.delivery.fee == 0
+                                      ? const Color.fromARGB(255, 163, 133, 42)
+                                      : null),
+                              AppText(
+                                  text:
+                                      '${nationalBrand.estimatedDeliveryTime} min')
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const Gap(10),
+                  SizedBox(
+                    height: 160,
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Container(
+                            width: Adaptive.w(80),
+                            height: 150,
+                            decoration: BoxDecoration(
+                              color: Colors.brown,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              AppText(
+                                                color: Colors.white,
+                                                text:
+                                                    '\$0 Delivery Fee + up to 10% off with Uber One',
+                                              ),
+                                              Gap(10),
+                                              AppText(
+                                                color: Colors.white,
+                                                text: 'Save on your next ride',
+                                              ),
+                                            ]),
+                                        AppButton2(
+                                            text: 'Try free for 4 weeks',
+                                            callback: () {}),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                    flex: 1,
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.only(
+                                          topRight: Radius.circular(10),
+                                          bottomRight: Radius.circular(10)),
+                                      child: Image.asset(
+                                        height: double.infinity,
+                                        AssetNames.hamburger,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ))
+                              ],
+                            )),
+                        const Gap(10),
+                        Container(
+                            width: Adaptive.w(80),
+                            height: 150,
+                            decoration: BoxDecoration(
+                              color: Colors.black45,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              AppText(
+                                                color: Colors.white,
+                                                text:
+                                                    '\$0 Delivery Fee + up to 10% off with Uber One',
+                                              ),
+                                            ]),
+                                        AppButton2(
+                                            text: 'Request ride',
+                                            callback: () {}),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                    flex: 1,
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.only(
+                                          topRight: Radius.circular(10),
+                                          bottomRight: Radius.circular(10)),
+                                      child: Image.asset(
+                                        height: double.infinity,
+                                        AssetNames.whiteCar,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ))
+                              ],
+                            )),
+                      ],
+                    ),
+                  ),
+                  HomeScreenTopic(callback: () {}, title: 'Popular near you'),
+                  SizedBox(
+                    height: 200,
+                    child: ListView.separated(
+                      cacheExtent: 300,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      separatorBuilder: (context, index) => const Gap(10),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _nationalBrands.length,
+                      itemBuilder: (context, index) {
+                        final nationalBrand = _nationalBrands[index];
+                        return SizedBox(
+                          width: 200,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      nationalBrand.cardImage,
+                                      width: 200,
+                                      height: 120,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                  (timeOfDayNow.hour <
+                                              nationalBrand.openingHour.hour ||
+                                          (timeOfDayNow.hour >=
+                                                  nationalBrand
+                                                      .closingHour.hour &&
+                                              timeOfDayNow.minute >=
+                                                  nationalBrand
+                                                      .closingHour.minute))
+                                      ? Container(
+                                          color: Colors.black.withOpacity(0.5),
+                                          width: 200,
+                                          height: 120,
+                                          child: const Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              AppText(
+                                                text: 'Closed',
+                                                color: Colors.white,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : !nationalBrand.delivery.canDeliver
+                                          ? Container(
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                              width: 200,
+                                              height: 120,
+                                              child: const Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  AppText(
+                                                    text: 'Pick up',
+                                                    color: Colors.white,
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : const SizedBox.shrink(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 8.0, top: 8.0),
+                                    child: InkWell(
+                                      onTap: () {},
+                                      child: Ink(
+                                        child: Icon(
+                                          nationalBrand.isFavorite
+                                              ? Icons.favorite
+                                              : Icons.favorite_outline,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Gap(5),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  AppText(
+                                    text: nationalBrand.name,
+                                    weight: FontWeight.w600,
+                                  ),
+                                  Container(
+                                      decoration: BoxDecoration(
+                                          color: AppColors.neutral200,
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 2),
+                                      child: AppText(
+                                          text:
+                                              nationalBrand.rating.toString()))
+                                ],
+                              ),
+                              AppText(
+                                  text:
+                                      '\$${nationalBrand.delivery.fee} Delivery Fee',
+                                  color: nationalBrand.delivery.fee == 0
+                                      ? const Color.fromARGB(255, 163, 133, 42)
+                                      : null),
+                              AppText(
+                                  text:
+                                      '${nationalBrand.estimatedDeliveryTime} min')
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  HomeScreenTopic(
+                      callback: () {},
+                      title: 'Prep brunch for Mum',
+                      subtitle: 'From ${_stores[6].name}',
+                      imageUrl: _stores[6].logo),
+                  SizedBox(
+                    height: 200,
+                    child: ListView.separated(
+                      cacheExtent: 300,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      separatorBuilder: (context, index) => const Gap(10),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _stores[6].products.length,
+                      itemBuilder: (context, index) {
+                        final product = _stores[6].products[index];
+                        return SizedBox(
+                          width: 100,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      product.imageUrl,
+                                      width: 100,
+                                      height: 120,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 8.0, top: 8.0),
+                                    child: InkWell(
+                                      onTap: () {},
+                                      child: Ink(
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.black12,
+                                                  offset: Offset(2, 2),
+                                                )
+                                              ],
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(50)),
+                                          child: const Icon(
+                                            Icons.add,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              const Gap(5),
+                              AppText(
+                                text: product.name,
+                                weight: FontWeight.w600,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
                               ),
                               Row(
                                 children: [
                                   Visibility(
-                                      visible: store.delivery.fee < 1,
-                                      child: Image.asset(
-                                        AssetNames.uberOneSmall,
-                                        height: 10,
-                                      )),
+                                    visible: product.promoPrice != null,
+                                    child: Row(
+                                      children: [
+                                        AppText(
+                                            text: '\$${product.initialPrice}',
+                                            color: Colors.green),
+                                        const Gap(5),
+                                      ],
+                                    ),
+                                  ),
                                   AppText(
-                                      text: isClosed
-                                          ? 'Closed • Available at ${store.openingHour}'
-                                          : '\$${store.delivery.fee} Delivery Fee',
-                                      color: store.delivery.fee < 1
-                                          ? const Color.fromARGB(
-                                              255, 163, 133, 42)
-                                          : null),
-                                  AppText(
-                                      text:
-                                          ' • ${store.estimatedDeliveryTime} min'),
+                                    text: product.initialPrice.toString(),
+                                    decoration: product.promoPrice != null
+                                        ? TextDecoration.lineThrough
+                                        : TextDecoration.none,
+                                  )
                                 ],
-                              )
+                              ),
                             ],
-                          );
-                        },
-                        separatorBuilder: (context, index) => const Gap(10),
-                        itemCount: _stores.length),
-                    const Gap(20),
-                    const Divider(),
-                    const Gap(3),
-                    Padding(
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  HomeScreenTopic(
+                      callback: () {},
+                      title: 'Beer',
+                      subtitle: 'From ${_stores[7].name}',
+                      imageUrl: _stores[7].logo),
+                  SizedBox(
+                    height: 200,
+                    child: ListView.separated(
+                      cacheExtent: 300,
                       padding: const EdgeInsets.symmetric(
                           horizontal: AppSizes.horizontalPaddingSmall),
-                      child: RichText(
-                        text: TextSpan(
-                            text:
-                                "Uber is paid by merchants for marketing and promotion, which influences the personalized recommendations you see. ",
-                            style: const TextStyle(
-                              fontSize: AppSizes.bodySmallest,
-                              color: Colors.black,
-                            ),
+                      separatorBuilder: (context, index) => const Gap(10),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _stores[7].products.length,
+                      itemBuilder: (context, index) {
+                        final product = _stores[7].products[index];
+                        return SizedBox(
+                          width: 100,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              TextSpan(
-                                text: 'Learn more or change settings',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    navigatorKey.currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => WebViewScreen(
-                                        controller: webViewcontroller,
-                                        link: Weblinks.uberOneTerms,
+                              Stack(
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      product.imageUrl,
+                                      width: 100,
+                                      height: 120,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 8.0, top: 8.0),
+                                    child: InkWell(
+                                      onTap: () {},
+                                      child: Ink(
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.black12,
+                                                  offset: Offset(2, 2),
+                                                )
+                                              ],
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(50)),
+                                          child: const Icon(
+                                            Icons.add,
+                                          ),
+                                        ),
                                       ),
-                                    ));
-                                  },
+                                    ),
+                                  )
+                                ],
                               ),
-                            ]),
-                      ),
+                              const Gap(5),
+                              AppText(
+                                text: product.name,
+                                weight: FontWeight.w600,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Row(
+                                children: [
+                                  Visibility(
+                                    visible: product.promoPrice != null,
+                                    child: Row(
+                                      children: [
+                                        AppText(
+                                            text: '\$${product.initialPrice}',
+                                            color: Colors.green),
+                                        const Gap(5),
+                                      ],
+                                    ),
+                                  ),
+                                  AppText(
+                                    text: product.initialPrice.toString(),
+                                    decoration: product.promoPrice != null
+                                        ? TextDecoration.lineThrough
+                                        : TextDecoration.none,
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    const Gap(10)
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Container(
-            color: Colors.white.withOpacity(0.96),
-            // height: _onFilterScreen ? 180 : 275,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (!_onFilterScreen)
+                  ),
+                  HomeScreenTopic(callback: () {}, title: 'All Stores'),
+                  ListView.separated(
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final store = _stores[index];
+                        final bool isClosed =
+                            timeOfDayNow.hour < store.openingHour.hour ||
+                                (timeOfDayNow.hour >= store.closingHour.hour &&
+                                    timeOfDayNow.minute >=
+                                        store.closingHour.minute);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    store.cardImage,
+                                    width: double.infinity,
+                                    height: 170,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                                isClosed
+                                    ? Container(
+                                        color: Colors.black.withOpacity(0.5),
+                                        width: double.infinity,
+                                        height: 170,
+                                        child: const Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            AppText(
+                                              text: 'Closed',
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : !store.delivery.canDeliver
+                                        ? Container(
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            width: double.infinity,
+                                            height: 170,
+                                            child: const Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                AppText(
+                                                  text: 'Pick up',
+                                                  color: Colors.white,
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : const SizedBox.shrink(),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 8.0, top: 8.0),
+                                  child: InkWell(
+                                    onTap: () {},
+                                    child: Ink(
+                                      child: Icon(
+                                        store.isFavorite
+                                            ? Icons.favorite
+                                            : Icons.favorite_outline,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            const Gap(5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AppText(
+                                  text: store.name,
+                                  weight: FontWeight.w600,
+                                ),
+                                Container(
+                                    decoration: BoxDecoration(
+                                        color: AppColors.neutral200,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 2),
+                                    child:
+                                        AppText(text: store.rating.toString()))
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Visibility(
+                                    visible: store.delivery.fee < 1,
+                                    child: Image.asset(
+                                      AssetNames.uberOneSmall,
+                                      height: 10,
+                                    )),
+                                AppText(
+                                    text: isClosed
+                                        ? 'Closed • Available at ${store.openingHour}'
+                                        : '\$${store.delivery.fee} Delivery Fee',
+                                    color: store.delivery.fee < 1
+                                        ? const Color.fromARGB(
+                                            255, 163, 133, 42)
+                                        : null),
+                                AppText(
+                                    text:
+                                        ' • ${store.estimatedDeliveryTime} min'),
+                              ],
+                            )
+                          ],
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Gap(10),
+                      itemCount: _stores.length),
+                  const Gap(20),
+                  const Divider(),
+                  const Gap(3),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppSizes.horizontalPaddingSmall),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const AppText(text: 'Deliver now'),
-                      subtitle: DropdownButton(
-                        value: _dropdownValues.first,
-                        items: _dropdownValues.map(
-                          (e) {
-                            return DropdownMenuItem(
-                              value: e,
-                              child: AppText(text: e),
-                            );
-                          },
-                        ).toList(),
-                        onChanged: (value) {},
-                      ),
-                      trailing: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            color: AppColors.neutral100,
+                    child: RichText(
+                      text: TextSpan(
+                          text:
+                              "Uber is paid by merchants for marketing and promotion, which influences the personalized recommendations you see. ",
+                          style: const TextStyle(
+                            fontSize: AppSizes.bodySmallest,
+                            color: Colors.black,
                           ),
-                          padding: const EdgeInsets.all(5),
-                          child: const Badge(
-                              backgroundColor: AppColors.primary2,
-                              child: Icon(Icons.notifications_outlined))),
+                          children: [
+                            TextSpan(
+                              text: 'Learn more or change settings',
+                              style: const TextStyle(
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) => WebViewScreen(
+                                      controller: webViewcontroller,
+                                      link: Weblinks.uberOneTerms,
+                                    ),
+                                  ));
+                                },
+                            ),
+                          ]),
                     ),
                   ),
+                  const Gap(10)
+                ],
+              ),
+            ),
+          ),
+        ),
+        Container(
+          color: Colors.white.withOpacity(0.96),
+          // height: _onFilterScreen ? 180 : 275,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!_onFilterScreen)
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSizes.horizontalPaddingSmall),
-                  child: InkWell(
-                    onTap: () =>
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => SearchScreen(
-                        stores: _stores,
-                      ),
-                    )),
-                    child: Ink(
-                      child: const AppTextFormField(
-                        enabled: false,
-                        hintText: 'Search Uber Eats',
-                        radius: 50,
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.only(left: 8.0),
-                          child: Icon(Icons.search),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const AppText(text: 'Deliver now'),
+                    subtitle: DropdownButton(
+                      value: _dropdownValues.first,
+                      items: _dropdownValues.map(
+                        (e) {
+                          return DropdownMenuItem(
+                            value: e,
+                            child: AppText(text: e),
+                          );
+                        },
+                      ).toList(),
+                      onChanged: (value) {},
+                    ),
+                    trailing: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: AppColors.neutral100,
                         ),
+                        padding: const EdgeInsets.all(5),
+                        child: const Badge(
+                            backgroundColor: AppColors.primary2,
+                            child: Icon(Icons.notifications_outlined))),
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.horizontalPaddingSmall),
+                child: InkWell(
+                  onTap: () =>
+                      navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) => SearchScreen(
+                      stores: _stores,
+                    ),
+                  )),
+                  child: Ink(
+                    child: const AppTextFormField(
+                      enabled: false,
+                      hintText: 'Search Uber Eats',
+                      radius: 50,
+                      prefixIcon: Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Icon(Icons.search),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 65,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    separatorBuilder: (context, index) => const Gap(15),
-                    itemCount: _foodCategories.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      final foodCategory = _foodCategories[index];
-                      return Column(
-                        children: [
-                          Image.asset(
-                            foodCategory.image,
-                            height: 45,
-                          ),
-                          AppText(
-                            text: foodCategory.name,
-                          )
-                        ],
-                      );
-                    },
-                  ),
+              ),
+              SizedBox(
+                height: 65,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.horizontalPaddingSmall),
+                  separatorBuilder: (context, index) => const Gap(15),
+                  itemCount: _foodCategories.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final foodCategory = _foodCategories[index];
+                    return Column(
+                      children: [
+                        Image.asset(
+                          foodCategory.image,
+                          height: 45,
+                        ),
+                        AppText(
+                          text: foodCategory.name,
+                        )
+                      ],
+                    );
+                  },
                 ),
-                if (_onFilterScreen || _showFilters)
-                  ChipsChoice<String>.multiple(
-                    choiceLabelBuilder: (item, i) {
-                      if (i < 3) {
+              ),
+              if (_onFilterScreen || _showFilters)
+                ChipsChoice<String>.multiple(
+                  choiceLabelBuilder: (item, i) {
+                    if (i < 3) {
+                      return AppText(
+                        text: item.label,
+                      );
+                    } else if (i == 3) {
+                      if (_selectedDeliveryFeeIndex == null) {
                         return AppText(
                           text: item.label,
                         );
-                      } else if (i == 3) {
-                        if (_selectedDeliveryFeeIndex == null) {
-                          return AppText(
-                            text: item.label,
-                          );
-                        } else {
-                          return AppText(
-                              text: OtherConstants.deliveryPriceFilters[
-                                  _selectedDeliveryFeeIndex!]);
-                        }
-                      } else if (i == 4) {
-                        if (_selectedRatingIndex == null) {
-                          return AppText(
-                            text: item.label,
-                          );
-                        } else {
-                          return AppText(
-                              text: OtherConstants
-                                  .ratingsFilters[_selectedRatingIndex!]);
-                        }
-                      } else if (i == 5) {
-                        if (_selectedPrice == null) {
-                          return AppText(
-                            text: item.label,
-                          );
-                        } else {
-                          return AppText(text: _selectedPrice!);
-                        }
-                      } else if (i == 6) {
-                        if (_selectedDietaryOptions.isEmpty) {
-                          return AppText(
-                            text: item.label,
-                          );
-                        } else {
-                          return AppText(
-                              text:
-                                  '${item.label}(${_selectedDietaryOptions.length})');
-                        }
                       } else {
-                        if (_selectedSort == null) {
-                          return AppText(
-                            text: item.label,
-                          );
-                        } else {
-                          return AppText(text: _selectedSort!);
-                        }
+                        return AppText(
+                            text: OtherConstants.deliveryPriceFilters[
+                                _selectedDeliveryFeeIndex!]);
                       }
-                    },
-                    choiceTrailingBuilder: (item, i) {
-                      if (i > 2) {
-                        return const Icon(Icons.keyboard_arrow_down_sharp);
+                    } else if (i == 4) {
+                      if (_selectedRatingIndex == null) {
+                        return AppText(
+                          text: item.label,
+                        );
+                      } else {
+                        return AppText(
+                            text: OtherConstants
+                                .ratingsFilters[_selectedRatingIndex!]);
                       }
-                      return null;
-                    },
-                    wrapped: false,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    value: _selectedFilters,
-                    onChanged: (value) {
-                      logger.d(value);
+                    } else if (i == 5) {
+                      if (_selectedPrice == null) {
+                        return AppText(
+                          text: item.label,
+                        );
+                      } else {
+                        return AppText(text: _selectedPrice!);
+                      }
+                    } else if (i == 6) {
+                      if (_selectedDietaryOptions.isEmpty) {
+                        return AppText(
+                          text: item.label,
+                        );
+                      } else {
+                        return AppText(
+                            text:
+                                '${item.label}(${_selectedDietaryOptions.length})');
+                      }
+                    } else {
+                      if (_selectedSort == null) {
+                        return AppText(
+                          text: item.label,
+                        );
+                      } else {
+                        return AppText(text: _selectedSort!);
+                      }
+                    }
+                  },
+                  choiceTrailingBuilder: (item, i) {
+                    if (i > 2) {
+                      return const Icon(Icons.keyboard_arrow_down_sharp);
+                    }
+                    return null;
+                  },
+                  wrapped: false,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.horizontalPaddingSmall),
+                  value: _selectedFilters,
+                  onChanged: (value) {
+                    logger.d(value);
 
-                      late String newFilter;
-                      if (value.any(
-                            (element) {
-                              newFilter = element;
-                              return !_selectedFilters.contains(element);
-                            },
-                          ) ||
-                          (value.isEmpty && _selectedFilters.isNotEmpty)) {
-                        if (_selectedFilters.isNotEmpty) {
-                          newFilter = _selectedFilters.first;
-                        }
-                        if (OtherConstants.filters.indexOf(newFilter) == 3) {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              late int temp;
-                              logger.d(_selectedDeliveryFeeIndex);
-                              if (_selectedDeliveryFeeIndex == null) {
-                                temp = 3;
-                              } else {
-                                temp = _selectedDeliveryFeeIndex!;
-                              }
-                              return Container(
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      // horizontal:
-                                      AppSizes.horizontalPaddingSmall),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                          child: AppText(
-                                        text: 'Delivery fee',
-                                        size: AppSizes.body,
-                                        weight: FontWeight.w600,
-                                      )),
-                                      AppText(
-                                          text: temp == 0
-                                              ? 'Under \$1'
-                                              : temp == 1
-                                                  ? 'Under \$3'
-                                                  : temp == 2
-                                                      ? 'Under \$5'
-                                                      : 'Any amount'),
-                                      Padding(
-                                        padding: const EdgeInsets.all(25.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: OtherConstants
-                                              .deliveryPriceFilters
-                                              .map(
-                                                (e) => AppText(text: e),
-                                              )
-                                              .toList(),
-                                        ),
+                    late String newFilter;
+                    if (value.any(
+                          (element) {
+                            newFilter = element;
+                            return !_selectedFilters.contains(element);
+                          },
+                        ) ||
+                        (value.isEmpty && _selectedFilters.isNotEmpty)) {
+                      if (_selectedFilters.isNotEmpty) {
+                        newFilter = _selectedFilters.first;
+                      }
+                      if (OtherConstants.filters.indexOf(newFilter) == 3) {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            late int temp;
+                            logger.d(_selectedDeliveryFeeIndex);
+                            if (_selectedDeliveryFeeIndex == null) {
+                              temp = 3;
+                            } else {
+                              temp = _selectedDeliveryFeeIndex!;
+                            }
+                            return Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                    // horizontal:
+                                    AppSizes.horizontalPaddingSmall),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Center(
+                                        child: AppText(
+                                      text: 'Delivery fee',
+                                      size: AppSizes.body,
+                                      weight: FontWeight.w600,
+                                    )),
+                                    AppText(
+                                        text: temp == 0
+                                            ? 'Under \$1'
+                                            : temp == 1
+                                                ? 'Under \$3'
+                                                : temp == 2
+                                                    ? 'Under \$5'
+                                                    : 'Any amount'),
+                                    Padding(
+                                      padding: const EdgeInsets.all(25.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children:
+                                            OtherConstants.deliveryPriceFilters
+                                                .map(
+                                                  (e) => AppText(text: e),
+                                                )
+                                                .toList(),
                                       ),
-                                      Slider.adaptive(
-                                          thumbColor: Colors.white,
-                                          min: 0,
-                                          max: OtherConstants
-                                                  .deliveryPriceFilters.length -
-                                              1,
-                                          divisions: OtherConstants
-                                                  .deliveryPriceFilters.length -
-                                              1,
-                                          value: temp.toDouble(),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              temp = value.toInt();
-                                              logger.d(temp);
-                                            });
-                                          }),
-                                      AppButton(
-                                        text: 'Apply',
+                                    ),
+                                    Slider.adaptive(
+                                        thumbColor: Colors.white,
+                                        min: 0,
+                                        max: OtherConstants
+                                                .deliveryPriceFilters.length -
+                                            1,
+                                        divisions: OtherConstants
+                                                .deliveryPriceFilters.length -
+                                            1,
+                                        value: temp.toDouble(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            temp = value.toInt();
+                                            logger.d(temp);
+                                          });
+                                        }),
+                                    AppButton(
+                                      text: 'Apply',
+                                      callback: () {
+                                        _selectedDeliveryFeeIndex = temp;
+                                        // logger.d(_selectedDeliveryFeeIndex);
+                                        //                      setState(() {
+                                        //   _currentlySelectedFilters = value;
+                                        // });
+                                        navigatorKey.currentState!.pop();
+                                        setState(() {
+                                          _selectedFilters = value;
+                                          if (value.isNotEmpty) {
+                                            _onFilterScreen = true;
+                                          } else {
+                                            _onFilterScreen = false;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                    Center(
+                                      child: AppTextButton(
+                                        size: AppSizes.body,
+                                        text: 'Reset',
                                         callback: () {
-                                          _selectedDeliveryFeeIndex = temp;
-                                          // logger.d(_selectedDeliveryFeeIndex);
-                                          //                      setState(() {
-                                          //   _currentlySelectedFilters = value;
+                                          // setState(() {
+                                          //   _currentlySelectedFilters =
+                                          //       List.from(value);
+                                          //   _currentlySelectedFilters.removeWhere(
+                                          //     (element) =>
+                                          //         element == 'Delivery fee',
+                                          //   );
                                           // });
                                           navigatorKey.currentState!.pop();
                                           setState(() {
-                                            _selectedFilters = value;
-                                            if (value.isNotEmpty) {
+                                            List<String> temp =
+                                                List<String>.from(value);
+
+                                            temp.removeWhere(
+                                              (element) =>
+                                                  element ==
+                                                  OtherConstants.filters[3],
+                                            );
+
+                                            _selectedFilters = temp;
+                                            _selectedDeliveryFeeIndex = null;
+
+                                            if (temp.isNotEmpty) {
                                               _onFilterScreen = true;
                                             } else {
                                               _onFilterScreen = false;
@@ -1675,128 +1725,123 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                           });
                                         },
                                       ),
-                                      Center(
-                                        child: AppTextButton(
-                                          size: AppSizes.body,
-                                          text: 'Reset',
-                                          callback: () {
-                                            // setState(() {
-                                            //   _currentlySelectedFilters =
-                                            //       List.from(value);
-                                            //   _currentlySelectedFilters.removeWhere(
-                                            //     (element) =>
-                                            //         element == 'Delivery fee',
-                                            //   );
-                                            // });
-                                            navigatorKey.currentState!.pop();
-                                            setState(() {
-                                              List<String> temp =
-                                                  List<String>.from(value);
-
-                                              temp.removeWhere(
-                                                (element) =>
-                                                    element ==
-                                                    OtherConstants.filters[3],
-                                              );
-
-                                              _selectedFilters = temp;
-                                              _selectedDeliveryFeeIndex = null;
-
-                                              if (temp.isNotEmpty) {
-                                                _onFilterScreen = true;
-                                              } else {
-                                                _onFilterScreen = false;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          );
-                        } else if (OtherConstants.filters.indexOf(newFilter) ==
-                            4) {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              late int temp;
-                              logger.d(_selectedRatingIndex);
-                              if (_selectedRatingIndex == null) {
-                                temp = 0;
-                              } else {
-                                temp = _selectedRatingIndex!;
-                              }
-                              return Container(
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      // horizontal:
-                                      AppSizes.horizontalPaddingSmall),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                          child: AppText(
-                                        text: 'Rating',
-                                        size: AppSizes.body,
-                                        weight: FontWeight.w600,
-                                      )),
-                                      AppText(
-                                          text: temp == 0
-                                              ? 'Over 3'
-                                              : temp == 1
-                                                  ? 'Over 3.5'
-                                                  : temp == 2
-                                                      ? 'Over 4'
-                                                      : temp == 3
-                                                          ? 'Over 4.5'
-                                                          : 'Over 5'),
-                                      Padding(
-                                        padding: const EdgeInsets.all(25.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children:
-                                              OtherConstants.ratingsFilters
-                                                  .map(
-                                                    (e) => AppText(text: e),
-                                                  )
-                                                  .toList(),
-                                        ),
+                              ),
+                            );
+                          },
+                        );
+                      } else if (OtherConstants.filters.indexOf(newFilter) ==
+                          4) {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            late int temp;
+                            logger.d(_selectedRatingIndex);
+                            if (_selectedRatingIndex == null) {
+                              temp = 0;
+                            } else {
+                              temp = _selectedRatingIndex!;
+                            }
+                            return Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                    // horizontal:
+                                    AppSizes.horizontalPaddingSmall),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Center(
+                                        child: AppText(
+                                      text: 'Rating',
+                                      size: AppSizes.body,
+                                      weight: FontWeight.w600,
+                                    )),
+                                    AppText(
+                                        text: temp == 0
+                                            ? 'Over 3'
+                                            : temp == 1
+                                                ? 'Over 3.5'
+                                                : temp == 2
+                                                    ? 'Over 4'
+                                                    : temp == 3
+                                                        ? 'Over 4.5'
+                                                        : 'Over 5'),
+                                    Padding(
+                                      padding: const EdgeInsets.all(25.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: OtherConstants.ratingsFilters
+                                            .map(
+                                              (e) => AppText(text: e),
+                                            )
+                                            .toList(),
                                       ),
-                                      Slider.adaptive(
-                                          thumbColor: Colors.white,
-                                          min: 0,
-                                          max: OtherConstants
-                                                  .ratingsFilters.length -
-                                              1,
-                                          divisions: OtherConstants
-                                                  .ratingsFilters.length -
-                                              1,
-                                          value: temp.toDouble(),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              temp = value.toInt();
-                                              logger.d(temp);
-                                            });
-                                          }),
-                                      AppButton(
-                                        text: 'Apply',
+                                    ),
+                                    Slider.adaptive(
+                                        thumbColor: Colors.white,
+                                        min: 0,
+                                        max: OtherConstants
+                                                .ratingsFilters.length -
+                                            1,
+                                        divisions: OtherConstants
+                                                .ratingsFilters.length -
+                                            1,
+                                        value: temp.toDouble(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            temp = value.toInt();
+                                            logger.d(temp);
+                                          });
+                                        }),
+                                    AppButton(
+                                      text: 'Apply',
+                                      callback: () {
+                                        _selectedRatingIndex = temp;
+                                        // logger.d(_selectedRatingIndex);
+                                        //                      setState(() {
+                                        //   _currentlySelectedFilters = value;
+                                        // });
+                                        navigatorKey.currentState!.pop();
+                                        setState(() {
+                                          _selectedFilters = value;
+                                          if (value.isNotEmpty) {
+                                            _onFilterScreen = true;
+                                          } else {
+                                            _onFilterScreen = false;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                    Center(
+                                      child: AppTextButton(
+                                        size: AppSizes.body,
+                                        text: 'Reset',
                                         callback: () {
-                                          _selectedRatingIndex = temp;
-                                          // logger.d(_selectedRatingIndex);
-                                          //                      setState(() {
-                                          //   _currentlySelectedFilters = value;
+                                          // setState(() {
+                                          //   _currentlySelectedFilters =
+                                          //       List.from(value);
+                                          //   _currentlySelectedFilters.removeWhere(
+                                          //     (element) =>
+                                          //         element == 'Delivery fee',
+                                          //   );
                                           // });
                                           navigatorKey.currentState!.pop();
                                           setState(() {
-                                            _selectedFilters = value;
-                                            if (value.isNotEmpty) {
+                                            List<String> temp =
+                                                List<String>.from(value);
+                                            temp.removeWhere(
+                                              (element) =>
+                                                  element ==
+                                                  OtherConstants.filters[4],
+                                            );
+                                            _selectedFilters = temp;
+                                            _selectedRatingIndex = null;
+                                            if (temp.isNotEmpty) {
                                               _onFilterScreen = true;
                                             } else {
                                               _onFilterScreen = false;
@@ -1804,266 +1849,105 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                           });
                                         },
                                       ),
-                                      Center(
-                                        child: AppTextButton(
-                                          size: AppSizes.body,
-                                          text: 'Reset',
-                                          callback: () {
-                                            // setState(() {
-                                            //   _currentlySelectedFilters =
-                                            //       List.from(value);
-                                            //   _currentlySelectedFilters.removeWhere(
-                                            //     (element) =>
-                                            //         element == 'Delivery fee',
-                                            //   );
-                                            // });
-                                            navigatorKey.currentState!.pop();
-                                            setState(() {
-                                              List<String> temp =
-                                                  List<String>.from(value);
-                                              temp.removeWhere(
-                                                (element) =>
-                                                    element ==
-                                                    OtherConstants.filters[4],
-                                              );
-                                              _selectedFilters = temp;
-                                              _selectedRatingIndex = null;
-                                              if (temp.isNotEmpty) {
-                                                _onFilterScreen = true;
-                                              } else {
-                                                _onFilterScreen = false;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          );
-                        } else if (OtherConstants.filters.indexOf(newFilter) ==
-                            5) {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              String? temp;
-                              if (_selectedPrice != null) {
-                                temp = _selectedPrice;
-                              }
+                              ),
+                            );
+                          },
+                        );
+                      } else if (OtherConstants.filters.indexOf(newFilter) ==
+                          5) {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            String? temp;
+                            if (_selectedPrice != null) {
+                              temp = _selectedPrice;
+                            }
 
-                              return Container(
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      // horizontal:
-                                      AppSizes.horizontalPaddingSmall),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                          child: AppText(
-                                        text: 'Price',
-                                        size: AppSizes.body,
-                                        weight: FontWeight.w600,
-                                      )),
-                                      Center(
-                                        child: ChipsChoice.single(
-                                            choiceItems: C2Choice.listFrom<
-                                                String, String>(
-                                              source:
-                                                  OtherConstants.pricesFilters,
-                                              value: (i, v) => v,
-                                              label: (i, v) => v,
-                                            ),
-                                            wrapped: true,
-                                            alignment:
-                                                WrapAlignment.spaceBetween,
-                                            choiceStyle: C2ChipStyle.filled(
-                                              selectedStyle: const C2ChipStyle(
-                                                foregroundColor: Colors.white,
-                                                backgroundColor:
-                                                    AppColors.neutral900,
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(100),
-                                                ),
+                            return Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                    // horizontal:
+                                    AppSizes.horizontalPaddingSmall),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Center(
+                                        child: AppText(
+                                      text: 'Price',
+                                      size: AppSizes.body,
+                                      weight: FontWeight.w600,
+                                    )),
+                                    Center(
+                                      child: ChipsChoice.single(
+                                          choiceItems:
+                                              C2Choice.listFrom<String, String>(
+                                            source:
+                                                OtherConstants.pricesFilters,
+                                            value: (i, v) => v,
+                                            label: (i, v) => v,
+                                          ),
+                                          wrapped: true,
+                                          alignment: WrapAlignment.spaceBetween,
+                                          choiceStyle: C2ChipStyle.filled(
+                                            selectedStyle: const C2ChipStyle(
+                                              foregroundColor: Colors.white,
+                                              backgroundColor:
+                                                  AppColors.neutral900,
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(100),
                                               ),
-                                              height: 30,
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                              color: AppColors.neutral200,
                                             ),
-                                            value: temp,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                temp = value;
-                                              });
-                                            }),
-                                      ),
-                                      const Gap(20),
-                                      AppButton(
-                                        text: 'Apply',
-                                        callback: () {
-                                          _selectedPrice = temp;
-
-                                          navigatorKey.currentState!.pop();
-                                          setState(() {
-                                            _selectedFilters = value;
-                                            if (value.isNotEmpty) {
-                                              _onFilterScreen = true;
-                                            } else {
-                                              _onFilterScreen = false;
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      Center(
-                                        child: AppTextButton(
-                                          size: AppSizes.body,
-                                          text: 'Reset',
-                                          callback: () {
-                                            navigatorKey.currentState!.pop();
-
+                                            height: 30,
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            color: AppColors.neutral200,
+                                          ),
+                                          value: temp,
+                                          onChanged: (value) {
                                             setState(() {
-                                              List<String> temp =
-                                                  List<String>.from(value);
-                                              temp.removeWhere(
-                                                (element) =>
-                                                    element ==
-                                                    OtherConstants.filters[5],
-                                              );
-                                              _selectedFilters = temp;
-                                              _selectedPrice = null;
-                                              if (value.isNotEmpty) {
-                                                _onFilterScreen = true;
-                                              } else {
-                                                _onFilterScreen = false;
-                                              }
+                                              temp = value;
                                             });
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        } else if (OtherConstants.filters.indexOf(newFilter) ==
-                            6) {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              List<String> temp = _selectedDietaryOptions;
+                                          }),
+                                    ),
+                                    const Gap(20),
+                                    AppButton(
+                                      text: 'Apply',
+                                      callback: () {
+                                        _selectedPrice = temp;
 
-                              return Container(
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      // horizontal:
-                                      AppSizes.horizontalPaddingSmall),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                          child: AppText(
-                                        text: 'Dietary',
+                                        navigatorKey.currentState!.pop();
+                                        setState(() {
+                                          _selectedFilters = value;
+                                          if (value.isNotEmpty) {
+                                            _onFilterScreen = true;
+                                          } else {
+                                            _onFilterScreen = false;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                    Center(
+                                      child: AppTextButton(
                                         size: AppSizes.body,
-                                        weight: FontWeight.w600,
-                                      )),
-                                      ListView(
-                                        shrinkWrap: true,
-                                        children: [
-                                          AppCheckboxListTile(
-                                            onChanged: (value) {
-                                              setState(() {
-                                                if (value != null) {
-                                                  if (value) {
-                                                    temp.add('Vegetarian');
-                                                  } else {
-                                                    temp.removeWhere(
-                                                      (element) =>
-                                                          element ==
-                                                          'Vegetarian',
-                                                    );
-                                                  }
-                                                }
-                                              });
-                                            },
-                                            value: 'Vegetarian',
-                                            selectedOptions: temp,
-                                          ),
-                                          AppCheckboxListTile(
-                                            onChanged: (value) {
-                                              setState(() {
-                                                if (value != null) {
-                                                  if (value) {
-                                                    temp.add('Vegan');
-                                                  } else {
-                                                    temp.removeWhere(
-                                                      (element) =>
-                                                          element == 'Vegan',
-                                                    );
-                                                  }
-                                                }
-                                              });
-                                            },
-                                            value: 'Vegan',
-                                            selectedOptions: temp,
-                                          ),
-                                          AppCheckboxListTile(
-                                            onChanged: (value) {
-                                              setState(() {
-                                                if (value != null) {
-                                                  if (value) {
-                                                    temp.add('Gluten-free');
-                                                  } else {
-                                                    temp.removeWhere(
-                                                      (element) =>
-                                                          element ==
-                                                          'Gluten-free',
-                                                    );
-                                                  }
-                                                }
-                                              });
-                                            },
-                                            value: 'Gluten-free',
-                                            selectedOptions: temp,
-                                          ),
-                                          AppCheckboxListTile(
-                                            onChanged: (value) {
-                                              setState(() {
-                                                if (value != null) {
-                                                  if (value) {
-                                                    temp.add('Halal');
-                                                  } else {
-                                                    temp.removeWhere(
-                                                      (element) =>
-                                                          element == 'Halal',
-                                                    );
-                                                  }
-                                                }
-                                              });
-                                            },
-                                            value: 'Halal',
-                                            selectedOptions: temp,
-                                          ),
-                                        ],
-                                      ),
-                                      const Gap(20),
-                                      AppButton(
-                                        text: 'Apply',
+                                        text: 'Reset',
                                         callback: () {
-                                          _selectedDietaryOptions = temp;
-
                                           navigatorKey.currentState!.pop();
+
                                           setState(() {
-                                            _selectedFilters = value;
+                                            List<String> temp =
+                                                List<String>.from(value);
+                                            temp.removeWhere(
+                                              (element) =>
+                                                  element ==
+                                                  OtherConstants.filters[5],
+                                            );
+                                            _selectedFilters = temp;
+                                            _selectedPrice = null;
                                             if (value.isNotEmpty) {
                                               _onFilterScreen = true;
                                             } else {
@@ -2072,87 +1956,147 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                           });
                                         },
                                       ),
-                                      Center(
-                                        child: AppTextButton(
-                                          size: AppSizes.body,
-                                          text: 'Reset',
-                                          callback: () {
-                                            navigatorKey.currentState!.pop();
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      } else if (OtherConstants.filters.indexOf(newFilter) ==
+                          6) {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            List<String> temp = _selectedDietaryOptions;
+
+                            return Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                    // horizontal:
+                                    AppSizes.horizontalPaddingSmall),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Center(
+                                        child: AppText(
+                                      text: 'Dietary',
+                                      size: AppSizes.body,
+                                      weight: FontWeight.w600,
+                                    )),
+                                    ListView(
+                                      shrinkWrap: true,
+                                      children: [
+                                        AppCheckboxListTile(
+                                          onChanged: (value) {
                                             setState(() {
-                                              List<String> temp2 =
-                                                  List<String>.from(value);
-                                              temp2.removeWhere(
-                                                (element) =>
-                                                    element ==
-                                                    OtherConstants.filters[6],
-                                              );
-                                              _selectedFilters = temp2;
-                                              _selectedDietaryOptions = [];
-                                              if (value.isNotEmpty) {
-                                                _onFilterScreen = true;
-                                              } else {
-                                                _onFilterScreen = false;
+                                              if (value != null) {
+                                                if (value) {
+                                                  temp.add('Vegetarian');
+                                                } else {
+                                                  temp.removeWhere(
+                                                    (element) =>
+                                                        element == 'Vegetarian',
+                                                  );
+                                                }
                                               }
                                             });
                                           },
+                                          value: 'Vegetarian',
+                                          selectedOptions: temp,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        } else if (OtherConstants.filters.indexOf(newFilter) ==
-                            7) {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              String? temp;
+                                        AppCheckboxListTile(
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null) {
+                                                if (value) {
+                                                  temp.add('Vegan');
+                                                } else {
+                                                  temp.removeWhere(
+                                                    (element) =>
+                                                        element == 'Vegan',
+                                                  );
+                                                }
+                                              }
+                                            });
+                                          },
+                                          value: 'Vegan',
+                                          selectedOptions: temp,
+                                        ),
+                                        AppCheckboxListTile(
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null) {
+                                                if (value) {
+                                                  temp.add('Gluten-free');
+                                                } else {
+                                                  temp.removeWhere(
+                                                    (element) =>
+                                                        element ==
+                                                        'Gluten-free',
+                                                  );
+                                                }
+                                              }
+                                            });
+                                          },
+                                          value: 'Gluten-free',
+                                          selectedOptions: temp,
+                                        ),
+                                        AppCheckboxListTile(
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null) {
+                                                if (value) {
+                                                  temp.add('Halal');
+                                                } else {
+                                                  temp.removeWhere(
+                                                    (element) =>
+                                                        element == 'Halal',
+                                                  );
+                                                }
+                                              }
+                                            });
+                                          },
+                                          value: 'Halal',
+                                          selectedOptions: temp,
+                                        ),
+                                      ],
+                                    ),
+                                    const Gap(20),
+                                    AppButton(
+                                      text: 'Apply',
+                                      callback: () {
+                                        _selectedDietaryOptions = temp;
 
-                              return Container(
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      // horizontal:
-                                      AppSizes.horizontalPaddingSmall),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                          child: AppText(
-                                        text: 'Sort',
+                                        navigatorKey.currentState!.pop();
+                                        setState(() {
+                                          _selectedFilters = value;
+                                          if (value.isNotEmpty) {
+                                            _onFilterScreen = true;
+                                          } else {
+                                            _onFilterScreen = false;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                    Center(
+                                      child: AppTextButton(
                                         size: AppSizes.body,
-                                        weight: FontWeight.w600,
-                                      )),
-                                      ListView(
-                                        shrinkWrap: true,
-                                        children: const [
-                                          AppRadioListTile(
-                                            groupValue: 'Sort',
-                                            value: 'Recommended',
-                                          ),
-                                          AppRadioListTile(
-                                            groupValue: 'Sort',
-                                            value: 'Rating',
-                                          ),
-                                          AppRadioListTile(
-                                            groupValue: 'Sort',
-                                            value: 'Delivery time',
-                                          ),
-                                        ],
-                                      ),
-                                      const Gap(20),
-                                      AppButton(
-                                        text: 'Apply',
+                                        text: 'Reset',
                                         callback: () {
-                                          _selectedSort = temp;
-
                                           navigatorKey.currentState!.pop();
                                           setState(() {
-                                            _selectedFilters = value;
+                                            List<String> temp2 =
+                                                List<String>.from(value);
+                                            temp2.removeWhere(
+                                              (element) =>
+                                                  element ==
+                                                  OtherConstants.filters[6],
+                                            );
+                                            _selectedFilters = temp2;
+                                            _selectedDietaryOptions = [];
                                             if (value.isNotEmpty) {
                                               _onFilterScreen = true;
                                             } else {
@@ -2161,65 +2105,128 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                           });
                                         },
                                       ),
-                                      Center(
-                                        child: AppTextButton(
-                                          size: AppSizes.body,
-                                          text: 'Reset',
-                                          callback: () {
-                                            navigatorKey.currentState!.pop();
-                                            setState(() {
-                                              List<String> temp =
-                                                  List<String>.from(value);
-
-                                              temp.removeWhere(
-                                                (element) =>
-                                                    element ==
-                                                    OtherConstants.filters[7],
-                                              );
-                                              _selectedFilters = temp;
-                                              _selectedSort = null;
-                                              if (value.isNotEmpty) {
-                                                _onFilterScreen = true;
-                                              } else {
-                                                _onFilterScreen = false;
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          );
-                        }
+                              ),
+                            );
+                          },
+                        );
+                      } else if (OtherConstants.filters.indexOf(newFilter) ==
+                          7) {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            String? temp;
+
+                            return Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                    // horizontal:
+                                    AppSizes.horizontalPaddingSmall),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Center(
+                                        child: AppText(
+                                      text: 'Sort',
+                                      size: AppSizes.body,
+                                      weight: FontWeight.w600,
+                                    )),
+                                    ListView(
+                                      shrinkWrap: true,
+                                      children: const [
+                                        AppRadioListTile(
+                                          groupValue: 'Sort',
+                                          value: 'Recommended',
+                                        ),
+                                        AppRadioListTile(
+                                          groupValue: 'Sort',
+                                          value: 'Rating',
+                                        ),
+                                        AppRadioListTile(
+                                          groupValue: 'Sort',
+                                          value: 'Delivery time',
+                                        ),
+                                      ],
+                                    ),
+                                    const Gap(20),
+                                    AppButton(
+                                      text: 'Apply',
+                                      callback: () {
+                                        _selectedSort = temp;
+
+                                        navigatorKey.currentState!.pop();
+                                        setState(() {
+                                          _selectedFilters = value;
+                                          if (value.isNotEmpty) {
+                                            _onFilterScreen = true;
+                                          } else {
+                                            _onFilterScreen = false;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                    Center(
+                                      child: AppTextButton(
+                                        size: AppSizes.body,
+                                        text: 'Reset',
+                                        callback: () {
+                                          navigatorKey.currentState!.pop();
+                                          setState(() {
+                                            List<String> temp =
+                                                List<String>.from(value);
+
+                                            temp.removeWhere(
+                                              (element) =>
+                                                  element ==
+                                                  OtherConstants.filters[7],
+                                            );
+                                            _selectedFilters = temp;
+                                            _selectedSort = null;
+                                            if (value.isNotEmpty) {
+                                              _onFilterScreen = true;
+                                            } else {
+                                              _onFilterScreen = false;
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
                       }
-                    },
-                    choiceItems: C2Choice.listFrom<String, String>(
-                      source: OtherConstants.filters,
-                      value: (i, v) => v,
-                      label: (i, v) => v,
-                    ),
-                    choiceStyle: C2ChipStyle.filled(
-                      selectedStyle: const C2ChipStyle(
-                        foregroundColor: Colors.white,
-                        backgroundColor: AppColors.neutral900,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(100),
-                        ),
-                      ),
-                      height: 30,
-                      borderRadius: BorderRadius.circular(100),
-                      color: AppColors.neutral200,
-                    ),
+                    }
+                  },
+                  choiceItems: C2Choice.listFrom<String, String>(
+                    source: OtherConstants.filters,
+                    value: (i, v) => v,
+                    label: (i, v) => v,
                   ),
-              ],
-            ),
+                  choiceStyle: C2ChipStyle.filled(
+                    selectedStyle: const C2ChipStyle(
+                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.neutral900,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(100),
+                      ),
+                    ),
+                    height: 30,
+                    borderRadius: BorderRadius.circular(100),
+                    color: AppColors.neutral200,
+                  ),
+                ),
+            ],
           ),
-        ],
-      )),
-    );
+        ),
+      ],
+    ));
   }
 }
 
@@ -2769,12 +2776,12 @@ class Product {
       required this.quantity});
 }
 
-class MainScreenTopic extends StatelessWidget {
+class HomeScreenTopic extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback callback;
   final String? imageUrl;
-  const MainScreenTopic({
+  const HomeScreenTopic({
     super.key,
     this.imageUrl,
     this.subtitle,
