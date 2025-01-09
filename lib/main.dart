@@ -4,6 +4,7 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 
 import 'presentation/features/sign_in/views/get_started_screen.dart';
 
@@ -78,7 +79,8 @@ class Wrapper extends ConsumerWidget {
         //     return
         ResponsiveSizer(builder: (BuildContext context, Orientation orientation,
             ScreenType screenType) {
-      return const GetStartedScreen();
+      // return const GetStartedScreen();
+      return const MainScreen();
     });
     //  ;
     // } else {

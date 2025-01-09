@@ -13,21 +13,21 @@ class AppText extends StatelessWidget {
   final TextOverflow overflow;
   final int? maxLines;
   final double? height;
-  final bool isWhite;
-  const AppText(
-      {super.key,
-      required this.text,
-      this.size = AppSizes.bodySmaller,
-      this.weight,
-      this.style = FontStyle.normal,
-      this.decoration = TextDecoration.none,
-      this.color,
-      this.textAlign = TextAlign.start,
-      this.softWrap = true,
-      this.overflow = TextOverflow.clip,
-      this.maxLines,
-      this.height,
-      this.isWhite = false});
+
+  const AppText({
+    super.key,
+    required this.text,
+    this.size = AppSizes.bodySmaller,
+    this.weight,
+    this.style = FontStyle.normal,
+    this.decoration = TextDecoration.none,
+    this.color,
+    this.textAlign = TextAlign.start,
+    this.softWrap = true,
+    this.overflow = TextOverflow.clip,
+    this.maxLines,
+    this.height,
+  });
   @override
   Widget build(BuildContext context) {
     return Text(
@@ -36,7 +36,7 @@ class AppText extends StatelessWidget {
         fontSize: size,
         fontWeight: weight,
         fontStyle: style,
-        color: isWhite ? Colors.white : color,
+        color: color,
         decoration: decoration,
         decorationColor: color,
         height: height,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
@@ -130,9 +131,12 @@ class UberOneScreen extends StatelessWidget {
             child: AppButton(
               text: 'Got it',
               callback: () {
-                navigatorKey.currentState!.push(MaterialPageRoute(
-                  builder: (context) => const UberOneScreen(),
-                ));
+                navigatorKey.currentState!.pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const MainScreen(),
+                    ), (r) {
+                  return false;
+                });
               },
             ),
           )

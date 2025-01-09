@@ -79,15 +79,15 @@ class _DropOffOptionsScreenState extends ConsumerState<DropOffOptionsScreen> {
                       ),
                       children: [
                         AppRadioListTile(
-                          groupValue1: _groupValue1,
+                          groupValue: _groupValue1,
                           value: 'Meet at my door',
                         ),
                         AppRadioListTile(
-                          groupValue1: _groupValue1,
+                          groupValue: _groupValue1,
                           value: 'Meet outside',
                         ),
                         AppRadioListTile(
-                          groupValue1: _groupValue1,
+                          groupValue: _groupValue1,
                           value: 'Meet in the lobby',
                         ),
                         // ListTile(
@@ -121,15 +121,15 @@ class _DropOffOptionsScreenState extends ConsumerState<DropOffOptionsScreen> {
                       ),
                       children: [
                         AppRadioListTile(
-                          groupValue1: _groupValue1,
+                          groupValue: _groupValue1,
                           value: 'Meet at my door',
                         ),
                         AppRadioListTile(
-                          groupValue1: _groupValue1,
+                          groupValue: _groupValue1,
                           value: 'Meet outside',
                         ),
                         AppRadioListTile(
-                          groupValue1: _groupValue1,
+                          groupValue: _groupValue1,
                           value: 'Meet in the lobby',
                         ),
                         // ListTile(
@@ -176,12 +176,15 @@ class _DropOffOptionsScreenState extends ConsumerState<DropOffOptionsScreen> {
 class AppRadioListTile extends StatefulWidget {
   const AppRadioListTile({
     super.key,
-    required String groupValue1,
+    required String groupValue,
     required String value,
-  })  : _groupValue1 = groupValue1,
+    Function(String? value)? onChanged,
+  })  : _groupValue1 = groupValue,
+        _onChanged = onChanged,
         _value = value;
   final String _groupValue1;
   final String _value;
+  final Function(String? value)? _onChanged;
 
   @override
   State<AppRadioListTile> createState() => _AppRadioListTileState();
@@ -197,7 +200,39 @@ class _AppRadioListTileState extends State<AppRadioListTile> {
       value: widget._value,
       title: AppText(text: widget._value),
       groupValue: widget._groupValue1,
-      onChanged: (value) {},
+      onChanged: widget._onChanged,
+    );
+  }
+}
+
+class AppCheckboxListTile extends StatefulWidget {
+  const AppCheckboxListTile({
+    super.key,
+    required String value,
+    required Function(bool? value) onChanged,
+    required List<String> selectedOptions,
+  })  : _value = value,
+        _onChanged = onChanged,
+        _selectedOptions = selectedOptions;
+
+  final String _value;
+  final Function(bool? value) _onChanged;
+  final List<String> _selectedOptions;
+
+  @override
+  State<AppCheckboxListTile> createState() => _AppCheckboxListTileState();
+}
+
+class _AppCheckboxListTileState extends State<AppCheckboxListTile> {
+  @override
+  Widget build(BuildContext context) {
+    return CheckboxListTile.adaptive(
+      splashRadius: 15,
+      controlAffinity: ListTileControlAffinity.leading,
+      contentPadding: EdgeInsets.zero,
+      value: widget._selectedOptions.contains(widget._value),
+      title: AppText(text: widget._value),
+      onChanged: widget._onChanged,
     );
   }
 }
