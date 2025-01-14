@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,346 @@ import '../../constants/weblinks.dart';
 import '../store/store_screen.dart';
 import '../webview/webview_screen.dart';
 import 'map/map_screen.dart';
+
+final List<Store> stores = [
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    name: "McDonald's",
+    doesPickup: false,
+    isFavorite: true,
+    isGroupFriendly: true,
+    location: Location(
+        countryOfOrigin: 'Ghanaian',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$',
+    type: 'Fast Food',
+    productCategories: [
+      ProductCategory(name: 'Homestyle Breakfasts', products: [
+        Product(
+            name: 'Big Breakfast with Muffin',
+            initialPrice: 6.69,
+            imageUrl:
+                'https://s7d1.scene7.com/is/image/mcdonalds/mcd-big-breakfast-uae-1223:nutrition-calculator-tile?wid=822&hei=822&dpr=off',
+            isSoldOut: true),
+        Product(
+          name: 'Big Breakfast with Muffin & Hotcakes',
+          initialPrice: 8.69,
+          imageUrl:
+              'https://s7d1.scene7.com/is/image/mcdonaldsstage/DC_202208_3590_BigBreakfast_HotCakes_1564x1564:product-header-mobile?wid=1313&hei=1313&dpr=off',
+        ),
+        Product(
+          name: 'Hotcakes',
+          initialPrice: 5.99,
+          frequentlyBoughtTogether: [
+            Product(
+              name: 'Corona Extra Mexican Lager Beer(12 pack)',
+              description:
+                  'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+              initialPrice: 21.39,
+              imageUrl:
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlnRtgDZ74Kh3YBFrqaD3F3WpgTANg7ebL8A&s',
+            ),
+            Product(
+              name: 'Modelo Cerveza Especial Lager Beer',
+              description:
+                  'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+              initialPrice: 36.29,
+              imageUrl:
+                  'https://i5.walmartimages.com/seo/Modelo-Especial-Mexican-Lager-Import-Beer-6-Pack-12-fl-oz-Glass-Bottles-4-4-ABV_cb2e7f8a-d7df-4bfd-b36c-257f9b023092.9e785aa9a4bf79387b8bbdec7f3b2d19.jpeg',
+            ),
+          ],
+          calories: 590,
+          options: [
+            Option(
+                name: 'Butter', price: 0.10, isExclusive: false, calories: 35),
+            Option(
+                name: 'Syrup', price: 0.25, isExclusive: false, calories: 190),
+            Option(name: 'Fork', isExclusive: false),
+            Option(name: 'Knife', isExclusive: false),
+          ],
+          imageUrl:
+              'https://s7d1.scene7.com/is/image/mcdonalds/mcdonalds-hotcakes:1-3-product-tile-desktop?wid=594&hei=368&dpr=off',
+        ),
+        Product(
+          name: 'Hotcakes and Sausages',
+          initialPrice: 6.69,
+          imageUrl:
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS-TWx-aTODD2giXaP5j4gRpqZdcHyHc3bDA&s',
+        )
+      ])
+    ],
+    cardImage:
+        'https://www.foodandwine.com/thmb/8N5jLutuTK4TDzpDkhMfdaHLZxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/McDonalds-Hacks-Menu-FT-1-BLOG0122-4ac9d62f6c9143be8da3d0a8553348b0.jpg',
+    logo:
+        'https://e7.pngegg.com/pngimages/676/74/png-clipart-fast-food-mcdonald-s-logo-golden-arches-restaurant-mcdonalds-mcdonald-s-logo-miscellaneous-food.png',
+    delivery: Delivery(
+      canDeliver: true,
+      fee: 0,
+      estimatedDeliveryTime: '15-30',
+    ),
+    rating: Rating(averageRating: 4.6, ratings: 660),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: true,
+    isGroupFriendly: true,
+    location: Location(
+        countryOfOrigin: 'American',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$\$',
+    type: 'Cafe',
+    name: "Jack in the Box",
+    isFavorite: false,
+    productCategories: [],
+    cardImage:
+        'https://media-cdn.tripadvisor.com/media/photo-s/08/c1/9b/d5/jack-in-the-box.jpg',
+    logo:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHDNjPca07Vm7i0F4kk8zcFDQX0O4o8wv4Kg&s',
+    delivery:
+        Delivery(canDeliver: false, fee: 0, estimatedDeliveryTime: '10-25'),
+    rating: Rating(averageRating: 4.4, ratings: 9654),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: false,
+    name: "Starbucks",
+    isFavorite: false,
+    isGroupFriendly: true,
+    location: Location(
+        countryOfOrigin: 'Ghanaian',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$',
+    type: 'Cafe',
+    productCategories: [],
+    cardImage:
+        'https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1240w,f_auto,q_auto:best/newscms/2020_41/1617109/starbucks-te-main2-201007.jpg',
+    logo:
+        'https://redprinting.com/cdn/shop/articles/starbucks-logo-vector-and-png-redprinting-com.jpg?v=1713379657&width=1100',
+    delivery:
+        Delivery(canDeliver: true, fee: 3.99, estimatedDeliveryTime: '10-20'),
+    rating: Rating(averageRating: 4.2, ratings: 2547),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: true,
+    name: "Wendy's",
+    isFavorite: true,
+    productCategories: [],
+    isGroupFriendly: false,
+    location: Location(
+        countryOfOrigin: 'American',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$\$',
+    type: 'Fast Food',
+    cardImage: 'https://utc.imgix.net/uploads/Wendys_ServiceImage_02.jpg',
+    logo:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUN0gOq_cRelnSsHcv_Aiq95sPwUYnooIeTQ&s',
+    delivery:
+        Delivery(canDeliver: true, fee: 5.49, estimatedDeliveryTime: '20-35'),
+    rating: Rating(averageRating: 3.9, ratings: 2356),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: false,
+    isFavorite: false,
+    isGroupFriendly: true,
+    location: Location(
+        countryOfOrigin: 'Ghanaian',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$\$\$',
+    type: 'Fast Food',
+    productCategories: [],
+    cardImage:
+        'https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/store/header/fb9e5a96-94b0-4406-9746-a0f8a7387bf7.jpg',
+    name: "The Posh Bagel",
+    logo:
+        'https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/restaurant/cover/Posh-Bagel.png',
+    delivery:
+        Delivery(canDeliver: false, fee: 0.49, estimatedDeliveryTime: '15-20'),
+    rating: Rating(averageRating: 3.8, ratings: 52),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: false,
+    isGroupFriendly: false,
+    location: Location(
+        countryOfOrigin: 'Ivorian',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$\$\$\$',
+    type: 'Restaurant',
+    productCategories: [],
+    isFavorite: false,
+    cardImage:
+        'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
+    name: "Joe & The Juice",
+    logo: 'https://gulffranchise.com/franchise-images/joe-juice-fl.png',
+    delivery:
+        Delivery(canDeliver: true, fee: 0.99, estimatedDeliveryTime: '10-15'),
+    rating: Rating(averageRating: 3.7, ratings: 32),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: true,
+    isGroupFriendly: false,
+    location: Location(
+        countryOfOrigin: 'Ghanaian',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$\$\$\$',
+    type: 'Grocery',
+    productCategories: [
+      ProductCategory(name: 'Pancakes', products: [
+        Product(
+            name: 'Birch Benders Oganic Buttermilk Pancake & Waffle Mix',
+            initialPrice: 7.30,
+            description:
+                'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+            imageUrl:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX2JBcwTEOFS2X5ss4oJDhm9_OIj6NOmeiWw&s',
+            isSoldOut: true),
+        Product(
+            name: 'Pearl Milling Company',
+            initialPrice: 6.51,
+            description:
+                'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+            imageUrl:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHstuwD4AyM-VGvrcVOhXht_j0lf3ie8Kahg&s',
+            isSoldOut: true)
+      ]),
+      ProductCategory(name: 'Syrups', products: [
+        Product(
+          name: 'O Organics Organic Syrup 100% Pure',
+          initialPrice: 9.55,
+          description:
+              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+          imageUrl:
+              'https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/abeb5951-b4ff-4f00-a7cb-10174e731013-retina-large.png',
+        ),
+        Product(
+            name: 'Signature Select Grade a Pure Maple Syrup',
+            initialPrice: 10.11,
+            description:
+                'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+            imageUrl:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTC0GD164u8Cvwu3fVbiOlEPPuye2EDkJy_w&s',
+            isSoldOut: true),
+      ]),
+      ProductCategory(name: 'Fruit', products: [
+        Product(
+          name: 'Organic Blueberries(18 oz)',
+          initialPrice: 10.11,
+          description:
+              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+          imageUrl:
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8lW8htrtQcsW1QI0UM34PNvTrLAFFniMruA&s',
+        ),
+      ]),
+    ],
+    isFavorite: false,
+    cardImage:
+        'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
+    name: "Safeway",
+    logo:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhZy8UOQW_ONW303-Cd1_39k8db8JVhfKlHA&s',
+    delivery:
+        Delivery(canDeliver: true, fee: 0.99, estimatedDeliveryTime: '10-15'),
+    rating: Rating(averageRating: 3.7, ratings: 32),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: true,
+    productCategories: [
+      ProductCategory(name: 'Beer', products: [
+        Product(
+          name: 'Corona Extra Mexican Lager Beer(12 pack)',
+          description:
+              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+          initialPrice: 21.39,
+          imageUrl:
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlnRtgDZ74Kh3YBFrqaD3F3WpgTANg7ebL8A&s',
+        ),
+        Product(
+          name: 'Modelo Cerveza Especial Lager Beer',
+          description:
+              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+          initialPrice: 36.29,
+          imageUrl:
+              'https://i5.walmartimages.com/seo/Modelo-Especial-Mexican-Lager-Import-Beer-6-Pack-12-fl-oz-Glass-Bottles-4-4-ABV_cb2e7f8a-d7df-4bfd-b36c-257f9b023092.9e785aa9a4bf79387b8bbdec7f3b2d19.jpeg',
+        ),
+        Product(
+          name: 'Coors Light American Lager Beer',
+          description:
+              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+          initialPrice: 15.39,
+          imageUrl:
+              'https://m.media-amazon.com/images/I/61JXbG2MPFL._SL1000_.jpg',
+        ),
+      ])
+    ],
+    isGroupFriendly: true,
+    location: Location(
+        countryOfOrigin: 'Ghanaian',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$',
+    type: 'Fast Food',
+    isFavorite: false,
+    cardImage:
+        'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
+    name: "7 Seven",
+    logo:
+        'https://cdn.prod.website-files.com/640ea4106aa3032db2a6cefb/6489566e8bfc72986607f1f2_6451a8cf783fe3e5bddce039_7-Eleven.png',
+    delivery:
+        Delivery(canDeliver: false, fee: 8.99, estimatedDeliveryTime: '10-15'),
+    rating: Rating(averageRating: 3.7, ratings: 660),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: true,
+    productCategories: [],
+    isGroupFriendly: true,
+    location: Location(
+        countryOfOrigin: 'Ghanaian',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$',
+    type: 'Fast Food',
+    isFavorite: false,
+    cardImage:
+        'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
+    name: "Joe & The Juice",
+    logo: 'https://gulffranchise.com/franchise-images/joe-juice-fl.png',
+    delivery:
+        Delivery(canDeliver: false, fee: 7.97, estimatedDeliveryTime: '10-15'),
+    rating: Rating(averageRating: 3.7, ratings: 32),
+  ),
+  Store(
+    openingTime: const TimeOfDay(hour: 8, minute: 0),
+    closingTime: const TimeOfDay(hour: 21, minute: 0),
+    doesPickup: false,
+    productCategories: [],
+    isGroupFriendly: true,
+    location: Location(
+        countryOfOrigin: 'Ghanaian',
+        streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+    priceCategory: '\$',
+    type: 'Fast Food',
+    isFavorite: false,
+    cardImage:
+        'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
+    name: "Joe & The Juice",
+    logo: 'https://gulffranchise.com/franchise-images/joe-juice-fl.png',
+    delivery:
+        Delivery(canDeliver: true, fee: 6.99, estimatedDeliveryTime: '10-15'),
+    rating: Rating(averageRating: 3.7, ratings: 660),
+  ),
+];
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -48,215 +389,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     FoodCategory('Korean', AssetNames.korean),
     FoodCategory('Donuts', AssetNames.donuts),
     FoodCategory('Indian', AssetNames.indian),
-  ];
-
-  final List<Store> _stores = [
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        name: "McDonald's",
-        doesPickup: false,
-        isFavorite: true,
-        isGhanaian: true,
-        products: [],
-        votes: 1245,
-        cardImage:
-            'https://www.foodandwine.com/thmb/8N5jLutuTK4TDzpDkhMfdaHLZxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/McDonalds-Hacks-Menu-FT-1-BLOG0122-4ac9d62f6c9143be8da3d0a8553348b0.jpg',
-        logo:
-            'https://e7.pngegg.com/pngimages/676/74/png-clipart-fast-food-mcdonald-s-logo-golden-arches-restaurant-mcdonalds-mcdonald-s-logo-miscellaneous-food.png',
-        delivery: Delivery(canDeliver: true, fee: 0),
-        rating: 4.6,
-        estimatedDeliveryTime: '15-30'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        votes: 9654,
-        doesPickup: true,
-        name: "Jack in the Box",
-        isFavorite: false,
-        products: [],
-        isGhanaian: false,
-        cardImage:
-            'https://media-cdn.tripadvisor.com/media/photo-s/08/c1/9b/d5/jack-in-the-box.jpg',
-        logo:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHDNjPca07Vm7i0F4kk8zcFDQX0O4o8wv4Kg&s',
-        delivery: Delivery(canDeliver: false, fee: 0),
-        rating: 4.4,
-        estimatedDeliveryTime: '10-25'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        doesPickup: false,
-        votes: 2547,
-        name: "Starbucks",
-        isFavorite: false,
-        isGhanaian: true,
-        products: [],
-        cardImage:
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1240w,f_auto,q_auto:best/newscms/2020_41/1617109/starbucks-te-main2-201007.jpg',
-        logo:
-            'https://redprinting.com/cdn/shop/articles/starbucks-logo-vector-and-png-redprinting-com.jpg?v=1713379657&width=1100',
-        delivery: Delivery(canDeliver: true, fee: 3.99),
-        rating: 4.2,
-        estimatedDeliveryTime: '10-20'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        doesPickup: true,
-        votes: 2356,
-        name: "Wendy's",
-        isFavorite: true,
-        products: [],
-        isGhanaian: false,
-        cardImage: 'https://utc.imgix.net/uploads/Wendys_ServiceImage_02.jpg',
-        logo:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUN0gOq_cRelnSsHcv_Aiq95sPwUYnooIeTQ&s',
-        delivery: Delivery(canDeliver: true, fee: 5.49),
-        rating: 3.9,
-        estimatedDeliveryTime: '20-35'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        doesPickup: false,
-        votes: 52,
-        isFavorite: false,
-        isGhanaian: false,
-        products: [],
-        cardImage:
-            'https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/store/header/fb9e5a96-94b0-4406-9746-a0f8a7387bf7.jpg',
-        name: "The Posh Bagel",
-        logo:
-            'https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/restaurant/cover/Posh-Bagel.png',
-        delivery: Delivery(canDeliver: false, fee: 0.49),
-        rating: 3.8,
-        estimatedDeliveryTime: '15-20'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        doesPickup: false,
-        votes: 32,
-        isGhanaian: false,
-        products: [],
-        isFavorite: false,
-        cardImage:
-            'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
-        name: "Joe & The Juice",
-        logo: 'https://gulffranchise.com/franchise-images/joe-juice-fl.png',
-        delivery: Delivery(canDeliver: true, fee: 0.99),
-        rating: 3.7,
-        estimatedDeliveryTime: '10-15'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        doesPickup: true,
-        votes: 32,
-        isGhanaian: true,
-        products: [
-          Product(
-              name: 'Birch Benders Oganic Buttermilk Pancake & Waffle Mix',
-              initialPrice: 7.30,
-              imageUrl:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX2JBcwTEOFS2X5ss4oJDhm9_OIj6NOmeiWw&s',
-              quantity: 5),
-          Product(
-              name: 'Signature Select Grade a Pure Maple',
-              initialPrice: 10.11,
-              imageUrl:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTC0GD164u8Cvwu3fVbiOlEPPuye2EDkJy_w&s',
-              quantity: 7),
-          Product(
-              name: 'Pearl Milling Company',
-              initialPrice: 6.51,
-              imageUrl:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHstuwD4AyM-VGvrcVOhXht_j0lf3ie8Kahg&s',
-              quantity: 11),
-          Product(
-              name: 'Organic Blueberries(18 oz)',
-              initialPrice: 10.11,
-              imageUrl:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8lW8htrtQcsW1QI0UM34PNvTrLAFFniMruA&s',
-              quantity: 3),
-          Product(
-              name: 'O Organics Organic Syrup 100% Pure',
-              initialPrice: 9.55,
-              imageUrl:
-                  'https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/abeb5951-b4ff-4f00-a7cb-10174e731013-retina-large.png',
-              quantity: 7)
-        ],
-        isFavorite: false,
-        cardImage:
-            'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
-        name: "Safeway",
-        logo:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhZy8UOQW_ONW303-Cd1_39k8db8JVhfKlHA&s',
-        delivery: Delivery(canDeliver: true, fee: 0.99),
-        rating: 3.7,
-        estimatedDeliveryTime: '10-15'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        doesPickup: true,
-        votes: 32,
-        products: [
-          Product(
-              name: 'Corona Extra Mexican Lager Beer(12 pack)',
-              initialPrice: 21.39,
-              imageUrl:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlnRtgDZ74Kh3YBFrqaD3F3WpgTANg7ebL8A&s',
-              quantity: 7),
-          Product(
-              name: 'Modelo Cerveza Especial Lager Beer',
-              initialPrice: 36.29,
-              imageUrl:
-                  'https://i5.walmartimages.com/seo/Modelo-Especial-Mexican-Lager-Import-Beer-6-Pack-12-fl-oz-Glass-Bottles-4-4-ABV_cb2e7f8a-d7df-4bfd-b36c-257f9b023092.9e785aa9a4bf79387b8bbdec7f3b2d19.jpeg',
-              quantity: 15),
-          Product(
-              name: 'Coors Light American Lager Beer',
-              initialPrice: 15.39,
-              imageUrl:
-                  'https://m.media-amazon.com/images/I/61JXbG2MPFL._SL1000_.jpg',
-              quantity: 7),
-        ],
-        isGhanaian: false,
-        isFavorite: false,
-        cardImage:
-            'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
-        name: "7 Seven",
-        logo:
-            'https://cdn.prod.website-files.com/640ea4106aa3032db2a6cefb/6489566e8bfc72986607f1f2_6451a8cf783fe3e5bddce039_7-Eleven.png',
-        delivery: Delivery(canDeliver: false, fee: 8.99),
-        rating: 3.7,
-        estimatedDeliveryTime: '10-15'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        doesPickup: true,
-        votes: 32,
-        products: [],
-        isGhanaian: true,
-        isFavorite: false,
-        cardImage:
-            'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
-        name: "Joe & The Juice",
-        logo: 'https://gulffranchise.com/franchise-images/joe-juice-fl.png',
-        delivery: Delivery(canDeliver: false, fee: 7.97),
-        rating: 3.7,
-        estimatedDeliveryTime: '10-15'),
-    Store(
-        openingHour: const TimeOfDay(hour: 8, minute: 0),
-        closingHour: const TimeOfDay(hour: 21, minute: 0),
-        doesPickup: false,
-        votes: 32,
-        products: [],
-        isGhanaian: false,
-        isFavorite: false,
-        cardImage:
-            'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
-        name: "Joe & The Juice",
-        logo: 'https://gulffranchise.com/franchise-images/joe-juice-fl.png',
-        delivery: Delivery(canDeliver: true, fee: 6.99),
-        rating: 3.7,
-        estimatedDeliveryTime: '10-15'),
   ];
 
   List<String> _selectedFilters = [];
@@ -288,14 +420,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       statusBarColor: Colors.white,
     ));
 
-    _nationalBrands = _stores
+    _nationalBrands = stores
         .where(
-          (element) => element.isGhanaian,
+          (element) => element.location.countryOfOrigin == 'Ghanaian',
         )
         .toList();
-    _hottestDeals = List.from(_stores);
+    _hottestDeals = List.from(stores);
     _hottestDeals.sort(
-      (a, b) => a.rating.compareTo(b.rating),
+      (a, b) => a.rating.averageRating.compareTo(b.rating.averageRating),
     );
     _hottestDeals = _hottestDeals.reversed.toList();
     //   _scrollController.addListener(() {
@@ -383,12 +515,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final store = _stores[index];
+                        final store = stores[index];
                         final bool isClosed =
-                            timeOfDayNow.hour < store.openingHour.hour ||
-                                (timeOfDayNow.hour >= store.closingHour.hour &&
+                            timeOfDayNow.hour < store.openingTime.hour ||
+                                (timeOfDayNow.hour >= store.closingTime.hour &&
                                     timeOfDayNow.minute >=
-                                        store.closingHour.minute);
+                                        store.closingTime.minute);
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -397,8 +529,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    store.cardImage,
+                                  child: CachedNetworkImage(
+                                    imageUrl: store.cardImage,
                                     width: double.infinity,
                                     height: 170,
                                     fit: BoxFit.fill,
@@ -474,8 +606,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             BorderRadius.circular(20)),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 5, vertical: 2),
-                                    child:
-                                        AppText(text: store.rating.toString()))
+                                    child: AppText(
+                                        text: store.rating.averageRating
+                                            .toString()))
                               ],
                             ),
                             Row(
@@ -488,7 +621,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     )),
                                 AppText(
                                     text: isClosed
-                                        ? 'Closed • Available at ${store.openingHour}'
+                                        ? 'Closed • Available  at ${store.openingTime.hour}:${store.openingTime.minute}'
                                         : '\$${store.delivery.fee} Delivery Fee',
                                     color: store.delivery.fee < 1
                                         ? const Color.fromARGB(
@@ -496,14 +629,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         : null),
                                 AppText(
                                     text:
-                                        ' • ${store.estimatedDeliveryTime} min'),
+                                        ' • ${store.delivery.estimatedDeliveryTime} min'),
                               ],
                             )
                           ],
                         );
                       },
                       separatorBuilder: (context, index) => const Gap(10),
-                      itemCount: _stores.length),
+                      itemCount: stores.length),
                 ],
               ),
             ),
@@ -542,123 +675,119 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       itemBuilder: (context, index) {
                         final store = _hottestDeals[index];
                         final bool isClosed =
-                            timeOfDayNow.hour < store.openingHour.hour ||
-                                (timeOfDayNow.hour >= store.closingHour.hour &&
+                            timeOfDayNow.hour < store.openingTime.hour ||
+                                (timeOfDayNow.hour >= store.closingTime.hour &&
                                     timeOfDayNow.minute >=
-                                        store.closingHour.minute);
-                        return ClipRRect(
-                          child: InkWell(
-                            radius: 12,
-                            onTap: () {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) => const StoreScreen(),
-                              ));
-                            },
-                            child: Ink(
-                              // decoration: BoxDecoration(
-                              //   borderRadius: BorderRadius.circular(12),
-                              // ),
-                              child: SizedBox(
-                                width: 200,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ClipRRect(
-                                      // borderRadius: BorderRadius.circular(12),
-                                      child: Stack(
-                                        children: [
-                                          Image.network(
-                                            store.cardImage,
-                                            width: 200,
-                                            height: 120,
-                                            fit: BoxFit.fill,
-                                          ),
-                                          isClosed
-                                              ? Container(
-                                                  color: Colors.black
-                                                      .withOpacity(0.5),
-                                                  width: 200,
-                                                  height: 120,
-                                                  child: const Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      AppText(
-                                                        text: 'Closed',
-                                                        color: Colors.white,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              : !store.delivery.canDeliver
-                                                  ? Container(
-                                                      color: Colors.black
-                                                          .withOpacity(0.5),
-                                                      width: 200,
-                                                      height: 120,
-                                                      child: const Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          AppText(
-                                                            text: 'Pick up',
-                                                            color: Colors.white,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )
-                                                  : const SizedBox.shrink(),
-                                        ],
+                                        store.closingTime.minute);
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            navigatorKey.currentState!.push(MaterialPageRoute(
+                              builder: (context) => StoreScreen(store),
+                            ));
+                          },
+                          child: Ink(
+                            // decoration: BoxDecoration(
+                            //   borderRadius: BorderRadius.circular(12),
+                            // ),
+                            child: SizedBox(
+                              width: 200,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Stack(
+                                      children: [
+                                        CachedNetworkImage(
+                                          imageUrl: store.cardImage,
+                                          width: 200,
+                                          height: 120,
+                                          fit: BoxFit.fill,
+                                        ),
+                                        isClosed
+                                            ? Container(
+                                                color: Colors.black
+                                                    .withOpacity(0.5),
+                                                width: 200,
+                                                height: 120,
+                                                child: const Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    AppText(
+                                                      text: 'Closed',
+                                                      color: Colors.white,
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            : !store.delivery.canDeliver
+                                                ? Container(
+                                                    color: Colors.black
+                                                        .withOpacity(0.5),
+                                                    width: 200,
+                                                    height: 120,
+                                                    child: const Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        AppText(
+                                                          text: 'Pick up',
+                                                          color: Colors.white,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                : const SizedBox.shrink(),
+                                      ],
+                                    ),
+                                  ),
+                                  const Gap(5),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      AppText(
+                                        text: store.name,
+                                        weight: FontWeight.w600,
                                       ),
-                                    ),
-                                    const Gap(5),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        AppText(
-                                          text: store.name,
-                                          weight: FontWeight.w600,
-                                        ),
-                                        Icon(
-                                          store.isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_outline,
-                                          color: AppColors.neutral600,
-                                        )
-                                      ],
-                                    ),
-                                    AppText(
-                                        text:
-                                            '\$${store.delivery.fee} Delivery Fee',
-                                        color: store.delivery.fee < 1
-                                            ? const Color.fromARGB(
-                                                255, 163, 133, 42)
-                                            : null),
-                                    Row(
-                                      children: [
-                                        AppText(
-                                          text: '${store.rating}',
-                                        ),
-                                        const Icon(
-                                          Icons.star,
-                                          size: 10,
-                                        ),
-                                        AppText(
-                                            text:
-                                                '(${store.votes}+) • ${store.estimatedDeliveryTime} min'),
-                                      ],
-                                    )
-                                  ],
-                                ),
+                                      Icon(
+                                        store.isFavorite
+                                            ? Icons.favorite
+                                            : Icons.favorite_outline,
+                                        color: AppColors.neutral600,
+                                      )
+                                    ],
+                                  ),
+                                  AppText(
+                                      text:
+                                          '\$${store.delivery.fee} Delivery Fee',
+                                      color: store.delivery.fee < 1
+                                          ? const Color.fromARGB(
+                                              255, 163, 133, 42)
+                                          : null),
+                                  Row(
+                                    children: [
+                                      AppText(
+                                        text: '${store.rating.averageRating}',
+                                      ),
+                                      const Icon(
+                                        Icons.star,
+                                        size: 10,
+                                      ),
+                                      AppText(
+                                          text:
+                                              '(${store.rating.ratings}+) • ${store.delivery.estimatedDeliveryTime} min'),
+                                    ],
+                                  )
+                                ],
                               ),
                             ),
                           ),
@@ -675,13 +804,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           horizontal: AppSizes.horizontalPaddingSmall),
                       separatorBuilder: (context, index) => const Gap(10),
                       scrollDirection: Axis.horizontal,
-                      itemCount: _stores.length,
+                      itemCount: stores.length,
                       itemBuilder: (context, index) {
-                        final store = _stores[index];
+                        final store = stores[index];
                         return InkWell(
                           onTap: () {
                             navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => const StoreScreen(),
+                              builder: (context) => StoreScreen(store),
                             ));
                           },
                           child: Ink(
@@ -697,8 +826,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             color: AppColors.neutral200)),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(50),
-                                      child: Image.network(
-                                        store.logo,
+                                      child: CachedNetworkImage(
+                                        imageUrl: store.logo,
                                         width: 70,
                                         height: 70,
                                         fit: BoxFit.fill,
@@ -740,21 +869,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      nationalBrand.cardImage,
+                                    child: CachedNetworkImage(
+                                      imageUrl: nationalBrand.cardImage,
                                       width: 200,
                                       height: 120,
                                       fit: BoxFit.fill,
                                     ),
                                   ),
                                   (timeOfDayNow.hour <
-                                              nationalBrand.openingHour.hour ||
+                                              nationalBrand.openingTime.hour ||
                                           (timeOfDayNow.hour >=
                                                   nationalBrand
-                                                      .closingHour.hour &&
+                                                      .closingTime.hour &&
                                               timeOfDayNow.minute >=
                                                   nationalBrand
-                                                      .closingHour.minute))
+                                                      .closingTime.minute))
                                       ? Container(
                                           color: Colors.black.withOpacity(0.5),
                                           width: 200,
@@ -826,8 +955,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 5, vertical: 2),
                                       child: AppText(
-                                          text:
-                                              nationalBrand.rating.toString()))
+                                          text: nationalBrand
+                                              .rating.averageRating
+                                              .toString()))
                                 ],
                               ),
                               AppText(
@@ -838,7 +968,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       : null),
                               AppText(
                                   text:
-                                      '${nationalBrand.estimatedDeliveryTime} min')
+                                      '${nationalBrand.delivery.estimatedDeliveryTime} min')
                             ],
                           ),
                         );
@@ -984,21 +1114,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      nationalBrand.cardImage,
+                                    child: CachedNetworkImage(
+                                      imageUrl: nationalBrand.cardImage,
                                       width: 200,
                                       height: 120,
                                       fit: BoxFit.fill,
                                     ),
                                   ),
                                   (timeOfDayNow.hour <
-                                              nationalBrand.openingHour.hour ||
+                                              nationalBrand.openingTime.hour ||
                                           (timeOfDayNow.hour >=
                                                   nationalBrand
-                                                      .closingHour.hour &&
+                                                      .closingTime.hour &&
                                               timeOfDayNow.minute >=
                                                   nationalBrand
-                                                      .closingHour.minute))
+                                                      .closingTime.minute))
                                       ? Container(
                                           color: Colors.black.withOpacity(0.5),
                                           width: 200,
@@ -1070,8 +1200,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 5, vertical: 2),
                                       child: AppText(
-                                          text:
-                                              nationalBrand.rating.toString()))
+                                          text: nationalBrand
+                                              .rating.averageRating
+                                              .toString()))
                                 ],
                               ),
                               AppText(
@@ -1082,7 +1213,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       : null),
                               AppText(
                                   text:
-                                      '${nationalBrand.estimatedDeliveryTime} min')
+                                      '${nationalBrand.delivery.estimatedDeliveryTime} min')
                             ],
                           ),
                         );
@@ -1092,191 +1223,223 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HomeScreenTopic(
                       callback: () {},
                       title: 'Prep brunch for Mum',
-                      subtitle: 'From ${_stores[6].name}',
-                      imageUrl: _stores[6].logo),
+                      subtitle: 'From ${stores[6].name}',
+                      imageUrl: stores[6].logo),
                   SizedBox(
                     height: 200,
-                    child: ListView.separated(
-                      cacheExtent: 300,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      separatorBuilder: (context, index) => const Gap(10),
+                    child: CustomScrollView(
                       scrollDirection: Axis.horizontal,
-                      itemCount: _stores[6].products.length,
-                      itemBuilder: (context, index) {
-                        final product = _stores[6].products[index];
-                        return SizedBox(
-                          width: 100,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Stack(
-                                alignment: Alignment.bottomRight,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      product.imageUrl,
-                                      width: 100,
-                                      height: 120,
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 8.0, top: 8.0),
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Ink(
-                                        child: Container(
-                                          padding: const EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.black12,
-                                                  offset: Offset(2, 2),
-                                                )
+                      slivers: stores[6]
+                          .productCategories
+                          .map(
+                            (productCategory) => SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                              //TODO: perfect and optimize slierlist builder
+                              (context, index) => Row(
+                                  children: productCategory.products
+                                      .map((product) => SizedBox(
+                                            width: 100,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Stack(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            product.imageUrl,
+                                                        width: 100,
+                                                        height: 120,
+                                                        fit: BoxFit.fill,
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0,
+                                                              top: 8.0),
+                                                      child: InkWell(
+                                                        onTap: () {},
+                                                        child: Ink(
+                                                          child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(5),
+                                                            decoration: BoxDecoration(
+                                                                boxShadow: const [
+                                                                  BoxShadow(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    offset:
+                                                                        Offset(
+                                                                            2,
+                                                                            2),
+                                                                  )
+                                                                ],
+                                                                color: Colors
+                                                                    .white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            50)),
+                                                            child: const Icon(
+                                                              Icons.add,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                                const Gap(5),
+                                                AppText(
+                                                  text: product.name,
+                                                  weight: FontWeight.w600,
+                                                  maxLines: 3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Visibility(
+                                                      visible:
+                                                          product.promoPrice !=
+                                                              null,
+                                                      child: Row(
+                                                        children: [
+                                                          AppText(
+                                                              text:
+                                                                  '\$${product.initialPrice}',
+                                                              color:
+                                                                  Colors.green),
+                                                          const Gap(5),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    AppText(
+                                                      text: product.initialPrice
+                                                          .toString(),
+                                                      decoration: product
+                                                                  .promoPrice !=
+                                                              null
+                                                          ? TextDecoration
+                                                              .lineThrough
+                                                          : TextDecoration.none,
+                                                    )
+                                                  ],
+                                                ),
                                               ],
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(50)),
-                                          child: const Icon(
-                                            Icons.add,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const Gap(5),
-                              AppText(
-                                text: product.name,
-                                weight: FontWeight.w600,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Row(
-                                children: [
-                                  Visibility(
-                                    visible: product.promoPrice != null,
-                                    child: Row(
-                                      children: [
-                                        AppText(
-                                            text: '\$${product.initialPrice}',
-                                            color: Colors.green),
-                                        const Gap(5),
-                                      ],
-                                    ),
-                                  ),
-                                  AppText(
-                                    text: product.initialPrice.toString(),
-                                    decoration: product.promoPrice != null
-                                        ? TextDecoration.lineThrough
-                                        : TextDecoration.none,
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                                            ),
+                                          ))
+                                      .toList()),
+                              childCount: 1,
+                            )),
+                          )
+                          .toList(),
                     ),
                   ),
+
                   HomeScreenTopic(
                       callback: () {},
                       title: 'Beer',
-                      subtitle: 'From ${_stores[7].name}',
-                      imageUrl: _stores[7].logo),
-                  SizedBox(
-                    height: 200,
-                    child: ListView.separated(
-                      cacheExtent: 300,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      separatorBuilder: (context, index) => const Gap(10),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _stores[7].products.length,
-                      itemBuilder: (context, index) {
-                        final product = _stores[7].products[index];
-                        return SizedBox(
-                          width: 100,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Stack(
-                                alignment: Alignment.bottomRight,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      product.imageUrl,
-                                      width: 100,
-                                      height: 120,
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 8.0, top: 8.0),
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Ink(
-                                        child: Container(
-                                          padding: const EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.black12,
-                                                  offset: Offset(2, 2),
-                                                )
-                                              ],
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(50)),
-                                          child: const Icon(
-                                            Icons.add,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const Gap(5),
-                              AppText(
-                                text: product.name,
-                                weight: FontWeight.w600,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Row(
-                                children: [
-                                  Visibility(
-                                    visible: product.promoPrice != null,
-                                    child: Row(
-                                      children: [
-                                        AppText(
-                                            text: '\$${product.initialPrice}',
-                                            color: Colors.green),
-                                        const Gap(5),
-                                      ],
-                                    ),
-                                  ),
-                                  AppText(
-                                    text: product.initialPrice.toString(),
-                                    decoration: product.promoPrice != null
-                                        ? TextDecoration.lineThrough
-                                        : TextDecoration.none,
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                      subtitle: 'From ${stores[7].name}',
+                      imageUrl: stores[7].logo),
+                  // SizedBox(
+                  //   height: 200,
+                  //   child: ListView.separated(
+                  //     cacheExtent: 300,
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: AppSizes.horizontalPaddingSmall),
+                  //     separatorBuilder: (context, index) => const Gap(10),
+                  //     scrollDirection: Axis.horizontal,
+                  //     itemCount: _stores[7].products.length,
+                  //     itemBuilder: (context, index) {
+                  //       final product = _stores[7].products[index];
+                  //       return SizedBox(
+                  //         width: 100,
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             Stack(
+                  //               alignment: Alignment.bottomRight,
+                  //               children: [
+                  //                 ClipRRect(
+                  //                   borderRadius: BorderRadius.circular(12),
+                  //                   child: CachedNetworkImage(
+                  //                     imageUrl: product.imageUrl,
+                  //                     width: 100,
+                  //                     height: 120,
+                  //                     fit: BoxFit.fill,
+                  //                   ),
+                  //                 ),
+                  //                 Padding(
+                  //                   padding: const EdgeInsets.only(
+                  //                       right: 8.0, top: 8.0),
+                  //                   child: InkWell(
+                  //                     onTap: () {},
+                  //                     child: Ink(
+                  //                       child: Container(
+                  //                         padding: const EdgeInsets.all(5),
+                  //                         decoration: BoxDecoration(
+                  //                             boxShadow: const [
+                  //                               BoxShadow(
+                  //                                 color: Colors.black12,
+                  //                                 offset: Offset(2, 2),
+                  //                               )
+                  //                             ],
+                  //                             color: Colors.white,
+                  //                             borderRadius:
+                  //                                 BorderRadius.circular(50)),
+                  //                         child: const Icon(
+                  //                           Icons.add,
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ),
+                  //                 )
+                  //               ],
+                  //             ),
+                  //             const Gap(5),
+                  //             AppText(
+                  //               text: product.name,
+                  //               weight: FontWeight.w600,
+                  //               maxLines: 3,
+                  //               overflow: TextOverflow.ellipsis,
+                  //             ),
+                  //             Row(
+                  //               children: [
+                  //                 Visibility(
+                  //                   visible: product.promoPrice != null,
+                  //                   child: Row(
+                  //                     children: [
+                  //                       AppText(
+                  //                           text: '\$${product.initialPrice}',
+                  //                           color: Colors.green),
+                  //                       const Gap(5),
+                  //                     ],
+                  //                   ),
+                  //                 ),
+                  //                 AppText(
+                  //                   text: product.initialPrice.toString(),
+                  //                   decoration: product.promoPrice != null
+                  //                       ? TextDecoration.lineThrough
+                  //                       : TextDecoration.none,
+                  //                 )
+                  //               ],
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
+
                   HomeScreenTopic(callback: () {}, title: 'All Stores'),
                   ListView.separated(
                       physics: const NeverScrollableScrollPhysics(),
@@ -1284,81 +1447,81 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           horizontal: AppSizes.horizontalPaddingSmall),
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final store = _stores[index];
+                        final store = stores[index];
                         final bool isClosed =
-                            timeOfDayNow.hour < store.openingHour.hour ||
-                                (timeOfDayNow.hour >= store.closingHour.hour &&
+                            timeOfDayNow.hour < store.openingTime.hour ||
+                                (timeOfDayNow.hour >= store.closingTime.hour &&
                                     timeOfDayNow.minute >=
-                                        store.closingHour.minute);
+                                        store.closingTime.minute);
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Stack(
-                              alignment: Alignment.topRight,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    store.cardImage,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl: store.cardImage,
                                     width: double.infinity,
                                     height: 170,
                                     fit: BoxFit.fill,
                                   ),
-                                ),
-                                isClosed
-                                    ? Container(
-                                        color: Colors.black.withOpacity(0.5),
-                                        width: double.infinity,
-                                        height: 170,
-                                        child: const Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            AppText(
-                                              text: 'Closed',
-                                              color: Colors.white,
-                                            ),
-                                          ],
+                                  isClosed
+                                      ? Container(
+                                          color: Colors.black.withOpacity(0.5),
+                                          width: double.infinity,
+                                          height: 170,
+                                          child: const Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              AppText(
+                                                text: 'Closed',
+                                                color: Colors.white,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : !store.delivery.canDeliver
+                                          ? Container(
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                              width: double.infinity,
+                                              height: 170,
+                                              child: const Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  AppText(
+                                                    text: 'Pick up',
+                                                    color: Colors.white,
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : const SizedBox.shrink(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 8.0, top: 8.0),
+                                    child: InkWell(
+                                      onTap: () {},
+                                      child: Ink(
+                                        child: Icon(
+                                          store.isFavorite
+                                              ? Icons.favorite
+                                              : Icons.favorite_outline,
+                                          color: Colors.white,
                                         ),
-                                      )
-                                    : !store.delivery.canDeliver
-                                        ? Container(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            width: double.infinity,
-                                            height: 170,
-                                            child: const Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                AppText(
-                                                  text: 'Pick up',
-                                                  color: Colors.white,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        : const SizedBox.shrink(),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 8.0, top: 8.0),
-                                  child: InkWell(
-                                    onTap: () {},
-                                    child: Ink(
-                                      child: Icon(
-                                        store.isFavorite
-                                            ? Icons.favorite
-                                            : Icons.favorite_outline,
-                                        color: Colors.white,
                                       ),
                                     ),
-                                  ),
-                                )
-                              ],
+                                  )
+                                ],
+                              ),
                             ),
                             const Gap(5),
                             Row(
@@ -1375,8 +1538,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             BorderRadius.circular(20)),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 5, vertical: 2),
-                                    child:
-                                        AppText(text: store.rating.toString()))
+                                    child: AppText(
+                                        text: store.rating.averageRating
+                                            .toString()))
                               ],
                             ),
                             Row(
@@ -1389,7 +1553,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     )),
                                 AppText(
                                     text: isClosed
-                                        ? 'Closed • Available at ${store.openingHour}'
+                                        ? 'Closed • Available at ${store.openingTime.hour}:${store.openingTime.minute}'
                                         : '\$${store.delivery.fee} Delivery Fee',
                                     color: store.delivery.fee < 1
                                         ? const Color.fromARGB(
@@ -1397,14 +1561,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         : null),
                                 AppText(
                                     text:
-                                        ' • ${store.estimatedDeliveryTime} min'),
+                                        ' • ${store.delivery.estimatedDeliveryTime} min'),
                               ],
                             )
                           ],
                         );
                       },
                       separatorBuilder: (context, index) => const Gap(10),
-                      itemCount: _stores.length),
+                      itemCount: stores.length),
                   const Gap(20),
                   const Divider(),
                   const Gap(3),
@@ -1488,7 +1652,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onTap: () =>
                       navigatorKey.currentState!.push(MaterialPageRoute(
                     builder: (context) => SearchScreen(
-                      stores: _stores,
+                      stores: stores,
                     ),
                   )),
                   child: Ink(
@@ -2265,9 +2429,9 @@ class SearchResultDisplay1 extends StatelessWidget {
               // shrinkWrap: true,
               itemBuilder: (context, index) {
                 final store = _stores[index];
-                final isClosed = _timeOfDayNow.hour < store.openingHour.hour ||
-                    (_timeOfDayNow.hour >= store.closingHour.hour &&
-                        _timeOfDayNow.minute >= store.closingHour.minute);
+                final isClosed = _timeOfDayNow.hour < store.openingTime.hour ||
+                    (_timeOfDayNow.hour >= store.closingTime.hour &&
+                        _timeOfDayNow.minute >= store.closingTime.minute);
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -2276,8 +2440,8 @@ class SearchResultDisplay1 extends StatelessWidget {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            store.cardImage,
+                          child: CachedNetworkImage(
+                            imageUrl: store.cardImage,
                             width: double.infinity,
                             height: 180,
                             fit: BoxFit.fill,
@@ -2348,7 +2512,8 @@ class SearchResultDisplay1 extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(20)),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 5, vertical: 2),
-                            child: AppText(text: store.rating.toString()))
+                            child: AppText(
+                                text: store.rating.averageRating.toString()))
                       ],
                     ),
                     Row(
@@ -2364,7 +2529,9 @@ class SearchResultDisplay1 extends StatelessWidget {
                             color: store.delivery.fee < 1
                                 ? const Color.fromARGB(255, 163, 133, 42)
                                 : null),
-                        AppText(text: ' • ${store.estimatedDeliveryTime} min'),
+                        AppText(
+                            text:
+                                ' • ${store.delivery.estimatedDeliveryTime} min'),
                       ],
                     )
                   ],
@@ -2415,8 +2582,8 @@ class SearchResultDisplay2 extends StatelessWidget {
                   ListTile(
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(50),
-                      child: Image.network(
-                        store.logo,
+                      child: CachedNetworkImage(
+                        imageUrl: store.logo,
                         width: 50,
                         height: 50,
                         fit: BoxFit.fill,
@@ -2440,7 +2607,8 @@ class SearchResultDisplay2 extends StatelessWidget {
                                     ? const Color.fromARGB(255, 163, 133, 42)
                                     : null),
                             AppText(
-                                text: ' • ${store.estimatedDeliveryTime} min'),
+                                text:
+                                    ' • ${store.delivery.estimatedDeliveryTime} min'),
                           ],
                         ),
                         const AppText(
@@ -2450,95 +2618,95 @@ class SearchResultDisplay2 extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 200,
-                    child: ListView.separated(
-                      cacheExtent: 300,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      separatorBuilder: (context, index) => const Gap(10),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: store.products.length,
-                      itemBuilder: (context, index) {
-                        final product = store.products[index];
-                        return SizedBox(
-                          width: 100,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Stack(
-                                alignment: Alignment.bottomRight,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      product.imageUrl,
-                                      width: 100,
-                                      height: 120,
-                                      fit: BoxFit.fill,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 8.0, top: 8.0),
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Ink(
-                                        child: Container(
-                                          padding: const EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.black12,
-                                                  offset: Offset(2, 2),
-                                                )
-                                              ],
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(50)),
-                                          child: const Icon(
-                                            Icons.add,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const Gap(5),
-                              AppText(
-                                text: product.name,
-                                weight: FontWeight.w600,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Row(
-                                children: [
-                                  Visibility(
-                                    visible: product.promoPrice != null,
-                                    child: Row(
-                                      children: [
-                                        AppText(
-                                            text: '\$${product.initialPrice}',
-                                            color: Colors.green),
-                                        const Gap(5),
-                                      ],
-                                    ),
-                                  ),
-                                  AppText(
-                                    text: product.initialPrice.toString(),
-                                    decoration: product.promoPrice != null
-                                        ? TextDecoration.lineThrough
-                                        : TextDecoration.none,
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  // SizedBox(
+                  //   height: 200,
+                  //   child: ListView.separated(
+                  //     cacheExtent: 300,
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: AppSizes.horizontalPaddingSmall),
+                  //     separatorBuilder: (context, index) => const Gap(10),
+                  //     scrollDirection: Axis.horizontal,
+                  //     itemCount: store.products.length,
+                  //     itemBuilder: (context, index) {
+                  //       final product = store.products[index];
+                  //       return SizedBox(
+                  //         width: 100,
+                  //         child: Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             Stack(
+                  //               alignment: Alignment.bottomRight,
+                  //               children: [
+                  //                 ClipRRect(
+                  //                   borderRadius: BorderRadius.circular(12),
+                  //                   child: CachedNetworkImage(
+                  //                     imageUrl: product.imageUrl,
+                  //                     width: 100,
+                  //                     height: 120,
+                  //                     fit: BoxFit.fill,
+                  //                   ),
+                  //                 ),
+                  //                 Padding(
+                  //                   padding: const EdgeInsets.only(
+                  //                       right: 8.0, top: 8.0),
+                  //                   child: InkWell(
+                  //                     onTap: () {},
+                  //                     child: Ink(
+                  //                       child: Container(
+                  //                         padding: const EdgeInsets.all(5),
+                  //                         decoration: BoxDecoration(
+                  //                             boxShadow: const [
+                  //                               BoxShadow(
+                  //                                 color: Colors.black12,
+                  //                                 offset: Offset(2, 2),
+                  //                               )
+                  //                             ],
+                  //                             color: Colors.white,
+                  //                             borderRadius:
+                  //                                 BorderRadius.circular(50)),
+                  //                         child: const Icon(
+                  //                           Icons.add,
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ),
+                  //                 )
+                  //               ],
+                  //             ),
+                  //             const Gap(5),
+                  //             AppText(
+                  //               text: product.name,
+                  //               weight: FontWeight.w600,
+                  //               maxLines: 3,
+                  //               overflow: TextOverflow.ellipsis,
+                  //             ),
+                  //             Row(
+                  //               children: [
+                  //                 Visibility(
+                  //                   visible: product.promoPrice != null,
+                  //                   child: Row(
+                  //                     children: [
+                  //                       AppText(
+                  //                           text: '\$${product.initialPrice}',
+                  //                           color: Colors.green),
+                  //                       const Gap(5),
+                  //                     ],
+                  //                   ),
+                  //                 ),
+                  //                 AppText(
+                  //                   text: product.initialPrice.toString(),
+                  //                   decoration: product.promoPrice != null
+                  //                       ? TextDecoration.lineThrough
+                  //                       : TextDecoration.none,
+                  //                 )
+                  //               ],
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
                 ],
               );
             },
@@ -2729,36 +2897,70 @@ class Store {
   final bool doesPickup;
   final String logo;
   final Delivery delivery;
-  final double rating;
-  final String estimatedDeliveryTime;
+  final Rating rating;
+  final String priceCategory;
+  final Location location;
+
+  final bool isGroupFriendly;
+  final String type;
+
   final String cardImage;
-  final int votes;
+
   final bool isFavorite;
-  final bool isGhanaian;
+
+  final List<ProductCategory> productCategories;
+
+  final TimeOfDay openingTime;
+  final TimeOfDay closingTime;
+  Store({
+    required this.location,
+    required this.priceCategory,
+    required this.isGroupFriendly,
+    required this.type,
+    required this.name,
+    required this.logo,
+    required this.doesPickup,
+    required this.productCategories,
+    required this.delivery,
+    required this.rating,
+    required this.cardImage,
+    required this.isFavorite,
+    required this.openingTime,
+    required this.closingTime,
+  });
+}
+
+class Rating {
+  final double averageRating;
+  final int ratings;
+
+  Rating({required this.averageRating, required this.ratings});
+}
+
+class Location {
+  final String countryOfOrigin;
+  final String streetAddress;
+
+  Location({required this.countryOfOrigin, required this.streetAddress});
+}
+
+class ProductCategory {
+  final String name;
   final List<Product> products;
-  final TimeOfDay openingHour;
-  final TimeOfDay closingHour;
-  Store(
-      {required this.name,
-      required this.logo,
-      required this.doesPickup,
-      required this.delivery,
-      required this.rating,
-      required this.cardImage,
-      required this.votes,
-      required this.isFavorite,
-      required this.products,
-      required this.isGhanaian,
-      required this.openingHour,
-      required this.closingHour,
-      required this.estimatedDeliveryTime});
+
+  ProductCategory({required this.name, required this.products});
 }
 
 class Delivery {
   final bool canDeliver;
+  final String estimatedDeliveryTime;
   final double fee;
 
-  Delivery({required this.canDeliver, required this.fee});
+  Delivery({
+    required this.canDeliver,
+    required this.fee,
+    required this.estimatedDeliveryTime,
+  });
 }
 
 class Product {
@@ -2766,14 +2968,48 @@ class Product {
   final double initialPrice;
   final double? promoPrice;
   final String imageUrl;
-  final int quantity;
+  final List<Product>? frequentlyBoughtTogether;
+
+  final String? description;
+  final List<Option>? options;
+  final bool selectOptionRequired;
+  final double? calories;
+  final bool? isSoldOut;
 
   Product(
       {required this.name,
       required this.initialPrice,
+      this.frequentlyBoughtTogether,
       this.promoPrice,
+      this.description,
+      this.options,
+      this.calories,
+      this.selectOptionRequired = false,
       required this.imageUrl,
-      required this.quantity});
+      this.isSoldOut});
+}
+
+class Option {
+  final String name;
+  final double? price;
+  final bool isExclusive;
+  final List<SubOption>? subOptions;
+  final double? calories;
+
+  Option({
+    required this.name,
+    this.price,
+    this.calories,
+    required this.isExclusive,
+    this.subOptions,
+  });
+}
+
+class SubOption {
+  final String name;
+  final bool canBeMultiple;
+
+  SubOption({required this.name, required this.canBeMultiple});
 }
 
 class HomeScreenTopic extends StatelessWidget {
@@ -2804,8 +3040,8 @@ class HomeScreenTopic extends StatelessWidget {
                   border: Border.all(color: AppColors.neutral200)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(50),
-                child: Image.network(
-                  imageUrl!,
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl!,
                   width: 40,
                   height: 40,
                   fit: BoxFit.fill,

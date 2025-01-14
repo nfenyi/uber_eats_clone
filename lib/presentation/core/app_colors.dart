@@ -12,6 +12,7 @@ class AppColors {
   static const neutral600 = Color(0xFF4B5563);
   static const neutral800 = Color(0xFF242935);
   static const neutral900 = Color(0xFF111827);
+  static const uberOneGold = Color(0xFFA3852A);
 
   const AppColors._();
 }

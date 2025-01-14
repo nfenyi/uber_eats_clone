@@ -98,11 +98,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                 store.name
                                     .toLowerCase()
                                     .contains(value.toLowerCase()) ||
-                                store.products.any(
-                                  (product) {
-                                    return product.name
-                                        .toLowerCase()
-                                        .contains(value);
+                                store.productCategories.any(
+                                  (productCategory) {
+                                    return productCategory.products.any(
+                                        (product) => product.name
+                                            .toLowerCase()
+                                            .contains(value));
                                     //TODO: store products gotten here in seperare variables to display per store to prevent looping through
                                     //all products again to find those that contain the search query/value to render them
                                   },

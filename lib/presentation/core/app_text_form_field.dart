@@ -46,6 +46,7 @@ class AppTextFormField extends ConsumerWidget {
   final VoidCallback? suffixCallback;
   final TextStyle? textStyle;
   final AutovalidateMode? autovalidateMode;
+  final bool autofocus;
 
   const AppTextFormField(
       {super.key,
@@ -70,6 +71,7 @@ class AppTextFormField extends ConsumerWidget {
       this.validator,
       this.onChanged,
       this.onTap,
+      this.autofocus = false,
       this.autovalidateMode,
       this.onEditingComplete,
       this.onTapOutside,
@@ -113,6 +115,7 @@ class AppTextFormField extends ConsumerWidget {
       minLines: minLines,
       validator: validator,
       onChanged: onChanged,
+      autofocus: autofocus,
       onTap: onTap,
       onEditingComplete: onEditingComplete,
       onTapOutside: onTapOutside,

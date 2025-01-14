@@ -25,6 +25,13 @@ class AssetNames {
   static const indian = 'assets/images/indian.png';
   static const uberOneSmall = 'assets/images/uber_one_small.png';
   static const map = 'assets/images/map.png';
+  static const groupOrder = 'assets/images/group_order.png';
+  static const groupOrderComplete = 'assets/images/group_order_complete.png';
+  static const didntFindMatch = 'assets/images/didnt_find_match.png';
+  static const uberOneCalendar = 'assets/images/uber_one_calendar.png';
+  static const uberOneCar = 'assets/images/uber_one_car.png';
+  static const uberOneTag = 'assets/images/uber_one_tag.png';
+  static const uberOneGiftBag = 'assets/images/uber_one_gift_bag.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';
@@ -35,4 +42,5 @@ class AssetNames {
   static const hamburger = 'assets/images/hamburger.jpg';
   static const whiteCar = 'assets/images/white_car.jpg';
   static const noSearchResult = 'assets/images/no_search_result.jpg';
+  static const greenTag = 'assets/images/green_tag.jpg';
 }
