@@ -9,7 +9,7 @@ class AppTextButton extends StatelessWidget {
   const AppTextButton({
     required this.text,
     required this.callback,
-    this.size = AppSizes.bodySmallest,
+    this.size = AppSizes.bodySmaller,
     this.color,
     this.isUnderlined = false,
     super.key,

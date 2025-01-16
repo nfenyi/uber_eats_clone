@@ -6,7 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/weblinks.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/address_screen.dart';
+import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/webview/webview_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
@@ -160,7 +160,7 @@ class _TermsNPrivacyNoticeScreenState
                               //     :
                               () => navigatorKey.currentState!
                                   .push(MaterialPageRoute(
-                            builder: (context) => const AddressScreen(),
+                            builder: (context) => const AddressesScreen(),
                           )),
                           child: Ink(
                             child: Container(

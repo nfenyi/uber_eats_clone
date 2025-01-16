@@ -113,7 +113,7 @@ class AppButton extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           icon!,
-                          const Gap(1.0),
+                          const Gap(5.0),
                           AppText(
                             text: text,
                             size: textSize ?? AppSizes.bodySmaller,

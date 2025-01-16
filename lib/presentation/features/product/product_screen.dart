@@ -238,7 +238,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                           children: [
                                             AppText(
                                                 text:
-                                                    '\$${frequentlyBoughtTogether.initialPrice}',
+                                                    '\$${frequentlyBoughtTogether.promoPrice}',
                                                 color: Colors.green),
                                             const Gap(5),
                                           ],

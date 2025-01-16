@@ -38,4 +38,6 @@ class OtherConstants {
     '\$\$\$',
     '\$\$\$\$'
   ];
+
+  static const String na = 'N/A';
 }

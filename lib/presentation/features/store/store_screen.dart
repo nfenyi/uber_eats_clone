@@ -18,7 +18,7 @@ import '../../../main.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
 import '../home/home_screen.dart';
-import '../sign_in/views/address_screen.dart';
+import '../address/screens/addresses_screen.dart';
 
 class StoreScreen extends StatefulWidget {
   final Store store;

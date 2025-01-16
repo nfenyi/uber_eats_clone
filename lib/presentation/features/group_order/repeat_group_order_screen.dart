@@ -198,7 +198,7 @@ class _RepeatGroupOrderScreenState
                       const AppText(
                         text: 'End date',
                       ),
-                      Switch(
+                      Switch.adaptive(
                         value: _endDate,
                         onChanged: (value) {
                           setState(() {

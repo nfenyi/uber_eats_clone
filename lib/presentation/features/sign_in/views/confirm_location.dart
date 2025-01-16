@@ -9,15 +9,15 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../core/app_colors.dart';
 
-class ConfirmLocation extends ConsumerStatefulWidget {
-  const ConfirmLocation({super.key});
+class ConfirmLocationScreen extends ConsumerStatefulWidget {
+  const ConfirmLocationScreen({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _ConfirmLocationState();
 }
 
-class _ConfirmLocationState extends ConsumerState<ConfirmLocation> {
+class _ConfirmLocationState extends ConsumerState<ConfirmLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

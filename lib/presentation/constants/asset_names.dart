@@ -32,6 +32,7 @@ class AssetNames {
   static const uberOneCar = 'assets/images/uber_one_car.png';
   static const uberOneTag = 'assets/images/uber_one_tag.png';
   static const uberOneGiftBag = 'assets/images/uber_one_gift_bag.png';
+  static const allowLocation = 'assets/images/allow_location.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

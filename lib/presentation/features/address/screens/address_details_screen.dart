@@ -5,13 +5,13 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/address_screen.dart';
+import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/confirm_location.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
-import 'payment_method_screen.dart';
+import '../../sign_in/views/payment_method_screen.dart';
 
 class AddressDetailsScreen extends ConsumerStatefulWidget {
   const AddressDetailsScreen({super.key});
@@ -40,13 +40,23 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                 InkWell(
                   onTap: () =>
                       navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) => const ConfirmLocation(),
+                    builder: (context) => const ConfirmLocationScreen(),
                   )),
                   child: Ink(
-                    child: Container(
-                      width: double.infinity,
-                      height: 200,
-                      color: AppColors.neutral300,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 200,
+                          color: AppColors.neutral300,
+                        ),
+                        Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(50)),
+                            child: const AppText(text: 'Edit pin'))
+                      ],
                     ),
                   ),
                 ),
