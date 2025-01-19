@@ -29,6 +29,7 @@ class UberEatsClone extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           color: Colors.white,
         ),
+        primaryColor: Colors.black,
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'UberMove',
 
@@ -47,7 +48,7 @@ class UberEatsClone extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorSchemeSeed: Colors.black,
+        // colorSchemeSeed: Colors.black,
         useMaterial3: true,
       ),
       home: const Wrapper(),

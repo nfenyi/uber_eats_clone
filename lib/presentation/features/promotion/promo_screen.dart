@@ -36,7 +36,7 @@ class _PromoScreenState extends State<PromoScreen> {
             "At select stores. For 2 orders. \$15 minimum order. Alcohol or other regulated items may not be eligible for this promotion")
   ];
 
-  bool _showSearchArea = true;
+  bool _showSearchArea = false;
 
   @override
   void dispose() {

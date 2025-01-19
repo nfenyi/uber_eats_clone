@@ -33,6 +33,16 @@ class AssetNames {
   static const uberOneTag = 'assets/images/uber_one_tag.png';
   static const uberOneGiftBag = 'assets/images/uber_one_gift_bag.png';
   static const allowLocation = 'assets/images/allow_location.png';
+  static const babyBottle = 'assets/images/baby_bottle.png';
+  static const retail = 'assets/images/retail_book.png';
+  static const flowers = 'assets/images/flowers.png';
+  static const petSupplies = 'assets/images/pet_supplies.png';
+  static const specialtyFoods = 'assets/images/specialty_foods.png';
+  static const pharmacy = 'assets/images/pharmacy.png';
+  static const gift = 'assets/images/gift.png';
+  static const alcohol = 'assets/images/alcohol.png';
+  static const convenience = 'assets/images/convenience.png';
+  static const grocery2 = 'assets/images/grocery2.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';
@@ -44,4 +54,5 @@ class AssetNames {
   static const whiteCar = 'assets/images/white_car.jpg';
   static const noSearchResult = 'assets/images/no_search_result.jpg';
   static const greenTag = 'assets/images/green_tag.jpg';
+  static const store = 'assets/images/store.jpeg';
 }

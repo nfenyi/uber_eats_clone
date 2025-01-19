@@ -13,10 +13,10 @@ import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
-import 'package:uber_eats_clone/presentation/features/promotion/promo_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import '../../../app_functions.dart';
 import '../../constants/asset_names.dart';
 import '../../constants/other_constants.dart';
 import '../../constants/weblinks.dart';
@@ -216,7 +216,7 @@ final List<Store> stores = [
         countryOfOrigin: 'Ghanaian',
         streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
     priceCategory: '\$\$\$\$',
-    type: 'Grocery',
+    type: 'Grocery, Alcohol',
     productCategories: [
       ProductCategory(name: 'Pancakes', products: [
         Product(
@@ -623,7 +623,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     )),
                                 AppText(
                                     text: isClosed
-                                        ? 'Closed • Available  at ${store.openingTime.hour}:${store.openingTime.minute}'
+                                        ? 'Closed • Available at ${AppFunctions.formatTime(store.openingTime)}'
                                         : '\$${store.delivery.fee} Delivery Fee',
                                     color: store.delivery.fee < 1
                                         ? const Color.fromARGB(
@@ -878,79 +878,81 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: CachedNetworkImage(
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Stack(
+                                  alignment: Alignment.topRight,
+                                  children: [
+                                    CachedNetworkImage(
                                       imageUrl: nationalBrand.cardImage,
                                       width: 200,
                                       height: 120,
                                       fit: BoxFit.fill,
                                     ),
-                                  ),
-                                  (timeOfDayNow.hour <
-                                              nationalBrand.openingTime.hour ||
-                                          (timeOfDayNow.hour >=
-                                                  nationalBrand
-                                                      .closingTime.hour &&
-                                              timeOfDayNow.minute >=
-                                                  nationalBrand
-                                                      .closingTime.minute))
-                                      ? Container(
-                                          color: Colors.black.withOpacity(0.5),
-                                          width: 200,
-                                          height: 120,
-                                          child: const Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              AppText(
-                                                text: 'Closed',
-                                                color: Colors.white,
-                                              ),
-                                            ],
+                                    (timeOfDayNow.hour <
+                                                nationalBrand
+                                                    .openingTime.hour ||
+                                            (timeOfDayNow.hour >=
+                                                    nationalBrand
+                                                        .closingTime.hour &&
+                                                timeOfDayNow.minute >=
+                                                    nationalBrand
+                                                        .closingTime.minute))
+                                        ? Container(
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            width: 200,
+                                            height: 120,
+                                            child: const Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                AppText(
+                                                  text: 'Closed',
+                                                  color: Colors.white,
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : !nationalBrand.delivery.canDeliver
+                                            ? Container(
+                                                color: Colors.black
+                                                    .withOpacity(0.5),
+                                                width: 200,
+                                                height: 120,
+                                                child: const Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    AppText(
+                                                      text: 'Pick up',
+                                                      color: Colors.white,
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            : const SizedBox.shrink(),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 8.0, top: 8.0),
+                                      child: InkWell(
+                                        onTap: () {},
+                                        child: Ink(
+                                          child: Icon(
+                                            nationalBrand.isFavorite
+                                                ? Icons.favorite
+                                                : Icons.favorite_outline,
+                                            color: Colors.white,
                                           ),
-                                        )
-                                      : !nationalBrand.delivery.canDeliver
-                                          ? Container(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              width: 200,
-                                              height: 120,
-                                              child: const Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  AppText(
-                                                    text: 'Pick up',
-                                                    color: Colors.white,
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          : const SizedBox.shrink(),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 8.0, top: 8.0),
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Ink(
-                                        child: Icon(
-                                          nationalBrand.isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_outline,
-                                          color: Colors.white,
                                         ),
                                       ),
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
                               const Gap(5),
                               Row(
@@ -1123,79 +1125,81 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: CachedNetworkImage(
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Stack(
+                                  alignment: Alignment.topRight,
+                                  children: [
+                                    CachedNetworkImage(
                                       imageUrl: nationalBrand.cardImage,
                                       width: 200,
                                       height: 120,
                                       fit: BoxFit.fill,
                                     ),
-                                  ),
-                                  (timeOfDayNow.hour <
-                                              nationalBrand.openingTime.hour ||
-                                          (timeOfDayNow.hour >=
-                                                  nationalBrand
-                                                      .closingTime.hour &&
-                                              timeOfDayNow.minute >=
-                                                  nationalBrand
-                                                      .closingTime.minute))
-                                      ? Container(
-                                          color: Colors.black.withOpacity(0.5),
-                                          width: 200,
-                                          height: 120,
-                                          child: const Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              AppText(
-                                                text: 'Closed',
-                                                color: Colors.white,
-                                              ),
-                                            ],
+                                    (timeOfDayNow.hour <
+                                                nationalBrand
+                                                    .openingTime.hour ||
+                                            (timeOfDayNow.hour >=
+                                                    nationalBrand
+                                                        .closingTime.hour &&
+                                                timeOfDayNow.minute >=
+                                                    nationalBrand
+                                                        .closingTime.minute))
+                                        ? Container(
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            width: 200,
+                                            height: 120,
+                                            child: const Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                AppText(
+                                                  text: 'Closed',
+                                                  color: Colors.white,
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : !nationalBrand.delivery.canDeliver
+                                            ? Container(
+                                                color: Colors.black
+                                                    .withOpacity(0.5),
+                                                width: 200,
+                                                height: 120,
+                                                child: const Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    AppText(
+                                                      text: 'Pick up',
+                                                      color: Colors.white,
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            : const SizedBox.shrink(),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 8.0, top: 8.0),
+                                      child: InkWell(
+                                        onTap: () {},
+                                        child: Ink(
+                                          child: Icon(
+                                            nationalBrand.isFavorite
+                                                ? Icons.favorite
+                                                : Icons.favorite_outline,
+                                            color: Colors.white,
                                           ),
-                                        )
-                                      : !nationalBrand.delivery.canDeliver
-                                          ? Container(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              width: 200,
-                                              height: 120,
-                                              child: const Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  AppText(
-                                                    text: 'Pick up',
-                                                    color: Colors.white,
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          : const SizedBox.shrink(),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 8.0, top: 8.0),
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Ink(
-                                        child: Icon(
-                                          nationalBrand.isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_outline,
-                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               const Gap(5),
                               Row(
@@ -1245,12 +1249,63 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       scrollDirection: Axis.horizontal,
                       slivers: stores[6]
                           .productCategories
-                          .map((productCategory) => SliverList.separated(
-                                separatorBuilder: (context, index) =>
-                                    const Gap(10),
-                                itemBuilder: (context, index) => Row(
-                                    children: productCategory.products
-                                        .map((product) => SizedBox(
+                          .map((productCategory) => SliverPadding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                sliver: SliverList.separated(
+                                  separatorBuilder: (context, index) =>
+                                      const Gap(10),
+                                  itemBuilder: (context, index) =>
+                                      ListView.separated(
+                                          scrollDirection: Axis.horizontal,
+                                          // TODO: find a way to do lazy loading and remove shrinkWrap
+                                          shrinkWrap: true,
+                                          itemCount:
+                                              productCategory.products.length,
+                                          separatorBuilder: (context, index) =>
+                                              const Gap(15),
+                                          itemBuilder: (context, index) {
+                                            final product =
+                                                productCategory.products[index];
+                                            return ProductGridTile(
+                                                product: product);
+                                          }),
+                                  itemCount: 1,
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                  HomeScreenTopic(
+                      callback: () {},
+                      title: 'Beer',
+                      subtitle: 'From ${stores[7].name}',
+                      imageUrl: stores[7].logo),
+                  SizedBox(
+                    height: 200,
+                    child: CustomScrollView(
+                      scrollDirection: Axis.horizontal,
+                      slivers: stores[7]
+                          .productCategories
+                          .map((productCategory) => SliverPadding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                sliver: SliverList.separated(
+                                  separatorBuilder: (context, index) =>
+                                      const Gap(10),
+                                  itemBuilder: (context, index) =>
+                                      ListView.separated(
+                                          scrollDirection: Axis.horizontal,
+                                          // TODO: find a way to do lazy loading and remove shrinkWrap
+                                          shrinkWrap: true,
+                                          itemCount:
+                                              productCategory.products.length,
+                                          separatorBuilder: (context, index) =>
+                                              const Gap(15),
+                                          itemBuilder: (context, index) {
+                                            final product =
+                                                productCategory.products[index];
+                                            return SizedBox(
                                               width: 100,
                                               child: Column(
                                                 crossAxisAlignment:
@@ -1353,109 +1408,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                   ),
                                                 ],
                                               ),
-                                            ))
-                                        .toList()),
-                                itemCount: 1,
+                                            );
+                                          }),
+                                  itemCount: 1,
+                                ),
                               ))
                           .toList(),
                     ),
                   ),
-
-                  HomeScreenTopic(
-                      callback: () {},
-                      title: 'Beer',
-                      subtitle: 'From ${stores[7].name}',
-                      imageUrl: stores[7].logo),
-                  // SizedBox(
-                  //   height: 200,
-                  //   child: ListView.separated(
-                  //     cacheExtent: 300,
-                  //     padding: const EdgeInsets.symmetric(
-                  //         horizontal: AppSizes.horizontalPaddingSmall),
-                  //     separatorBuilder: (context, index) => const Gap(10),
-                  //     scrollDirection: Axis.horizontal,
-                  //     itemCount: _stores[7].products.length,
-                  //     itemBuilder: (context, index) {
-                  //       final product = _stores[7].products[index];
-                  //       return SizedBox(
-                  //         width: 100,
-                  //         child: Column(
-                  //           crossAxisAlignment: CrossAxisAlignment.start,
-                  //           children: [
-                  //             Stack(
-                  //               alignment: Alignment.bottomRight,
-                  //               children: [
-                  //                 ClipRRect(
-                  //                   borderRadius: BorderRadius.circular(12),
-                  //                   child: CachedNetworkImage(
-                  //                     imageUrl: product.imageUrl,
-                  //                     width: 100,
-                  //                     height: 120,
-                  //                     fit: BoxFit.fill,
-                  //                   ),
-                  //                 ),
-                  //                 Padding(
-                  //                   padding: const EdgeInsets.only(
-                  //                       right: 8.0, top: 8.0),
-                  //                   child: InkWell(
-                  //                     onTap: () {},
-                  //                     child: Ink(
-                  //                       child: Container(
-                  //                         padding: const EdgeInsets.all(5),
-                  //                         decoration: BoxDecoration(
-                  //                             boxShadow: const [
-                  //                               BoxShadow(
-                  //                                 color: Colors.black12,
-                  //                                 offset: Offset(2, 2),
-                  //                               )
-                  //                             ],
-                  //                             color: Colors.white,
-                  //                             borderRadius:
-                  //                                 BorderRadius.circular(50)),
-                  //                         child: const Icon(
-                  //                           Icons.add,
-                  //                         ),
-                  //                       ),
-                  //                     ),
-                  //                   ),
-                  //                 )
-                  //               ],
-                  //             ),
-                  //             const Gap(5),
-                  //             AppText(
-                  //               text: product.name,
-                  //               weight: FontWeight.w600,
-                  //               maxLines: 3,
-                  //               overflow: TextOverflow.ellipsis,
-                  //             ),
-                  //             Row(
-                  //               children: [
-                  //                 Visibility(
-                  //                   visible: product.promoPrice != null,
-                  //                   child: Row(
-                  //                     children: [
-                  //                       AppText(
-                  //                           text: '\$${product.initialPrice}',
-                  //                           color: Colors.green),
-                  //                       const Gap(5),
-                  //                     ],
-                  //                   ),
-                  //                 ),
-                  //                 AppText(
-                  //                   text: product.initialPrice.toString(),
-                  //                   decoration: product.promoPrice != null
-                  //                       ? TextDecoration.lineThrough
-                  //                       : TextDecoration.none,
-                  //                 )
-                  //               ],
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
-
                   HomeScreenTopic(callback: () {}, title: 'All Stores'),
                   ListView.separated(
                       physics: const NeverScrollableScrollPhysics(),
@@ -1569,7 +1529,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     )),
                                 AppText(
                                     text: isClosed
-                                        ? 'Closed • Available at ${store.openingTime.hour}:${store.openingTime.minute}'
+                                        ? 'Closed • Available at ${AppFunctions.formatTime(store.openingTime)}'
                                         : '\$${store.delivery.fee} Delivery Fee',
                                     color: store.delivery.fee < 1
                                         ? const Color.fromARGB(
@@ -2415,6 +2375,91 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
+class ProductGridTile extends StatelessWidget {
+  const ProductGridTile({
+    super.key,
+    required this.product,
+  });
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 110,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CachedNetworkImage(
+                  imageUrl: product.imageUrl,
+                  width: 110,
+                  height: 120,
+                  fit: BoxFit.fill,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                child: InkWell(
+                  onTap: () {},
+                  child: Ink(
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              offset: Offset(2, 2),
+                            )
+                          ],
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50)),
+                      child: const Icon(
+                        Icons.add,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+          const Gap(5),
+          AppText(
+            text: product.name,
+            weight: FontWeight.w600,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Row(
+            children: [
+              Visibility(
+                visible: product.promoPrice != null,
+                child: Row(
+                  children: [
+                    AppText(
+                        text: '\$${product.initialPrice}', color: Colors.green),
+                    const Gap(5),
+                  ],
+                ),
+              ),
+              AppText(
+                text: product.initialPrice.toString(),
+                decoration: product.promoPrice != null
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class SearchResultDisplay1 extends StatelessWidget {
   const SearchResultDisplay1({
     super.key,
@@ -3079,6 +3124,7 @@ class HomeScreenTopic extends StatelessWidget {
           ? null
           : AppText(
               text: subtitle!,
+              color: AppColors.neutral500,
             ),
       trailing: Container(
           padding: const EdgeInsets.all(5),
