@@ -95,16 +95,15 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
               ];
             },
             body: Visibility(
-              // visible: _featuredStores.isNotEmpty,
-              visible: true,
+              visible: _featuredStores.isNotEmpty,
               replacement: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    // fit: BoxFit.fitHeight,
-                    AssetNames.store,
-                    height: 100,
-                  ),
+                      // fit: BoxFit.fitHeight,
+                      AssetNames.store,
+                      height: 100,
+                      color: Colors.black),
                   const Gap(10),
                   const AppText(
                     text: 'Stores coming soon',
@@ -983,7 +982,8 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                             final product =
                                                 productCategory.products[index];
                                             return ProductGridTile(
-                                                product: product);
+                                                product: product,
+                                                store: stores[6]);
                                           }),
                                   itemCount: 1,
                                 ),

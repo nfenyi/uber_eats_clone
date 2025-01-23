@@ -21,6 +21,7 @@ import '../../../../app_functions.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../alcohol/alcohol_screen.dart';
+import '../../grocery_store/screens/grocery_store_screens.dart';
 import '../../home/home_screen.dart';
 import '../../home/map/map_screen.dart';
 import '../../national_brands/national_brands_screen.dart';
@@ -410,7 +411,13 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                             borderRadius: BorderRadius.circular(12),
                             onTap: () {
                               navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) => StoreScreen(store),
+                                builder: (context) {
+                                  if (store.type.contains('Grocery')) {
+                                    return GroceryStoreMainScreen(store);
+                                  } else {
+                                    return StoreScreen(store);
+                                  }
+                                },
                               ));
                             },
                             child: Ink(
@@ -874,8 +881,8 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                                 .circular(12),
                                                         child:
                                                             CachedNetworkImage(
-                                                          imageUrl:
-                                                              product.imageUrl,
+                                                          imageUrl: product
+                                                              .imageUrls.first,
                                                           width: 100,
                                                           height: 120,
                                                           fit: BoxFit.fill,
@@ -1014,8 +1021,8 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                                 .circular(12),
                                                         child:
                                                             CachedNetworkImage(
-                                                          imageUrl:
-                                                              product.imageUrl,
+                                                          imageUrl: product
+                                                              .imageUrls.first,
                                                           width: 100,
                                                           height: 120,
                                                           fit: BoxFit.fill,

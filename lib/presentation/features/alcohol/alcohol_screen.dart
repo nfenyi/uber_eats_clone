@@ -261,7 +261,9 @@ class _AlcoholScreenState extends State<AlcoholScreen> {
                                           final product =
                                               productCategory.products[index];
                                           return ProductGridTile(
-                                              product: product);
+                                            product: product,
+                                            store: stores[6],
+                                          );
                                         }),
                                 itemCount: 1,
                               ),

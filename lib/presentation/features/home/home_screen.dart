@@ -21,6 +21,7 @@ import '../../constants/asset_names.dart';
 import '../../constants/other_constants.dart';
 import '../../constants/weblinks.dart';
 import '../national_brands/national_brands_screen.dart';
+import '../product/product_screen.dart';
 import '../store/store_screen.dart';
 import '../webview/webview_screen.dart';
 import 'map/map_screen.dart';
@@ -43,54 +44,58 @@ final List<Store> stores = [
         Product(
             name: 'Big Breakfast with Muffin',
             initialPrice: 6.69,
-            imageUrl:
-                'https://s7d1.scene7.com/is/image/mcdonalds/mcd-big-breakfast-uae-1223:nutrition-calculator-tile?wid=822&hei=822&dpr=off',
+            imageUrls: [
+              'https://s7d1.scene7.com/is/image/mcdonalds/mcd-big-breakfast-uae-1223:nutrition-calculator-tile?wid=822&hei=822&dpr=off',
+            ],
             isSoldOut: true),
         Product(
-          name: 'Big Breakfast with Muffin & Hotcakes',
-          initialPrice: 8.69,
-          imageUrl:
+            name: 'Big Breakfast with Muffin & Hotcakes',
+            initialPrice: 8.69,
+            imageUrls: [
               'https://s7d1.scene7.com/is/image/mcdonaldsstage/DC_202208_3590_BigBreakfast_HotCakes_1564x1564:product-header-mobile?wid=1313&hei=1313&dpr=off',
-        ),
+            ]),
         Product(
-          name: 'Hotcakes',
-          initialPrice: 5.99,
-          frequentlyBoughtTogether: [
-            Product(
-              name: 'Corona Extra Mexican Lager Beer(12 pack)',
-              description:
-                  'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-              initialPrice: 21.39,
-              imageUrl:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlnRtgDZ74Kh3YBFrqaD3F3WpgTANg7ebL8A&s',
-            ),
-            Product(
-              name: 'Modelo Cerveza Especial Lager Beer',
-              description:
-                  'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-              initialPrice: 36.29,
-              imageUrl:
-                  'https://i5.walmartimages.com/seo/Modelo-Especial-Mexican-Lager-Import-Beer-6-Pack-12-fl-oz-Glass-Bottles-4-4-ABV_cb2e7f8a-d7df-4bfd-b36c-257f9b023092.9e785aa9a4bf79387b8bbdec7f3b2d19.jpeg',
-            ),
-          ],
-          calories: 590,
-          options: [
-            Option(
-                name: 'Butter', price: 0.10, isExclusive: false, calories: 35),
-            Option(
-                name: 'Syrup', price: 0.25, isExclusive: false, calories: 190),
-            Option(name: 'Fork', isExclusive: false),
-            Option(name: 'Knife', isExclusive: false),
-          ],
-          imageUrl:
+            name: 'Hotcakes',
+            initialPrice: 5.99,
+            frequentlyBoughtTogether: [
+              Product(
+                  name: 'Corona Extra Mexican Lager Beer(12 pack)',
+                  description:
+                      'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+                  initialPrice: 21.39,
+                  imageUrls: [
+                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlnRtgDZ74Kh3YBFrqaD3F3WpgTANg7ebL8A&s',
+                  ]),
+              Product(
+                  name: 'Modelo Cerveza Especial Lager Beer',
+                  description:
+                      'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+                  initialPrice: 36.29,
+                  imageUrls: [
+                    'https://i5.walmartimages.com/seo/Modelo-Especial-Mexican-Lager-Import-Beer-6-Pack-12-fl-oz-Glass-Bottles-4-4-ABV_cb2e7f8a-d7df-4bfd-b36c-257f9b023092.9e785aa9a4bf79387b8bbdec7f3b2d19.jpeg',
+                  ]),
+            ],
+            calories: 590,
+            options: [
+              Option(
+                  name: 'Butter',
+                  price: 0.10,
+                  isExclusive: false,
+                  calories: 35),
+              Option(
+                  name: 'Syrup',
+                  price: 0.25,
+                  isExclusive: false,
+                  calories: 190),
+              Option(name: 'Fork', isExclusive: false),
+              Option(name: 'Knife', isExclusive: false),
+            ],
+            imageUrls: [
               'https://s7d1.scene7.com/is/image/mcdonalds/mcdonalds-hotcakes:1-3-product-tile-desktop?wid=594&hei=368&dpr=off',
-        ),
-        Product(
-          name: 'Hotcakes and Sausages',
-          initialPrice: 6.69,
-          imageUrl:
-              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS-TWx-aTODD2giXaP5j4gRpqZdcHyHc3bDA&s',
-        )
+            ]),
+        Product(name: 'Hotcakes and Sausages', initialPrice: 6.69, imageUrls: [
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS-TWx-aTODD2giXaP5j4gRpqZdcHyHc3bDA&s',
+        ])
       ])
     ],
     cardImage:
@@ -216,7 +221,7 @@ final List<Store> stores = [
         countryOfOrigin: 'Ghanaian',
         streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
     priceCategory: '\$\$\$\$',
-    type: 'Grocery, Alcohol',
+    type: 'Grocery, Alcohol, Pharmacy',
     productCategories: [
       ProductCategory(name: 'Pancakes', products: [
         Product(
@@ -224,51 +229,119 @@ final List<Store> stores = [
             initialPrice: 7.30,
             description:
                 'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-            imageUrl:
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX2JBcwTEOFS2X5ss4oJDhm9_OIj6NOmeiWw&s',
+            imageUrls: [
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX2JBcwTEOFS2X5ss4oJDhm9_OIj6NOmeiWw&s',
+            ],
             isSoldOut: true),
         Product(
             name: 'Pearl Milling Company',
             initialPrice: 6.51,
             description:
                 'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-            imageUrl:
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHstuwD4AyM-VGvrcVOhXht_j0lf3ie8Kahg&s',
+            imageUrls: [
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHstuwD4AyM-VGvrcVOhXht_j0lf3ie8Kahg&s',
+            ],
             isSoldOut: true)
       ]),
       ProductCategory(name: 'Syrups', products: [
         Product(
-          name: 'O Organics Organic Syrup 100% Pure',
-          initialPrice: 9.55,
-          description:
-              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-          imageUrl:
+            name: 'O Organics Organic Syrup 100% Pure',
+            initialPrice: 9.55,
+            description:
+                'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+            imageUrls: [
               'https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/abeb5951-b4ff-4f00-a7cb-10174e731013-retina-large.png',
-        ),
+            ]),
         Product(
             name: 'Signature Select Grade a Pure Maple Syrup',
             initialPrice: 10.11,
             description:
                 'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-            imageUrl:
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTC0GD164u8Cvwu3fVbiOlEPPuye2EDkJy_w&s',
+            imageUrls: [
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTC0GD164u8Cvwu3fVbiOlEPPuye2EDkJy_w&s',
+            ],
             isSoldOut: true),
       ]),
       ProductCategory(name: 'Fruit', products: [
         Product(
-          name: 'Organic Blueberries(18 oz)',
-          initialPrice: 10.11,
-          description:
-              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-          imageUrl:
+            name: 'Organic Blueberries(18 oz)',
+            initialPrice: 10.11,
+            description:
+                'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+            imageUrls: [
               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8lW8htrtQcsW1QI0UM34PNvTrLAFFniMruA&s',
-        ),
+            ]),
       ]),
     ],
     isFavorite: false,
     cardImage:
         'https://www.belgravialdn.com/sites/belgravialdn.com/files/styles/aspect_ratio_4_3_1021w/public/2023/09/0211_joe_004-edited.jpg.webp?h=43753d63&itok=OZEobaI0',
     name: "Safeway",
+    aisles: [
+      Aisle(
+        name: 'Breakfast',
+        productCategories: [
+          ProductCategory(name: 'Pancakes', products: [
+            Product(
+                name: 'Birch Benders Oganic Buttermilk Pancake & Waffle Mix',
+                initialPrice: 7.30,
+                description:
+                    'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+                imageUrls: [
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX2JBcwTEOFS2X5ss4oJDhm9_OIj6NOmeiWw&s',
+                ],
+                isSoldOut: true),
+            Product(
+                name: 'Pearl Milling Company',
+                initialPrice: 6.51,
+                description:
+                    'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+                imageUrls: [
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHstuwD4AyM-VGvrcVOhXht_j0lf3ie8Kahg&s',
+                ],
+                isSoldOut: true)
+          ]),
+          ProductCategory(name: 'Syrups', products: [
+            Product(
+                name: 'O Organics Organic Syrup 100% Pure',
+                initialPrice: 9.55,
+                description:
+                    'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+                imageUrls: [
+                  'https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/abeb5951-b4ff-4f00-a7cb-10174e731013-retina-large.png',
+                ]),
+            Product(
+                name: 'Signature Select Grade a Pure Maple Syrup',
+                initialPrice: 10.11,
+                description:
+                    'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+                imageUrls: [
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTC0GD164u8Cvwu3fVbiOlEPPuye2EDkJy_w&s',
+                ],
+                isSoldOut: true),
+          ]),
+          ProductCategory(name: 'Fruit', products: [
+            Product(
+                name: 'Organic Blueberries(18 oz)',
+                initialPrice: 10.11,
+                description:
+                    'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+                imageUrls: [
+                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8lW8htrtQcsW1QI0UM34PNvTrLAFFniMruA&s',
+                ]),
+          ]),
+        ],
+      ),
+      Aisle(name: 'Canned Products', productCategories: []),
+      Aisle(
+        name: 'International Food',
+        productCategories: [],
+      ),
+      Aisle(name: 'Other', productCategories: []),
+      Aisle(name: 'Flowers & Plants', productCategories: []),
+      Aisle(name: 'Pets', productCategories: []),
+      Aisle(name: 'Meat', productCategories: [])
+    ],
     logo:
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhZy8UOQW_ONW303-Cd1_39k8db8JVhfKlHA&s',
     delivery:
@@ -282,29 +355,29 @@ final List<Store> stores = [
     productCategories: [
       ProductCategory(name: 'Beer', products: [
         Product(
-          name: 'Corona Extra Mexican Lager Beer(12 pack)',
-          description:
-              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-          initialPrice: 21.39,
-          imageUrl:
+            name: 'Corona Extra Mexican Lager Beer(12 pack)',
+            description:
+                'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+            initialPrice: 21.39,
+            imageUrls: [
               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlnRtgDZ74Kh3YBFrqaD3F3WpgTANg7ebL8A&s',
-        ),
+            ]),
         Product(
-          name: 'Modelo Cerveza Especial Lager Beer',
-          description:
-              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-          initialPrice: 36.29,
-          imageUrl:
+            name: 'Modelo Cerveza Especial Lager Beer',
+            description:
+                'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+            initialPrice: 36.29,
+            imageUrls: [
               'https://i5.walmartimages.com/seo/Modelo-Especial-Mexican-Lager-Import-Beer-6-Pack-12-fl-oz-Glass-Bottles-4-4-ABV_cb2e7f8a-d7df-4bfd-b36c-257f9b023092.9e785aa9a4bf79387b8bbdec7f3b2d19.jpeg',
-        ),
+            ]),
         Product(
-          name: 'Coors Light American Lager Beer',
-          description:
-              'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
-          initialPrice: 15.39,
-          imageUrl:
+            name: 'Coors Light American Lager Beer',
+            description:
+                'ojojoajfkojoajwijawfjiojadfwij[jdsakpjamdf,lmaflmlafsdnnfanklanlknafknlanlnalnlanlkasfd]',
+            initialPrice: 15.39,
+            imageUrls: [
               'https://m.media-amazon.com/images/I/61JXbG2MPFL._SL1000_.jpg',
-        ),
+            ]),
       ])
     ],
     isGroupFriendly: true,
@@ -1268,7 +1341,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             final product =
                                                 productCategory.products[index];
                                             return ProductGridTile(
-                                                product: product);
+                                                product: product,
+                                                store: stores[6]);
                                           }),
                                   itemCount: 1,
                                 ),
@@ -1305,110 +1379,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           itemBuilder: (context, index) {
                                             final product =
                                                 productCategory.products[index];
-                                            return SizedBox(
-                                              width: 100,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Stack(
-                                                    alignment:
-                                                        Alignment.bottomRight,
-                                                    children: [
-                                                      ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          imageUrl:
-                                                              product.imageUrl,
-                                                          width: 100,
-                                                          height: 120,
-                                                          fit: BoxFit.fill,
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0,
-                                                                top: 8.0),
-                                                        child: InkWell(
-                                                          onTap: () {},
-                                                          child: Ink(
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              decoration: BoxDecoration(
-                                                                  boxShadow: const [
-                                                                    BoxShadow(
-                                                                      color: Colors
-                                                                          .black12,
-                                                                      offset:
-                                                                          Offset(
-                                                                              2,
-                                                                              2),
-                                                                    )
-                                                                  ],
-                                                                  color: Colors
-                                                                      .white,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              50)),
-                                                              child: const Icon(
-                                                                Icons.add,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  const Gap(5),
-                                                  AppText(
-                                                    text: product.name,
-                                                    weight: FontWeight.w600,
-                                                    maxLines: 3,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Visibility(
-                                                        visible: product
-                                                                .promoPrice !=
-                                                            null,
-                                                        child: Row(
-                                                          children: [
-                                                            AppText(
-                                                                text:
-                                                                    '\$${product.initialPrice}',
-                                                                color: Colors
-                                                                    .green),
-                                                            const Gap(5),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      AppText(
-                                                        text: product
-                                                            .initialPrice
-                                                            .toString(),
-                                                        decoration:
-                                                            product.promoPrice !=
-                                                                    null
-                                                                ? TextDecoration
-                                                                    .lineThrough
-                                                                : TextDecoration
-                                                                    .none,
-                                                      )
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            );
+                                            return ProductGridTile(
+                                                product: product,
+                                                store: stores[7]);
                                           }),
                                   itemCount: 1,
                                 ),
@@ -1883,7 +1856,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           context: context,
                           builder: (context) {
                             late int temp;
-                            logger.d(_selectedRatingIndex);
+                            // logger.d(_selectedRatingIndex);
                             if (_selectedRatingIndex == null) {
                               temp = 0;
                             } else {
@@ -2378,83 +2351,103 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 class ProductGridTile extends StatelessWidget {
   const ProductGridTile({
     super.key,
-    required this.product,
-  });
+    required Product product,
+    required Store store,
+    VoidCallback? callback,
+  })  : _product = product,
+        _store = store,
+        _callback = callback;
 
-  final Product product;
+  final Product _product;
+  final Store _store;
+  final VoidCallback? _callback;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 110,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: CachedNetworkImage(
-                  imageUrl: product.imageUrl,
-                  width: 110,
-                  height: 120,
-                  fit: BoxFit.fill,
-                ),
+    return InkWell(
+      onTap: _callback ??
+          () {
+            navigatorKey.currentState!.push(MaterialPageRoute(
+              builder: (context) => ProductScreen(
+                product: _product,
+                store: _store,
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: InkWell(
-                  onTap: () {},
-                  child: Ink(
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              offset: Offset(2, 2),
-                            )
-                          ],
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(50)),
-                      child: const Icon(
-                        Icons.add,
-                      ),
+            ));
+          },
+      child: Ink(
+        child: SizedBox(
+          width: 110,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: CachedNetworkImage(
+                      imageUrl: _product.imageUrls.first,
+                      width: 110,
+                      height: 120,
+                      fit: BoxFit.fill,
                     ),
                   ),
-                ),
-              )
-            ],
-          ),
-          const Gap(5),
-          AppText(
-            text: product.name,
-            weight: FontWeight.w600,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Row(
-            children: [
-              Visibility(
-                visible: product.promoPrice != null,
-                child: Row(
-                  children: [
-                    AppText(
-                        text: '\$${product.initialPrice}', color: Colors.green),
-                    const Gap(5),
-                  ],
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: Ink(
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  offset: Offset(2, 2),
+                                )
+                              ],
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(50)),
+                          child: const Icon(
+                            Icons.add,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
               ),
+              const Gap(5),
               AppText(
-                text: product.initialPrice.toString(),
-                decoration: product.promoPrice != null
-                    ? TextDecoration.lineThrough
-                    : TextDecoration.none,
-              )
+                text: _product.name,
+                weight: FontWeight.w600,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Row(
+                children: [
+                  Visibility(
+                    visible: _product.promoPrice != null,
+                    child: Row(
+                      children: [
+                        AppText(
+                            text: '\$${_product.promoPrice}',
+                            color: Colors.green),
+                        const Gap(5),
+                      ],
+                    ),
+                  ),
+                  AppText(
+                    text: _product.initialPrice.toString(),
+                    decoration: _product.promoPrice != null
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
+                  )
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -2969,6 +2962,7 @@ class Store {
 
   final bool isGroupFriendly;
   final String type;
+  final List<Aisle>? aisles;
 
   final String cardImage;
 
@@ -2983,6 +2977,7 @@ class Store {
     required this.priceCategory,
     required this.isGroupFriendly,
     required this.type,
+    this.aisles,
     required this.name,
     required this.logo,
     required this.doesPickup,
@@ -2994,6 +2989,13 @@ class Store {
     required this.openingTime,
     required this.closingTime,
   });
+}
+
+class Aisle {
+  final String name;
+  final List<ProductCategory> productCategories;
+
+  Aisle({required this.name, required this.productCategories});
 }
 
 class Rating {
@@ -3033,25 +3035,36 @@ class Product {
   final String name;
   final double initialPrice;
   final double? promoPrice;
-  final String imageUrl;
+  final List<String> imageUrls;
   final List<Product>? frequentlyBoughtTogether;
-
+  final Map<String, String>? nutritionFacts;
+  final String? ingredients;
+  final String? directions;
+  final String? quantity;
   final String? description;
   final List<Option>? options;
   final bool selectOptionRequired;
   final double? calories;
   final bool? isSoldOut;
+  final bool? isSponsored;
+  final List<Product>? similarProducts;
 
   Product(
       {required this.name,
       required this.initialPrice,
       this.frequentlyBoughtTogether,
       this.promoPrice,
+      this.quantity,
+      this.nutritionFacts,
+      this.ingredients,
+      this.isSponsored,
+      this.directions,
       this.description,
       this.options,
+      this.similarProducts,
       this.calories,
       this.selectOptionRequired = false,
-      required this.imageUrl,
+      required this.imageUrls,
       this.isSoldOut});
 }
 

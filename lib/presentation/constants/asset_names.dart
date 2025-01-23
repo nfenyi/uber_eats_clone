@@ -54,5 +54,6 @@ class AssetNames {
   static const whiteCar = 'assets/images/white_car.jpg';
   static const noSearchResult = 'assets/images/no_search_result.jpg';
   static const greenTag = 'assets/images/green_tag.jpg';
-  static const store = 'assets/images/store.jpeg';
+  static const store = 'assets/images/store.jpg';
+  static const aisleImage = 'assets/images/aisle_image.jpg';
 }

@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -248,8 +247,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                   onTap: () {
                                     navigatorKey.currentState!
                                         .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          ProductScreen(product),
+                                      builder: (context) => ProductScreen(
+                                        product: product,
+                                        store: _store,
+                                      ),
                                     ));
                                   },
                                   child: Row(
@@ -271,15 +272,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                                 Visibility(
                                                   visible: product.promoPrice !=
                                                       null,
-                                                  child: Row(
-                                                    children: [
-                                                      AppText(
-                                                          text:
-                                                              '\$${product.initialPrice}',
-                                                          color: Colors.green),
-                                                      const Gap(5),
-                                                    ],
-                                                  ),
+                                                  child: AppText(
+                                                      text:
+                                                          '\$${product.promoPrice} ',
+                                                      color: Colors.green),
                                                 ),
                                                 AppText(
                                                   text:
@@ -319,7 +315,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                             child: CachedNetworkImage(
-                                              imageUrl: product.imageUrl,
+                                              imageUrl: product.imageUrls.first,
                                               width: 100,
                                               height: 100,
                                               fit: BoxFit.fill,

@@ -122,7 +122,10 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
                       widget.store.productCategories[1].products[index];
                   return Column(
                     children: [
-                      ProductGridTile(product: product),
+                      ProductGridTile(
+                        product: product,
+                        store: widget.store,
+                      ),
                       if (product.promoPrice != null)
                         AppTextBadge(
                             text:

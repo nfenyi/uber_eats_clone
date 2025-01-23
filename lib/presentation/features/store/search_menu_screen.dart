@@ -98,7 +98,10 @@ class _SearchMenuScreenState extends ConsumerState<SearchMenuScreen> {
                                             navigatorKey.currentState!
                                                 .push(MaterialPageRoute(
                                               builder: (context) =>
-                                                  ProductScreen(product),
+                                                  ProductScreen(
+                                                product: product,
+                                                store: widget.store,
+                                              ),
                                             ));
                                           },
                                           child: Row(
@@ -182,8 +185,8 @@ class _SearchMenuScreenState extends ConsumerState<SearchMenuScreen> {
                                                         BorderRadius.circular(
                                                             12),
                                                     child: CachedNetworkImage(
-                                                      imageUrl:
-                                                          product.imageUrl,
+                                                      imageUrl: product
+                                                          .imageUrls.first,
                                                       width: 100,
                                                       height: 100,
                                                       fit: BoxFit.fill,
