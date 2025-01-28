@@ -25,6 +25,13 @@ class OtherConstants {
     'Dietary',
     'Sort'
   ];
+
+  static const List<String> boxCateringFilters = [
+    'Group size',
+    'Sort',
+    'Offers',
+    'Best overall'
+  ];
   static const List<String> deliveryPriceFilters = [
     '\$1',
     '\$3',

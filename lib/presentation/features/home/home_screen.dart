@@ -221,7 +221,7 @@ final List<Store> stores = [
         countryOfOrigin: 'Ghanaian',
         streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
     priceCategory: '\$\$\$\$',
-    type: 'Grocery, Alcohol, Pharmacy',
+    type: 'Grocery, Alcohol, Pharmacy, Box Catering',
     productCategories: [
       ProductCategory(name: 'Pancakes', products: [
         Product(

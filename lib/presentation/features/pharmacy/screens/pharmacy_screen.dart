@@ -18,8 +18,8 @@ import '../../home/home_screen.dart';
 import '../../sign_in/views/drop_off_options_screen.dart';
 
 class PharmacyScreen extends StatefulWidget {
-  final List<Store> alcoholStores;
-  const PharmacyScreen({super.key, required this.alcoholStores});
+  final List<Store> pharmacyStores;
+  const PharmacyScreen({super.key, required this.pharmacyStores});
 
   @override
   State<PharmacyScreen> createState() => _PharmacyScreenState();
@@ -45,7 +45,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
   void initState() {
     super.initState();
 
-    _featuredStores = widget.alcoholStores;
+    _featuredStores = widget.pharmacyStores;
     for (var i = 0; i < _featuredStores.length; i++) {
       _featuredStoresColors.add(Color.fromARGB(50, Random().nextInt(256),
           Random().nextInt(256), Random().nextInt(256)));
@@ -95,15 +95,15 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
               ];
             },
             body: Visibility(
-              visible: _featuredStores.isNotEmpty,
+              visible: widget.pharmacyStores.isNotEmpty,
               replacement: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                      // fit: BoxFit.fitHeight,
-                      AssetNames.store,
-                      height: 100,
-                      color: Colors.black),
+                    // fit: BoxFit.fitHeight,
+                    AssetNames.store,
+                    height: 100,
+                  ),
                   const Gap(10),
                   const AppText(
                     text: 'Stores coming soon',
@@ -998,7 +998,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                           horizontal: AppSizes.horizontalPaddingSmall),
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final store = widget.alcoholStores[index];
+                        final store = widget.pharmacyStores[index];
                         final bool isClosed =
                             timeOfDayNow.hour < store.openingTime.hour ||
                                 (timeOfDayNow.hour >= store.closingTime.hour &&
@@ -1067,7 +1067,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                       separatorBuilder: (context, index) => const Divider(
                             indent: 30,
                           ),
-                      itemCount: widget.alcoholStores.length),
+                      itemCount: widget.pharmacyStores.length),
                 ],
               ),
             )));

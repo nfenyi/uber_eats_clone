@@ -98,6 +98,9 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
       (a, b) => a.rating.averageRating.compareTo(b.rating.averageRating),
     );
     _hottestDeals = _hottestDeals.reversed.toList();
+    //TODO: store in global lists so this filteration does not occur on every screen
+    //that needs this sorting
+    //or better still let firebase take care of sorting
     for (var store in stores) {
       if (store.type.contains('Grocery')) {
         _groceryGroceryStores.add(store);
@@ -339,7 +342,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                     )),
                                 AppText(
                                     text: isClosed
-                                        ? 'Closed • Available  at ${store.openingTime.hour}:${store.openingTime.minute}'
+                                        ? 'Closed • Available at ${AppFunctions.formatTime(store.openingTime)}'
                                         : '\$${store.delivery.fee} Delivery Fee',
                                     color: store.delivery.fee < 1
                                         ? const Color.fromARGB(
@@ -376,7 +379,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const Gap(148),
+                  const Gap(160),
                   const Padding(
                     padding: EdgeInsets.all(AppSizes.horizontalPaddingSmall),
                     child: Row(
@@ -1304,7 +1307,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                           } else if (index == 4) {
                             navigatorKey.currentState!.push(MaterialPageRoute(
                               builder: (context) => PharmacyScreen(
-                                  alcoholStores: _pharmacyStores),
+                                  pharmacyStores: _pharmacyStores),
                             ));
                           }
                         },

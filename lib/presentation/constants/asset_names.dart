@@ -44,6 +44,53 @@ class AssetNames {
   static const convenience = 'assets/images/convenience.png';
   static const grocery2 = 'assets/images/grocery2.png';
 
+  static const breakfastNBrunch = 'assets/images/breakfast_n_brunch.png';
+  static const kosher = 'assets/images/kosher.png';
+  static const deli = 'assets/images/deli.png';
+  static const pizzaImage = 'assets/images/pizza_image.png';
+  static const bestOverall = 'assets/images/best_overall.png';
+  static const fastFoodImage = 'assets/images/fast_food_image.png';
+  static const healthyImage = 'assets/images/healthy_image.png';
+  static const halal = 'assets/images/halal.png';
+  static const vegetarianFriendly = 'assets/images/vegetarian_friendly.png';
+  static const cantonese = 'assets/images/cantonese.png';
+  static const kidsFriendly = 'assets/images/kids_friendly.png';
+  static const traditionalAmerican = 'assets/images/traditional_american.png';
+  static const israeli = 'assets/images/israeli.png';
+  static const easternEuropean = 'assets/images/eastern_european.png';
+  static const arab = 'assets/images/arab.png';
+
+  static const sendGifts = 'assets/images/send_gifts.png';
+  static const sendGifts2 = 'assets/images/send_gifts2.png';
+  static const birthday = 'assets/images/birthday.png';
+  static const giftCard = 'assets/images/gift_card.png';
+  static const giftFlowers = 'assets/images/gift_flowers.png';
+  static const giftRetail = 'assets/images/gift_retail.png';
+  static const sweets = 'assets/images/sweets.png';
+  static const giftAlcohol = 'assets/images/gift_alcohol.png';
+  static const giftRetailBg = 'assets/images/gift_retail_bg.png';
+  static const giftflowersBg = 'assets/images/gift_flowers_bg.png';
+  static const giftBirthdayBg = 'assets/images/gift_birthday_bg.png';
+  static const giftAlcoholBg = 'assets/images/gift_alcohol_bg.png';
+  static const giftSweetsBg = 'assets/images/gift_sweets_bg.png';
+  static const giftCardOnboarding = 'assets/images/gift_card_onboarding.png';
+  static const graduation1 = 'assets/images/graduation1.png';
+  static const graduation2 = 'assets/images/graduation2.png';
+  static const mothersDay1 = 'assets/images/mothers_day1.png';
+  static const mothersDay2 = 'assets/images/mothers_day2.png';
+  static const teacherAppreciation1 = 'assets/images/teacher_appreciation1.png';
+  static const teacherAppreciation2 = 'assets/images/teacher_appreciation2.png';
+  static const eats1 = 'assets/images/eats1.png';
+  static const eats2 = 'assets/images/eats2.png';
+  static const officeCelebration1 = 'assets/images/office_celebration1.png';
+  static const officeCelebration2 = 'assets/images/office_celebration2.png';
+  static const community1 = 'assets/images/community1.png';
+  static const community2 = 'assets/images/community2.png';
+  static const community3 = 'assets/images/community3.png';
+  static const boxCatering = 'assets/images/box_catering.png';
+  static const offers = 'assets/images/offers.png';
+  static const bestOverallWhBg = 'assets/images/best_overall_white_bg.png';
+
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';
   static const bagDoorstep = 'assets/images/bag_doorstep.jpg';
@@ -56,4 +103,5 @@ class AssetNames {
   static const greenTag = 'assets/images/green_tag.jpg';
   static const store = 'assets/images/store.jpg';
   static const aisleImage = 'assets/images/aisle_image.jpg';
+  static const masterCardLogo = 'assets/images/master_card_logo.jpg';
 }

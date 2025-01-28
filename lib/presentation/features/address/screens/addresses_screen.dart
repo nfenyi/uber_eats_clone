@@ -333,6 +333,7 @@ class AppButton2 extends StatefulWidget {
   final String text;
   final VoidCallback callback;
   final OutlinedBorder? shape;
+
   const AppButton2({
     required this.text,
     required this.callback,

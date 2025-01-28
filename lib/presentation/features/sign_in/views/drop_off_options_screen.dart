@@ -184,7 +184,7 @@ class _DropOffOptionsScreenState extends ConsumerState<DropOffOptionsScreen> {
 class AppRadioListTile extends StatefulWidget {
   const AppRadioListTile({
     super.key,
-    required String groupValue,
+    required String? groupValue,
     EdgeInsets? padding,
     String? subtitle,
     ListTileControlAffinity? controlAffinity,
@@ -198,7 +198,7 @@ class AppRadioListTile extends StatefulWidget {
         _controlAffinity = controlAffinity,
         _padding = padding,
         _value = value;
-  final String _groupValue1;
+  final String? _groupValue1;
   final String _value;
   final Function(String? value)? _onChanged;
   final ListTileControlAffinity? _controlAffinity;

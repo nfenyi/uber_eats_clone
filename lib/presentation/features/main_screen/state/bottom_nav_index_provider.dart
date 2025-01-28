@@ -6,6 +6,14 @@ class BottomNavIndexNotifier extends StateNotifier<int> {
   void updateIndex(int step) {
     state = step;
   }
+
+  void showGiftScreen() {
+    state = 6;
+  }
+
+  void showGiftCategoryScreen() {
+    state = 7;
+  }
 }
 
 final bottomNavIndexProvider =

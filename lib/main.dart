@@ -27,6 +27,7 @@ class UberEatsClone extends StatelessWidget {
       title: 'Uber Eats Clone',
       theme: ThemeData(
         appBarTheme: const AppBarTheme(
+          surfaceTintColor: Colors.white,
           color: Colors.white,
         ),
         primaryColor: Colors.black,

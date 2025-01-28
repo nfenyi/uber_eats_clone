@@ -32,7 +32,7 @@ class AppButton extends ConsumerWidget {
     this.margin,
     this.icon,
     this.decoration,
-    this.height = 45.0,
+    this.height = 50.0,
     this.borderRadius = 8.0,
     this.iconFirst = false,
     this.isLoading = false,
@@ -68,7 +68,9 @@ class AppButton extends ConsumerWidget {
                   //                 ref.watch(themeProvider) == 'Dark'
                   //             ? AppColors.primaryDark
                   //             : AppColors.primary),
-                  : buttonColor ?? Colors.black,
+                  : callback == null
+                      ? Colors.black12
+                      : buttonColor ?? Colors.black,
               borderRadius: BorderRadius.circular(borderRadius),
               // border: isSecondary
               //     ? Border.all(
@@ -93,17 +95,21 @@ class AppButton extends ConsumerWidget {
                     text: text,
                     size: textSize ?? AppSizes.bodySmaller,
                     color: isSecondary
-                        ? buttonColor ??
-                            // ((ref.watch(themeProvider) == 'System' &&
-                            //             MediaQuery.platformBrightnessOf(
-                            //                     context) ==
-                            //                 Brightness.dark) ||
-                            //         ref.watch(themeProvider) == 'Dark'
-                            // ? AppColors.primaryDark
-                            // :
-                            AppColors.primary
+                        ? callback == null
+                            ? Colors.black38
+                            : buttonColor ??
+                                // ((ref.watch(themeProvider) == 'System' &&
+                                //             MediaQuery.platformBrightnessOf(
+                                //                     context) ==
+                                //                 Brightness.dark) ||
+                                //         ref.watch(themeProvider) == 'Dark'
+                                // ? AppColors.primaryDark
+                                // :
+                                AppColors.primary
                         //  )
-                        : textColor,
+                        : callback == null
+                            ? Colors.black38
+                            : textColor,
                     weight: textWeight,
                     style: textStyle,
                     decoration: textDecoration,
