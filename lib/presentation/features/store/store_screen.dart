@@ -8,6 +8,7 @@ import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/group_order/group_order_screen.dart';
+import 'package:uber_eats_clone/presentation/features/group_order/group_order_settings.dart';
 import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/search_menu_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_details_screen.dart';
@@ -687,8 +688,8 @@ class _StoreScreenState extends State<StoreScreen> {
                                                     navigatorKey.currentState!
                                                         .push(MaterialPageRoute(
                                                       builder: (context) =>
-                                                          GroupOrderScreen(
-                                                              _store),
+                                                          GroupOrderSettings(
+                                                              store: _store),
                                                     ));
                                                   },
                                                   child: Ink(

@@ -14,7 +14,9 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
+import 'package:uber_eats_clone/presentation/features/promotion/promo_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../app_functions.dart';
 import '../../constants/asset_names.dart';
@@ -3087,8 +3089,9 @@ class Option {
 class SubOption {
   final String name;
   final bool canBeMultiple;
+  final double? price;
 
-  SubOption({required this.name, required this.canBeMultiple});
+  SubOption({required this.name, required this.canBeMultiple, this.price});
 }
 
 class HomeScreenTopic extends StatelessWidget {
@@ -3154,4 +3157,121 @@ class FoodCategory {
   final String image;
 
   FoodCategory(this.name, this.image);
+}
+
+class IndividualOrder {
+  final Map<Product, int> productsAndQuantities;
+  final DateTime deliveryDate;
+  // final DateTime createdAt;
+  final double? tip;
+  final String orderNumber;
+  final String courier;
+  final Promotion? promo;
+  final double serviceFee;
+  final double tax;
+  final double? caDriverBenefits;
+  final double deliveryFee;
+  final double? membershipBenefit;
+  final double totalFee;
+  final List<Payment> payments;
+  final Store store;
+
+  final String status;
+
+  IndividualOrder(
+      {required this.productsAndQuantities,
+      required this.orderNumber,
+      required this.deliveryDate,
+      required this.status,
+      required this.store,
+      required this.tip,
+      // required this.createdAt,
+      required this.courier,
+      required this.totalFee,
+      this.promo,
+      required this.serviceFee,
+      required this.tax,
+      this.caDriverBenefits,
+      required this.deliveryFee,
+      this.membershipBenefit,
+      required this.payments});
+}
+
+class GroupOrder {
+  final String name;
+  final String createdBy;
+  final String location;
+  final List<Store> stores;
+  final List<OrderSchedule> orderSchedules;
+  final List<String> persons;
+  final String? repeat;
+
+  GroupOrder(
+      {required this.name,
+      required this.createdBy,
+      this.repeat,
+      required this.location,
+      required this.stores,
+      required this.orderSchedules,
+      required this.persons});
+}
+
+class OrderSchedule {
+  // final List<String> persons;
+  final DateTime deliveryDate;
+  // final DateTime createdAt;
+  final String orderNumber;
+  final Store store;
+  final List<OrderItem> orderItems;
+  final double? tip;
+  final String courier;
+  final String status;
+  final Promotion? promo;
+  final double serviceFee;
+  final double tax;
+  final double? caDriverBenefits;
+  final double deliveryFee;
+  final double? membershipBenefit;
+  final List<Payment> payments;
+  final double totalFee;
+
+  OrderSchedule({
+    // required this.persons,
+    required this.deliveryDate,
+    required this.store,
+    required this.orderNumber,
+    required this.orderItems,
+    // required this.createdAt,
+    this.tip,
+    required this.courier,
+    required this.status,
+    this.promo,
+    required this.serviceFee,
+    required this.tax,
+    this.caDriverBenefits,
+    required this.deliveryFee,
+    this.membershipBenefit,
+    required this.payments,
+    required this.totalFee,
+  });
+}
+
+class Payment {
+  final PaymentMethod paymentMethod;
+  final int amountPaid;
+  final String cardNumber;
+  final DateTime datePaid;
+
+  Payment(
+      {required this.paymentMethod,
+      required this.amountPaid,
+      required this.datePaid,
+      required this.cardNumber});
+}
+
+class OrderItem {
+  final String person;
+  final Map<Product, int> productsAndQuantities;
+
+  OrderItem({required this.person, required this.productsAndQuantities});
 }

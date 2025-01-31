@@ -90,6 +90,13 @@ class AssetNames {
   static const boxCatering = 'assets/images/box_catering.png';
   static const offers = 'assets/images/offers.png';
   static const bestOverallWhBg = 'assets/images/best_overall_white_bg.png';
+  static const whatDelivSee1 = 'assets/images/what_deliv_see1.png';
+  static const whatDelivSee2 = 'assets/images/what_deliv_see2.png';
+  static const whatDelivSee3 = 'assets/images/what_deliv_see3.png';
+  static const neverShowDelivInformation =
+      'assets/images/never_show_deliv_information.png';
+  static const neverShareInfoBag = 'assets/images/never_share_info_bag.png';
+  static const receiptImage = 'assets/images/receipt_image.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';
@@ -104,4 +111,5 @@ class AssetNames {
   static const store = 'assets/images/store.jpg';
   static const aisleImage = 'assets/images/aisle_image.jpg';
   static const masterCardLogo = 'assets/images/master_card_logo.jpg';
+  static const fastFoodBNW = 'assets/images/fast_food_black_n_white.jpg';
 }

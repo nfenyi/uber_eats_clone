@@ -31,7 +31,7 @@ class _GroupOrderCompleteScreenState
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
-            onTap: () => navigatorKey.currentState!.pop,
+            onTap: navigatorKey.currentState!.pop,
             child: const Icon(Icons.close)),
       ),
       body: Column(

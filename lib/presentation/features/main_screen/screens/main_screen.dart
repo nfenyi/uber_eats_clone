@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/browse/screens/browse_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_category_screen.dart';
@@ -112,13 +113,17 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             label: 'Browse',
           ),
           BottomNavigationBarItem(
-            activeIcon:
-                Badge(child: Iconify(MaterialSymbols.shopping_cart_rounded)),
+            activeIcon: Badge(
+                backgroundColor: Colors.green,
+                label: AppText(text: '4'),
+                child: Iconify(MaterialSymbols.shopping_cart_rounded)),
             icon: Badge(
+                backgroundColor: Colors.green,
+                label: AppText(text: '4'),
                 child: Iconify(
-              MaterialSymbols.shopping_cart_outline_rounded,
-              color: AppColors.neutral500,
-            )),
+                  MaterialSymbols.shopping_cart_outline_rounded,
+                  color: AppColors.neutral500,
+                )),
             label: 'Carts',
             // 'Budgets',
           ),
