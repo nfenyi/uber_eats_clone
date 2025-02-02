@@ -1,0 +1,184 @@
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/mdi.dart';
+import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
+import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/uber_account_screen.dart';
+
+import '../../../constants/asset_names.dart';
+import '../../../core/app_colors.dart';
+import '../../../core/widgets.dart';
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmall),
+              child: AppText(
+                text: 'Settings',
+                size: AppSizes.heading4,
+              ),
+            ),
+            Center(
+              child: Column(
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        height: 70,
+                        width: 70,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          gradient: const RadialGradient(stops: [
+                            0.6,
+                            1.0
+                          ], colors: [
+                            Colors.white,
+                            AppColors.neutral200,
+                          ]),
+                        ),
+                      ),
+                      Transform.translate(
+                        offset: const Offset(0, -8),
+                        child: Image.asset(
+                          AssetNames.noProfilePic,
+                          width: 45,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(10),
+                  const AppText(
+                    text: 'Nana Fenyi',
+                    size: AppSizes.body,
+                  ),
+                  const Gap(5),
+                  InkWell(
+                    onTap: () {
+                      navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => const UberAccountScreen(),
+                      ));
+                    },
+                    child: Ink(
+                      child: const AppText(
+                        text: 'EDIT ACCOUNT',
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Gap(40),
+            const Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmall),
+              child: AppText(
+                text: 'Saved places',
+                size: AppSizes.body,
+              ),
+            ),
+            const ListTile(
+              dense: true,
+              leading: Icon(Icons.home_outlined),
+              title: AppText(text: 'Home'),
+              subtitle: AppText(text: '1226 University Dr'),
+            ),
+            const ListTile(
+              dense: true,
+              leading: Iconify(Mdi.briefcase_outline),
+              title: AppText(text: 'Work'),
+              subtitle: AppText(text: 'Add Work'),
+            ),
+            const Gap(10),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmall),
+              child: InkWell(
+                onTap: () {},
+                child: Ink(
+                  child: const AppText(
+                    text: 'View All',
+                    // size: AppSizes.bodySmalle,
+                    color: Colors.green,
+                  ),
+                ),
+              ),
+            ),
+            const Gap(15),
+            const Divider(),
+            const Gap(5),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmall),
+              child: InkWell(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return Container(
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(
+                              AppSizes.horizontalPaddingSmall),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const AppText(
+                                text: 'Are you sure you want to sign out?',
+                                size: AppSizes.bodySmall,
+                                color: AppColors.neutral500,
+                              ),
+                              const Gap(20),
+                              AppButton(
+                                text: 'Sign out',
+                                callback: () {},
+                              ),
+                              const Gap(10),
+                              Center(
+                                child: AppButton(
+                                  isSecondary: true,
+                                  text: 'Cancel',
+                                  callback: () =>
+                                      navigatorKey.currentState!.pop(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Ink(
+                  child: AppText(
+                    text: 'Sign out',
+                    size: AppSizes.bodySmall,
+                    color: Colors.red.shade900,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -33,6 +33,7 @@ final List<Store> stores = [
     openingTime: const TimeOfDay(hour: 8, minute: 0),
     closingTime: const TimeOfDay(hour: 21, minute: 0),
     name: "McDonald's",
+    isUberOneShop: true,
     doesPickup: false,
     isFavorite: true,
     isGroupFriendly: true,
@@ -2957,6 +2958,7 @@ class Store {
   final String name;
   final bool doesPickup;
   final String logo;
+  final bool isUberOneShop;
   final Delivery delivery;
   final Rating rating;
   final String priceCategory;
@@ -2975,6 +2977,7 @@ class Store {
   final TimeOfDay openingTime;
   final TimeOfDay closingTime;
   Store({
+    this.isUberOneShop = false,
     required this.location,
     required this.priceCategory,
     required this.isGroupFriendly,

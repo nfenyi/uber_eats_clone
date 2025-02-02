@@ -97,6 +97,10 @@ class AssetNames {
       'assets/images/never_show_deliv_information.png';
   static const neverShareInfoBag = 'assets/images/never_share_info_bag.png';
   static const receiptImage = 'assets/images/receipt_image.png';
+  static const noProfilePic = 'assets/images/no_profile_pic.png';
+  static const favorites = 'assets/images/favorites.png';
+  static const orders = 'assets/images/orders.png';
+  static const wallet = 'assets/images/wallet.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

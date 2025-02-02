@@ -4,11 +4,13 @@ import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/features/account/screens/account_screen.dart';
 import 'package:uber_eats_clone/presentation/features/browse/screens/browse_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_category_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery/screens/grocery_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
+import 'package:uber_eats_clone/state/account_state_provider.dart';
 
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
@@ -29,7 +31,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     const GroceryScreen(),
     const BrowseScreen(),
     const CartsScreen(),
-    Container()
+    const AccountScreen()
   ];
 
   @override
@@ -74,8 +76,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           fontWeight: FontWeight.w500,
           color: AppColors.neutral500,
         ),
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
               activeIcon: Icon(
                 Icons.home_filled,
                 size: 27,
@@ -89,7 +91,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               label: 'Home'
               // 'Home',
               ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             activeIcon: Iconify(
               Mdi.food_apple,
             ),
@@ -100,7 +102,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             ),
             label: 'Grocery',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             activeIcon: Iconify(
               MaterialSymbols.manage_search_rounded,
               size: 27,
@@ -112,7 +114,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             ),
             label: 'Browse',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             activeIcon: Badge(
                 backgroundColor: Colors.green,
                 label: AppText(text: '4'),
@@ -128,12 +130,37 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             // 'Budgets',
           ),
           BottomNavigationBarItem(
-            activeIcon: Icon(
-              Icons.person,
-              // color: AppColors.primary,
-              size: 27,
+            activeIcon: Consumer(
+              builder: (context, ref, child) {
+                final isPersonal =
+                    ref.watch(accountStateProvider).type == 'Personal';
+                return isPersonal
+                    ? const Icon(
+                        Icons.person,
+                        // color: AppColors.primary,
+                        size: 27,
+                      )
+                    : const Iconify(
+                        Mdi.briefcase,
+                        size: 26,
+                      );
+              },
             ),
-            icon: Icon(Icons.person_outline),
+            icon: Consumer(
+              builder: (context, ref, child) {
+                final isPersonal =
+                    ref.watch(accountStateProvider).type == 'Personal';
+                return isPersonal
+                    ? const Icon(
+                        Icons.person_outline,
+                        size: 27,
+                      )
+                    : const Iconify(
+                        Mdi.briefcase_outline,
+                        size: 26,
+                      );
+              },
+            ),
             label: 'Account',
             //  'User',
           ),
