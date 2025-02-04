@@ -3,7 +3,7 @@ part of 'widgets.dart';
 class AppButton extends ConsumerWidget {
   final String text;
   final double? textSize;
-  final Color textColor;
+  final Color? textColor;
   final FontWeight textWeight;
   final FontStyle textStyle;
   final TextDecoration textDecoration;
@@ -37,8 +37,7 @@ class AppButton extends ConsumerWidget {
     this.iconFirst = false,
     this.isLoading = false,
     this.isSecondary = false,
-    this.textColor = Colors.white,
-    // this.buttonColor = AppColors.primary,
+    this.textColor,
     this.buttonColor,
     this.loaderColor = Colors.white,
     this.loaderSize = 30.0,
@@ -60,31 +59,11 @@ class AppButton extends ConsumerWidget {
         decoration: decoration ??
             BoxDecoration(
               color: isSecondary
-                  ? Colors.black12
-                  //     : buttonColor ??
-                  //         ((ref.watch(themeProvider) == 'System' &&
-                  //                     MediaQuery.platformBrightnessOf(context) ==
-                  //                         Brightness.dark) ||
-                  //                 ref.watch(themeProvider) == 'Dark'
-                  //             ? AppColors.primaryDark
-                  //             : AppColors.primary),
+                  ? buttonColor ?? Colors.black12
                   : callback == null
                       ? Colors.black12
                       : buttonColor ?? Colors.black,
               borderRadius: BorderRadius.circular(borderRadius),
-              // border: isSecondary
-              //     ? Border.all(
-              //         width: 1,
-              //         // color:
-              //         //  (ref.watch(themeProvider) == 'System' &&
-              //         //             MediaQuery.platformBrightnessOf(context) ==
-              //         //                 Brightness.dark) ||
-              //         //         ref.watch(themeProvider) == 'Dark'
-              //         // ? AppColors.primaryDark
-              //         // :
-              //         // AppColors.primary
-              //       )
-              //     : null
             ),
         child: isLoading
             ? CircularProgressIndicator(
@@ -97,19 +76,10 @@ class AppButton extends ConsumerWidget {
                     color: isSecondary
                         ? callback == null
                             ? Colors.black38
-                            : buttonColor ??
-                                // ((ref.watch(themeProvider) == 'System' &&
-                                //             MediaQuery.platformBrightnessOf(
-                                //                     context) ==
-                                //                 Brightness.dark) ||
-                                //         ref.watch(themeProvider) == 'Dark'
-                                // ? AppColors.primaryDark
-                                // :
-                                AppColors.primary
-                        //  )
+                            : textColor ?? AppColors.primary
                         : callback == null
                             ? Colors.black38
-                            : textColor,
+                            : textColor ?? Colors.white,
                     weight: textWeight,
                     style: textStyle,
                     decoration: textDecoration,
@@ -124,17 +94,12 @@ class AppButton extends ConsumerWidget {
                             text: text,
                             size: textSize ?? AppSizes.bodySmaller,
                             color: isSecondary
-                                ? buttonColor ??
-                                    // ((ref.watch(themeProvider) == 'System' &&
-                                    //             MediaQuery.platformBrightnessOf(
-                                    //                     context) ==
-                                    //                 Brightness.dark) ||
-                                    //         ref.watch(themeProvider) == 'Dark'
-                                    //     ? AppColors.primaryDark
-                                    // :
-                                    AppColors.primary
-                                //  )
-                                : textColor,
+                                ? callback == null
+                                    ? Colors.black38
+                                    : textColor ?? AppColors.primary
+                                : callback == null
+                                    ? Colors.black38
+                                    : textColor ?? Colors.white,
                             weight: textWeight,
                             style: textStyle,
                             decoration: textDecoration,
@@ -147,7 +112,13 @@ class AppButton extends ConsumerWidget {
                           AppText(
                             text: text,
                             size: textSize ?? AppSizes.bodySmaller,
-                            color: isSecondary ? buttonColor : textColor,
+                            color: isSecondary
+                                ? callback == null
+                                    ? Colors.black38
+                                    : textColor ?? AppColors.primary
+                                : callback == null
+                                    ? Colors.black38
+                                    : textColor ?? Colors.white,
                             weight: textWeight,
                             style: textStyle,
                             decoration: textDecoration,

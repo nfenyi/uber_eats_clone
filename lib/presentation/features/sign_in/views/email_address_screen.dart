@@ -22,6 +22,12 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
   final _emailController = TextEditingController();
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

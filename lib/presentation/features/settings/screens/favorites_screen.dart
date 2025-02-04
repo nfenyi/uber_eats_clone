@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 
 import '../../../constants/app_sizes.dart';

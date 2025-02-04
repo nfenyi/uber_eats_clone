@@ -101,6 +101,10 @@ class AssetNames {
   static const favorites = 'assets/images/favorites.png';
   static const orders = 'assets/images/orders.png';
   static const wallet = 'assets/images/wallet.png';
+  static const oneHouse = 'assets/images/one_house.png';
+  static String walletGift = 'assets/images/wallet_gift.png';
+  static String uberOneImage = 'assets/images/uber_one_image.png';
+  static String exclusiveOffers = 'assets/images/exclusive_offers_image.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

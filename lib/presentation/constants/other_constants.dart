@@ -1,3 +1,5 @@
+import 'asset_names.dart';
+
 class OtherConstants {
   // final List<FoodCategory> _foodCategories = [
   //   FoodCategory('Breakfast', AssetNames.breakfast),
@@ -47,4 +49,42 @@ class OtherConstants {
   ];
 
   static const String na = 'N/A';
+
+  static final benefits = [
+    UberOneBenefit(
+        assetImage: AssetNames.uberOneGiftBag,
+        title: '\$0 Delivery Fee',
+        message:
+            'Save on food, grocery, and other orders over the minimum subtotal'),
+    UberOneBenefit(
+        assetImage: AssetNames.uberOneTag,
+        title: 'Up to 10% off orders',
+        message:
+            'Save on delivery and pickup orders over the minimum subtotal'),
+    UberOneBenefit(
+        assetImage: AssetNames.uberOneCar,
+        title: '6% back on rides',
+        message: 'Earn 6% Uber Cash and get top-rated drivers'),
+    UberOneBenefit(
+        assetImage: AssetNames.uberOneGiftBag,
+        title: 'Exclusive offers',
+        message: 'Member-only promos and special items'),
+    UberOneBenefit(
+        assetImage: AssetNames.oneHouse,
+        title: 'Thousands of options',
+        message: 'Save on your favorite restaurants and stores'),
+    UberOneBenefit(
+        assetImage: AssetNames.uberOneCalendar,
+        title: 'Cancel anytime',
+        message: 'Cancel your membership with no additional fees'),
+  ];
+}
+
+class UberOneBenefit {
+  final String assetImage;
+  final String title;
+  final String message;
+
+  UberOneBenefit(
+      {required this.assetImage, required this.title, required this.message});
 }

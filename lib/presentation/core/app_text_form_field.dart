@@ -153,19 +153,24 @@ class AppTextFormField extends ConsumerWidget {
                 ),
               ),
         prefix: prefix,
+        // ignore: prefer_null_aware_operators
         prefixIcon: prefixIcon == null
             ? null
-            : GestureDetector(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    prefixIcon!,
-                  ],
-                ),
+            :
+            // Column(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     prefixIcon!,
+            //   ],
+            // ),
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: prefixIcon!,
               ),
         suffixText: suffixText,
         filled: filled,
         fillColor: fillColor,
+
         suffixStyle: const TextStyle(),
         suffixIconConstraints: BoxConstraints.tightFor(
           width: constraintWidth,

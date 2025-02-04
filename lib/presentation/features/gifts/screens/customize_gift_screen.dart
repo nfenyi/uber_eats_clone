@@ -27,7 +27,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
 
   final List<String> _giftAmounts = ['25', '50', '100', '200'];
   late String _selectedGiftAmount;
-  final _fromTextEdController = TextEditingController();
+  final _fromTextEditingController = TextEditingController();
   final _toTextEditingController = TextEditingController();
   final _textMessageController = TextEditingController();
 
@@ -42,7 +42,15 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
     super.initState();
     _selectedCard = widget.initiallySelectedCard;
     _selectedGiftAmount = _giftAmounts.first;
-    _fromTextEdController.text = 'Nana';
+    _fromTextEditingController.text = 'Nana';
+  }
+
+  @override
+  void dispose() {
+    _fromTextEditingController.dispose();
+    _toTextEditingController.dispose();
+    _textMessageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -137,7 +145,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
               const AppText(text: "Who's this gift card from?"),
               const Gap(5),
               AppTextFormField(
-                controller: _fromTextEdController,
+                controller: _fromTextEditingController,
                 enabled: false,
               ),
               const Gap(15),

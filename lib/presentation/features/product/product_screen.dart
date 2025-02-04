@@ -54,6 +54,12 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   }
 
   @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
@@ -82,6 +88,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                   );
                                 },
                                 options: CarouselOptions(
+                                    padEnds: false,
                                     onPageChanged: (index, reason) {
                                       setState(() {
                                         _activeIndex = index;

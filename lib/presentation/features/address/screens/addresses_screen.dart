@@ -40,6 +40,12 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   DateTime? _timePreference;
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

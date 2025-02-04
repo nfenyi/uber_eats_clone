@@ -77,6 +77,7 @@ class _WhatDeliveryPeopleSeeScreenState
             CarouselSlider(
                 carouselController: _carouselController,
                 options: CarouselOptions(
+                  padEnds: false,
                   enableInfiniteScroll: false,
                   onPageChanged: (index, reason) {
                     setState(() {

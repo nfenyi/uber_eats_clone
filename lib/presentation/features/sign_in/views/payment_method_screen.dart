@@ -50,32 +50,32 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
         ],
       ),
       body: Padding(
-        padding:
-            EdgeInsets.symmetric(horizontal: AppSizes.horizontalPaddingSmall),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.horizontalPaddingSmall),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppText(
+            const AppText(
               text: 'Select your preferred payment method',
               size: AppSizes.heading5,
               weight: FontWeight.w600,
             ),
-            Gap(40),
+            const Gap(40),
             ListTile(
               contentPadding: EdgeInsets.zero,
               dense: true,
               leading: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   color: Colors.green,
-                  child: Icon(
+                  child: const Icon(
                     Icons.arrow_forward_ios,
                     size: 15,
                   )),
-              title: AppText(text: 'Bank account'),
+              title: const AppText(text: 'Bank account'),
             ),
-            Gap(5),
-            AppText(text: 'Connect quickly with Link'),
-            Gap(20),
+            const Gap(5),
+            const AppText(text: 'Connect quickly with Link'),
+            const Gap(20),
             Expanded(
               child: ListView.builder(
                   itemBuilder: (context, index) {
@@ -101,6 +101,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
 class PaymentMethod {
   final String name;
   final String assetImage;
+  final String? cardNumber;
 
-  PaymentMethod(this.name, this.assetImage);
+  PaymentMethod(this.name, this.assetImage, {this.cardNumber});
 }

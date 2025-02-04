@@ -44,6 +44,12 @@ class _BackUpOptionScreenState extends State<BackUpOptionScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(

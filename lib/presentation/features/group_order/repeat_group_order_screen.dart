@@ -48,6 +48,7 @@ class _RepeatGroupOrderScreenState
   void dispose() {
     _scheduleController.dispose();
     _frequencyController.dispose();
+    _endDateController.dispose();
     super.dispose();
   }
 

@@ -28,6 +28,13 @@ class _NameEditScreenState extends State<NameEditScreen> {
   }
 
   @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(

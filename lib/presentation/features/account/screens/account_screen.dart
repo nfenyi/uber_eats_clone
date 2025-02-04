@@ -11,6 +11,8 @@ import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/simple_line_icons.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/favorites_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/uber_one_account_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/wallet/wallet_screen.dart';
 
 import '../../../../main.dart';
 import '../../../constants/app_sizes.dart';
@@ -247,20 +249,27 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                       ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                          color: AppColors.neutral100,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            AssetNames.wallet,
-                            width: 30,
-                            height: 30,
-                          ),
-                          const AppText(text: 'Wallet')
-                        ],
+                    InkWell(
+                      onTap: () {
+                        navigatorKey.currentState!.push(MaterialPageRoute(
+                          builder: (context) => const WalletScreen(),
+                        ));
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: AppColors.neutral100,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              AssetNames.wallet,
+                              width: 30,
+                              height: 30,
+                            ),
+                            const AppText(text: 'Wallet')
+                          ],
+                        ),
                       ),
                     ),
                     Container(
@@ -283,7 +292,11 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
                 const Gap(20),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => const UberOneAccountScreen(),
+                    ));
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 20),
