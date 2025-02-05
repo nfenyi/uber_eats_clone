@@ -3,13 +3,10 @@ import 'package:gap/gap.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/wallet/uber_cash_modal.dart';
 
 import '../../../../constants/app_sizes.dart';

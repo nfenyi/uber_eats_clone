@@ -21,15 +21,18 @@ class UberOneAllSetScreen extends StatelessWidget {
               alignment: Alignment.topLeft,
               children: [
                 Image.asset(AssetNames.uberOneImage),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 15, left: AppSizes.horizontalPaddingSmall),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(50)),
-                    child: const Icon(Icons.arrow_back),
+                GestureDetector(
+                  onTap: navigatorKey.currentState!.pop,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 15, left: AppSizes.horizontalPaddingSmall),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50)),
+                      child: const Icon(Icons.arrow_back),
+                    ),
                   ),
                 )
               ],

@@ -105,6 +105,12 @@ class AssetNames {
   static String walletGift = 'assets/images/wallet_gift.png';
   static String uberOneImage = 'assets/images/uber_one_image.png';
   static String exclusiveOffers = 'assets/images/exclusive_offers_image.png';
+  static String switchToAnnual = 'assets/images/switch_to_annual_image.png';
+  static String family = 'assets/images/family.png';
+  static String teenImage1 = 'assets/images/teen_image1.png';
+  static String teenImage2 = 'assets/images/teen_image2.png';
+  static String noContactQuestionMark =
+      'assets/images/no_contact_question_mark.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

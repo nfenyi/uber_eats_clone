@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
+import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/end_membership_modal_bottom_sheet.dart';
 
 import '../../../../../app_functions.dart';
 import '../../../../constants/app_sizes.dart';
@@ -8,6 +11,7 @@ import '../../../../constants/asset_names.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_text.dart';
 import '../../../sign_in/views/payment_method_screen.dart';
+import 'switch_to_annual_plan_screen.dart';
 import 'uber_one_account_screen.dart';
 
 class ManageMembershipScreen extends StatefulWidget {
@@ -73,7 +77,19 @@ class _ManageMembershipScreenState extends State<ManageMembershipScreen> {
               size: AppSizes.bodySmall,
             ),
             trailing: _membershipDetails.plan.period == 'Monthly'
-                ? AppButton2(text: 'Change', callback: () {})
+                ? AppButton2(
+                    text: 'Change',
+                    callback: () {
+                      navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => SwitchToAnnualPlanScreen(
+                          membershipDetails: _membershipDetails,
+                        ),
+                      ));
+                      //                       SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+                      //   statusBarIconBrightness: Brightness.light,
+                      //   statusBarColor: Colors.transparent,
+                      // ));
+                    })
                 : null,
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +167,17 @@ class _ManageMembershipScreenState extends State<ManageMembershipScreen> {
           ),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () {
+            showModalBottomSheet(
+                useSafeArea: true,
+                isScrollControlled: true,
+                context: context,
+                builder: (context) {
+                  return Container(
+                      color: Colors.white,
+                      child: const EndMembershipModalBottomSheet());
+                });
+          },
           dense: true,
           leading: const Icon(Icons.cancel),
           title: const AppText(

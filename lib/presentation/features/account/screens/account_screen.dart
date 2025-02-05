@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ant_design.dart';
 import 'package:iconify_flutter/icons/bi.dart';
@@ -10,6 +9,7 @@ import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/simple_line_icons.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/gifts/screens/send_gifts_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/favorites_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/uber_one_account_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/wallet/wallet_screen.dart';
@@ -20,6 +20,7 @@ import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 import '../../settings/screens/settings_screen.dart';
+import 'family_and_teens/family_and_teens_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -330,10 +331,15 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           const Gap(15),
           const Divider(),
-          const ListTile(
-            leading: Icon(Icons.groups_outlined),
-            title: AppText(text: 'Family and teens'),
-            subtitle: AppText(text: 'Teen and adult accounts'),
+          ListTile(
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const FamilyAndTeensScreen(),
+              ));
+            },
+            leading: const Icon(Icons.groups_outlined),
+            title: const AppText(text: 'Family and teens'),
+            subtitle: const AppText(text: 'Teen and adult accounts'),
           ),
           ListTile(
             onTap: () {},
@@ -347,7 +353,11 @@ class _AccountScreenState extends State<AccountScreen> {
             title: const AppText(text: 'Promotions'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const SendGiftsScreen(),
+              ));
+            },
             leading: const Iconify(Ph.gift),
             title: const AppText(text: 'Send a gift'),
           ),

@@ -279,7 +279,7 @@ class _UberOneAccountScreenState extends State<UberOneAccountScreen> {
                                                         '\$${billings.last.bill.toStringAsFixed(2)}/mo'),
                                                 AppText(
                                                     text:
-                                                        'billed at ${(billings.last.bill * 12).toStringAsFixed(2)}/yr')
+                                                        'billed at \$${(billings.last.bill * 12).toStringAsFixed(2)}/yr')
                                               ],
                                             ),
                                           ],

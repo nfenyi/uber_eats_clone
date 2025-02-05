@@ -72,7 +72,7 @@ class AppButton extends ConsumerWidget {
             : icon == null
                 ? AppText(
                     text: text,
-                    size: textSize ?? AppSizes.bodySmaller,
+                    size: textSize ?? AppSizes.bodySmall,
                     color: isSecondary
                         ? callback == null
                             ? Colors.black38
@@ -92,7 +92,7 @@ class AppButton extends ConsumerWidget {
                           const Gap(5.0),
                           AppText(
                             text: text,
-                            size: textSize ?? AppSizes.bodySmaller,
+                            size: textSize ?? AppSizes.bodySmall,
                             color: isSecondary
                                 ? callback == null
                                     ? Colors.black38
@@ -111,7 +111,7 @@ class AppButton extends ConsumerWidget {
                         children: [
                           AppText(
                             text: text,
-                            size: textSize ?? AppSizes.bodySmaller,
+                            size: textSize ?? AppSizes.bodySmall,
                             color: isSecondary
                                 ? callback == null
                                     ? Colors.black38
