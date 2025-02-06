@@ -112,6 +112,14 @@ class AssetNames {
   static String noContactQuestionMark =
       'assets/images/no_contact_question_mark.png';
   static String helpThankYou = 'assets/images/help_thank_you_image.png';
+  static String businessPreferences =
+      'assets/images/business_preferences_image.png';
+  static String businessPreferences2 =
+      'assets/images/business_preferences2.png';
+  static String initialAddBusinessPreference =
+      'assets/images/initial_add_business_preference.png';
+  static String businessPreferenceReady =
+      'assets/images/business_preference_ready.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

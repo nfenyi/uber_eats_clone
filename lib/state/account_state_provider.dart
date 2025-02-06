@@ -3,7 +3,8 @@ import 'package:uber_eats_clone/state/account_state_model.dart';
 
 class AccountStateNotifier extends StateNotifier<AccountState> {
   AccountStateNotifier()
-      : super(AccountState(name: 'Nana Fenyi', type: 'Personal'));
+      : super(AccountState(
+            name: 'Nana Fenyi', type: 'Personal', hasUberOne: true));
 }
 
 final accountStateProvider =

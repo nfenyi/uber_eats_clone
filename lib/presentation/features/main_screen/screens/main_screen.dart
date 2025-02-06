@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/account_screen.dart';
 import 'package:uber_eats_clone/presentation/features/browse/screens/browse_screen.dart';
@@ -134,31 +135,63 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               builder: (context, ref, child) {
                 final isPersonal =
                     ref.watch(accountStateProvider).type == 'Personal';
-                return isPersonal
-                    ? const Icon(
-                        Icons.person,
-                        // color: AppColors.primary,
-                        size: 27,
-                      )
-                    : const Iconify(
-                        Mdi.briefcase,
-                        size: 26,
-                      );
+                final hasUberOne = ref.watch(accountStateProvider).hasUberOne;
+                return Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    isPersonal
+                        ? const Icon(
+                            Icons.person,
+                            // color: AppColors.primary,
+                            size: 27,
+                          )
+                        : const Iconify(
+                            Mdi.briefcase,
+                            size: 26,
+                          ),
+                    if (hasUberOne)
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Image.asset(
+                          AssetNames.uberOneSmall,
+                          width: 17,
+                        ),
+                      ),
+                  ],
+                );
               },
             ),
             icon: Consumer(
               builder: (context, ref, child) {
                 final isPersonal =
                     ref.watch(accountStateProvider).type == 'Personal';
-                return isPersonal
-                    ? const Icon(
-                        Icons.person_outline,
-                        size: 27,
-                      )
-                    : const Iconify(
-                        Mdi.briefcase_outline,
-                        size: 26,
-                      );
+                final hasUberOne = ref.watch(accountStateProvider).hasUberOne;
+                return Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    isPersonal
+                        ? const Icon(
+                            Icons.person_outline,
+                            size: 27,
+                          )
+                        : const Iconify(
+                            Mdi.briefcase_outline,
+                            size: 26,
+                          ),
+                    if (hasUberOne)
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Image.asset(
+                          AssetNames.uberOneSmall,
+                          width: 17,
+                        ),
+                      ),
+                  ],
+                );
               },
             ),
             label: 'Account',
