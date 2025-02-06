@@ -111,6 +111,7 @@ class AssetNames {
   static String teenImage2 = 'assets/images/teen_image2.png';
   static String noContactQuestionMark =
       'assets/images/no_contact_question_mark.png';
+  static String helpThankYou = 'assets/images/help_thank_you_image.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

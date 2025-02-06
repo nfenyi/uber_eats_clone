@@ -11,6 +11,7 @@ import 'package:iconify_flutter/icons/simple_line_icons.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/send_gifts_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/favorites_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/help_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/uber_one_account_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/wallet/wallet_screen.dart';
 
@@ -362,7 +363,11 @@ class _AccountScreenState extends State<AccountScreen> {
             title: const AppText(text: 'Send a gift'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const HelpScreen(),
+              ));
+            },
             leading: const Iconify(Ep.help),
             title: const AppText(text: 'Help'),
           ),
