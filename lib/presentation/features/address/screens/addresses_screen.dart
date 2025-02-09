@@ -339,11 +339,13 @@ class AppButton2 extends StatefulWidget {
   final String text;
   final VoidCallback callback;
   final OutlinedBorder? shape;
+  final Color color;
 
   const AppButton2({
     required this.text,
     required this.callback,
     this.shape,
+    this.color = AppColors.neutral100,
     super.key,
   });
 
@@ -357,7 +359,7 @@ class _AppButton2State extends State<AppButton2> {
     return TextButton(
       onPressed: widget.callback,
       style: TextButton.styleFrom(
-          backgroundColor: AppColors.neutral100, shape: widget.shape),
+          backgroundColor: widget.color, shape: widget.shape),
       child: AppText(
         text: widget.text,
       ),

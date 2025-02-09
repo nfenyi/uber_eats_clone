@@ -120,6 +120,14 @@ class AssetNames {
       'assets/images/initial_add_business_preference.png';
   static String businessPreferenceReady =
       'assets/images/business_preference_ready.png';
+  static String inviteFriend = 'assets/images/invite_friend.png';
+  static String theyGet = 'assets/images/they_get.png';
+  static String dataNPrivacy1 = 'assets/images/data_n_privacy1.png';
+  static String dataNPrivacyBottomImage =
+      'assets/images/data_n_privacy_bottom_image.png';
+  static String voiceCommand1 = 'assets/images/voice_command1.png';
+  static String voiceCommand2 = 'assets/images/voice_command2.png';
+  static String voiceCommand3 = 'assets/images/voice_command3.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';
@@ -135,4 +143,5 @@ class AssetNames {
   static const aisleImage = 'assets/images/aisle_image.jpg';
   static const masterCardLogo = 'assets/images/master_card_logo.jpg';
   static const fastFoodBNW = 'assets/images/fast_food_black_n_white.jpg';
+  static String dataNPrivacy2 = 'assets/images/data_n_privacy2.jpg';
 }

@@ -1,12 +1,16 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/name_edit_screen.dart';
+import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
+import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
+import '../../webview/webview_screen.dart';
 
 class UberAccountScreen extends StatelessWidget {
   final bool _isVerified = true;
@@ -15,6 +19,7 @@ class UberAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final webViewcontroller = WebViewControllerPlus();
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
@@ -173,8 +178,188 @@ class UberAccountScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Column(),
-                const Column()
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Gap(20),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(
+                            text: 'Security',
+                            weight: FontWeight.w600,
+                            size: AppSizes.heading4,
+                          ),
+                          Gap(20),
+                          AppText(
+                            text: 'Logging in to Uber',
+                            weight: FontWeight.w600,
+                            size: AppSizes.heading6,
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        // navigatorKey.currentState!.push(MaterialPageRoute(
+                        //   builder: (context) => const NameEditScreen(),
+                        // ));
+                      },
+                      title: const AppText(
+                        text: 'Password',
+                        size: AppSizes.bodySmall,
+                        weight: FontWeight.w600,
+                      ),
+                      trailing: const Icon(
+                        Icons.keyboard_arrow_right,
+                        color: AppColors.neutral500,
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      title: const AppText(
+                        text: 'Passkeys',
+                        size: AppSizes.bodySmall,
+                        weight: FontWeight.w600,
+                      ),
+                      subtitle: const AppText(
+                        text:
+                            'Passkeys are easier and more secure than passwords.',
+                        color: AppColors.neutral500,
+                      ),
+                      trailing: const Icon(
+                        Icons.keyboard_arrow_right,
+                        color: AppColors.neutral500,
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      title: const AppText(
+                        text: '2-step verification',
+                        size: AppSizes.bodySmall,
+                        weight: FontWeight.w600,
+                      ),
+                      subtitle: const AppText(
+                        text:
+                            'Add additional security to your account with 2-step verification.',
+                        color: AppColors.neutral500,
+                      ),
+                      trailing: const Icon(
+                        Icons.keyboard_arrow_right,
+                        color: AppColors.neutral500,
+                      ),
+                    ),
+                    const Gap(50),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(
+                            text: 'Connected social apps',
+                            weight: FontWeight.bold,
+                            size: AppSizes.heading4,
+                          ),
+                          Gap(20),
+                          AppText(
+                            text:
+                                'Once you\'ve allowed social apps to sign in to your Uber account, you\'ll see them here.',
+                            color: AppColors.neutral500,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Gap(20),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(
+                            text: 'Privacy & Data',
+                            weight: FontWeight.w600,
+                            size: AppSizes.heading4,
+                          ),
+                          Gap(30),
+                          AppText(
+                            text: 'Privacy',
+                            weight: FontWeight.w600,
+                            size: AppSizes.heading6,
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      title: const AppText(
+                        text: 'Privacy Center',
+                        size: AppSizes.bodySmall,
+                        weight: FontWeight.w600,
+                      ),
+                      subtitle: const AppText(
+                        text:
+                            'Take control of your privacy and learn how we protect it.',
+                        color: AppColors.neutral500,
+                      ),
+                      trailing: const Icon(
+                        Icons.keyboard_arrow_right,
+                        color: AppColors.neutral500,
+                      ),
+                    ),
+                    const Gap(50),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const AppText(
+                            text: 'Third-party apps with account access',
+                            weight: FontWeight.bold,
+                            size: AppSizes.heading4,
+                          ),
+                          const Gap(20),
+                          RichText(
+                            text: TextSpan(
+                                text:
+                                    "Once you allow access to third-party apps, you'll see them here. ",
+                                style: const TextStyle(
+                                  color: AppColors.neutral500,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: 'Learn more',
+                                    style: const TextStyle(
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        navigatorKey.currentState!
+                                            .push(MaterialPageRoute(
+                                          builder: (context) => WebViewScreen(
+                                            controller: webViewcontroller,
+                                            link: Weblinks.uberOneTerms,
+                                          ),
+                                        ));
+                                      },
+                                  ),
+                                ]),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ]))
             ],
           )),

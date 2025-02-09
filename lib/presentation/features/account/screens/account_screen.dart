@@ -9,10 +9,15 @@ import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/simple_line_icons.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/account/screens/communication/communication_screen.dart';
+import 'package:uber_eats_clone/presentation/features/account/screens/voice_command_screen.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/send_gifts_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/about/about_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/business_preferences/turn_on_business_preferences_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/favorites_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/help_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/invite_a_friend_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/privacy_center_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/uber_one_account_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/wallet/wallet_screen.dart';
 
@@ -389,18 +394,30 @@ class _AccountScreenState extends State<AccountScreen> {
             title: const AppText(text: 'Partner Rewards'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const InviteAFriendScreen(),
+              ));
+            },
             leading: const Icon(Icons.person_add_outlined),
             title: const AppText(text: 'Invite friends'),
             subtitle: const AppText(text: 'Get \$15 off your order'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const PrivacyCenterScreen(),
+              ));
+            },
             leading: const Iconify(Mdi.eye_remove_outline),
             title: const AppText(text: 'Privacy'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const CommunicationScreen(),
+              ));
+            },
             leading: const Iconify(Bi.phone_vibrate),
             title: const AppText(text: 'Communication'),
           ),
@@ -410,7 +427,11 @@ class _AccountScreenState extends State<AccountScreen> {
             title: const AppText(text: 'Earn by driving or delivering'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const VoiceCommandScreen(),
+              ));
+            },
             leading: const Iconify(SimpleLineIcons.microphone),
             title: const AppText(text: 'Voice command settings'),
           ),
@@ -420,7 +441,11 @@ class _AccountScreenState extends State<AccountScreen> {
             title: const AppText(text: 'Manage Uber account'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const AboutScreen(),
+              ));
+            },
             leading: const Icon(Icons.info_outline),
             title: const AppText(text: 'About'),
           ),

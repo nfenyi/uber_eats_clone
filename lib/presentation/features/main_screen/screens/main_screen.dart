@@ -117,11 +117,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           ),
           const BottomNavigationBarItem(
             activeIcon: Badge(
-                backgroundColor: Colors.green,
                 label: AppText(text: '4'),
                 child: Iconify(MaterialSymbols.shopping_cart_rounded)),
             icon: Badge(
-                backgroundColor: Colors.green,
                 label: AppText(text: '4'),
                 child: Iconify(
                   MaterialSymbols.shopping_cart_outline_rounded,
