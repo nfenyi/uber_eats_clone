@@ -66,8 +66,11 @@ class AppButton extends ConsumerWidget {
               borderRadius: BorderRadius.circular(borderRadius),
             ),
         child: isLoading
-            ? CircularProgressIndicator(
-                color: isSecondary ? Colors.black : Colors.white,
+            ? SizedBox(
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: isSecondary ? Colors.black : Colors.white,
+                ),
               )
             : icon == null
                 ? AppText(

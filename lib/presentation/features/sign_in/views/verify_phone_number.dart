@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
@@ -6,13 +8,15 @@ import 'package:gap/gap.dart';
 import 'package:pinput/pinput.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/email_address_screen.dart';
 
 import '../../../../main.dart';
 import '../../../core/app_colors.dart';
 
 class VerifyPhoneNumber extends ConsumerStatefulWidget {
-  const VerifyPhoneNumber({super.key});
+  final String verificationId;
+  const VerifyPhoneNumber(this.verificationId, {super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -97,10 +101,21 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumber> {
                   focusedPinTheme: _focusedPinTheme,
                   submittedPinTheme: _followingPinTheme,
                   controller: _pinController,
-                  onCompleted: (value) {
-                    navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => const EmailAddressScreen(),
-                    ));
+                  onCompleted: (value) async {
+                    try {
+                      final credential = PhoneAuthProvider.credential(
+                          verificationId: widget.verificationId,
+                          smsCode: value);
+                      await FirebaseAuth.instance
+                          .signInWithCredential(credential);
+                      navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => const EmailAddressScreen(),
+                      ));
+                    } on FirebaseAuthException catch (e) {
+                      showInfoToast(e.code, context: context);
+                    } on Exception catch (e) {
+                      showInfoToast(e.toString(), context: context);
+                    }
                   },
                 ),
                 const Gap(50),
@@ -133,7 +148,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumber> {
                               format: CountDownTimerFormat.minutesSeconds,
                               endTime: DateTime.now().add(
                                 const Duration(
-                                  minutes: 2,
+                                  minutes: 1,
                                 ),
                               ),
                               onEnd: () {

@@ -1,18 +1,68 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 
+import 'models/country/country_ip_model.dart';
 import 'presentation/features/main_screen/screens/main_screen.dart';
+import 'presentation/features/sign_in/views/get_started/get_started_screen.dart';
+import 'presentation/features/sign_in/views/name_screen.dart';
+import 'presentation/features/sign_in/views/phone_number_screen.dart';
+import 'presentation/features/sign_in/views/sign_in/sign_in_screen.dart';
 
 final Logger logger = Logger();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await Hive.initFlutter();
+  await registerHiveAdpapters();
+  await openBoxes();
+
+  if (Hive.box(AppBoxes.appState).get('emailLoginLink') != null) {
+    // Confirm the link is a sign-in with email link.
+    if (FirebaseAuth.instance.isSignInWithEmailLink(
+        Hive.box(AppBoxes.appState).get('emailLoginLink'))) {
+      try {
+        // The client SDK will parse the code from the link for you.
+        final userCredential = await FirebaseAuth.instance.signInWithEmailLink(
+            email: Hive.box(AppBoxes.appState).get('email'),
+            emailLink: Hive.box(AppBoxes.appState).get('emailLoginLink'));
+        await Hive.box(AppBoxes.appState).put('authenticated', true);
+      } catch (error) {
+        logger.d('Error signing in with email link.');
+      }
+    }
+  }
   runApp(const ProviderScope(child: UberEatsClone()));
+}
+
+Future<void> registerHiveAdpapters() async {
+  Hive.registerAdapter(CountryResponseAdapter());
+  // Hive.registerAdapter(AccountAdapter());
+  // Hive.registerAdapter(BudgetAdapter());
+  // Hive.registerAdapter(TransactionAdapter());
+  // Hive.registerAdapter(TransactionCategoryAdapter());
+  // Hive.registerAdapter(GoalAdapter());
+  // Hive.registerAdapter(NotificationAdapter());
+}
+
+Future<void> openBoxes() async {
+  await Hive.openBox(AppBoxes.appState);
+  // await Hive.openBox<AppUser>(AppBoxes.users);
+  // await Hive.openBox<Account>(AppBoxes.accounts);
+  // await Hive.openBox<Budget>(AppBoxes.budgets);
+  // await Hive.openBox<AppNotification>(AppBoxes.notifications);
+  // await Hive.openBox<AccountTransaction>(AppBoxes.transactions);
+  // await Hive.openBox<TransactionCategory>(AppBoxes.transactionsCategories);
+  // await Hive.openBox<Goal>(AppBoxes.goals);
 }
 
 class UberEatsClone extends StatelessWidget {
@@ -66,26 +116,13 @@ class UberEatsClone extends StatelessWidget {
           ),
           scaffoldBackgroundColor: Colors.white,
           fontFamily: 'UberMove',
-
-          // This is the theme of your application.
-          //
-          // TRY THIS: Try running your application with "flutter run". You'll see
-          // the application has a purple toolbar. Then, without quitting the app,
-          // try changing the seedColor in the colorScheme below to Colors.green
-          // and then invoke "hot reload" (save your changes or press the "hot
-          // reload" button in a Flutter-supported IDE, or press "r" if you used
-          // the command line to start the app).
-          //
-          // Notice that the counter didn't reset back to zero; the application
-          // state is not lost during the reload. To reset the state, use hot
-          // restart instead.
-          //
-          // This works for code too, not just values: Most code changes can be
-          // tested with just a hot reload.
           // colorSchemeSeed: Colors.black,
           useMaterial3: false,
         ),
-        home: const Wrapper(),
+        home: ResponsiveSizer(builder: (BuildContext context,
+            Orientation orientation, ScreenType screenType) {
+          return const Wrapper();
+        }),
       ),
     );
   }
@@ -98,32 +135,30 @@ class Wrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return
-        //  Scaffold(
-        //     body:
-        //  ValueListenableBuilder(
-        // valueListenable: Hive.box(AppBoxes.appState).listenable(keys: 'authenticated'),
-        // builder: (context, appStateBox, child) {
-        //   bool onboarded = appStateBox.get('onboarded', defaultValue: false);
-        //   if (!onboarded) {
-        //     return const OnboardingScreen();
-        //   }
-        //   bool authenticated =
-        //       appStateBox.get('authenticated', defaultValue: false);
+    return ValueListenableBuilder(
+        valueListenable:
+            Hive.box(AppBoxes.appState).listenable(keys: ['authenticated']),
+        builder: (context, appStateBox, child) {
+          bool onboarded = appStateBox.get('onboarded', defaultValue: false);
+          if (!onboarded) {
+            return const GetStartedScreen();
+          }
+          if (Hive.box(AppBoxes.appState).get('emailLoginLink') != null) {
+            return const NameScreen();
+          }
 
-        //   if (!authenticated) {
-        //     return
-        ResponsiveSizer(builder: (BuildContext context, Orientation orientation,
-            ScreenType screenType) {
-      // return const GetStartedScreen();
-      return const MainScreen();
-    });
-    //  ;
-    // } else {
-    //   return const MainScreen();
-    // }
-    //     },
-    //   ),
-    // );
+          bool authenticated =
+              appStateBox.get('authenticated', defaultValue: false);
+
+          if (!authenticated) {
+            return const PhoneNumberScreen();
+          } else {
+            return const MainScreen();
+          }
+        });
   }
+}
+
+class AppBoxes {
+  static const String appState = 'app_state';
 }

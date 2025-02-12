@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "610338045611",
+    "project_id": "uber-eats-clone-d792a",
+    "storage_bucket": "uber-eats-clone-d792a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:610338045611:android:7ed8f677f02f1d18bf41ee",
+        "android_client_info": {
+          "package_name": "com.example.uber_eats_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "610338045611-avacd02nvhkg5v853b2ia0010sc8fvm2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.uber_eats_clone",
+            "certificate_hash": "36bfe0f8bd95cc467ad92473ecb2e347a8b02a60"
+          }
+        },
+        {
+          "client_id": "610338045611-gccves6e99pgd7jpun5vin0hmburptnv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqHLzRLiG7meM1SlfhmdHkh5w2TfV7bTM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "610338045611-gccves6e99pgd7jpun5vin0hmburptnv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "610338045611-oskee6pp5k47v9neheu3scd4bdjfhdbn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.uberEatsClone"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

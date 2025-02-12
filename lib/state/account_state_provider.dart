@@ -1,13 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uber_eats_clone/state/account_state_model.dart';
 
-class AccountStateNotifier extends StateNotifier<AccountState> {
+import '../presentation/features/sign_in/views/sign_in/sign_in_view_models.dart';
+
+class AccountStateNotifier extends StateNotifier<AccountDetails> {
   AccountStateNotifier()
-      : super(AccountState(
-            name: 'Nana Fenyi', type: 'Personal', hasUberOne: true));
+      : super(AccountDetails(
+            userId: '6646516331',
+            name: 'Nana Fenyi',
+            type: 'Personal',
+            hasUberOne: true));
 }
 
 final accountStateProvider =
-    StateNotifierProvider<AccountStateNotifier, AccountState>((ref) {
+    StateNotifierProvider<AccountStateNotifier, AccountDetails>((ref) {
   return AccountStateNotifier();
 });

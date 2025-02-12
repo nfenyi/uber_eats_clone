@@ -11,7 +11,7 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/uber_one_scr
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
 import 'payment_method_screen.dart';
-import 'sign_in_screen.dart';
+import 'sign_in/sign_in_screen.dart';
 
 class AddCardScreen extends ConsumerStatefulWidget {
   const AddCardScreen({super.key});

@@ -47,6 +47,7 @@ class AppTextFormField extends ConsumerWidget {
   final TextStyle? textStyle;
   final AutovalidateMode? autovalidateMode;
   final bool autofocus;
+  final List<TextInputFormatter>? inputFormatters;
 
   const AppTextFormField(
       {super.key,
@@ -58,6 +59,7 @@ class AppTextFormField extends ConsumerWidget {
       this.helperText,
       this.counterText,
       this.suffixText,
+      this.inputFormatters,
       this.prefix,
       this.readOnly = false,
       this.enabled,
@@ -100,6 +102,7 @@ class AppTextFormField extends ConsumerWidget {
     // logger.d(((ref.watch(themeProvider) == 'System') &&
     //     (MediaQuery.platformBrightnessOf(context) == Brightness.dark)));
     return TextFormField(
+      inputFormatters: inputFormatters,
       textAlign: textAlign,
       controller: controller,
       focusNode: focusNode,
@@ -109,7 +112,7 @@ class AppTextFormField extends ConsumerWidget {
       readOnly: readOnly,
       enabled: enabled,
       maxLengthEnforcement: MaxLengthEnforcement.enforced,
-      autovalidateMode: autovalidateMode ?? AutovalidateMode.onUserInteraction,
+      autovalidateMode: autovalidateMode ?? AutovalidateMode.onUnfocus,
       maxLength: maxLength,
       maxLines: maxLines,
       minLines: minLines,
@@ -156,16 +159,14 @@ class AppTextFormField extends ConsumerWidget {
         // ignore: prefer_null_aware_operators
         prefixIcon: prefixIcon == null
             ? null
-            :
-            // Column(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   children: [
-            //     prefixIcon!,
-            //   ],
-            // ),
-            Padding(
+            : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: prefixIcon!,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    prefixIcon!,
+                  ],
+                ),
               ),
         suffixText: suffixText,
         filled: filled,

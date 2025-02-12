@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
@@ -6,16 +7,17 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_account_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/sign_in/sign_in_view_models.dart';
 
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/widgets.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -149,7 +151,23 @@ class SettingsScreen extends StatelessWidget {
                               const Gap(20),
                               AppButton(
                                 text: 'Sign out',
-                                callback: () {},
+                                callback: () async {
+                                  navigatorKey.currentState!.pop();
+                                  showInfoToast('Logging out',
+                                      icon: const CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                      context: context);
+                                  try {
+                                    await ref
+                                        .read(signInProvider.notifier)
+                                        .logOut();
+                                    navigatorKey.currentState!.pop();
+                                  } on Exception catch (e) {
+                                    showInfoToast(e.toString(),
+                                        context: context);
+                                  }
+                                },
                               ),
                               const Gap(10),
                               Center(
