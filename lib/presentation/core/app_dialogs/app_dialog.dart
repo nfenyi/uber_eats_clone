@@ -1,14 +1,14 @@
 part of '../widgets.dart';
 
-Future<dynamic> showAppInfoDialog(BuildContext context, WidgetRef ref,
-    {required String title,
-    String? description,
+Future<dynamic> showAppInfoDialog(BuildContext context,
+    {String title = 'Error',
+    required String description,
     String? confirmText,
     String? cancelText,
     bool isWarning = false,
     void Function()? confirmCallbackFunction,
     void Function()? cancelCallbackFunction,
-    bool dismissible = true}) {
+    bool dismissible = false}) {
   return showDialog(
     context: context,
     barrierDismissible: dismissible,
@@ -21,17 +21,15 @@ Future<dynamic> showAppInfoDialog(BuildContext context, WidgetRef ref,
             // color: AppColors.neutral900,
             // weight: FontWeight.w600,
           ),
-          content: description != null
-              ? Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: AppText(
-                    text: description,
-                    color: AppColors.neutral900,
-                    weight: FontWeight.w500,
-                    height: 1.5,
-                  ),
-                )
-              : null,
+          content: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: AppText(
+              text: description,
+              color: AppColors.neutral900,
+              weight: FontWeight.w500,
+              height: 1.5,
+            ),
+          ),
           actions: <Widget>[
             CupertinoDialogAction(
               onPressed: confirmCallbackFunction ??
@@ -68,8 +66,8 @@ Future<dynamic> showAppInfoDialog(BuildContext context, WidgetRef ref,
         );
       } else {
         return AlertDialog(
-          contentPadding: const EdgeInsets.only(),
-          actionsPadding: const EdgeInsets.only(bottom: 4),
+          // contentPadding: const EdgeInsets.symmetric(horizontal: ),
+          actionsPadding: const EdgeInsets.only(bottom: 10, right: 10),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
           title: AppText(
@@ -78,16 +76,16 @@ Future<dynamic> showAppInfoDialog(BuildContext context, WidgetRef ref,
 
             // weight: FontWeight.w600,
           ),
-          content: description != null
-              ? AppText(
-                  text: description,
-                  color: AppColors.neutral900,
-                  weight: FontWeight.w500,
-                  height: 1.5,
-                )
-              : null,
+          content: AppText(
+            text: description,
+            color: AppColors.neutral900,
+            weight: FontWeight.w500,
+            height: 1.5,
+          ),
           actions: <Widget>[
             TextButton(
+              style: TextButton.styleFrom(
+                  backgroundColor: Colors.black, foregroundColor: Colors.white),
               onPressed: confirmCallbackFunction ??
                   () {
                     navigatorKey.currentState!.pop();
@@ -103,7 +101,7 @@ Future<dynamic> showAppInfoDialog(BuildContext context, WidgetRef ref,
                       //         ref.watch(themeProvider) == 'Dark'
                       //     ? AppColors.primaryDark
                       // :
-                      AppColors.primary
+                      null
                   //  ),
                   // weight: FontWeight.w600,
                   ),

@@ -57,7 +57,7 @@ class _GroupOrderSettingsState extends State<GroupOrderSettings> {
                                 const Center(
                                     child: AppText(
                                   text: 'Create group order',
-                                  size: AppSizes.body,
+                                  size: AppSizes.bodySmall,
                                   weight: FontWeight.w600,
                                 )),
                                 const Gap(5),
@@ -130,7 +130,7 @@ class _GroupOrderSettingsState extends State<GroupOrderSettings> {
                     leading: const Icon(Icons.watch_later, size: 20),
                     title: const AppText(
                       text: "People can order at any time",
-                      size: AppSizes.body,
+                      size: AppSizes.bodySmall,
                     ),
                     subtitle: const AppText(
                       text: 'No deadline set',
@@ -153,7 +153,7 @@ class _GroupOrderSettingsState extends State<GroupOrderSettings> {
                   leading: const Icon(FontAwesomeIcons.moneyBill, size: 20),
                   title: const AppText(
                     text: "You pay for everyone",
-                    size: AppSizes.body,
+                    size: AppSizes.bodySmall,
                   ),
                   subtitle: const AppText(
                     text: 'No spending limit',
@@ -175,7 +175,7 @@ class _GroupOrderSettingsState extends State<GroupOrderSettings> {
                   leading: const Icon(Icons.refresh, size: 20),
                   title: const AppText(
                     text: "Does not repeat",
-                    size: AppSizes.body,
+                    size: AppSizes.bodySmall,
                   ),
                   subtitle: const AppText(
                     text:

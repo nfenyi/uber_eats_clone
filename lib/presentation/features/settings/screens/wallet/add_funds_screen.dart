@@ -56,7 +56,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                 const AppText(
                   text:
                       'How much do you want to add to your Uber Cash balance?',
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
                 const Gap(20),
                 AppTextFormField(

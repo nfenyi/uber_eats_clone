@@ -86,7 +86,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                     title: const AppText(
                       text: 'Box Catering',
                       weight: FontWeight.w600,
-                      size: AppSizes.body,
+                      size: AppSizes.bodySmall,
                     ),
                     expandedTitleScale: 1.5,
                   ),
@@ -200,7 +200,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         //               const Center(
                         //                   child: AppText(
                         //                 text: 'Delivery fee',
-                        //                 size: AppSizes.body,
+                        //                 size: AppSizes.bodySmall,
                         //                 weight: FontWeight.w600,
                         //               )),
                         //               AppText(
@@ -261,7 +261,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         //               ),
                         //               Center(
                         //                 child: AppTextButton(
-                        //                   size: AppSizes.body,
+                        //                   size: AppSizes.bodySmall,
                         //                   text: 'Reset',
                         //                   callback: () {
                         //                     // setState(() {
@@ -327,7 +327,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         //               const Center(
                         //                   child: AppText(
                         //                 text: 'Rating',
-                        //                 size: AppSizes.body,
+                        //                 size: AppSizes.bodySmall,
                         //                 weight: FontWeight.w600,
                         //               )),
                         //               AppText(
@@ -390,7 +390,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         //               ),
                         //               Center(
                         //                 child: AppTextButton(
-                        //                   size: AppSizes.body,
+                        //                   size: AppSizes.bodySmall,
                         //                   text: 'Reset',
                         //                   callback: () {
                         //                     // setState(() {
@@ -451,7 +451,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         //               const Center(
                         //                   child: AppText(
                         //                 text: 'Price',
-                        //                 size: AppSizes.body,
+                        //                 size: AppSizes.bodySmall,
                         //                 weight: FontWeight.w600,
                         //               )),
                         //               Center(
@@ -505,7 +505,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         //               ),
                         //               Center(
                         //                 child: AppTextButton(
-                        //                   size: AppSizes.body,
+                        //                   size: AppSizes.bodySmall,
                         //                   text: 'Reset',
                         //                   callback: () {
                         //                     navigatorKey.currentState!.pop();
@@ -556,7 +556,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         //               const Center(
                         //                   child: AppText(
                         //                 text: 'Dietary',
-                        //                 size: AppSizes.body,
+                        //                 size: AppSizes.bodySmall,
                         //                 weight: FontWeight.w600,
                         //               )),
                         //               ListView(
@@ -657,7 +657,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         //               ),
                         //               Center(
                         //                 child: AppTextButton(
-                        //                   size: AppSizes.body,
+                        //                   size: AppSizes.bodySmall,
                         //                   text: 'Reset',
                         //                   callback: () {
                         //                     navigatorKey.currentState!.pop();
@@ -713,7 +713,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Group size',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       ListView(
@@ -776,7 +776,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             navigatorKey.currentState!.pop();

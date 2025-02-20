@@ -40,7 +40,7 @@ class _NameEditScreenState extends State<NameEditScreen> {
         appBar: AppBar(
           title: const AppText(
             text: 'Uber Account',
-            size: AppSizes.body,
+            size: AppSizes.bodySmall,
           ),
         ),
         body: Padding(

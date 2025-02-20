@@ -94,7 +94,7 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
             const AppText(
               text: 'Schedule delivery',
               weight: FontWeight.w600,
-              size: AppSizes.heading5,
+              size: AppSizes.heading6,
             ),
             const Gap(10),
             SizedBox(

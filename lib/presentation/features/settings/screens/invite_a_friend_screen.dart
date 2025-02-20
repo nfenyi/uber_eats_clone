@@ -24,7 +24,7 @@ class InviteAFriendScreen extends StatelessWidget {
       appBar: AppBar(
         title: const AppText(
           text: 'Invite a friend, get \$15 off',
-          size: AppSizes.body,
+          size: AppSizes.bodySmall,
         ),
       ),
       body: SingleChildScrollView(

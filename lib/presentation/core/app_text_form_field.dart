@@ -32,6 +32,7 @@ class AppTextFormField extends ConsumerWidget {
   final Widget? suffixIcon;
   final int? maxLength;
   final int? maxLines;
+  final bool removePrefixConstraints;
   final int? minLines;
   final double? letterSpacing;
   final bool filled;
@@ -59,6 +60,7 @@ class AppTextFormField extends ConsumerWidget {
       this.helperText,
       this.counterText,
       this.suffixText,
+      this.removePrefixConstraints = false,
       this.inputFormatters,
       this.prefix,
       this.readOnly = false,
@@ -156,6 +158,7 @@ class AppTextFormField extends ConsumerWidget {
                 ),
               ),
         prefix: prefix,
+
         // ignore: prefer_null_aware_operators
         prefixIcon: prefixIcon == null
             ? null
@@ -177,10 +180,12 @@ class AppTextFormField extends ConsumerWidget {
           width: constraintWidth,
           height: constraintHeight,
         ),
-        prefixIconConstraints: BoxConstraints.tightFor(
-          width: constraintWidth,
-          height: constraintHeight,
-        ),
+        prefixIconConstraints: removePrefixConstraints
+            ? null
+            : BoxConstraints.tightFor(
+                width: constraintWidth,
+                height: constraintHeight,
+              ),
         disabledBorder: borderType == BorderType.outline
             ? OutlineInputBorder(
                 borderSide: BorderSide.none,

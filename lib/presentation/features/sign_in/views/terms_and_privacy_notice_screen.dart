@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/weblinks.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/webview/webview_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
@@ -54,13 +55,14 @@ class _TermsNPrivacyNoticeScreenState
                         const Gap(20),
                         const Expanded(
                           child: AppText(
-                            size: AppSizes.heading5,
+                            size: AppSizes.heading6,
                             text: "Accept Uber's Terms & Review Privacy Notice",
+                            weight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    const Gap(10),
+                    const Gap(40),
                     RichText(
                       text: TextSpan(
                         style: const TextStyle(
@@ -110,23 +112,18 @@ class _TermsNPrivacyNoticeScreenState
                 ),
                 Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const AppText(
-                          text: 'I Agree',
-                          size: AppSizes.bodySmaller,
-                        ),
-                        Checkbox.adaptive(
-                          activeColor: Colors.black,
-                          value: _isChecked,
-                          onChanged: (value) {
-                            setState(() {
-                              _isChecked = value;
-                            });
-                          },
-                        ),
-                      ],
+                    CheckboxListTile.adaptive(
+                      value: _isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          _isChecked = value;
+                        });
+                      },
+                      contentPadding: EdgeInsets.zero,
+                      title: const AppText(
+                        text: 'I Agree',
+                        size: AppSizes.bodySmaller,
+                      ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -154,28 +151,40 @@ class _TermsNPrivacyNoticeScreenState
                         InkWell(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20)),
-                          onTap:
-                              // _emailController.text.isEmpty
-                              //     ? null
-                              //     :
-                              () => navigatorKey.currentState!
-                                  .push(MaterialPageRoute(
-                            builder: (context) => const AddressesScreen(),
-                          )),
+                          onTap: _isChecked == true
+                              ? () => navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AddressesScreen(),
+                                  ))
+                              : () => showInfoToast(
+                                    'Please agree to the terms to proceed',
+                                    context: context,
+                                  ),
                           child: Ink(
                             child: Container(
                               padding:
                                   const EdgeInsets.all(AppSizes.bodySmallest),
-                              decoration: const BoxDecoration(
-                                  color: AppColors.neutral200,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20))),
-                              child: const Row(
+                              decoration: BoxDecoration(
+                                  color: _isChecked == true
+                                      ? Colors.black
+                                      : AppColors.neutral200,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(20))),
+                              child: Row(
                                 children: [
-                                  Text('Next'),
-                                  Gap(5),
+                                  AppText(
+                                    text: 'Next',
+                                    color: _isChecked == true
+                                        ? Colors.white
+                                        : null,
+                                  ),
+                                  const Gap(5),
                                   Icon(
                                     FontAwesomeIcons.arrowRight,
+                                    color: _isChecked == true
+                                        ? Colors.white
+                                        : null,
                                     size: 15,
                                   ),
                                 ],

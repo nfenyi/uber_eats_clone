@@ -108,7 +108,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                           AppText(
                             text: widget.groceryStore.name,
                             color: Colors.white,
-                            size: AppSizes.body,
+                            size: AppSizes.bodySmall,
                             weight: FontWeight.w600,
                           ),
                           const Gap(10),
@@ -163,7 +163,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                             AppText(
                               text: widget.groceryStore.name,
                               color: Colors.white,
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                               weight: FontWeight.w600,
                             ),
                             const Gap(10),

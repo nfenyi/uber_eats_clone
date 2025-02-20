@@ -68,6 +68,7 @@ class AppButton extends ConsumerWidget {
         child: isLoading
             ? SizedBox(
                 height: 20,
+                width: 20,
                 child: CircularProgressIndicator(
                   color: isSecondary ? Colors.black : Colors.white,
                 ),

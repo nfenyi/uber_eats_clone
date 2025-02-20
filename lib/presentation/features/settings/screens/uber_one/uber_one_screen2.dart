@@ -78,7 +78,7 @@ class _UberOneScreen2State extends State<UberOneScreen2> {
                         AppText(
                           text: '\$0.00',
                           color: Colors.brown,
-                          size: AppSizes.heading5,
+                          size: AppSizes.heading6,
                         )
                       ],
                     ),
@@ -125,7 +125,7 @@ class _UberOneScreen2State extends State<UberOneScreen2> {
                   Gap(10),
                   AppText(
                     text: 'From stores',
-                    size: AppSizes.body,
+                    size: AppSizes.bodySmall,
                     color: AppColors.neutral500,
                   ),
                 ],

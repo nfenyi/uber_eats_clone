@@ -67,7 +67,7 @@ class _RepeatGroupOrderScreenState
               children: [
                 const AppText(
                   text: 'Repeat group order',
-                  size: AppSizes.heading5,
+                  size: AppSizes.heading6,
                   weight: FontWeight.w600,
                 ),
                 const Gap(20),
@@ -77,7 +77,7 @@ class _RepeatGroupOrderScreenState
                 const Gap(20),
                 const AppText(
                   text: 'First order scheduled for',
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
                 const Gap(10),
                 InkWell(
@@ -106,7 +106,7 @@ class _RepeatGroupOrderScreenState
                       children: [
                         AppText(
                           text: 'First Schedule',
-                          size: AppSizes.body,
+                          size: AppSizes.bodySmall,
                           weight: FontWeight.w600,
                         ),
                       ],
@@ -127,7 +127,7 @@ class _RepeatGroupOrderScreenState
                 const Gap(20),
                 const AppText(
                   text: 'Frequency',
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
                 const Gap(10),
                 InkWell(
@@ -151,7 +151,7 @@ class _RepeatGroupOrderScreenState
                               const Center(
                                   child: AppText(
                                 text: 'Frequency',
-                                size: AppSizes.body,
+                                size: AppSizes.bodySmall,
                                 weight: FontWeight.w600,
                               )),
                               const Gap(5),
@@ -242,7 +242,7 @@ class _RepeatGroupOrderScreenState
                             children: [
                               AppText(
                                 text: 'Select end date',
-                                size: AppSizes.body,
+                                size: AppSizes.bodySmall,
                                 weight: FontWeight.w600,
                               ),
                             ],

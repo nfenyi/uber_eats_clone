@@ -26,7 +26,7 @@ class _WalletScreenState extends State<WalletScreen> {
       appBar: AppBar(
         title: const AppText(
           text: 'Wallet',
-          size: AppSizes.body,
+          size: AppSizes.bodySmall,
         ),
       ),
       body: SingleChildScrollView(
@@ -106,7 +106,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         children: [
                           const AppText(
                             text: 'Send a gift',
-                            size: AppSizes.body,
+                            size: AppSizes.bodySmall,
                             weight: FontWeight.w600,
                           ),
                           const Gap(10),
@@ -139,7 +139,7 @@ class _WalletScreenState extends State<WalletScreen> {
               const AppText(
                 text: 'Payment methods',
                 weight: FontWeight.w600,
-                size: AppSizes.body,
+                size: AppSizes.bodySmall,
               ),
               const Gap(10),
               ListTile(
@@ -157,7 +157,7 @@ class _WalletScreenState extends State<WalletScreen> {
               const AppText(
                 text: 'Vouchers',
                 weight: FontWeight.w600,
-                size: AppSizes.body,
+                size: AppSizes.bodySmall,
               ),
               const ListTile(
                 contentPadding: EdgeInsets.zero,

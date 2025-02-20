@@ -38,7 +38,7 @@ class _GroupOrderNameScreenState extends ConsumerState<GroupOrderNameScreen> {
               children: [
                 const AppText(
                   text: 'Name your order',
-                  size: AppSizes.heading5,
+                  size: AppSizes.heading6,
                   weight: FontWeight.w600,
                 ),
                 const Gap(20),

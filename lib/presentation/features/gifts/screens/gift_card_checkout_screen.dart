@@ -54,7 +54,7 @@ class _GiftCardCheckoutScreenState
       appBar: AppBar(
         title: const AppText(
           text: 'Checkout',
-          size: AppSizes.body,
+          size: AppSizes.bodySmall,
         ),
       ),
       body: SingleChildScrollView(
@@ -199,7 +199,7 @@ class _GiftCardCheckoutScreenState
                               AppText(
                                 text:
                                     'You can choose the messaging app after payment',
-                                size: AppSizes.body,
+                                size: AppSizes.bodySmall,
                               )
                             ],
                           ),

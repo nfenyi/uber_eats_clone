@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
@@ -130,7 +131,12 @@ class UberOneScreen extends StatelessWidget {
             padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
             child: AppButton(
               text: 'Got it',
-              callback: () {
+              callback: () async {
+                await Hive.box(AppBoxes.appState).delete('isVerifiedViaLink');
+                await Hive.box(AppBoxes.appState)
+                    .delete(BoxKeys.addedEmailToPhoneNumber);
+                await Hive.box(AppBoxes.appState)
+                    .delete(BoxKeys.addressDetailsSaved);
                 navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const HomeScreen(),

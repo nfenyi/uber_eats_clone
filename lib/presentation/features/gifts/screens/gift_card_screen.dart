@@ -56,7 +56,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
               title: AppText(
                 text: 'Gift Cards',
                 weight: FontWeight.w600,
-                size: AppSizes.heading5,
+                size: AppSizes.heading6,
               ),
             ),
             expandedHeight: 120,
@@ -139,7 +139,7 @@ class _GiftCardScreenState extends State<GiftCardScreen> {
                 child: AppText(
                   text: 'Shop gift cards',
                   weight: FontWeight.w600,
-                  size: AppSizes.heading5,
+                  size: AppSizes.heading6,
                 ),
               ),
               const Gap(10),

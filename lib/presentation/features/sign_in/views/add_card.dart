@@ -10,7 +10,6 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/uber_one_scr
 
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
-import 'payment_method_screen.dart';
 import 'sign_in/sign_in_screen.dart';
 
 class AddCardScreen extends ConsumerStatefulWidget {
@@ -40,7 +39,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
       appBar: AppBar(
         title: const AppText(
           text: 'Add Card',
-          size: AppSizes.body,
+          size: AppSizes.heading6,
         ),
       ),
       body: Column(
@@ -61,10 +60,17 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                       ),
                       const Gap(15),
                       AppTextFormField(
-                        prefixIcon: Image.asset(AssetNames.creditCard),
+                        readOnly: true,
+                        onTap: () {},
+                        removePrefixConstraints: true,
+                        prefixIcon: Image.asset(
+                          AssetNames.creditCard,
+                          height: 30,
+                          width: 30,
+                        ),
                         suffixIcon: const Icon(Icons.camera_alt),
                       ),
-                      const Gap(15),
+                      const Gap(25),
                       const Row(
                         children: [
                           Expanded(
@@ -100,7 +106,9 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                           ),
                         ],
                       ),
+                      const Gap(25),
                       const AppText(text: 'Country'),
+                      const Gap(15),
                       SizedBox(
                         height: 50,
                         child: DropdownButtonHideUnderline(
@@ -217,29 +225,19 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                           ),
                         ),
                       ),
-                      const Gap(10),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText(
-                            text: 'Zip Code',
-                          ),
-                          Gap(5),
-                          AppTextFormField(),
-                        ],
+                      const Gap(25),
+                      const AppText(
+                        text: 'Zip Code',
                       ),
-                      const Gap(10),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText(
-                            text: 'Nickname (optional)',
-                          ),
-                          Gap(5),
-                          AppTextFormField(
-                            hintText: 'e.g. joint account or work card',
-                          ),
-                        ],
+                      const Gap(15),
+                      const AppTextFormField(),
+                      const Gap(25),
+                      const AppText(
+                        text: 'Nickname (optional)',
+                      ),
+                      const Gap(15),
+                      const AppTextFormField(
+                        hintText: 'e.g. joint account or work card',
                       ),
                     ],
                   ),

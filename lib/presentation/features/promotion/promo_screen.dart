@@ -50,7 +50,7 @@ class _PromoScreenState extends State<PromoScreen> {
       appBar: AppBar(
         title: const AppText(
           text: 'Promotions',
-          size: AppSizes.heading5,
+          size: AppSizes.heading6,
         ),
       ),
       body: Column(

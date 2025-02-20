@@ -85,7 +85,7 @@ class _SearchMenuScreenState extends ConsumerState<SearchMenuScreen> {
                                   children: [
                                     AppText(
                                       text: result.name,
-                                      size: AppSizes.heading5,
+                                      size: AppSizes.heading6,
                                       weight: FontWeight.w600,
                                     ),
                                     ListView.separated(
@@ -273,7 +273,7 @@ class NoMatch extends StatelessWidget {
           ),
           const AppText(
             text: "We didn't find a match",
-            size: AppSizes.body,
+            size: AppSizes.bodySmall,
             weight: FontWeight.w600,
           ),
           const AppText(

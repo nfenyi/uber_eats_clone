@@ -1,20 +1,38 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/states/onboarding_state_model.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/confirm_location.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
+import 'package:uber_eats_clone/presentation/services/place_detail_model.dart';
 
 import '../../../constants/app_sizes.dart';
-import '../../../core/app_colors.dart';
+import '../../../services/sign_in_view_model.dart';
 import '../../sign_in/views/payment_method_screen.dart';
 
 class AddressDetailsScreen extends ConsumerStatefulWidget {
-  const AddressDetailsScreen({super.key});
+  final String placeDescription;
+  final PlaceLocation location;
+
+  final BitmapDescriptor markerIcon;
+
+  const AddressDetailsScreen(
+      {super.key,
+      required this.location,
+      required this.placeDescription,
+      required this.markerIcon});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -22,13 +40,41 @@ class AddressDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
+  late LatLng _setLocation;
+  Timer? _debounce;
+  late String _placeDescription;
+  final _instructionsController = TextEditingController();
+  final _aptController = TextEditingController();
+  final _addressLabelController = TextEditingController();
+  final _buildingNameController = TextEditingController();
+  String _dropOffOption = 'Meet at my door';
+
+  bool _isLoading = false;
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _setLocation = LatLng(widget.location.lat!, widget.location.lng!);
+    _placeDescription = widget.placeDescription;
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+
+    _instructionsController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
           text: 'Address Details',
-          size: AppSizes.body,
+          size: AppSizes.heading6,
         ),
       ),
       body: Column(
@@ -38,24 +84,53 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
             child: ListView(
               children: [
                 InkWell(
-                  onTap: () =>
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) => const ConfirmLocationScreen(),
-                  )),
+                  onTap: () async {
+                    final List? setLocationDetails =
+                        await navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => ConfirmLocationScreen(
+                          markerIcon: widget.markerIcon,
+                          initialLocation: _setLocation),
+                    ));
+                    if (setLocationDetails != null) {
+                      setState(() {
+                        _setLocation = setLocationDetails.first;
+                        _placeDescription = setLocationDetails.last;
+                      });
+                    }
+                  },
                   child: Ink(
                     child: Stack(
                       alignment: Alignment.bottomCenter,
                       children: [
-                        Container(
+                        SizedBox(
                           width: double.infinity,
                           height: 200,
-                          color: AppColors.neutral300,
+                          child: GoogleMap(
+                            zoomControlsEnabled: false,
+                            zoomGesturesEnabled: false,
+                            tiltGesturesEnabled: false,
+                            markers: {
+                              Marker(
+                                  markerId: const MarkerId('set_location'),
+                                  icon: widget.markerIcon,
+                                  position: _setLocation)
+                            },
+                            initialCameraPosition:
+                                CameraPosition(target: _setLocation, zoom: 15),
+                          ),
                         ),
-                        Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50)),
-                            child: const AppText(text: 'Edit pin'))
+                        Column(
+                          children: [
+                            Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 7),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(50)),
+                                child: const AppText(text: 'Edit pin')),
+                            const Gap(10)
+                          ],
+                        )
                       ],
                     ),
                   ),
@@ -64,93 +139,155 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSizes.horizontalPaddingSmall),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const AppText(
-                        size: AppSizes.heading5,
-                        text: '1226 University Dr, Menlo Park, CA 94025, USA',
-                        weight: FontWeight.w600,
-                      ),
-                      const Gap(15),
-                      const AppTextFormField(
-                        hintText: 'Apt/Suite/Floor',
-                      ),
-                      const Gap(15),
-                      const AppTextFormField(
-                        hintText: 'Business or building name',
-                      ),
-                      const Gap(20),
-                      const Divider(),
-                      const Gap(15),
-                      const AppText(
-                        text: 'Dropoff options',
-                        size: AppSizes.body,
-                        weight: FontWeight.w600,
-                      ),
-                      ListTile(
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                        leading: Container(
-                            decoration: BoxDecoration(
-                                // border: Border.all(),
-                                borderRadius: BorderRadius.circular(50)),
-                            child: Image.asset(
-                              AssetNames.carrierBag,
-                              height: 40,
-                            )),
-                        title: const AppText(
-                          text: 'Meet at my door',
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(
+                          size: AppSizes.heading6,
+                          text: _placeDescription,
+                          weight: FontWeight.w600,
                         ),
-                        subtitle: const Row(
-                          children: [
-                            AppTextBadge(
-                              text: 'More options available',
-                            ),
-                          ],
-                        ),
-                        trailing: AppButton2(
-                            text: 'Edit',
-                            callback: () {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const DropOffOptionsScreen(),
-                              ));
-                            }),
-                      ),
-                      const Gap(20),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          AppText(
-                            text: 'Instructions for delivery person',
-                            size: AppSizes.body,
+                        const Gap(15),
+                        AppTextFormField(
+                          validator: FormBuilderValidators.compose(
+                              [FormBuilderValidators.required()]),
+                          onChanged: (value) async {
+                            if (_debounce?.isActive ?? false)
+                              _debounce?.cancel();
+                            _debounce =
+                                Timer(const Duration(milliseconds: 500), () {
+                              setState(() {});
+                            });
+                          },
+                          controller: _aptController,
+                          hintText: 'Apt/Suite/Floor',
+                          suffixIcon: Visibility(
+                            //TODO: add if it is in focus so it disappears when not in focus
+                            visible: _aptController.text.isNotEmpty,
+                            child: GestureDetector(
+                                onTap: () => _aptController.clear(),
+                                child: const Icon(Icons.cancel)),
                           ),
-                          AppTextBadge(text: 'Needs review')
-                        ],
-                      ),
-                      const Gap(20),
-                      const AppTextFormField(
-                        minLines: 4,
-                        readOnly: true,
-                        maxLines: 15,
-                        // textAlign: TextAlign.start,
-                        // height: 50,
-                        hintText:
-                            'Example: Please knock instead of using the doorbell',
-                      ),
-                      const Gap(15),
-                      const Divider(),
-                      const Gap(15),
-                      const AppText(
-                        text: 'Address Label',
-                      ),
-                      const Gap(10),
-                      const AppTextFormField(),
-                      const Gap(15),
-                      const Divider(),
-                      const Gap(10)
-                    ],
+                        ),
+                        const Gap(15),
+                        AppTextFormField(
+                          validator: FormBuilderValidators.compose(
+                              [FormBuilderValidators.required()]),
+                          onChanged: (value) async {
+                            if (_debounce?.isActive ?? false)
+                              _debounce?.cancel();
+                            _debounce =
+                                Timer(const Duration(milliseconds: 500), () {
+                              setState(() {});
+                            });
+                          },
+                          suffixIcon: Visibility(
+                            visible: _buildingNameController.text.isNotEmpty,
+                            child: GestureDetector(
+                                onTap: () => _buildingNameController.clear(),
+                                child: const Icon(Icons.cancel)),
+                          ),
+                          controller: _buildingNameController,
+                          hintText: 'Business or building name',
+                        ),
+                        const Gap(20),
+                        const Divider(),
+                        const Gap(15),
+                        const AppText(
+                          text: 'Dropoff options',
+                          size: AppSizes.body,
+                          weight: FontWeight.w600,
+                        ),
+                        ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Container(
+                              decoration: BoxDecoration(
+                                  // border: Border.all(),
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: Image.asset(
+                                AssetNames.carrierBag,
+                                height: 40,
+                              )),
+                          title: AppText(
+                            text: _dropOffOption,
+                          ),
+                          subtitle: const Row(
+                            children: [
+                              AppTextBadge(
+                                text: 'More options available',
+                              ),
+                            ],
+                          ),
+                          trailing: AppButton2(
+                              text: 'Edit',
+                              callback: () async {
+                                List? newEntry = await navigatorKey
+                                    .currentState!
+                                    .push(MaterialPageRoute(
+                                  builder: (context) => DropOffOptionsScreen(
+                                      instructions:
+                                          _instructionsController.text,
+                                      placeDescription: _placeDescription,
+                                      selectedGroupValue: _dropOffOption),
+                                ));
+                                if (newEntry != null) {
+                                  setState(() {
+                                    _dropOffOption = newEntry.first;
+                                    _instructionsController.text =
+                                        newEntry.last;
+                                  });
+                                }
+                              }),
+                        ),
+                        // const Gap(20),
+                        const ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            dense: true,
+                            // titleAlignment: ListTileTitleAlignment.top,
+                            title: AppText(
+                              text: 'Instructions for delivery person',
+                            ),
+                            trailing: AppTextBadge(text: 'Needs review')),
+                        AppTextFormField(
+                          controller: _instructionsController,
+                          minLines: 4,
+                          readOnly: true,
+                          maxLines: 15,
+                          // textAlign: TextAlign.start,
+                          // height: 50,
+                          hintText:
+                              'Example: Please knock instead of using the doorbell',
+                        ),
+                        const Gap(15),
+                        const Divider(),
+                        const Gap(15),
+                        const AppText(
+                          text: 'Address Label',
+                        ),
+                        const Gap(10),
+                        AppTextFormField(
+                          controller: _addressLabelController,
+                          validator: FormBuilderValidators.compose([
+                            FormBuilderValidators.required(
+                                errorText:
+                                    'This field cannot be empty. eg. Home, Work')
+                          ]),
+                          suffixIcon: Visibility(
+                            //TODO: add if it is in focus so it disappears when not in focus
+                            visible: _instructionsController.text.isNotEmpty,
+                            child: GestureDetector(
+                                onTap: () => _instructionsController.clear(),
+                                child: const Icon(Icons.cancel)),
+                          ),
+                        ),
+                        const Gap(15),
+                        const Divider(),
+                        const Gap(10)
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -159,11 +296,50 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
           Padding(
             padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
             child: AppButton(
+              isLoading: _isLoading,
               text: 'Save and continue',
-              callback: () {
-                navigatorKey.currentState!.push(MaterialPageRoute(
-                  builder: (context) => const PaymentMethodScreen(),
-                ));
+              callback: () async {
+                if (_formKey.currentState!.validate()) {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  var addressDetails = AddressDetails(
+                      instruction: _instructionsController.text,
+                      apartment: _aptController.text,
+                      latLng: '${_setLocation.latitude}',
+                      addressLabel: _addressLabelController.text,
+                      building: _buildingNameController.text,
+                      dropoffOption: _dropOffOption);
+                  var formattedDetails = addressDetails.toJson();
+                  formattedDetails.addEntries([
+                    MapEntry('uid', FirebaseAuth.instance.currentUser!.uid)
+                  ]);
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection(FirestoreCollections.users)
+                        .add(formattedDetails);
+                    await Hive.box(AppBoxes.appState)
+                        .put('addressDetailsSaved', true);
+                    //TODO: store details in box here?
+
+                    navigatorKey.currentState!.pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (context) => const PaymentMethodScreen()),
+                        (r) {
+                      return false;
+                    });
+                  } on FirebaseException catch (e) {
+                    showAppInfoDialog(context, description: e.code);
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  } on Exception catch (e) {
+                    showAppInfoDialog(context, description: e.toString());
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  }
+                }
               },
             ),
           )

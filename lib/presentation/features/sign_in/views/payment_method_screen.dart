@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/add_card.dart';
 
 import '../../../../main.dart';
 import '../../../constants/app_sizes.dart';
+import 'uber_one_screen.dart';
 
 class PaymentMethodScreen extends ConsumerStatefulWidget {
   const PaymentMethodScreen({super.key});
@@ -36,15 +37,11 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
           Padding(
             padding:
                 const EdgeInsets.only(right: AppSizes.horizontalPaddingSmall),
-            child: InkWell(
-              onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => const AddCardScreen(),
+            child: AppTextButton(
+              callback: () => navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const UberOneScreen(),
               )),
-              child: Ink(
-                child: const AppText(
-                  text: 'Skip',
-                ),
-              ),
+              text: 'Skip',
             ),
           )
         ],
@@ -57,7 +54,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
           children: [
             const AppText(
               text: 'Select your preferred payment method',
-              size: AppSizes.heading5,
+              size: AppSizes.heading6,
               weight: FontWeight.w600,
             ),
             const Gap(40),
@@ -81,10 +78,23 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
                   itemBuilder: (context, index) {
                     final paymentMethod = _paymentMethods[index];
                     return ListTile(
+                      onTap: () {
+                        if (paymentMethod.name == 'Credit or Debit') {
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                              builder: (context) => AddCardScreen()));
+                        } else {
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                            builder: (context) => const UberOneScreen(),
+                          ));
+                        }
+                      },
+                      titleAlignment: ListTileTitleAlignment.center,
                       contentPadding: EdgeInsets.zero,
                       leading: Image.asset(
                         paymentMethod.assetImage,
+                        fit: BoxFit.cover,
                         height: 15,
+                        width: 30,
                       ),
                       title: AppText(text: paymentMethod.name),
                     );

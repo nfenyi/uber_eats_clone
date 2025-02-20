@@ -35,7 +35,7 @@ class _HelpScreenState extends State<HelpScreen> {
         // flexibleSpace: FlexibleSpaceBar(
         title: const AppText(
           text: 'Help',
-          size: AppSizes.body,
+          size: AppSizes.bodySmall,
           weight: FontWeight.bold,
         ),
         // ),
@@ -94,7 +94,7 @@ class _HelpScreenState extends State<HelpScreen> {
                             const AppText(
                               text: 'All Topics',
                               weight: FontWeight.bold,
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                             ),
                           ],
                         ),
@@ -135,7 +135,7 @@ class _HelpScreenState extends State<HelpScreen> {
                         child: AppText(
                           text: 'Account and payments',
                           weight: FontWeight.bold,
-                          size: AppSizes.body,
+                          size: AppSizes.bodySmall,
                         ),
                       ),
                       ListTile(
@@ -222,7 +222,7 @@ class _HelpScreenState extends State<HelpScreen> {
                         child: AppText(
                           text: 'Account settings',
                           weight: FontWeight.bold,
-                          size: AppSizes.body,
+                          size: AppSizes.bodySmall,
                         ),
                       ),
                       ListTile(

@@ -92,14 +92,14 @@ class _UberOneAccountScreenState extends State<UberOneAccountScreen> {
                             const Gap(15),
                             AppText(
                               text: benefit.title,
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                               weight: FontWeight.w600,
                             ),
                             const Gap(5),
                             AppText(
                               text: benefit.message,
                               color: AppColors.neutral500,
-                              // size: AppSizes.body,
+                              // size: AppSizes.bodySmall,
                             )
                           ],
                         ),
@@ -137,14 +137,14 @@ class _UberOneAccountScreenState extends State<UberOneAccountScreen> {
                     const AppText(
                       text: 'Save \$25 every month',
                       color: Colors.brown,
-                      size: AppSizes.body,
+                      size: AppSizes.bodySmall,
                     ),
                     const Gap(10),
                     const AppText(
                       text:
                           "That's how much people save on average from Uber One and promos in your country",
                       color: AppColors.neutral500, textAlign: TextAlign.center,
-                      // size: AppSizes.body,
+                      // size: AppSizes.bodySmall,
                     ),
                     const Gap(20)
                   ],

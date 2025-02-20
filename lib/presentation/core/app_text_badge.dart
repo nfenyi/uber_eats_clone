@@ -14,12 +14,11 @@ class AppTextBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
         color: const Color.fromARGB(255, 206, 232, 221),
       ),
-      // constraints: BoxConstraints.tightFor(),
-
+      // constraints: const BoxConstraints.tightForFinite(),
       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
       child: AppText(
         text: text,
-        size: AppSizes.bodySmallest,
+        size: 9,
         color: AppColors.primary2,
       ),
     );

@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../presentation/features/sign_in/views/sign_in/sign_in_view_models.dart';
+import '../presentation/features/sign_in/views/sign_in/sign_in_provider.dart';
 
 class AccountStateNotifier extends StateNotifier<AccountDetails> {
   AccountStateNotifier()
       : super(AccountDetails(
-            userId: '6646516331',
-            name: 'Nana Fenyi',
+            userId: 'Unknown Id',
+            name: 'Unknown Name',
             type: 'Personal',
             hasUberOne: true));
 }

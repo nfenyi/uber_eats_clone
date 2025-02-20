@@ -27,7 +27,7 @@ class JoinUberOneScreen extends StatelessWidget {
                   children: [
                     AppText(
                       text: 'Uber One',
-                      size: AppSizes.heading5,
+                      size: AppSizes.heading6,
                       weight: FontWeight.w600,
                     ),
                     Row(children: [
@@ -95,7 +95,7 @@ class JoinUberOneScreen extends StatelessWidget {
               const AppText(
                 text: 'Save \$25 every month',
                 color: AppColors.uberOneGold,
-                size: AppSizes.body,
+                size: AppSizes.bodySmall,
               ),
               const Gap(10),
               const Padding(

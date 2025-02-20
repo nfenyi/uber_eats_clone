@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,7 +19,7 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/name_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/terms_and_privace_notice_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/verify_phone_number.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
@@ -31,7 +34,7 @@ class PhoneNumberScreen extends ConsumerStatefulWidget {
 
 class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
   late Country? _selectedCountry;
-
+  Timer? _debounce;
   final _phoneNumberController = TextEditingController();
   late final Iterable<Country> _countries;
   final _formKey = GlobalKey<FormState>();
@@ -53,6 +56,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
   @override
   void dispose() {
     _phoneNumberController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -192,6 +196,15 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                         child: Expanded(
                             //TODO: add input formatter
                             child: AppTextFormField(
+                          onChanged: (value) {
+                            if (_debounce?.isActive ?? false) {
+                              _debounce?.cancel();
+                            }
+                            _debounce =
+                                Timer(const Duration(milliseconds: 500), () {
+                              setState(() {});
+                            });
+                          },
                           validator: FormBuilderValidators.compose([
                             FormBuilderValidators.required(
                                 errorText: 'Please provide a phone number')
@@ -261,29 +274,69 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                         ),
                       ),
                       InkWell(
-                        onTap:
-                            // _emailController.text.isEmpty
-                            //     ? null
-                            //     :
-                            () => navigatorKey.currentState!
-                                .push(MaterialPageRoute(
-                          builder: (context) =>
-                              const TermsNPrivacyNoticeScreen(),
-                        )),
+                        onTap: _phoneNumberController.text.isEmpty
+                            ? null
+                            : () async {
+                                if (_formKey.currentState!.validate()) {
+                                  await FirebaseAuth.instance.verifyPhoneNumber(
+                                    phoneNumber:
+                                        '${_selectedCountry!.dialCode}${_phoneNumberController.text.trim()}',
+                                    verificationCompleted:
+                                        (PhoneAuthCredential credential) async {
+                                      await FirebaseAuth.instance.currentUser!
+                                          .updatePhoneNumber(credential);
+                                      navigatorKey.currentState!
+                                          .push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            const NameScreen(),
+                                      ));
+                                    },
+                                    verificationFailed:
+                                        (FirebaseAuthException e) {
+                                      showInfoToast(e.code, context: context);
+                                    },
+                                    codeSent: (String verificationId,
+                                        int? resendToken) {
+                                      navigatorKey.currentState!
+                                          .push(MaterialPageRoute(
+                                        builder: (context) => VerifyPhoneNumber(
+                                          verificationId: verificationId,
+                                          signedInWithEmail: true,
+                                          phoneNumber:
+                                              '${_selectedCountry!.dialCode}${_phoneNumberController.text}',
+                                        ),
+                                      ));
+                                    },
+                                    timeout: const Duration(minutes: 1),
+                                    codeAutoRetrievalTimeout:
+                                        (String verificationId) {},
+                                  );
+                                }
+                              },
                         child: Ink(
                           child: Container(
                             padding:
                                 const EdgeInsets.all(AppSizes.bodySmallest),
-                            decoration: const BoxDecoration(
-                                color: AppColors.neutral200,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            child: const Row(
+                            decoration: BoxDecoration(
+                                color: _phoneNumberController.text.isEmpty
+                                    ? AppColors.neutral200
+                                    : Colors.black,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(20))),
+                            child: Row(
                               children: [
-                                Text('Next'),
-                                Gap(5),
+                                AppText(
+                                  text: 'Next',
+                                  color: _phoneNumberController.text.isEmpty
+                                      ? null
+                                      : Colors.white,
+                                ),
+                                const Gap(5),
                                 Icon(
                                   FontAwesomeIcons.arrowRight,
+                                  color: _phoneNumberController.text.isEmpty
+                                      ? null
+                                      : Colors.white,
                                   size: 15,
                                 ),
                               ],

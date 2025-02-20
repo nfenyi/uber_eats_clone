@@ -225,7 +225,7 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                                       child: AppText(
                                         key: _categoryKeys[index],
                                         text: productCategory.name,
-                                        size: AppSizes.heading5,
+                                        size: AppSizes.heading6,
                                       ),
                                     ),
                                     const Gap(10),
@@ -444,7 +444,7 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                             .map(
                               (category) => AppText(
                                 text: category.name,
-                                size: AppSizes.body,
+                                size: AppSizes.bodySmall,
                               ),
                             )
                             .toList(),

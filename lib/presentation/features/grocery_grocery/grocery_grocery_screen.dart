@@ -35,7 +35,7 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                   title: AppText(
                     text: 'Grocery',
                     weight: FontWeight.w600,
-                    size: AppSizes.body,
+                    size: AppSizes.bodySmall,
                   ),
                 ),
               )

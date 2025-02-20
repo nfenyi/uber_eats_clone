@@ -541,7 +541,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const AppText(
-                        size: AppSizes.body,
+                        size: AppSizes.bodySmall,
                         text: '80 results',
                         weight: FontWeight.w600,
                       ),
@@ -844,7 +844,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     const Center(
                                         child: AppText(
                                       text: 'Delivery fee',
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       weight: FontWeight.w600,
                                     )),
                                     AppText(
@@ -905,7 +905,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                     Center(
                                       child: AppTextButton(
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         text: 'Reset',
                                         callback: () {
                                           // setState(() {
@@ -970,7 +970,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     const Center(
                                         child: AppText(
                                       text: 'Rating',
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       weight: FontWeight.w600,
                                     )),
                                     AppText(
@@ -1032,7 +1032,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                     Center(
                                       child: AppTextButton(
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         text: 'Reset',
                                         callback: () {
                                           // setState(() {
@@ -1092,7 +1092,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     const Center(
                                         child: AppText(
                                       text: 'Price',
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       weight: FontWeight.w600,
                                     )),
                                     Center(
@@ -1146,7 +1146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                     Center(
                                       child: AppTextButton(
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         text: 'Reset',
                                         callback: () {
                                           navigatorKey.currentState!.pop();
@@ -1196,7 +1196,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     const Center(
                                         child: AppText(
                                       text: 'Dietary',
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       weight: FontWeight.w600,
                                     )),
                                     ListView(
@@ -1296,7 +1296,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                     Center(
                                       child: AppTextButton(
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         text: 'Reset',
                                         callback: () {
                                           navigatorKey.currentState!.pop();
@@ -1345,7 +1345,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     const Center(
                                         child: AppText(
                                       text: 'Sort',
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       weight: FontWeight.w600,
                                     )),
                                     ListView(
@@ -1384,7 +1384,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                     Center(
                                       child: AppTextButton(
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         text: 'Reset',
                                         callback: () {
                                           navigatorKey.currentState!.pop();
@@ -2444,7 +2444,7 @@ class SearchResultDisplay1 extends StatelessWidget {
               EdgeInsets.symmetric(horizontal: AppSizes.horizontalPaddingSmall),
           child: AppText(
             text: '383 results',
-            size: AppSizes.body,
+            size: AppSizes.bodySmall,
           ),
         ),
         const Gap(10),
@@ -2592,7 +2592,7 @@ class SearchResultDisplay2 extends StatelessWidget {
               EdgeInsets.symmetric(horizontal: AppSizes.horizontalPaddingSmall),
           child: AppText(
             text: '83 results',
-            size: AppSizes.body,
+            size: AppSizes.bodySmall,
           ),
         ),
         const Divider(
@@ -2803,7 +2803,7 @@ class InitialSearchPage1 extends StatelessWidget {
             const Gap(10),
             const AppText(
               text: 'Recent',
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
             ),
             ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -2823,7 +2823,7 @@ class InitialSearchPage1 extends StatelessWidget {
             ),
             const AppText(
               text: 'Top categories',
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
             ),
             ListView.builder(
               shrinkWrap: true,
@@ -2875,7 +2875,7 @@ class InitialSearchPage2 extends StatelessWidget {
             const Gap(20),
             const AppText(
               text: 'Recent',
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
             ),
             ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -2893,7 +2893,7 @@ class InitialSearchPage2 extends StatelessWidget {
             ),
             const AppText(
               text: 'Top searches',
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
             ),
             ListView.builder(
               shrinkWrap: true,

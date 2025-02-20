@@ -64,7 +64,7 @@ class _SendGiftsState extends ConsumerState<SendGiftsScreen> {
             title: AppText(
               text: 'Set recipient address',
               weight: FontWeight.w600,
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
             ),
             subtitle: AppText(
               text:
@@ -77,7 +77,7 @@ class _SendGiftsState extends ConsumerState<SendGiftsScreen> {
             title: AppText(
               text: 'Customize sharing link',
               weight: FontWeight.w600,
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
             ),
             subtitle: AppText(
               text: 'Add a personalized video message or note.',
@@ -89,7 +89,7 @@ class _SendGiftsState extends ConsumerState<SendGiftsScreen> {
             title: AppText(
               text: 'Share with recipient',
               weight: FontWeight.w600,
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
             ),
             subtitle: AppText(
               text:

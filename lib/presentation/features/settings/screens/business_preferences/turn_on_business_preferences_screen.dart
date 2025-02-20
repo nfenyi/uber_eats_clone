@@ -46,7 +46,7 @@ class TurnOnBusinessPreferencesScreen extends StatelessWidget {
                             child: AppText(
                               text: 'Get more with business meals',
                               weight: FontWeight.bold,
-                              size: AppSizes.heading5,
+                              size: AppSizes.heading6,
                             ),
                           )
                         ],

@@ -46,7 +46,7 @@ class _GroupOrderCompleteScreenState
           ListTile(
             title: const AppText(
               text: "Repeat group order scheduled",
-              size: AppSizes.heading5,
+              size: AppSizes.heading6,
             ),
             trailing: GestureDetector(
               onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(

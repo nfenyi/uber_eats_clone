@@ -42,7 +42,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       appBar: AppBar(
         title: const AppText(
           text: 'Your Favorites',
-          size: AppSizes.body,
+          size: AppSizes.bodySmall,
         ),
       ),
       body: CustomScrollView(

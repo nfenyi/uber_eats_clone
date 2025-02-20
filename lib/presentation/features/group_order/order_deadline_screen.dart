@@ -46,7 +46,7 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
               children: [
                 const AppText(
                   text: 'Set an order deadline',
-                  size: AppSizes.heading5,
+                  size: AppSizes.heading6,
                   weight: FontWeight.w600,
                 ),
                 const Gap(20),
@@ -78,7 +78,7 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
                       children: [
                         AppText(
                           text: 'Pick a time',
-                          size: AppSizes.body,
+                          size: AppSizes.bodySmall,
                           weight: FontWeight.w600,
                         ),
                       ],

@@ -135,7 +135,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                               children: [
                                 AppText(
                                     text: '\$${_product.initialPrice}',
-                                    size: AppSizes.body,
+                                    size: AppSizes.bodySmall,
                                     color: Colors.green),
                                 const Gap(5),
                               ],
@@ -143,7 +143,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           ),
                           AppText(
                             text: '\$${_product.initialPrice}',
-                            size: AppSizes.body,
+                            size: AppSizes.bodySmall,
                             decoration: _product.promoPrice != null
                                 ? TextDecoration.lineThrough
                                 : TextDecoration.none,
@@ -160,7 +160,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           ListTile(
                             title: AppText(
                               text: 'Select Option',
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                               weight: FontWeight.w600,
                             ),
                             trailing: AppTextBadge(
@@ -288,7 +288,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                               children: [
                                                 const AppText(
                                                   text: 'Add note',
-                                                  size: AppSizes.body,
+                                                  size: AppSizes.bodySmall,
                                                 ),
                                                 const Gap(10),
                                                 AppTextFormField(
@@ -299,7 +299,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                 const Gap(10),
                                                 const AppText(
                                                   text: 'Backup instructions',
-                                                  size: AppSizes.body,
+                                                  size: AppSizes.bodySmall,
                                                 ),
                                               ],
                                             ),
@@ -537,7 +537,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                             title: const AppText(
                               text: 'Description',
                               weight: FontWeight.w600,
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                             ),
                             children: [
                               AppText(
@@ -552,7 +552,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                             title: const AppText(
                               text: 'Nutrition Facts',
                               weight: FontWeight.w600,
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                             ),
                             children:
                                 widget.product.nutritionFacts!.entries.map(
@@ -585,7 +585,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                             title: const AppText(
                               text: 'Ingredients',
                               weight: FontWeight.w600,
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                             ),
                             children: [
                               AppText(
@@ -600,7 +600,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                             title: const AppText(
                               text: 'Directions',
                               weight: FontWeight.w600,
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                             ),
                             children: [
                               AppText(

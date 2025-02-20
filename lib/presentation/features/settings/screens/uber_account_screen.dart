@@ -24,7 +24,7 @@ class UberAccountScreen extends StatelessWidget {
       appBar: AppBar(
         title: const AppText(
           text: 'Uber Account',
-          size: AppSizes.body,
+          size: AppSizes.bodySmall,
         ),
       ),
       body: DefaultTabController(

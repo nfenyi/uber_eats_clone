@@ -1,25 +1,23 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/sign_in/sign_in_view_models.dart';
 import 'package:uber_eats_clone/presentation/services/service_model.dart';
 
 import '../../main.dart';
-import '../core/widgets.dart';
 
-class AuthenticatorRepository {
-  const AuthenticatorRepository();
+class AuthenticatoViewModel {
+  const AuthenticatoViewModel();
   String? get userId => FirebaseAuth.instance.currentUser?.uid;
   bool get isAlreadyLoggedIn => userId != null;
   String get displayName =>
       FirebaseAuth.instance.currentUser?.displayName ?? '';
   String? get email => FirebaseAuth.instance.currentUser?.email;
 
-  Future<ServiceResponse> logInWithGoogle() async {
+  Future<ServiceResponse> signInWithGoogle() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     if (googleUser == null) {
-      return ServiceResponse(response: Result.aborted, payload: {});
+      return ServiceResponse(response: Result.aborted);
     }
 
     // Obtain the auth details from the request
@@ -33,7 +31,7 @@ class AuthenticatorRepository {
     );
 
     try {
-      final result = await FirebaseAuth.instance.signInWithCredential(
+      await FirebaseAuth.instance.signInWithCredential(
         credential,
       );
       // await Hive.box(AppBoxes.appState).put(  AccountDetails(
@@ -43,7 +41,7 @@ class AuthenticatorRepository {
       //     photoUrl: result.user?.photoURL,
       //     phoneNumber: result.user?.phoneNumber));
       // await Hive.box(AppBoxes.appState).put('currentUser', result.user!.uid);
-      await Hive.box(AppBoxes.appState).put('authenticated', true);
+
       return ServiceResponse(response: Result.success, payload: {});
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-password' || e.code == 'user-not-found') {
@@ -51,6 +49,53 @@ class AuthenticatorRepository {
             response: Result.failure, payload: 'Invalid credentials.');
       } else {
         return ServiceResponse(response: Result.failure, payload: e.code);
+      }
+    } catch (e) {
+      // await showAppInfoDialog(navigatorKey.currentContext!, ref,
+      //     title: e.toString());
+      return ServiceResponse(response: Result.failure, payload: e.toString());
+    }
+  }
+
+  Future<ServiceResponse> signInWithApple() async {
+    try {
+      final appleProvider = AppleAuthProvider();
+      final credential =
+          await FirebaseAuth.instance.signInWithProvider(appleProvider);
+// Keep the authorization code returned from Apple platforms
+      logger.d('hello');
+      String? authCode = credential.additionalUserInfo?.authorizationCode;
+      if (authCode == null) {
+        return ServiceResponse(response: Result.aborted, payload: {});
+      }
+      // Revoke Apple auth token
+      await FirebaseAuth.instance.revokeTokenWithAuthorizationCode(authCode);
+
+      // // Create a new credential
+      // final credential = GoogleAuthProvider.credential(
+      //   accessToken: googleAuth.accessToken,
+      //   idToken: googleAuth.idToken,
+      // );
+
+      // await Hive.box(AppBoxes.appState).put(  AccountDetails(
+      //     uid: result.user!.uid,
+      //     displayName: result.user?.displayName,
+      //     email: result.user?.email,
+      //     photoUrl: result.user?.photoURL,
+      //     phoneNumber: result.user?.phoneNumber));
+      // await Hive.box(AppBoxes.appState).put('currentUser', result.user!.uid);
+
+      return ServiceResponse(response: Result.success, payload: {});
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'web-context-canceled') {
+        return ServiceResponse(response: Result.aborted);
+      }
+      if (e.code == 'invalid-password' || e.code == 'user-not-found') {
+        return ServiceResponse(
+            response: Result.failure, payload: 'Invalid credentials.');
+      } else {
+        return ServiceResponse(
+            response: Result.failure, payload: '${e.code}\n\n${e.message}');
       }
     } catch (e) {
       // await showAppInfoDialog(navigatorKey.currentContext!, ref,
@@ -92,11 +137,16 @@ class AuthenticatorRepository {
         },
       );
 
-      return ServiceResponse(response: Result.success, payload: {});
+      return ServiceResponse(response: Result.success);
     } catch (e) {
       // await showAppInfoDialog(navigatorKey.currentContext!, ref,
       //     title: e.toString());
       return ServiceResponse(response: Result.failure, payload: e.toString());
     }
   }
+}
+
+class FirestoreCollections {
+  static String devices = 'devices';
+  static String users = 'users';
 }

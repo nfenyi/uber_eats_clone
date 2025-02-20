@@ -45,7 +45,7 @@ class _CommunicationEmailScreenState
                     text: 'Email',
                     // color: Colors.red,
                     weight: FontWeight.bold,
-                    size: AppSizes.heading5,
+                    size: AppSizes.heading6,
                   ),
                   pinned: true,
                 )
@@ -59,7 +59,7 @@ class _CommunicationEmailScreenState
                 child: AppText(
                   text: 'Email Address',
                   weight: FontWeight.bold,
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
               ),
               ListTile(
@@ -135,7 +135,7 @@ class _CommunicationEmailScreenState
                 child: AppText(
                   text: 'Categories',
                   weight: FontWeight.bold,
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
               ),
               CheckboxListTile.adaptive(
@@ -146,7 +146,7 @@ class _CommunicationEmailScreenState
                 title: const AppText(
                   text: 'Promotional offers',
                   weight: FontWeight.bold,
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
                 value: _enablePromoOffers,
                 onChanged: (value) {
@@ -163,7 +163,7 @@ class _CommunicationEmailScreenState
                 title: const AppText(
                   text: 'Membership',
                   weight: FontWeight.bold,
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
                 value: _enableMembership,
                 onChanged: (value) {
@@ -180,7 +180,7 @@ class _CommunicationEmailScreenState
                 title: const AppText(
                   text: 'Product updates & news',
                   weight: FontWeight.bold,
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
                 value: _enableNews,
                 onChanged: (value) {
@@ -197,7 +197,7 @@ class _CommunicationEmailScreenState
                 title: const AppText(
                   text: 'Recommendations for great food, groceries and more',
                   weight: FontWeight.bold,
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
                 value: _enableRecommendations,
                 onChanged: (value) {
@@ -214,7 +214,7 @@ class _CommunicationEmailScreenState
                 title: const AppText(
                   text: 'Reminders',
                   weight: FontWeight.bold,
-                  size: AppSizes.body,
+                  size: AppSizes.bodySmall,
                 ),
                 value: _enableReminders,
                 onChanged: (value) {

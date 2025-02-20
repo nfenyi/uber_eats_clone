@@ -45,7 +45,7 @@ class _GroupOrderPaymentScreenState
               children: [
                 const AppText(
                   text: 'Choose who pays',
-                  size: AppSizes.heading5,
+                  size: AppSizes.heading6,
                   weight: FontWeight.w600,
                 ),
                 const Gap(20),

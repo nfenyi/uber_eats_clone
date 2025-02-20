@@ -229,7 +229,7 @@ class _StoreScreenState extends State<StoreScreen> {
                               child: AppText(
                                 key: _categoryKeys[index],
                                 text: productCategory.name,
-                                size: AppSizes.heading5,
+                                size: AppSizes.heading6,
                               ),
                             ),
                             const Gap(10),
@@ -387,7 +387,7 @@ class _StoreScreenState extends State<StoreScreen> {
                     .map(
                       (category) => AppText(
                         text: category.name,
-                        size: AppSizes.body,
+                        size: AppSizes.bodySmall,
                       ),
                     )
                     .toList(),
@@ -632,7 +632,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                             const Gap(10),
                                             AppText(
                                               text: _store.name,
-                                              size: AppSizes.heading5,
+                                              size: AppSizes.heading6,
                                               weight: FontWeight.w600,
                                             ),
                                             const Gap(5),

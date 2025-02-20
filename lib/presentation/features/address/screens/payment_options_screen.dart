@@ -43,7 +43,7 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
             const AppText(
               text: 'Payment options',
               weight: FontWeight.w600,
-              size: AppSizes.heading5,
+              size: AppSizes.heading6,
             ),
             const Gap(10),
             Row(
@@ -119,7 +119,7 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
             ),
             const Gap(30),
             const AppText(
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
               text: 'Vouchers',
               weight: FontWeight.w600,
             ),
@@ -140,7 +140,7 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
             ),
             const Divider(),
             const AppText(
-              size: AppSizes.body,
+              size: AppSizes.bodySmall,
               text: 'Business settings',
               weight: FontWeight.w600,
             ),

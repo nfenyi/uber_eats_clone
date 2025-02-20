@@ -277,7 +277,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
                                 ),
                                 AppText(
                                   text: foodNearYou.name,
-                                  size: AppSizes.body,
+                                  size: AppSizes.bodySmall,
                                   overflow: TextOverflow.ellipsis,
                                 )
                               ],

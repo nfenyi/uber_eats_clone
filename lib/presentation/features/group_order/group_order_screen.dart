@@ -155,7 +155,7 @@ class _GroupOrderScreenState extends ConsumerState<GroupOrderScreen> {
                                 const Duration(days: 7)
                             ? "Up next"
                             : 'Coming soon',
-                        size: AppSizes.heading5,
+                        size: AppSizes.heading6,
                         weight: FontWeight.w600,
                       ),
                     ),
@@ -277,7 +277,7 @@ class _GroupOrderScreenState extends ConsumerState<GroupOrderScreen> {
                                               const Gap(20),
                                               const AppText(
                                                 text: 'Your items',
-                                                size: AppSizes.body,
+                                                size: AppSizes.bodySmall,
                                                 weight: FontWeight.w600,
                                               ),
                                               const Gap(10),

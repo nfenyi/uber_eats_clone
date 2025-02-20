@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
@@ -10,13 +9,20 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/email_address_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/name_screen.dart';
 
 import '../../../../main.dart';
 import '../../../core/app_colors.dart';
 
 class VerifyPhoneNumber extends ConsumerStatefulWidget {
   final String verificationId;
-  const VerifyPhoneNumber(this.verificationId, {super.key});
+  final bool signedInWithEmail;
+  final String phoneNumber;
+  const VerifyPhoneNumber(
+      {super.key,
+      this.signedInWithEmail = false,
+      required this.verificationId,
+      required this.phoneNumber});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -49,7 +55,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumber> {
       fontWeight: FontWeight.w600,
     ),
     decoration: BoxDecoration(
-      color: Colors.black12.withOpacity(0.1),
+      color: AppColors.neutral100,
       borderRadius: BorderRadius.circular(10),
     ),
   );
@@ -82,20 +88,23 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumber> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const AppText(
-                  size: AppSizes.heading5,
-                  text: 'Enter the 4-digit code sent to you at (929) 924-7938.',
+                AppText(
+                  size: AppSizes.heading6,
+                  text:
+                      'Enter the 6-digit code sent to you at ${widget.phoneNumber}',
                   weight: FontWeight.w600,
                 ),
                 const Gap(10),
-                const AppText(
-                  size: AppSizes.body,
-                  text: 'Changes your mobile number?',
-                  decoration: TextDecoration.underline,
+                GestureDetector(
+                  onTap: () => navigatorKey.currentState!.pop(),
+                  child: const AppText(
+                    text: 'Changed your mobile number?',
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
                 const Gap(30),
                 Pinput(
-                  length: 4,
+                  length: 6,
                   followingPinTheme: _followingPinTheme,
                   defaultPinTheme: _defaultPinTheme,
                   focusedPinTheme: _focusedPinTheme,
@@ -106,15 +115,26 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumber> {
                       final credential = PhoneAuthProvider.credential(
                           verificationId: widget.verificationId,
                           smsCode: value);
-                      await FirebaseAuth.instance
-                          .signInWithCredential(credential);
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => const EmailAddressScreen(),
-                      ));
+
+                      if (widget.signedInWithEmail) {
+                        await FirebaseAuth.instance.currentUser!
+                            .updatePhoneNumber(credential);
+                        navigatorKey.currentState!
+                            .pushReplacement(MaterialPageRoute(
+                          builder: (context) => const NameScreen(),
+                        ));
+                      } else {
+                        await FirebaseAuth.instance
+                            .signInWithCredential(credential);
+                        navigatorKey.currentState!
+                            .pushReplacement(MaterialPageRoute(
+                          builder: (context) => const EmailAddressScreen(),
+                        ));
+                      }
                     } on FirebaseAuthException catch (e) {
-                      showInfoToast(e.code, context: context);
+                      showAppInfoDialog(description: e.code, context);
                     } on Exception catch (e) {
-                      showInfoToast(e.toString(), context: context);
+                      showAppInfoDialog(description: e.toString(), context);
                     }
                   },
                 ),
@@ -126,7 +146,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumber> {
                       padding: const EdgeInsets.all(
                           AppSizes.horizontalPaddingSmallest),
                       decoration: const BoxDecoration(
-                          color: Colors.black12,
+                          color: AppColors.neutral100,
                           borderRadius: BorderRadius.all(Radius.circular(20))),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -148,7 +168,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumber> {
                               format: CountDownTimerFormat.minutesSeconds,
                               endTime: DateTime.now().add(
                                 const Duration(
-                                  minutes: 1,
+                                  minutes: 2,
                                 ),
                               ),
                               onEnd: () {
@@ -177,7 +197,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumber> {
                         child: Container(
                           padding: const EdgeInsets.all(AppSizes.bodySmallest),
                           decoration: const BoxDecoration(
-                              color: AppColors.neutral200,
+                              color: AppColors.neutral100,
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
                           child: const Icon(

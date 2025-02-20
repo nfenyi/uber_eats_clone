@@ -189,7 +189,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const AppText(
-                        size: AppSizes.body,
+                        size: AppSizes.bodySmall,
                         text: '80 results',
                         weight: FontWeight.w600,
                       ),

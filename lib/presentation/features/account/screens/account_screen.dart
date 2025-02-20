@@ -320,7 +320,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           children: [
                             AppText(
                               text: 'Uber One',
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                             ),
                             AppText(text: 'Try free for 4 weeks'),
                           ],

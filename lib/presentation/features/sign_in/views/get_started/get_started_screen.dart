@@ -7,7 +7,7 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
-import '../../../../../models/country/country_ip_model.dart';
+import '../../../../../hive_models/country/country_ip_model.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../core/app_colors.dart';
 import '../sign_in/sign_in_screen.dart';
@@ -50,7 +50,7 @@ class _GetStartedScreenState extends ConsumerState<GetStartedScreen> {
                 const Text(
                   'Get started with Uber Eats',
                   style: TextStyle(
-                      fontSize: AppSizes.heading5, fontWeight: FontWeight.w600),
+                      fontSize: AppSizes.heading6, fontWeight: FontWeight.w600),
                 ),
                 const Gap(10),
                 AppButton(
@@ -59,21 +59,25 @@ class _GetStartedScreenState extends ConsumerState<GetStartedScreen> {
                   text: "Continue",
                   textSize: AppSizes.bodySmall,
                   callback: () async {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    final countryResponse = await CountryIp.find();
+                    try {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      final countryResponse = await CountryIp.find();
 
-                    await Hive.box(AppBoxes.appState).put('onboarded', true);
-                    await Hive.box(AppBoxes.appState).put(
-                        'country',
-                        HiveCountryResponse(
-                            ip: countryResponse?.ip,
-                            code: countryResponse?.countryCode,
-                            country: countryResponse?.country));
-                    navigatorKey.currentState!.pushReplacement(
-                        MaterialPageRoute(
-                            builder: (context) => const SignInScreen()));
+                      await Hive.box(AppBoxes.appState).put('onboarded', true);
+                      await Hive.box(AppBoxes.appState).put(
+                          'country',
+                          HiveCountryResponse(
+                              ip: countryResponse?.ip,
+                              code: countryResponse?.countryCode,
+                              country: countryResponse?.country));
+                      navigatorKey.currentState!.pushReplacement(
+                          MaterialPageRoute(
+                              builder: (context) => const SignInScreen()));
+                    } on Exception catch (e) {
+                      showAppInfoDialog(context, description: e.toString());
+                    }
                   },
                 )
               ],

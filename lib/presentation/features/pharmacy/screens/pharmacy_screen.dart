@@ -87,7 +87,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                     title: const AppText(
                       text: 'Pharmacy',
                       weight: FontWeight.w600,
-                      size: AppSizes.body,
+                      size: AppSizes.bodySmall,
                     ),
                     expandedTitleScale: 1.5,
                   ),
@@ -215,7 +215,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Delivery fee',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       AppText(
@@ -276,7 +276,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             // setState(() {
@@ -342,7 +342,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Rating',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       AppText(
@@ -405,7 +405,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             // setState(() {
@@ -466,7 +466,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Price',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       Center(
@@ -521,7 +521,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             navigatorKey.currentState!.pop();
@@ -572,7 +572,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Dietary',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       ListView(
@@ -673,7 +673,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             navigatorKey.currentState!.pop();
@@ -723,7 +723,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Sort',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       ListView(
@@ -762,7 +762,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             navigatorKey.currentState!.pop();

@@ -8,7 +8,7 @@ void showInfoToast(String message,
   FToast fToast = FToast();
   fToast.init(context);
   Widget toast = Container(
-    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(10),
       color: color,

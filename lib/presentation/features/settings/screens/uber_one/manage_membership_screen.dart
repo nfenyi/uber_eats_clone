@@ -44,7 +44,7 @@ class _ManageMembershipScreenState extends State<ManageMembershipScreen> {
           child: AppText(
             weight: FontWeight.bold,
             text: 'Your membership',
-            size: AppSizes.heading5,
+            size: AppSizes.heading6,
           ),
         ),
         ListTile(
@@ -128,7 +128,7 @@ class _ManageMembershipScreenState extends State<ManageMembershipScreen> {
           child: AppText(
             weight: FontWeight.bold,
             text: 'Payment details',
-            size: AppSizes.heading5,
+            size: AppSizes.heading6,
           ),
         ),
         ListTile(
@@ -163,7 +163,7 @@ class _ManageMembershipScreenState extends State<ManageMembershipScreen> {
           child: AppText(
             weight: FontWeight.bold,
             text: 'Manage membership',
-            size: AppSizes.heading5,
+            size: AppSizes.heading6,
           ),
         ),
         ListTile(

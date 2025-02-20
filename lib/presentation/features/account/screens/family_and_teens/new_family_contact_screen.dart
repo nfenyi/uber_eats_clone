@@ -74,7 +74,7 @@ class _NewFamilyContactScreenState extends State<NewFamilyContactScreen> {
                   const Icon(Icons.keyboard_arrow_down),
                   const AppText(
                     text: '+1',
-                    size: AppSizes.body,
+                    size: AppSizes.bodySmall,
                   ),
                   Expanded(
                     child: AppTextFormField(

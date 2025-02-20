@@ -196,7 +196,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                   const Center(
                                       child: AppText(
                                     text: 'Delivery fee',
-                                    size: AppSizes.body,
+                                    size: AppSizes.bodySmall,
                                     weight: FontWeight.w600,
                                   )),
                                   AppText(
@@ -257,7 +257,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                   ),
                                   Center(
                                     child: AppTextButton(
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       text: 'Reset',
                                       callback: () {
                                         // setState(() {
@@ -320,7 +320,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                   const Center(
                                       child: AppText(
                                     text: 'Rating',
-                                    size: AppSizes.body,
+                                    size: AppSizes.bodySmall,
                                     weight: FontWeight.w600,
                                   )),
                                   AppText(
@@ -382,7 +382,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                   ),
                                   Center(
                                     child: AppTextButton(
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       text: 'Reset',
                                       callback: () {
                                         // setState(() {
@@ -440,7 +440,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                   const Center(
                                       child: AppText(
                                     text: 'Price',
-                                    size: AppSizes.body,
+                                    size: AppSizes.bodySmall,
                                     weight: FontWeight.w600,
                                   )),
                                   Center(
@@ -493,7 +493,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                   ),
                                   Center(
                                     child: AppTextButton(
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       text: 'Reset',
                                       callback: () {
                                         navigatorKey.currentState!.pop();
@@ -541,7 +541,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                   const Center(
                                       child: AppText(
                                     text: 'Sort',
-                                    size: AppSizes.body,
+                                    size: AppSizes.bodySmall,
                                     weight: FontWeight.w600,
                                   )),
                                   ListView(
@@ -580,7 +580,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                   ),
                                   Center(
                                     child: AppTextButton(
-                                      size: AppSizes.body,
+                                      size: AppSizes.bodySmall,
                                       text: 'Reset',
                                       callback: () {
                                         navigatorKey.currentState!.pop();
@@ -669,7 +669,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                     const Gap(10),
                     const AppText(
                       text: 'Popular searches',
-                      size: AppSizes.body,
+                      size: AppSizes.bodySmall,
                     ),
                     Expanded(
                       child: ListView.builder(

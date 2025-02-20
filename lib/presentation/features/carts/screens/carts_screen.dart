@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:uber_eats_clone/app_functions.dart';
@@ -272,7 +272,8 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                                           text: store.name,
                                                           weight:
                                                               FontWeight.w600,
-                                                          size: AppSizes.body,
+                                                          size: AppSizes
+                                                              .bodySmall,
                                                         ),
                                                       ),
                                                       ListView.separated(

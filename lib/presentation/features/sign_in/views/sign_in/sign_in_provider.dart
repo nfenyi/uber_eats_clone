@@ -3,10 +3,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/services/service_model.dart';
 
-import '../../../../services/sign_in_repository.dart';
+import '../../../../services/sign_in_view_model.dart';
 
 class SignInNotifier extends StateNotifier<AuthState> {
-  final _authenticator = const AuthenticatorRepository();
+  final _authenticator = const AuthenticatoViewModel();
+
   SignInNotifier() : super(const AuthState.unknown()) {
     if (_authenticator.isAlreadyLoggedIn) {
       state = const AuthState(
@@ -31,9 +32,9 @@ class SignInNotifier extends StateNotifier<AuthState> {
     return await _authenticator.verifyPhoneNumber(phoneNumber);
   }
 
-  Future<void> logInWithGoogle() async {
+  Future<void> signInWithGoogle() async {
     state = state.copiedWithIsLoading(true);
-    final result = await _authenticator.logInWithGoogle();
+    final result = await _authenticator.signInWithGoogle();
     // final userId = _authenticator.userId;
 
     switch (result.response) {
@@ -43,11 +44,37 @@ class SignInNotifier extends StateNotifier<AuthState> {
           status: AuthStatus.success,
         );
       case Result.failure:
-        if (result.payload) {}
+        state = AuthState(
+            isLoading: false,
+            status: AuthStatus.failure,
+            payload: result.payload);
+      case Result.aborted:
         state = const AuthState(
           isLoading: false,
-          status: AuthStatus.failure,
+          status: AuthStatus.aborted,
         );
+    }
+    // if (result == AuthResult.success && userId != null) {
+    //   await saveUserInfo(userId: userId);
+    // }
+  }
+
+  Future<void> signInApple() async {
+    state = state.copiedWithIsLoading(true);
+    final result = await _authenticator.signInWithApple();
+    // final userId = _authenticator.userId;
+
+    switch (result.response) {
+      case Result.success:
+        state = const AuthState(
+          isLoading: false,
+          status: AuthStatus.success,
+        );
+      case Result.failure:
+        state = AuthState(
+            isLoading: false,
+            status: AuthStatus.failure,
+            payload: result.payload);
       case Result.aborted:
         state = const AuthState(
           isLoading: false,
@@ -63,19 +90,17 @@ class SignInNotifier extends StateNotifier<AuthState> {
 class AuthState {
   final bool isLoading;
   final AuthStatus? status;
+  final dynamic payload;
   // final AccountDetails? details;
 
-  const AuthState({
-    required this.isLoading,
-    required this.status,
-    // required this.details
-  });
+  const AuthState({required this.isLoading, required this.status, this.payload
+      // required this.details
+      });
 
   const AuthState.unknown()
       : status = null,
-        isLoading = false
-  // details = null
-  ;
+        isLoading = false,
+        payload = null;
 
   AuthState copiedWithIsLoading(bool isLoading) => AuthState(
         isLoading: isLoading,

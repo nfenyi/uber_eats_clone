@@ -191,7 +191,7 @@ class _MapScreenState extends State<MapScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Delivery fee',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       AppText(
@@ -252,7 +252,7 @@ class _MapScreenState extends State<MapScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             // setState(() {
@@ -318,7 +318,7 @@ class _MapScreenState extends State<MapScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Rating',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       AppText(
@@ -381,7 +381,7 @@ class _MapScreenState extends State<MapScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             // setState(() {
@@ -442,7 +442,7 @@ class _MapScreenState extends State<MapScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Price',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       Center(
@@ -497,7 +497,7 @@ class _MapScreenState extends State<MapScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             navigatorKey.currentState!.pop();
@@ -548,7 +548,7 @@ class _MapScreenState extends State<MapScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Dietary',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       ListView(
@@ -649,7 +649,7 @@ class _MapScreenState extends State<MapScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             navigatorKey.currentState!.pop();
@@ -699,7 +699,7 @@ class _MapScreenState extends State<MapScreen> {
                                       const Center(
                                           child: AppText(
                                         text: 'Sort',
-                                        size: AppSizes.body,
+                                        size: AppSizes.bodySmall,
                                         weight: FontWeight.w600,
                                       )),
                                       ListView(
@@ -738,7 +738,7 @@ class _MapScreenState extends State<MapScreen> {
                                       ),
                                       Center(
                                         child: AppTextButton(
-                                          size: AppSizes.body,
+                                          size: AppSizes.bodySmall,
                                           text: 'Reset',
                                           callback: () {
                                             navigatorKey.currentState!.pop();

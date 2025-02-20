@@ -40,7 +40,7 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
                     title: AppText(
                       text: 'Prep brunch for Mom',
                       weight: FontWeight.w600,
-                      size: AppSizes.body,
+                      size: AppSizes.bodySmall,
                     ),
                   ),
                 )

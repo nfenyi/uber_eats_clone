@@ -31,7 +31,7 @@ class _UberCashModalState extends State<UberCashModal> {
         AppBar(
           title: const AppText(
             text: 'Uber Cash',
-            size: AppSizes.body,
+            size: AppSizes.bodySmall,
           ),
           leading: GestureDetector(
               onTap: navigatorKey.currentState!.pop,
@@ -152,7 +152,7 @@ class _UberCashModalState extends State<UberCashModal> {
           child: AppText(
             text: 'Monthly activity',
             weight: FontWeight.w600,
-            size: AppSizes.body,
+            size: AppSizes.bodySmall,
           ),
         ),
         const Gap(10),
@@ -189,7 +189,7 @@ class _UberCashModalState extends State<UberCashModal> {
           child: AppText(
             text: 'Deals and partner rewards',
             weight: FontWeight.w600,
-            size: AppSizes.body,
+            size: AppSizes.bodySmall,
           ),
         ),
         const Gap(20),

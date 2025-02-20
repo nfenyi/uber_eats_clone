@@ -126,12 +126,12 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 children: [
                                   AppText(
                                     text: 'Uber ',
-                                    size: AppSizes.heading5,
+                                    size: AppSizes.heading6,
                                   ),
                                   AppText(
                                     text: 'Eats',
                                     weight: FontWeight.w600,
-                                    size: AppSizes.heading5,
+                                    size: AppSizes.heading6,
                                   ),
                                 ],
                               ),
@@ -165,7 +165,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                           ),
                           const Gap(20),
                           AppText(
-                              size: AppSizes.body,
+                              size: AppSizes.bodySmall,
                               text:
                                   "Here's your updated receipt for ${widget.order.store.name} (${widget.order.store.location.streetAddress.split(', ')[1]})"),
                         ],

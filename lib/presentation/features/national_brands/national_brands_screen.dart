@@ -24,7 +24,7 @@ class _NationalBrandsScreenState extends State<NationalBrandsScreen> {
       appBar: AppBar(
         title: const AppText(
           text: 'National brands',
-          size: AppSizes.heading5,
+          size: AppSizes.heading6,
           // weight: FontWeight.w600,
         ),
       ),

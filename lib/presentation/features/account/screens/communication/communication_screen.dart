@@ -24,7 +24,7 @@ class _CommunicationScreenState extends State<CommunicationScreen> {
       appBar: AppBar(
         title: const AppText(
           text: 'Communication',
-          size: AppSizes.body,
+          size: AppSizes.bodySmall,
         ),
       ),
       body: Column(

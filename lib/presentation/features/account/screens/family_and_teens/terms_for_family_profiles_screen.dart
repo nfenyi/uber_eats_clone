@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
@@ -9,6 +15,7 @@ import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../../main.dart';
 import '../../../../constants/weblinks.dart';
+import '../../../../services/sign_in_view_model.dart';
 import '../../../webview/webview_screen.dart';
 
 class TermsForFamilyProfilesScreen extends StatefulWidget {
@@ -200,7 +207,7 @@ class _TermsForFamilyProfilesScreenState
                 AppButton(
                   text: 'Send invite',
                   callback: (_hasAgreed == true)
-                      ? () {
+                      ? () async {
                           showInfoToast(
                               icon: const Icon(
                                 Icons.check_circle,
@@ -208,6 +215,36 @@ class _TermsForFamilyProfilesScreenState
                               ),
                               'Invite sent to ${widget.familyMemberName} ',
                               context: context);
+                          final userCredential =
+                              FirebaseAuth.instance.currentUser;
+                          late String deviceId;
+                          DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+                          if (Platform.isAndroid) {
+                            AndroidDeviceInfo androidInfo =
+                                await deviceInfo.androidInfo;
+                            deviceId = androidInfo.id;
+                            // Unique ID on Android (may not persist across factory resets)
+                            // Other potentially useful properties on AndroidDeviceInfo:
+                            // androidInfo.androidId; // More likely to persist, but not guaranteed
+                            // androidInfo.imei;       // International Mobile Equipment Identity (if available) - requires permissions
+                            // androidInfo.meid;       // Mobile Equipment Identifier (if available) - requires permissions
+                          } else if (Platform.isIOS) {
+                            IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+                            deviceId = iosInfo
+                                .identifierForVendor!; // A unique ID for the *vendor* (your app developer), persists across app reinstalls, but changes if all apps by the vendor are uninstalled.
+                            // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
+                          }
+                          await Hive.box(AppBoxes.appState)
+                              .put('authenticated', true);
+                          final device = <String, dynamic>{
+                            "deviceId": deviceId,
+                            "email": userCredential?.email,
+                            "phoneNumber": userCredential?.phoneNumber
+                          };
+                          await FirebaseFirestore.instance
+                              .collection(FirestoreCollections.devices)
+                              .add(device);
 
                           navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(

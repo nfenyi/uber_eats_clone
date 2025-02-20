@@ -50,7 +50,7 @@ class PrivacyCenterScreen extends StatelessWidget {
                   horizontal: AppSizes.horizontalPaddingSmall),
               child: AppText(
                 text: 'Your data and privacy at Uber',
-                size: AppSizes.body,
+                size: AppSizes.bodySmall,
                 weight: FontWeight.bold,
               ),
             ),

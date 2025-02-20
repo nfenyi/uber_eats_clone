@@ -7,7 +7,7 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_account_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/sign_in/sign_in_view_models.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/sign_in/sign_in_provider.dart';
 
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
@@ -64,7 +64,7 @@ class SettingsScreen extends ConsumerWidget {
                   const Gap(10),
                   const AppText(
                     text: 'Nana Fenyi',
-                    size: AppSizes.body,
+                    size: AppSizes.bodySmall,
                   ),
                   const Gap(5),
                   InkWell(
@@ -89,7 +89,7 @@ class SettingsScreen extends ConsumerWidget {
                   horizontal: AppSizes.horizontalPaddingSmall),
               child: AppText(
                 text: 'Saved places',
-                size: AppSizes.body,
+                size: AppSizes.bodySmall,
               ),
             ),
             const ListTile(

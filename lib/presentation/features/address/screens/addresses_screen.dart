@@ -1,22 +1,31 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_places_autocomplete/google_places_autocomplete.dart';
+import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:iconify_flutter_plus/icons/bi.dart';
-import 'package:iconify_flutter_plus/icons/gridicons.dart';
+import 'package:location/location.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/payment_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/schedule_delivery_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
+import 'package:uber_eats_clone/presentation/services/google_location_model.dart';
+import 'package:uber_eats_clone/presentation/services/google_maps_services.dart';
+import 'package:uber_eats_clone/presentation/services/place_detail_model.dart';
 
 import '../../../../app_functions.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
+import 'address_details_screen.dart';
 
 class AddressesScreen extends ConsumerStatefulWidget {
   const AddressesScreen({super.key});
@@ -27,21 +36,61 @@ class AddressesScreen extends ConsumerStatefulWidget {
 }
 
 class _AddressesScreenState extends ConsumerState<AddressesScreen> {
-  final _emailController = TextEditingController();
-  bool _firstLogIn = false;
+  // late final GooglePlacesAutocomplete _googlePlaces;
+  final Location _location = Location();
 
+  late final bool _serviceEnabled;
+  PermissionStatus? _permissionGranted;
+  LocationData? _userLocationData;
+
+  bool _firstLogIn = true;
+  List<Prediction> _predictions = [];
+  Timer? _debounce;
   final List<Address> _recentAddresses = [
     Address(name: '222 NY-59', location: 'Suffen, NY'),
     Address(name: 'My Home', location: '1226 University Dr')
   ];
+  final _addressController = TextEditingController();
+  Prediction? _selectedPrediction;
 
-  String _profile = 'Business';
+  String _profile = 'Personal';
+
+  Future<void> _getCurrentLocation() async {
+    _serviceEnabled = await _location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await _location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+    _permissionGranted = await _location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await _location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _userLocationData = await _location.getLocation();
+  }
 
   DateTime? _timePreference;
 
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(
+      const Duration(seconds: 1),
+      () async {
+        await _getCurrentLocation();
+      },
+    );
+  }
+
+  @override
   void dispose() {
-    _emailController.dispose();
+    _addressController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -51,7 +100,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
       appBar: AppBar(
         title: const AppText(
           text: 'Addresses',
-          size: AppSizes.body,
+          size: AppSizes.heading6,
         ),
       ),
       body: Padding(
@@ -65,138 +114,226 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AppText(
-                      size: AppSizes.heading5,
+                      size: AppSizes.heading6,
                       text: 'Find what you need near you',
                       weight: FontWeight.w600,
                     ),
                     Gap(10),
                     AppText(
-                      size: AppSizes.body,
+                      size: AppSizes.bodySmall,
                       text:
                           'We use your address to help you find the best spots nearby.',
                     ),
-                    Gap(30),
+                    Gap(25),
                   ]),
             TextFormField(
-              decoration: const InputDecoration(
+              onChanged: (value) async {
+                if (_debounce?.isActive ?? false) _debounce?.cancel();
+                _debounce = Timer(const Duration(milliseconds: 500), () async {
+                  final result = await GoogleMapsServices().fetchPredictions(
+                      query: value, location: _userLocationData);
+                  _predictions = result.payload;
+
+                  setState(() {});
+                });
+              },
+              decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: 'Search for an address',
                   filled: true,
                   fillColor: AppColors.neutral100,
-                  prefixIcon: Icon(Icons.search),
-                  suffixIconConstraints: BoxConstraints.tightFor(height: 20),
-                  suffixIcon: Padding(
-                    padding: EdgeInsets.only(right: 10),
-                    child: Iconify(
-                      Gridicons.cross_circle,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIconConstraints:
+                      const BoxConstraints.tightFor(height: 20),
+                  suffixIcon: _addressController.text.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: GestureDetector(
+                              onTap: () {
+                                _addressController.clear();
+                                setState(() {});
+                              },
+                              child: const Icon(Icons.cancel)),
+                        )
+                      : null,
+                  focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide.none,
                       borderRadius: BorderRadius.all(Radius.circular(30))),
-                  enabledBorder: OutlineInputBorder(
+                  enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide.none,
                       borderRadius: BorderRadius.all(Radius.circular(30)))),
-              keyboardType: TextInputType.emailAddress,
-              controller: _emailController,
+              controller: _addressController,
             ),
-            const Gap(20),
-            const AppText(
-              text: 'Explore nearby',
-              weight: FontWeight.w600,
-              size: AppSizes.heading6,
-            ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Iconify(
-                Bi.cursor,
-                size: 15,
-              ),
-              // dense: true,
-              title: const AppText(
-                text: 'Use current location',
-                size: AppSizes.bodySmaller,
-              ),
-              trailing: AppButton2(
-                text: 'Enable',
-                callback: () {
-                  //Check for location permission
-                  //if (not permitted){
-                  //
-                  //}
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return Container(
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10))),
-                        child: Padding(
-                          padding: const EdgeInsets.all(
-                              AppSizes.horizontalPaddingSmall),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Center(
-                                child: AppText(
-                                  text: 'Allow location access',
-                                  size: AppSizes.heading6,
-                                  weight: FontWeight.w600,
-                                ),
-                              ),
-                              const Gap(5),
-                              const Divider(),
-                              const Gap(5),
-                              Row(
-                                children: [
-                                  const Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        AppText(
-                                            text:
-                                                'This lets us show you which restaurants and stores you can order from'),
-                                        Gap(15),
-                                        AppText(
-                                            text:
-                                                'Please go to permissions → Location and allow access'),
-                                      ],
-                                    ),
-                                  ),
-                                  Image.asset(
-                                    AssetNames.allowLocation,
-                                    width: 60,
-                                  ),
-                                ],
-                              ),
-                              const Gap(20),
-                              AppButton(
-                                text: 'Allow',
-                                callback: () {},
-                              ),
-                              const Gap(10),
-                              Center(
-                                child: AppTextButton(
-                                  text: 'Close',
-                                  callback: () =>
-                                      navigatorKey.currentState!.pop(),
-                                ),
-                              ),
-                            ],
+            Visibility(
+                visible: _addressController.text.isNotEmpty,
+                child: Column(
+                  children: [
+                    const Gap(10),
+                    //  TODO: wrap widget with flexible or expanded to account for popping of
+                    //keyboard to prevent overflow and allow user to scroll to see content 'behind'
+                    //keyboard
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final prediction = _predictions[index];
+                        return ListTile(
+                          onTap: () async {
+                            try {
+                              _selectedPrediction = prediction;
+                              final result = await GoogleMapsServices()
+                                  .fetchDetailsFromPlaceID(
+                                      id: prediction.placeId!);
+                              final List<PlaceResult> payload = result.payload;
+                              final location = payload.first.geometry!.location;
+                              final BitmapDescriptor bitmapDescriptor =
+                                  await BitmapDescriptor.asset(
+                                const ImageConfiguration(
+                                    size:
+                                        Size(30, 46)), // Adjust size as needed
+                                AssetNames.mapMarker, // Path to your asset
+                              );
+                              navigatorKey.currentState!.push(MaterialPageRoute(
+                                builder: (context) {
+                                  return AddressDetailsScreen(
+                                      placeDescription: prediction.description!,
+                                      markerIcon: bitmapDescriptor,
+                                      location: location!);
+                                },
+                              ));
+                            } on Exception catch (e) {
+                              showAppInfoDialog(context,
+                                  description: e.toString());
+                            }
+                          },
+                          titleAlignment: ListTileTitleAlignment.center,
+                          horizontalTitleGap: 0,
+                          leading: const Iconify(
+                            size: 20,
+                            Ph.map_pin,
+                            color: AppColors.neutral500,
                           ),
-                        ),
-                      );
-                    },
-                  );
+                          title: AppText(
+                            text: prediction.structuredFormatting!.mainText!,
+                            weight: FontWeight.bold,
+                          ),
+                          subtitle: AppText(
+                              text: prediction
+                                      .structuredFormatting?.secondaryText ??
+                                  "null"),
+                        );
+                      },
+                      itemCount:
+                          _predictions.length <= 10 ? _predictions.length : 10,
+                    ),
+                  ],
+                )),
+            const Gap(20),
+            Visibility(
+              visible: _addressController.text.isEmpty,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppText(
+                    text: 'Explore nearby',
+                    weight: FontWeight.w600,
+                    size: AppSizes.heading6,
+                  ),
+                  ListTile(
+                    contentPadding: const EdgeInsets.only(left: 15),
+                    leading: const Iconify(
+                      Bi.cursor,
+                      size: 15,
+                    ),
+                    titleAlignment: ListTileTitleAlignment.center,
+                    // dense: true,
+                    title: const AppText(
+                      text: 'Use current location',
+                      size: AppSizes.bodySmaller,
+                    ),
+                    trailing: AppButton2(
+                      text: 'Enable',
+                      callback: () {
+                        if (_permissionGranted != PermissionStatus.granted ||
+                            _permissionGranted !=
+                                PermissionStatus.grantedLimited) {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return Container(
+                                decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10))),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(
+                                      AppSizes.horizontalPaddingSmall),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Center(
+                                        child: AppText(
+                                          text: 'Allow location access',
+                                          size: AppSizes.heading6,
+                                          weight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const Gap(5),
+                                      const Divider(),
+                                      const Gap(5),
+                                      Row(
+                                        children: [
+                                          const Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                AppText(
+                                                    text:
+                                                        'This lets us show you which restaurants and stores you can order from'),
+                                                Gap(15),
+                                                AppText(
+                                                    text:
+                                                        'Please go to permissions → Location and allow access'),
+                                              ],
+                                            ),
+                                          ),
+                                          Image.asset(
+                                            AssetNames.allowLocation,
+                                            width: 60,
+                                          ),
+                                        ],
+                                      ),
+                                      const Gap(20),
+                                      AppButton(
+                                        text: 'Allow',
+                                        callback: () async {
+                                          await _getCurrentLocation();
 
-                  // navigatorKey.currentState!.push(MaterialPageRoute(
-                  //   builder: (context) => const AddressDetailsScreen(),
-                  // ));
-                },
+                                          navigatorKey.currentState!.pop();
+                                        },
+                                      ),
+                                      const Gap(10),
+                                      Center(
+                                        child: AppTextButton(
+                                          text: 'Close',
+                                          callback: () =>
+                                              navigatorKey.currentState!.pop(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             if (!_firstLogIn)
@@ -270,7 +407,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                 ),
                 const Gap(10),
                 const AppText(
-                  size: AppSizes.heading5,
+                  size: AppSizes.heading6,
                   text: 'Profile',
                   weight: FontWeight.w600,
                 ),
@@ -359,7 +496,10 @@ class _AppButton2State extends State<AppButton2> {
     return TextButton(
       onPressed: widget.callback,
       style: TextButton.styleFrom(
-          backgroundColor: widget.color, shape: widget.shape),
+        backgroundColor: widget.color,
+        shape: widget.shape ??
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+      ),
       child: AppText(
         text: widget.text,
       ),

@@ -43,7 +43,7 @@ class AssetNames {
   static const alcohol = 'assets/images/alcohol.png';
   static const convenience = 'assets/images/convenience.png';
   static const grocery2 = 'assets/images/grocery2.png';
-
+  static const handToMe = 'assets/images/hand_to_me.png';
   static const breakfastNBrunch = 'assets/images/breakfast_n_brunch.png';
   static const kosher = 'assets/images/kosher.png';
   static const deli = 'assets/images/deli.png';
@@ -59,6 +59,7 @@ class AssetNames {
   static const israeli = 'assets/images/israeli.png';
   static const easternEuropean = 'assets/images/eastern_european.png';
   static const arab = 'assets/images/arab.png';
+  static const mapMarker = 'assets/images/map_marker.png';
 
   static const sendGifts = 'assets/images/send_gifts.png';
   static const sendGifts2 = 'assets/images/send_gifts2.png';

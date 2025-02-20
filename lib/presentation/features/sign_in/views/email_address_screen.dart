@@ -14,6 +14,7 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/name_screen.
 
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
+import 'email_sent_screen.dart';
 
 class EmailAddressScreen extends ConsumerStatefulWidget {
   const EmailAddressScreen({super.key});
@@ -27,7 +28,6 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
   final _emailController = TextEditingController();
   Timer? _debounce;
   final _formKey = GlobalKey<FormState>();
-  final _emailLoginLink = 'https://ubereatsclone.page.link/email-link-login';
 
   @override
   void dispose() {
@@ -115,39 +115,52 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
                           ? null
                           : () async {
                               if (_formKey.currentState!.validate()) {
-                                try {
-                                  await FirebaseAuth.instance
-                                      .sendSignInLinkToEmail(
-                                          email: _emailController.text,
-                                          actionCodeSettings:
-                                              ActionCodeSettings(
-                                                  // URL you want to redirect back to. The domain (www.example.com) for this
-                                                  // URL must be whitelisted in the Firebase Console.
-                                                  url: _emailLoginLink,
-                                                  // This must be true
-                                                  handleCodeInApp: true,
-                                                  iOSBundleId:
-                                                      'com.example.ios',
-                                                  androidPackageName:
-                                                      'com.example.android',
-                                                  // installIfNotAvailable
-                                                  androidInstallApp: true,
-                                                  // minimumVersion
-                                                  androidMinimumVersion: '12'))
-                                      .catchError((onError) => showInfoToast(
-                                          'Error sending email verification $onError',
-                                          context: navigatorKey.currentContext))
-                                      .then((value) async {
-                                    await Hive.box(AppBoxes.appState)
-                                        .put('email', _emailController.text);
-                                    await Hive.box(AppBoxes.appState)
-                                        .put('emailLoginLink', _emailLoginLink);
-                                  });
-                                } on Exception catch (e) {
-                                  showInfoToast(e.toString(),
-                                      context: navigatorKey.currentContext,
-                                      seconds: 60);
-                                }
+                                await FirebaseAuth.instance.currentUser!
+                                    .verifyBeforeUpdateEmail(
+                                  _emailController.text,
+                                  // ActionCodeSettings(
+                                  //     // URL you want to redirect back to. The domain (www.example.com) for this
+                                  //     // URL must be whitelisted in the Firebase Console.
+                                  //     url:
+                                  //         'https://ubereatsclone.page.link/email-verification-link',
+                                  //     // This must be true
+                                  //     handleCodeInApp: true,
+                                  //     iOSBundleId:
+                                  //         'com.example.uberEatsClone',
+                                  //     androidPackageName:
+                                  //         'com.example.uber_eats_clone',
+                                  //     // installIfNotAvailable
+                                  //     androidInstallApp: true,
+                                  //     // minimumVersion
+                                  //     androidMinimumVersion: '12')
+                                )
+                                    .then((value) async {
+                                  // await Hive.box(AppBoxes.appState).put(
+                                  //     BoxKeys.email, _emailController.text);
+                                  await Hive.box(AppBoxes.appState).put(
+                                      BoxKeys.addedEmailToPhoneNumber, true);
+
+                                  navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) => EmailSentScreen(
+                                      email: _emailController.text,
+                                    ),
+                                  ));
+                                }, onError: (e) {
+                                  if (e is FirebaseAuthException) {
+                                    return showAppInfoDialog(
+                                        title:
+                                            'Error sending email verification:',
+                                        description: '${e.message}',
+                                        context);
+                                  } else {
+                                    return showAppInfoDialog(
+                                        title:
+                                            'Error sending email verification:',
+                                        description: '$e',
+                                        context);
+                                  }
+                                });
                               }
                             },
                       child: Ink(

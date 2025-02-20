@@ -85,7 +85,7 @@ class SelectATeenScreen extends StatelessWidget {
                                 const AppText(
                                   text: 'No contacts',
                                   weight: FontWeight.bold,
-                                  size: AppSizes.body,
+                                  size: AppSizes.bodySmall,
                                 ),
                                 const Gap(10),
                                 const AppText(
@@ -93,7 +93,7 @@ class SelectATeenScreen extends StatelessWidget {
                                   text:
                                       "Looks like you have no contacts in your device's address book.",
                                   color: AppColors.neutral500,
-                                  // size: AppSizes.body,
+                                  // size: AppSizes.bodySmall,
                                 ),
                                 const Gap(10),
                                 AppButton(

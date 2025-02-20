@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/customize_gift_screen.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_card_screen.dart';
