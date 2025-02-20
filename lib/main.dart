@@ -144,14 +144,14 @@ class Wrapper extends ConsumerWidget {
             return const GetStartedScreen();
           }
           if (Hive.box(AppBoxes.appState).get('emailLoginLink') != null) {
-            return const NameScreen();
+            return const PhoneNumberScreen();
           }
 
           bool authenticated =
               appStateBox.get('authenticated', defaultValue: false);
 
           if (!authenticated) {
-            return const PhoneNumberScreen();
+            return const SignInScreen();
           } else {
             return const MainScreen();
           }
