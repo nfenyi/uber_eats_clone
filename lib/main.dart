@@ -112,6 +112,9 @@ class UberEatsClone extends StatelessWidget {
         navigatorKey: navigatorKey,
         title: 'Uber Eats Clone',
         theme: ThemeData(
+          listTileTheme: const ListTileThemeData(
+              iconColor: Colors.black,
+              titleAlignment: ListTileTitleAlignment.center),
           iconTheme: const IconThemeData(
             color: Colors.black,
           ),
@@ -198,8 +201,9 @@ class Wrapper extends ConsumerWidget {
         valueListenable:
             Hive.box(AppBoxes.appState).listenable(keys: ['authenticated']),
         builder: (context, appStateBox, child) {
-          bool onboarded = appStateBox.get('onboarded', defaultValue: false);
-          if (!onboarded) {
+          bool showGetStarted =
+              appStateBox.get(BoxKeys.showGetStarted, defaultValue: true);
+          if (showGetStarted) {
             return const GetStartedScreen();
           }
           if (Hive.box(AppBoxes.appState).get('isVerifiedViaLink') == true) {
@@ -243,6 +247,7 @@ class BoxKeys {
   static const String authenticated = 'authenticated';
   static const String addressDetailsSaved = 'addressDetailsSaved';
   static const String email = 'email';
-  static const String isOnboarded = 'onboarded';
+  static const String showGetStarted = 'showGetStarted';
+  static const String onboarded = 'onboarded';
   static const String country = 'country';
 }

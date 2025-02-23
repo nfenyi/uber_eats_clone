@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,8 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/phone_number
 import '../../../../main.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
+import '../../../services/sign_in_view_model.dart';
+import '../../main_screen/screens/main_screen.dart';
 import 'name_screen.dart';
 
 class EmailSentScreen extends StatefulWidget {
@@ -41,10 +44,24 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
           await Hive.box(AppBoxes.appState).delete('email');
 
           await Hive.box(AppBoxes.appState).put('isVerifiedViaLink', true);
+          try {
+            final snapshot = await FirebaseFirestore.instance
+                .collection(FirestoreCollections.users)
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .get();
 
-          navigatorKey.currentState!.pushReplacement(MaterialPageRoute(
-            builder: (context) => const PhoneNumberScreen(),
-          ));
+            if (snapshot.exists &&
+                snapshot.data() != null &&
+                snapshot.data()!['onboarded'] == true) {
+              navigatorKey.currentState!.push(
+                  MaterialPageRoute(builder: (context) => const MainScreen()));
+            } else {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                  builder: (context) => const PhoneNumberScreen()));
+            }
+          } catch (e) {
+            showAppInfoDialog(context, description: e.toString());
+          }
         }, onError: (error) {
           if (mounted) {
             showAppInfoDialog(context, description: error.toString());

@@ -43,13 +43,30 @@ class UberOneScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0, top: 8),
                       child: GestureDetector(
-                        onTap: () {
+                        onTap: () async {
+                          await Hive.box(AppBoxes.appState)
+                              .delete('isVerifiedViaLink');
+                          await Hive.box(AppBoxes.appState)
+                              .delete(BoxKeys.addedEmailToPhoneNumber);
+                          await Hive.box(AppBoxes.appState)
+                              .delete(BoxKeys.addressDetailsSaved);
+                          await FirebaseFirestore.instance
+                              .collection(FirestoreCollections.users)
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .update({
+                            'hasUberOne': false,
+                            'type': "Account",
+                            "onboarded": true
+                          });
+
                           navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (context) => const MainScreen()),
-                              (r) {
+                                builder: (context) => const MainScreen(),
+                              ), (r) {
                             return false;
                           });
+                          await Hive.box(AppBoxes.appState)
+                              .put(BoxKeys.authenticated, true);
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -154,13 +171,19 @@ class UberOneScreen extends StatelessWidget {
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.users)
                     .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .update({'hasUberOne': false, 'type': "Account"});
+                    .update({
+                  'hasUberOne': false,
+                  'type': "Account",
+                  "onboarded": true
+                });
                 navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const MainScreen(),
                     ), (r) {
                   return false;
                 });
+                await Hive.box(AppBoxes.appState)
+                    .put(BoxKeys.authenticated, true);
               },
             ),
           )

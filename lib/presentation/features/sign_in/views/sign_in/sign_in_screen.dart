@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -22,6 +23,8 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/verify_phone
 import 'package:uber_eats_clone/presentation/features/sign_in/views/whats_your_email_screen.dart';
 
 import '../../../../core/app_colors.dart';
+import '../../../../services/sign_in_view_model.dart';
+import '../../../main_screen/screens/main_screen.dart';
 import '../email_address_screen.dart';
 import '../phone_number_screen.dart';
 import 'sign_in_provider.dart';
@@ -217,9 +220,22 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           (PhoneAuthCredential credential) async {
                         await FirebaseAuth.instance
                             .signInWithCredential(credential);
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                          builder: (context) => const EmailAddressScreen(),
-                        ));
+                        final snapshot = await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.users)
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .get();
+
+                        if (snapshot.exists &&
+                            snapshot.data() != null &&
+                            snapshot.data()!['onboarded'] == true) {
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                            builder: (context) => const MainScreen(),
+                          ));
+                        } else {
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                            builder: (context) => const EmailAddressScreen(),
+                          ));
+                        }
                       },
                       // autoRetrievedSmsCodeForTesting: '',
                       verificationFailed: (FirebaseAuthException e) {
@@ -274,8 +290,24 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   final providerState = ref.read(signInProvider);
                   switch (providerState.status) {
                     case AuthStatus.success:
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                          builder: (context) => const PhoneNumberScreen()));
+                      try {
+                        final snapshot = await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.users)
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .get();
+
+                        if (snapshot.exists &&
+                            snapshot.data() != null &&
+                            snapshot.data()!['onboarded'] == true) {
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                              builder: (context) => const MainScreen()));
+                        } else {
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                              builder: (context) => const PhoneNumberScreen()));
+                        }
+                      } catch (e) {
+                        showAppInfoDialog(context, description: e.toString());
+                      }
                       break;
                     case AuthStatus.failure:
                       if (mounted) {
@@ -304,9 +336,23 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   // final providerState = ref.read(signInProvider);
                   // switch (providerState.status) {
                   //   case AuthStatus.success:
-                  //     navigatorKey.currentState!.push(MaterialPageRoute(
-                  //         builder: (context) =>
-                  //             const TermsNPrivacyNoticeScreen()));
+                  // final snapshot = await FirebaseFirestore.instance
+                  //         .collection(FirestoreCollections.users)
+                  //         .doc(FirebaseAuth.instance.currentUser!.uid)
+                  //         .get();
+
+                  //     if (snapshot.exists &&
+                  //         snapshot.data() != null &&
+                  //         snapshot.data()!['onboarded'] == true) {
+                  //       navigatorKey.currentState!.push(MaterialPageRoute(
+                  //         builder: (context) => const MainScreen(),
+                  //       ));
+                  //     } else {
+                  //       navigatorKey.currentState!.push(MaterialPageRoute(
+                  //         builder: (context) => const EmailAddressScreen(),
+                  //       ));
+                  //     }
+
                   //     break;
                   //   case AuthStatus.failure:
                   //     if (mounted) {
@@ -325,7 +371,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               ),
               const Gap(10),
               AppButton(
-                callback: () {
+                callback: () async {
                   navigatorKey.currentState!.push(MaterialPageRoute(
                     builder: (context) => const WhatsYourEmailScreen(),
                   ));

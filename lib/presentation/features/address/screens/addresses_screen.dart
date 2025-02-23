@@ -368,6 +368,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                           );
                         } else {
                           await _getCurrentLocation();
+                          // logger.d(_userLocationData);
                           final result = await GoogleMapsServices()
                               .fetchDetailsFromLatlng(
                                   latlng: LatLng(_userLocationData!.latitude!,
