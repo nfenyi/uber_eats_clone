@@ -23,7 +23,7 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/whats_your_e
 
 import '../../../../core/app_colors.dart';
 import '../email_address_screen.dart';
-import '../terms_and_privacy_notice_screen.dart';
+import '../phone_number_screen.dart';
 import 'sign_in_provider.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
@@ -34,10 +34,6 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
-  // final List<CountryCode> _countryCodes = [
-  //   CountryCode(flag: AssetNames.ghanaFlag, countryName: "Ghana", code: '+233'),
-  //   CountryCode(flag: AssetNames.usaFlag, countryName: "USA", code: '+1'),
-  // ];
   late Country? _selectedCountry;
 
   final _phoneNumberController = TextEditingController();
@@ -114,29 +110,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         onChanged: (value) async {
                           setState(() {
                             _selectedCountry = value;
-                            // _accounts[index].currency = value;
-                            // _accounts[index].save();
-                            // _accountsBox.values[index];
                           });
                         },
                         buttonStyleData: ButtonStyleData(
                           height: AppSizes.dropDownBoxHeight,
                           decoration: BoxDecoration(
-                            // color: ((ref.watch(themeProvider) ==
-                            //                 'System' ||
-                            //             ref.watch(
-                            //                     themeProvider) ==
-                            //                 'Dark') &&
-                            //         (MediaQuery
-                            //                 .platformBrightnessOf(
-                            //                     context) ==
-                            //             Brightness.dark))
-                            //     ? const Color.fromARGB(
-                            //         255, 32, 25, 33)
-                            //     : Colors.white,
-
                             color: AppColors.neutral100,
-
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
@@ -146,19 +125,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           elevation: 1,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5.0),
-                            // color:
-                            // ((ref.watch(themeProvider) ==
-                            //                 'System' ||
-                            //             ref.watch(
-                            //                     themeProvider) ==
-                            //                 'Dark') &&
-                            //         (MediaQuery
-                            //                 .platformBrightnessOf(
-                            //                     context) ==
-                            //             Brightness.dark))
-                            //     ? const Color.fromARGB(
-                            //         255, 32, 25, 33)
-                            //     : Colors.white,
                           ),
                         ),
                         // isExpanded: true,
@@ -172,14 +138,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                   _selectedCountry!.code,
                                   width: 40,
                                   // height: 80,
-                                )
-                                // Image.asset(
-                                //   _selectedCountry?.flag ??
-                                //       AssetNames.ghanaFlag,
-                                //   fit: BoxFit.fitWidth,
-                                //   width: 40,
-                                // ),
-                                ))
+                                )))
                             .toList(),
                         menuItemStyleData: const MenuItemStyleData(
                             // height: 40.0,
@@ -316,8 +275,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   switch (providerState.status) {
                     case AuthStatus.success:
                       navigatorKey.currentState!.push(MaterialPageRoute(
-                          builder: (context) =>
-                              const TermsNPrivacyNoticeScreen()));
+                          builder: (context) => const PhoneNumberScreen()));
                       break;
                     case AuthStatus.failure:
                       if (mounted) {

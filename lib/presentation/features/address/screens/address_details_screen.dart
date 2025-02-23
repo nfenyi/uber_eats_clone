@@ -310,17 +310,14 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                       addressLabel: _addressLabelController.text,
                       building: _buildingNameController.text,
                       dropoffOption: _dropOffOption);
-                  var formattedDetails = addressDetails.toJson();
-                  formattedDetails.addEntries([
-                    MapEntry('uid', FirebaseAuth.instance.currentUser!.uid)
-                  ]);
+
                   try {
                     await FirebaseFirestore.instance
                         .collection(FirestoreCollections.users)
-                        .add(formattedDetails);
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .set(addressDetails.toJson());
                     await Hive.box(AppBoxes.appState)
                         .put('addressDetailsSaved', true);
-                    //TODO: store details in box here?
 
                     navigatorKey.currentState!.pushAndRemoveUntil(
                         MaterialPageRoute(

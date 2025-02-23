@@ -39,7 +39,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   // late final GooglePlacesAutocomplete _googlePlaces;
   final Location _location = Location();
 
-  late final bool _serviceEnabled;
+  late bool _serviceEnabled;
   PermissionStatus? _permissionGranted;
   LocationData? _userLocationData;
 
@@ -51,7 +51,6 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
     Address(name: 'My Home', location: '1226 University Dr')
   ];
   final _addressController = TextEditingController();
-  Prediction? _selectedPrediction;
 
   String _profile = 'Personal';
 
@@ -79,12 +78,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(
-      const Duration(seconds: 1),
-      () async {
-        await _getCurrentLocation();
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getCurrentLocation();
+    });
   }
 
   @override
@@ -179,7 +175,6 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                         return ListTile(
                           onTap: () async {
                             try {
-                              _selectedPrediction = prediction;
                               final result = await GoogleMapsServices()
                                   .fetchDetailsFromPlaceID(
                                       id: prediction.placeId!);
@@ -252,83 +247,149 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                     ),
                     trailing: AppButton2(
                       text: 'Enable',
-                      callback: () {
-                        if (_permissionGranted != PermissionStatus.granted ||
+                      callback: () async {
+                        if (_permissionGranted != PermissionStatus.granted &&
                             _permissionGranted !=
                                 PermissionStatus.grantedLimited) {
-                          showModalBottomSheet(
+                          await showModalBottomSheet(
                             context: context,
                             builder: (context) {
-                              return Container(
-                                decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10))),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      AppSizes.horizontalPaddingSmall),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                        child: AppText(
-                                          text: 'Allow location access',
-                                          size: AppSizes.heading6,
-                                          weight: FontWeight.w600,
+                              bool allowButtonIsLoading = false;
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                return Container(
+                                  decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10))),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(
+                                        AppSizes.horizontalPaddingSmall),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Center(
+                                          child: AppText(
+                                            text: 'Allow location access',
+                                            size: AppSizes.heading6,
+                                            weight: FontWeight.w600,
+                                          ),
                                         ),
-                                      ),
-                                      const Gap(5),
-                                      const Divider(),
-                                      const Gap(5),
-                                      Row(
-                                        children: [
-                                          const Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                AppText(
-                                                    text:
-                                                        'This lets us show you which restaurants and stores you can order from'),
-                                                Gap(15),
-                                                AppText(
-                                                    text:
-                                                        'Please go to permissions → Location and allow access'),
-                                              ],
+                                        const Gap(5),
+                                        const Divider(),
+                                        const Gap(5),
+                                        Row(
+                                          children: [
+                                            const Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  AppText(
+                                                      text:
+                                                          'This lets us show you which restaurants and stores you can order from'),
+                                                  Gap(15),
+                                                  AppText(
+                                                      text:
+                                                          'Please go to permissions → Location and allow access'),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                          Image.asset(
-                                            AssetNames.allowLocation,
-                                            width: 60,
-                                          ),
-                                        ],
-                                      ),
-                                      const Gap(20),
-                                      AppButton(
-                                        text: 'Allow',
-                                        callback: () async {
-                                          await _getCurrentLocation();
-
-                                          navigatorKey.currentState!.pop();
-                                        },
-                                      ),
-                                      const Gap(10),
-                                      Center(
-                                        child: AppTextButton(
-                                          text: 'Close',
-                                          callback: () =>
-                                              navigatorKey.currentState!.pop(),
+                                            Image.asset(
+                                              AssetNames.allowLocation,
+                                              width: 60,
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                        const Gap(20),
+                                        AppButton(
+                                          isLoading: allowButtonIsLoading,
+                                          text: 'Allow',
+                                          callback: () async {
+                                            setState(() {
+                                              allowButtonIsLoading = true;
+                                            });
+                                            await _getCurrentLocation();
+
+                                            final result =
+                                                await GoogleMapsServices()
+                                                    .fetchDetailsFromLatlng(
+                                                        latlng: LatLng(
+                                                            _userLocationData!
+                                                                .latitude!,
+                                                            _userLocationData!
+                                                                .longitude!));
+                                            final List<PlaceResult> payload =
+                                                result.payload;
+                                            final location = payload
+                                                .first.geometry!.location;
+                                            final BitmapDescriptor
+                                                bitmapDescriptor =
+                                                await BitmapDescriptor.asset(
+                                              const ImageConfiguration(
+                                                  size: Size(30,
+                                                      46)), // Adjust size as needed
+                                              AssetNames
+                                                  .mapMarker, // Path to your asset
+                                            );
+                                            navigatorKey.currentState!.pop();
+                                            navigatorKey.currentState!
+                                                .push(MaterialPageRoute(
+                                              builder: (context) {
+                                                return AddressDetailsScreen(
+                                                    placeDescription: result
+                                                        .payload[1]
+                                                        .formattedAddress,
+                                                    markerIcon:
+                                                        bitmapDescriptor,
+                                                    location: location!);
+                                              },
+                                            ));
+                                          },
+                                        ),
+                                        const Gap(10),
+                                        Center(
+                                          child: AppTextButton(
+                                            text: 'Close',
+                                            callback: () => navigatorKey
+                                                .currentState!
+                                                .pop(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
+                              });
                             },
                           );
+                        } else {
+                          await _getCurrentLocation();
+                          final result = await GoogleMapsServices()
+                              .fetchDetailsFromLatlng(
+                                  latlng: LatLng(_userLocationData!.latitude!,
+                                      _userLocationData!.longitude!));
+                          final List<PlaceResult> payload = result.payload;
+                          final location = payload.first.geometry!.location;
+                          final BitmapDescriptor bitmapDescriptor =
+                              await BitmapDescriptor.asset(
+                            const ImageConfiguration(
+                                size: Size(30, 46)), // Adjust size as needed
+                            AssetNames.mapMarker, // Path to your asset
+                          );
+
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                            builder: (context) {
+                              return AddressDetailsScreen(
+                                  placeDescription:
+                                      result.payload[1].formattedAddress,
+                                  markerIcon: bitmapDescriptor,
+                                  location: location!);
+                            },
+                          ));
                         }
                       },
                     ),

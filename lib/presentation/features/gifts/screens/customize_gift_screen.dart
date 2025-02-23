@@ -2,7 +2,7 @@ import 'package:chips_choice/chips_choice.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
@@ -193,9 +193,9 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                   });
                   logger.d(value);
                   if (value == 'Record video') {
-                    await ImagePicker().pickVideo(
-                      source: ImageSource.camera,
-                    );
+                    // await ImagePicker().pickVideo(
+                    //   source: ImageSource.camera,
+                    // );
                   }
                 },
                 choiceLeadingBuilder: (item, i) {

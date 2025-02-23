@@ -1,10 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
@@ -12,6 +14,8 @@ import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../../core/widgets.dart';
+import '../../../services/sign_in_view_model.dart';
+import '../../main_screen/screens/main_screen.dart';
 import '../../webview/webview_screen.dart';
 
 class UberOneScreen extends StatelessWidget {
@@ -38,12 +42,22 @@ class UberOneScreen extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0, top: 8),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(50)),
-                        child: const Icon(Icons.close),
+                      child: GestureDetector(
+                        onTap: () {
+                          navigatorKey.currentState!.pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => const MainScreen()),
+                              (r) {
+                            return false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(50)),
+                          child: const Icon(Icons.close),
+                        ),
                       ),
                     )
                   ],
@@ -137,9 +151,13 @@ class UberOneScreen extends StatelessWidget {
                     .delete(BoxKeys.addedEmailToPhoneNumber);
                 await Hive.box(AppBoxes.appState)
                     .delete(BoxKeys.addressDetailsSaved);
+                await FirebaseFirestore.instance
+                    .collection(FirestoreCollections.users)
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .update({'hasUberOne': false, 'type': "Account"});
                 navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
-                      builder: (context) => const HomeScreen(),
+                      builder: (context) => const MainScreen(),
                     ), (r) {
                   return false;
                 });

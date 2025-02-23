@@ -4,7 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/add_card.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/add_a_card/add_card.dart';
 
 import '../../../../main.dart';
 import '../../../constants/app_sizes.dart';

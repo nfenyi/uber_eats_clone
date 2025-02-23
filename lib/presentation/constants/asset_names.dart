@@ -129,6 +129,8 @@ class AssetNames {
   static String voiceCommand1 = 'assets/images/voice_command1.png';
   static String voiceCommand2 = 'assets/images/voice_command2.png';
   static String voiceCommand3 = 'assets/images/voice_command3.png';
+  static String expDate = 'assets/images/exp_date.png';
+  static String cvv = 'assets/images/cvv.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

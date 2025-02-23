@@ -117,23 +117,22 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
                               if (_formKey.currentState!.validate()) {
                                 await FirebaseAuth.instance.currentUser!
                                     .verifyBeforeUpdateEmail(
-                                  _emailController.text,
-                                  // ActionCodeSettings(
-                                  //     // URL you want to redirect back to. The domain (www.example.com) for this
-                                  //     // URL must be whitelisted in the Firebase Console.
-                                  //     url:
-                                  //         'https://ubereatsclone.page.link/email-verification-link',
-                                  //     // This must be true
-                                  //     handleCodeInApp: true,
-                                  //     iOSBundleId:
-                                  //         'com.example.uberEatsClone',
-                                  //     androidPackageName:
-                                  //         'com.example.uber_eats_clone',
-                                  //     // installIfNotAvailable
-                                  //     androidInstallApp: true,
-                                  //     // minimumVersion
-                                  //     androidMinimumVersion: '12')
-                                )
+                                        _emailController.text,
+                                        ActionCodeSettings(
+                                            // URL you want to redirect back to. The domain (www.example.com) for this
+                                            // URL must be whitelisted in the Firebase Console.
+                                            url:
+                                                'https://ubereatsclone.page.link/email-verification-link',
+                                            // This must be true
+                                            handleCodeInApp: true,
+                                            iOSBundleId:
+                                                'com.example.uberEatsClone',
+                                            androidPackageName:
+                                                'com.example.uber_eats_clone',
+                                            // installIfNotAvailable
+                                            androidInstallApp: true,
+                                            // minimumVersion
+                                            androidMinimumVersion: '12'))
                                     .then((value) async {
                                   // await Hive.box(AppBoxes.appState).put(
                                   //     BoxKeys.email, _emailController.text);

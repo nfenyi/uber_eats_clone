@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -13,8 +14,6 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_meth
 
 import 'hive_models/country/country_ip_model.dart';
 import 'presentation/features/main_screen/screens/main_screen.dart';
-import 'presentation/features/sign_in/views/add_card.dart';
-import 'presentation/features/sign_in/views/email_address_screen.dart';
 import 'presentation/features/sign_in/views/get_started/get_started_screen.dart';
 import 'presentation/features/sign_in/views/name_screen.dart';
 import 'presentation/features/sign_in/views/phone_number_screen.dart';
@@ -30,27 +29,35 @@ void main() async {
   await registerHiveAdpapters();
   await openBoxes();
 
-  try {
 // Check if you received the link via `getInitialLink` first
-    final PendingDynamicLinkData? initialLink =
-        await FirebaseDynamicLinks.instance.getInitialLink();
+  final PendingDynamicLinkData? initialLink =
+      await FirebaseDynamicLinks.instance.getInitialLink();
 
-    if (initialLink != null) {
-      if (FirebaseAuth.instance
-          .isSignInWithEmailLink(initialLink.link.toString())) {
-        // final Uri deepLink = initialLink.link;
-        // // Example of using the dynamic link to push the user to a different screen
-        // Navigator.pushNamed(context, deepLink.path);
+  if (initialLink != null) {
+    if (FirebaseAuth.instance
+        .isSignInWithEmailLink(initialLink.link.toString())) {
+      // final Uri deepLink = initialLink.link;
+      // // Example of using the dynamic link to push the user to a different screen
+      // Navigator.pushNamed(context, deepLink.path);
 
-        await FirebaseAuth.instance.signInWithEmailLink(
-            email: Hive.box(AppBoxes.appState).get('email'),
-            emailLink: initialLink.link.toString());
-        await Hive.box(AppBoxes.appState).put('isVerifiedViaLink', true);
-      }
+      await FirebaseAuth.instance
+          .signInWithEmailLink(
+              email: Hive.box(AppBoxes.appState).get('email'),
+              emailLink: initialLink.link.toString())
+          .then(
+        onError: (error, stackTrace) {
+          logger.d(error.toString());
+        },
+        (credential) async {
+          await Hive.box(AppBoxes.appState).put('isVerifiedViaLink', true);
+        },
+      );
     }
-  } catch (error) {
-    logger.d('Error signing in with email link.');
   }
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent, // Or any other color you want
+    // statusBarIconBrightness: Brightness.light, // For light status bar icons (white)
+  ));
 
   runApp(const ProviderScope(child: UberEatsClone()));
 }
@@ -204,9 +211,9 @@ class Wrapper extends ConsumerWidget {
               // return const EmailAddressScreen();
             }
             //if signed in with email initially
-            // return const PhoneNumberScreen();
-            //was testing:
-            return const AddCardScreen();
+            return const PhoneNumberScreen();
+            // //was testing:
+            // return const AddCardScreen();
           }
 
           if (Hive.box(AppBoxes.appState).get(BoxKeys.addressDetailsSaved) ==

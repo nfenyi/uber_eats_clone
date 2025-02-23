@@ -40,18 +40,11 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
             .then((credential) async {
           await Hive.box(AppBoxes.appState).delete('email');
 
-          if (Hive.box(AppBoxes.appState)
-                  .get(BoxKeys.addedEmailToPhoneNumber) ==
-              true) {
-            navigatorKey.currentState!.pushReplacement(MaterialPageRoute(
-              builder: (context) => const NameScreen(),
-            ));
-          } else {
-            await Hive.box(AppBoxes.appState).put('isVerifiedViaLink', true);
-            navigatorKey.currentState!.pushReplacement(MaterialPageRoute(
-              builder: (context) => const PhoneNumberScreen(),
-            ));
-          }
+          await Hive.box(AppBoxes.appState).put('isVerifiedViaLink', true);
+
+          navigatorKey.currentState!.pushReplacement(MaterialPageRoute(
+            builder: (context) => const PhoneNumberScreen(),
+          ));
         }, onError: (error) {
           if (mounted) {
             showAppInfoDialog(context, description: error.toString());
