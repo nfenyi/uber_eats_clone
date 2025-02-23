@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
@@ -50,15 +53,45 @@ class UberOneScreen extends StatelessWidget {
                               .delete(BoxKeys.addedEmailToPhoneNumber);
                           await Hive.box(AppBoxes.appState)
                               .delete(BoxKeys.addressDetailsSaved);
+                          final userCredential =
+                              FirebaseAuth.instance.currentUser;
                           await FirebaseFirestore.instance
                               .collection(FirestoreCollections.users)
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .doc(userCredential!.uid)
                               .update({
                             'hasUberOne': false,
                             'type': "Account",
                             "onboarded": true
                           });
 
+                          late String deviceId;
+                          DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+                          if (Platform.isAndroid) {
+                            AndroidDeviceInfo androidInfo =
+                                await deviceInfo.androidInfo;
+                            deviceId = androidInfo.id;
+                            // Unique ID on Android (may not persist across factory resets)
+                            // Other potentially useful properties on AndroidDeviceInfo:
+                            // androidInfo.androidId; // More likely to persist, but not guaranteed
+                            // androidInfo.imei;       // International Mobile Equipment Identity (if available) - requires permissions
+                            // androidInfo.meid;       // Mobile Equipment Identifier (if available) - requires permissions
+                          } else if (Platform.isIOS) {
+                            IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+                            deviceId = iosInfo
+                                .identifierForVendor!; // A unique ID for the *vendor* (your app developer), persists across app reinstalls, but changes if all apps by the vendor are uninstalled.
+                            // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
+                          }
+                          await Hive.box(AppBoxes.appState)
+                              .put('authenticated', true);
+                          final device = <String, dynamic>{
+                            "email": userCredential.email,
+                            "phoneNumber": userCredential.phoneNumber
+                          };
+                          await FirebaseFirestore.instance
+                              .collection(FirestoreCollections.devices)
+                              .doc(deviceId)
+                              .set(device);
                           navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                 builder: (context) => const MainScreen(),
@@ -168,14 +201,42 @@ class UberOneScreen extends StatelessWidget {
                     .delete(BoxKeys.addedEmailToPhoneNumber);
                 await Hive.box(AppBoxes.appState)
                     .delete(BoxKeys.addressDetailsSaved);
+                final userCredential = FirebaseAuth.instance.currentUser;
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.users)
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .doc(userCredential!.uid)
                     .update({
                   'hasUberOne': false,
                   'type': "Account",
                   "onboarded": true
                 });
+
+                late String deviceId;
+                DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+                if (Platform.isAndroid) {
+                  AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+                  deviceId = androidInfo.id;
+                  // Unique ID on Android (may not persist across factory resets)
+                  // Other potentially useful properties on AndroidDeviceInfo:
+                  // androidInfo.androidId; // More likely to persist, but not guaranteed
+                  // androidInfo.imei;       // International Mobile Equipment Identity (if available) - requires permissions
+                  // androidInfo.meid;       // Mobile Equipment Identifier (if available) - requires permissions
+                } else if (Platform.isIOS) {
+                  IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+                  deviceId = iosInfo
+                      .identifierForVendor!; // A unique ID for the *vendor* (your app developer), persists across app reinstalls, but changes if all apps by the vendor are uninstalled.
+                  // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
+                }
+                await Hive.box(AppBoxes.appState).put('authenticated', true);
+                final device = <String, dynamic>{
+                  "email": userCredential.email,
+                  "phoneNumber": userCredential.phoneNumber
+                };
+                await FirebaseFirestore.instance
+                    .collection(FirestoreCollections.devices)
+                    .doc(deviceId)
+                    .set(device);
                 navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const MainScreen(),
