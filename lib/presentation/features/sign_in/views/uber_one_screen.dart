@@ -84,14 +84,14 @@ class UberOneScreen extends StatelessWidget {
                           }
                           await Hive.box(AppBoxes.appState)
                               .put('authenticated', true);
-                          final device = <String, dynamic>{
+                          final contacts = <String, dynamic>{
                             "email": userCredential.email,
                             "phoneNumber": userCredential.phoneNumber
                           };
                           await FirebaseFirestore.instance
                               .collection(FirestoreCollections.devices)
                               .doc(deviceId)
-                              .set(device);
+                              .set(contacts);
                           navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                 builder: (context) => const MainScreen(),
@@ -229,14 +229,14 @@ class UberOneScreen extends StatelessWidget {
                   // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
                 }
                 await Hive.box(AppBoxes.appState).put('authenticated', true);
-                final device = <String, dynamic>{
+                final contacts = <String, dynamic>{
                   "email": userCredential.email,
                   "phoneNumber": userCredential.phoneNumber
                 };
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.devices)
                     .doc(deviceId)
-                    .set(device);
+                    .set(contacts);
                 navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const MainScreen(),

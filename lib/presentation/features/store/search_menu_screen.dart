@@ -8,8 +8,8 @@ import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
+import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
-import '../home/home_screen.dart';
 import '../product/product_screen.dart';
 
 class SearchMenuScreen extends ConsumerStatefulWidget {
@@ -41,17 +41,17 @@ class _SearchMenuScreenState extends ConsumerState<SearchMenuScreen> {
             autofocus: true,
             onChanged: (query) {
               setState(() {
-                if (query != null) {
-                  _searchResults = widget.store.productCategories
-                      .where(
-                        (category) => category.products.any(
-                          (product) => product.name
-                              .toLowerCase()
-                              .contains(query.toLowerCase()),
-                        ),
-                      )
-                      .toList();
-                }
+                // if (query != null) {
+                //   _searchResults = widget.store.productCategories
+                //       .where(
+                //         (category) => category.products.any(
+                //           (product) => product.name
+                //               .toLowerCase()
+                //               .contains(query.toLowerCase()),
+                //         ),
+                //       )
+                //       .toList();
+                // }
               });
             },
             controller: _controller,
@@ -88,155 +88,155 @@ class _SearchMenuScreenState extends ConsumerState<SearchMenuScreen> {
                                       size: AppSizes.heading6,
                                       weight: FontWeight.w600,
                                     ),
-                                    ListView.separated(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        final product = result.products[index];
-                                        return InkWell(
-                                          onTap: () {
-                                            navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ProductScreen(
-                                                product: product,
-                                                store: widget.store,
-                                              ),
-                                            ));
-                                          },
-                                          child: Row(
-                                            // crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    AppText(
-                                                      text: product.name,
-                                                      weight: FontWeight.w600,
-                                                      maxLines: 3,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Visibility(
-                                                          visible: product
-                                                                  .promoPrice !=
-                                                              null,
-                                                          child: Row(
-                                                            children: [
-                                                              AppText(
-                                                                  text:
-                                                                      '\$${product.initialPrice}',
-                                                                  color: Colors
-                                                                      .green),
-                                                              const Gap(5),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        AppText(
-                                                          text:
-                                                              '\$${product.initialPrice}',
-                                                          decoration: product
-                                                                      .promoPrice !=
-                                                                  null
-                                                              ? TextDecoration
-                                                                  .lineThrough
-                                                              : TextDecoration
-                                                                  .none,
-                                                        ),
-                                                        if (product.calories !=
-                                                            null)
-                                                          AppText(
-                                                            text:
-                                                                ' • ${product.calories!} Cal.',
-                                                            maxLines: 2,
-                                                            color: AppColors
-                                                                .neutral500,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          )
-                                                      ],
-                                                    ),
-                                                    if (product.description !=
-                                                        null)
-                                                      AppText(
-                                                        text: product
-                                                            .description!,
-                                                        maxLines: 2,
-                                                        color: AppColors
-                                                            .neutral500,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                  ],
-                                                ),
-                                              ),
-                                              const Gap(20),
-                                              Stack(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                children: [
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: product
-                                                          .imageUrls.first,
-                                                      width: 100,
-                                                      height: 100,
-                                                      fit: BoxFit.fill,
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 8.0,
-                                                            top: 8.0),
-                                                    child: InkWell(
-                                                      onTap: () {},
-                                                      child: Ink(
-                                                        child: Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(5),
-                                                          decoration: BoxDecoration(
-                                                              boxShadow: const [
-                                                                BoxShadow(
-                                                                  color: Colors
-                                                                      .black12,
-                                                                  offset:
-                                                                      Offset(
-                                                                          2, 2),
-                                                                )
-                                                              ],
-                                                              color:
-                                                                  Colors.white,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          50)),
-                                                          child: const Icon(
-                                                            Icons.add,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) =>
-                                          const Divider(),
-                                      itemCount: result.products.length,
-                                    )
+                                    // ListView.separated(
+                                    //   padding: EdgeInsets.zero,
+                                    //   shrinkWrap: true,
+                                    //   itemBuilder: (context, index) {
+                                    //     final product = result.products[index];
+                                    //     return InkWell(
+                                    //       onTap: () {
+                                    //         navigatorKey.currentState!
+                                    //             .push(MaterialPageRoute(
+                                    //           builder: (context) =>
+                                    //               ProductScreen(
+                                    //             product: product,
+                                    //             store: widget.store,
+                                    //           ),
+                                    //         ));
+                                    //       },
+                                    //       child: Row(
+                                    //         // crossAxisAlignment: CrossAxisAlignment.start,
+                                    //         children: [
+                                    //           Expanded(
+                                    //             child: Column(
+                                    //               crossAxisAlignment:
+                                    //                   CrossAxisAlignment.start,
+                                    //               children: [
+                                    //                 AppText(
+                                    //                   text: product.name,
+                                    //                   weight: FontWeight.w600,
+                                    //                   maxLines: 3,
+                                    //                   overflow:
+                                    //                       TextOverflow.ellipsis,
+                                    //                 ),
+                                    //                 Row(
+                                    //                   children: [
+                                    //                     Visibility(
+                                    //                       visible: product
+                                    //                               .promoPrice !=
+                                    //                           null,
+                                    //                       child: Row(
+                                    //                         children: [
+                                    //                           AppText(
+                                    //                               text:
+                                    //                                   '\$${product.initialPrice}',
+                                    //                               color: Colors
+                                    //                                   .green),
+                                    //                           const Gap(5),
+                                    //                         ],
+                                    //                       ),
+                                    //                     ),
+                                    //                     AppText(
+                                    //                       text:
+                                    //                           '\$${product.initialPrice}',
+                                    //                       decoration: product
+                                    //                                   .promoPrice !=
+                                    //                               null
+                                    //                           ? TextDecoration
+                                    //                               .lineThrough
+                                    //                           : TextDecoration
+                                    //                               .none,
+                                    //                     ),
+                                    //                     if (product.calories !=
+                                    //                         null)
+                                    //                       AppText(
+                                    //                         text:
+                                    //                             ' • ${product.calories!} Cal.',
+                                    //                         maxLines: 2,
+                                    //                         color: AppColors
+                                    //                             .neutral500,
+                                    //                         overflow:
+                                    //                             TextOverflow
+                                    //                                 .ellipsis,
+                                    //                       )
+                                    //                   ],
+                                    //                 ),
+                                    //                 if (product.description !=
+                                    //                     null)
+                                    //                   AppText(
+                                    //                     text: product
+                                    //                         .description!,
+                                    //                     maxLines: 2,
+                                    //                     color: AppColors
+                                    //                         .neutral500,
+                                    //                     overflow: TextOverflow
+                                    //                         .ellipsis,
+                                    //                   ),
+                                    //               ],
+                                    //             ),
+                                    //           ),
+                                    //           const Gap(20),
+                                    //           Stack(
+                                    //             alignment:
+                                    //                 Alignment.bottomRight,
+                                    //             children: [
+                                    //               ClipRRect(
+                                    //                 borderRadius:
+                                    //                     BorderRadius.circular(
+                                    //                         12),
+                                    //                 child: CachedNetworkImage(
+                                    //                   imageUrl: product
+                                    //                       .imageUrls.first,
+                                    //                   width: 100,
+                                    //                   height: 100,
+                                    //                   fit: BoxFit.fill,
+                                    //                 ),
+                                    //               ),
+                                    //               Padding(
+                                    //                 padding:
+                                    //                     const EdgeInsets.only(
+                                    //                         right: 8.0,
+                                    //                         top: 8.0),
+                                    //                 child: InkWell(
+                                    //                   onTap: () {},
+                                    //                   child: Ink(
+                                    //                     child: Container(
+                                    //                       padding:
+                                    //                           const EdgeInsets
+                                    //                               .all(5),
+                                    //                       decoration: BoxDecoration(
+                                    //                           boxShadow: const [
+                                    //                             BoxShadow(
+                                    //                               color: Colors
+                                    //                                   .black12,
+                                    //                               offset:
+                                    //                                   Offset(
+                                    //                                       2, 2),
+                                    //                             )
+                                    //                           ],
+                                    //                           color:
+                                    //                               Colors.white,
+                                    //                           borderRadius:
+                                    //                               BorderRadius
+                                    //                                   .circular(
+                                    //                                       50)),
+                                    //                       child: const Icon(
+                                    //                         Icons.add,
+                                    //                       ),
+                                    //                     ),
+                                    //                   ),
+                                    //                 ),
+                                    //               )
+                                    //             ],
+                                    //           ),
+                                    //         ],
+                                    //       ),
+                                    //     );
+                                    //   },
+                                    //   separatorBuilder: (context, index) =>
+                                    //       const Divider(),
+                                    //   itemCount: result.products.length,
+                                    // )
                                   ],
                                 );
                               },
@@ -277,7 +277,7 @@ class NoMatch extends StatelessWidget {
             weight: FontWeight.w600,
           ),
           const AppText(
-            text: "Try searching for something else instead",
+            text: "Try searching for something else",
             color: AppColors.neutral500,
           ),
           const Gap(10),

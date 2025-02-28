@@ -42,7 +42,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   late bool _serviceEnabled;
   PermissionStatus? _permissionGranted;
   LocationData? _userLocationData;
-
+  bool _isLoading = false;
   bool _firstLogIn = true;
   List<Prediction> _predictions = [];
   Timer? _debounce;
@@ -246,7 +246,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                       size: AppSizes.bodySmaller,
                     ),
                     trailing: AppButton2(
-                      text: 'Enable',
+                      text: _isLoading ? 'Please wait...' : 'Enable',
                       callback: () async {
                         if (_permissionGranted != PermissionStatus.granted &&
                             _permissionGranted !=
@@ -367,6 +367,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                             },
                           );
                         } else {
+                          setState(() {
+                            _isLoading = true;
+                          });
                           await _getCurrentLocation();
                           // logger.d(_userLocationData);
                           final result = await GoogleMapsServices()
@@ -381,7 +384,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                 size: Size(30, 46)), // Adjust size as needed
                             AssetNames.mapMarker, // Path to your asset
                           );
-
+                          setState(() {
+                            _isLoading = false;
+                          });
                           navigatorKey.currentState!.push(MaterialPageRoute(
                             builder: (context) {
                               return AddressDetailsScreen(

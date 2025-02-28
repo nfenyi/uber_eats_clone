@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 
 import '../../../app_functions.dart';
+import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
@@ -89,7 +89,7 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
                                   ? widget.store.openingTime.hour -
                                               timeOfDayNow.hour >
                                           1
-                                      ? 'Available at ${AppFunctions.formatTime(widget.store.openingTime)}'
+                                      ? 'Available at ${AppFunctions.formatDate(widget.store.openingTime.toString(), format: 'h:i A')}'
                                       : 'Available in ${widget.store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${widget.store.openingTime.minute - timeOfDayNow.minute} mins'}'
                                   : '\$${widget.store.delivery.fee} Delivery Fee',
                               color: widget.store.delivery.fee < 1
@@ -109,32 +109,32 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
               const Divider(
                 indent: 60,
               ),
-              Expanded(
-                  child: GridView.builder(
-                padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 120,
-                    mainAxisExtent: 220,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10),
-                itemBuilder: (context, index) {
-                  final product =
-                      widget.store.productCategories[1].products[index];
-                  return Column(
-                    children: [
-                      ProductGridTile(
-                        product: product,
-                        store: widget.store,
-                      ),
-                      if (product.promoPrice != null)
-                        AppTextBadge(
-                            text:
-                                '${(((product.initialPrice - product.promoPrice!) / product.initialPrice) * 100).toStringAsFixed(0)}% off')
-                    ],
-                  );
-                },
-                itemCount: widget.store.productCategories[1].products.length,
-              )),
+              // Expanded(
+              //     child: GridView.builder(
+              //   padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+              //   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              //       maxCrossAxisExtent: 120,
+              //       mainAxisExtent: 220,
+              //       mainAxisSpacing: 10,
+              //       crossAxisSpacing: 10),
+              //   itemBuilder: (context, index) {
+              //     final product =
+              //         widget.store.productCategories[1].products[index];
+              //     return Column(
+              //       children: [
+              //         ProductGridTile(
+              //           product: product,
+              //           store: widget.store,
+              //         ),
+              //         if (product.promoPrice != null)
+              //           AppTextBadge(
+              //               text:
+              //                   '${(((product.initialPrice - product.promoPrice!) / product.initialPrice) * 100).toStringAsFixed(0)}% off')
+              //       ],
+              //     );
+              //   },
+              //   itemCount: widget.store.productCategories[1].products.length,
+              // )),
             ],
           )),
     );

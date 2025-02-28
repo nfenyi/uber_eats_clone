@@ -18,6 +18,7 @@ import 'package:uber_eats_clone/presentation/features/address/screens/addresses_
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/some_kind_of_section_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../../app_functions.dart';
+import '../../../../models/store/store_model.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../alcohol/alcohol_screen.dart';
@@ -302,7 +303,9 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                     onTap: () {},
                                     child: Ink(
                                       child: Icon(
-                                        store.isFavorite
+                                        favoriteStores.any(
+                                          (element) => element.id == store.id,
+                                        )
                                             ? Icons.favorite
                                             : Icons.favorite_outline,
                                         color: Colors.white,
@@ -342,7 +345,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                     )),
                                 AppText(
                                     text: isClosed
-                                        ? 'Closed • Available at ${AppFunctions.formatTime(store.openingTime)}'
+                                        ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
                                         : '\$${store.delivery.fee} Delivery Fee',
                                     color: store.delivery.fee < 1
                                         ? const Color.fromARGB(
@@ -616,7 +619,11 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                         onTap: () {},
                                         child: Ink(
                                           child: Icon(
-                                            groceryScreenStore.isFavorite
+                                            favoriteStores.any(
+                                              (element) =>
+                                                  element.id ==
+                                                  groceryScreenStore.id,
+                                            )
                                                 ? Icons.favorite
                                                 : Icons.favorite_outline,
                                             color: Colors.white,
@@ -771,7 +778,11 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                         onTap: () {},
                                         child: Ink(
                                           child: Icon(
-                                            groceryScreenStore.isFavorite
+                                            favoriteStores.any(
+                                              (element) =>
+                                                  element.id ==
+                                                  groceryScreenStore.id,
+                                            )
                                                 ? Icons.favorite
                                                 : Icons.favorite_outline,
                                             color: Colors.white,
@@ -838,287 +849,289 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                       callback: () {
                         navigatorKey.currentState!.push(MaterialPageRoute(
                           builder: (context) =>
-                              SomeKindOfSectionScreen(store: stores[6]),
+                              SomeKindOfSectionScreen(store: stores[2]),
                         ));
                       },
                       title: 'Prep brunch for Mum',
-                      subtitle: 'From ${stores[6].name}',
-                      imageUrl: stores[6].logo),
-                  SizedBox(
-                    height: 200,
-                    child: CustomScrollView(
-                      scrollDirection: Axis.horizontal,
-                      slivers: stores[6]
-                          .productCategories
-                          .map((productCategory) => SliverPadding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                sliver: SliverList.separated(
-                                  separatorBuilder: (context, index) =>
-                                      const Gap(10),
-                                  itemBuilder: (context, index) =>
-                                      ListView.separated(
-                                          scrollDirection: Axis.horizontal,
-                                          // TODO: find a way to do lazy loading and remove shrinkWrap
-                                          shrinkWrap: true,
-                                          itemCount:
-                                              productCategory.products.length,
-                                          separatorBuilder: (context, index) =>
-                                              const Gap(15),
-                                          itemBuilder: (context, index) {
-                                            final product =
-                                                productCategory.products[index];
-                                            return SizedBox(
-                                              width: 100,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Stack(
-                                                    alignment:
-                                                        Alignment.bottomRight,
-                                                    children: [
-                                                      ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          imageUrl: product
-                                                              .imageUrls.first,
-                                                          width: 100,
-                                                          height: 120,
-                                                          fit: BoxFit.fill,
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0,
-                                                                top: 8.0),
-                                                        child: InkWell(
-                                                          onTap: () {},
-                                                          child: Ink(
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              decoration: BoxDecoration(
-                                                                  boxShadow: const [
-                                                                    BoxShadow(
-                                                                      color: Colors
-                                                                          .black12,
-                                                                      offset:
-                                                                          Offset(
-                                                                              2,
-                                                                              2),
-                                                                    )
-                                                                  ],
-                                                                  color: Colors
-                                                                      .white,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              50)),
-                                                              child: const Icon(
-                                                                Icons.add,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  const Gap(5),
-                                                  AppText(
-                                                    text: product.name,
-                                                    weight: FontWeight.w600,
-                                                    maxLines: 3,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Visibility(
-                                                        visible: product
-                                                                .promoPrice !=
-                                                            null,
-                                                        child: Row(
-                                                          children: [
-                                                            AppText(
-                                                                text:
-                                                                    '\$${product.initialPrice}',
-                                                                color: Colors
-                                                                    .green),
-                                                            const Gap(5),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      AppText(
-                                                        text: product
-                                                            .initialPrice
-                                                            .toString(),
-                                                        decoration:
-                                                            product.promoPrice !=
-                                                                    null
-                                                                ? TextDecoration
-                                                                    .lineThrough
-                                                                : TextDecoration
-                                                                    .none,
-                                                      )
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }),
-                                  itemCount: 1,
-                                ),
-                              ))
-                          .toList(),
-                    ),
-                  ),
+                      subtitle: 'From ${stores[2].name}',
+                      imageUrl: stores[2].logo),
+                  // SizedBox(
+                  //   height: 200,
+                  //   child: CustomScrollView(
+                  //     scrollDirection: Axis.horizontal,
+                  //     slivers: stores[2]
+                  //         .productCategories
+                  //         .map((productCategory) => SliverPadding(
+                  //               padding:
+                  //                   const EdgeInsets.symmetric(horizontal: 10),
+                  //               sliver: SliverList.separated(
+                  //                 separatorBuilder: (context, index) =>
+                  //                     const Gap(10),
+                  //                 itemBuilder: (context, index) =>
+                  //                     ListView.separated(
+                  //                         scrollDirection: Axis.horizontal,
+                  //                         // TODO: find a way to do lazy loading and remove shrinkWrap
+                  //                         shrinkWrap: true,
+                  //                         itemCount:
+                  //                             productCategory.productsAndQuantities.length,
+                  //                         separatorBuilder: (context, index) =>
+                  //                             const Gap(15),
+                  //                         itemBuilder: (context, index) {
+                  //                           final product =
+                  //                               productCategory.products[index];
+                  //                           return SizedBox(
+                  //                             width: 100,
+                  //                             child: Column(
+                  //                               crossAxisAlignment:
+                  //                                   CrossAxisAlignment.start,
+                  //                               children: [
+                  //                                 Stack(
+                  //                                   alignment:
+                  //                                       Alignment.bottomRight,
+                  //                                   children: [
+                  //                                     ClipRRect(
+                  //                                       borderRadius:
+                  //                                           BorderRadius
+                  //                                               .circular(12),
+                  //                                       child:
+                  //                                           CachedNetworkImage(
+                  //                                         imageUrl: product
+                  //                                             .imageUrls.first,
+                  //                                         width: 100,
+                  //                                         height: 120,
+                  //                                         fit: BoxFit.fill,
+                  //                                       ),
+                  //                                     ),
+                  //                                     Padding(
+                  //                                       padding:
+                  //                                           const EdgeInsets
+                  //                                               .only(
+                  //                                               right: 8.0,
+                  //                                               top: 8.0),
+                  //                                       child: InkWell(
+                  //                                         onTap: () {},
+                  //                                         child: Ink(
+                  //                                           child: Container(
+                  //                                             padding:
+                  //                                                 const EdgeInsets
+                  //                                                     .all(5),
+                  //                                             decoration: BoxDecoration(
+                  //                                                 boxShadow: const [
+                  //                                                   BoxShadow(
+                  //                                                     color: Colors
+                  //                                                         .black12,
+                  //                                                     offset:
+                  //                                                         Offset(
+                  //                                                             2,
+                  //                                                             2),
+                  //                                                   )
+                  //                                                 ],
+                  //                                                 color: Colors
+                  //                                                     .white,
+                  //                                                 borderRadius:
+                  //                                                     BorderRadius
+                  //                                                         .circular(
+                  //                                                             50)),
+                  //                                             child: const Icon(
+                  //                                               Icons.add,
+                  //                                             ),
+                  //                                           ),
+                  //                                         ),
+                  //                                       ),
+                  //                                     )
+                  //                                   ],
+                  //                                 ),
+                  //                                 const Gap(5),
+                  //                                 AppText(
+                  //                                   text: product.name,
+                  //                                   weight: FontWeight.w600,
+                  //                                   maxLines: 3,
+                  //                                   overflow:
+                  //                                       TextOverflow.ellipsis,
+                  //                                 ),
+                  //                                 Row(
+                  //                                   children: [
+                  //                                     Visibility(
+                  //                                       visible: product
+                  //                                               .promoPrice !=
+                  //                                           null,
+                  //                                       child: Row(
+                  //                                         children: [
+                  //                                           AppText(
+                  //                                               text:
+                  //                                                   '\$${product.initialPrice}',
+                  //                                               color: Colors
+                  //                                                   .green),
+                  //                                           const Gap(5),
+                  //                                         ],
+                  //                                       ),
+                  //                                     ),
+                  //                                     AppText(
+                  //                                       text: product
+                  //                                           .initialPrice
+                  //                                           .toString(),
+                  //                                       decoration:
+                  //                                           product.promoPrice !=
+                  //                                                   null
+                  //                                               ? TextDecoration
+                  //                                                   .lineThrough
+                  //                                               : TextDecoration
+                  //                                                   .none,
+                  //                                     )
+                  //                                   ],
+                  //                                 ),
+                  //                               ],
+                  //                             ),
+                  //                           );
+                  //                         }),
+                  //                 itemCount: 1,
+                  //               ),
+                  //             ))
+                  //         .toList(),
+                  //   ),
+                  // ),
+
                   HomeScreenTopic(
                       callback: () {},
                       title: 'Breakfast baked goods',
-                      subtitle: 'From ${stores[6].name}',
-                      imageUrl: stores[6].logo),
-                  SizedBox(
-                    height: 200,
-                    child: CustomScrollView(
-                      scrollDirection: Axis.horizontal,
-                      slivers: stores[6]
-                          .productCategories
-                          .map((productCategory) => SliverPadding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                sliver: SliverList.separated(
-                                  separatorBuilder: (context, index) =>
-                                      const Gap(10),
-                                  itemBuilder: (context, index) =>
-                                      ListView.separated(
-                                          scrollDirection: Axis.horizontal,
-                                          // TODO: find a way to do lazy loading and remove shrinkWrap
-                                          shrinkWrap: true,
-                                          itemCount:
-                                              productCategory.products.length,
-                                          separatorBuilder: (context, index) =>
-                                              const Gap(15),
-                                          itemBuilder: (context, index) {
-                                            final product =
-                                                productCategory.products[index];
-                                            return SizedBox(
-                                              width: 100,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Stack(
-                                                    alignment:
-                                                        Alignment.bottomRight,
-                                                    children: [
-                                                      ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          imageUrl: product
-                                                              .imageUrls.first,
-                                                          width: 100,
-                                                          height: 120,
-                                                          fit: BoxFit.fill,
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 8.0,
-                                                                top: 8.0),
-                                                        child: InkWell(
-                                                          onTap: () {},
-                                                          child: Ink(
-                                                            child: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              decoration: BoxDecoration(
-                                                                  boxShadow: const [
-                                                                    BoxShadow(
-                                                                      color: Colors
-                                                                          .black12,
-                                                                      offset:
-                                                                          Offset(
-                                                                              2,
-                                                                              2),
-                                                                    )
-                                                                  ],
-                                                                  color: Colors
-                                                                      .white,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              50)),
-                                                              child: const Icon(
-                                                                Icons.add,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  const Gap(5),
-                                                  AppText(
-                                                    text: product.name,
-                                                    weight: FontWeight.w600,
-                                                    maxLines: 3,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Visibility(
-                                                        visible: product
-                                                                .promoPrice !=
-                                                            null,
-                                                        child: Row(
-                                                          children: [
-                                                            AppText(
-                                                                text:
-                                                                    '\$${product.initialPrice}',
-                                                                color: Colors
-                                                                    .green),
-                                                            const Gap(5),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      AppText(
-                                                        text: product
-                                                            .initialPrice
-                                                            .toString(),
-                                                        decoration:
-                                                            product.promoPrice !=
-                                                                    null
-                                                                ? TextDecoration
-                                                                    .lineThrough
-                                                                : TextDecoration
-                                                                    .none,
-                                                      )
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }),
-                                  itemCount: 1,
-                                ),
-                              ))
-                          .toList(),
-                    ),
-                  ),
+                      subtitle: 'From ${stores[2].name}',
+                      imageUrl: stores[2].logo),
+                  // SizedBox(
+                  //   height: 200,
+                  //   child: CustomScrollView(
+                  //     scrollDirection: Axis.horizontal,
+                  //     slivers: stores[2]
+                  //         .productCategories
+                  //         .map((productCategory) => SliverPadding(
+                  //               padding:
+                  //                   const EdgeInsets.symmetric(horizontal: 10),
+                  //               sliver: SliverList.separated(
+                  //                 separatorBuilder: (context, index) =>
+                  //                     const Gap(10),
+                  //                 itemBuilder: (context, index) =>
+                  //                     ListView.separated(
+                  //                         scrollDirection: Axis.horizontal,
+                  //                         // TODO: find a way to do lazy loading and remove shrinkWrap
+                  //                         shrinkWrap: true,
+                  //                         itemCount: productCategory
+                  //                             .productsAndQuantities.length,
+                  //                         separatorBuilder: (context, index) =>
+                  //                             const Gap(15),
+                  //                         itemBuilder: (context, index) {
+                  //                           final product =
+                  //                               productCategory.products[index];
+                  //                           return SizedBox(
+                  //                             width: 100,
+                  //                             child: Column(
+                  //                               crossAxisAlignment:
+                  //                                   CrossAxisAlignment.start,
+                  //                               children: [
+                  //                                 Stack(
+                  //                                   alignment:
+                  //                                       Alignment.bottomRight,
+                  //                                   children: [
+                  //                                     ClipRRect(
+                  //                                       borderRadius:
+                  //                                           BorderRadius
+                  //                                               .circular(12),
+                  //                                       child:
+                  //                                           CachedNetworkImage(
+                  //                                         imageUrl: product
+                  //                                             .imageUrls.first,
+                  //                                         width: 100,
+                  //                                         height: 120,
+                  //                                         fit: BoxFit.fill,
+                  //                                       ),
+                  //                                     ),
+                  //                                     Padding(
+                  //                                       padding:
+                  //                                           const EdgeInsets
+                  //                                               .only(
+                  //                                               right: 8.0,
+                  //                                               top: 8.0),
+                  //                                       child: InkWell(
+                  //                                         onTap: () {},
+                  //                                         child: Ink(
+                  //                                           child: Container(
+                  //                                             padding:
+                  //                                                 const EdgeInsets
+                  //                                                     .all(5),
+                  //                                             decoration: BoxDecoration(
+                  //                                                 boxShadow: const [
+                  //                                                   BoxShadow(
+                  //                                                     color: Colors
+                  //                                                         .black12,
+                  //                                                     offset:
+                  //                                                         Offset(
+                  //                                                             2,
+                  //                                                             2),
+                  //                                                   )
+                  //                                                 ],
+                  //                                                 color: Colors
+                  //                                                     .white,
+                  //                                                 borderRadius:
+                  //                                                     BorderRadius
+                  //                                                         .circular(
+                  //                                                             50)),
+                  //                                             child: const Icon(
+                  //                                               Icons.add,
+                  //                                             ),
+                  //                                           ),
+                  //                                         ),
+                  //                                       ),
+                  //                                     )
+                  //                                   ],
+                  //                                 ),
+                  //                                 const Gap(5),
+                  //                                 AppText(
+                  //                                   text: product.name,
+                  //                                   weight: FontWeight.w600,
+                  //                                   maxLines: 3,
+                  //                                   overflow:
+                  //                                       TextOverflow.ellipsis,
+                  //                                 ),
+                  //                                 Row(
+                  //                                   children: [
+                  //                                     Visibility(
+                  //                                       visible: product
+                  //                                               .promoPrice !=
+                  //                                           null,
+                  //                                       child: Row(
+                  //                                         children: [
+                  //                                           AppText(
+                  //                                               text:
+                  //                                                   '\$${product.initialPrice}',
+                  //                                               color: Colors
+                  //                                                   .green),
+                  //                                           const Gap(5),
+                  //                                         ],
+                  //                                       ),
+                  //                                     ),
+                  //                                     AppText(
+                  //                                       text: product
+                  //                                           .initialPrice
+                  //                                           .toString(),
+                  //                                       decoration:
+                  //                                           product.promoPrice !=
+                  //                                                   null
+                  //                                               ? TextDecoration
+                  //                                                   .lineThrough
+                  //                                               : TextDecoration
+                  //                                                   .none,
+                  //                                     )
+                  //                                   ],
+                  //                                 ),
+                  //                               ],
+                  //                             ),
+                  //                           );
+                  //                         }),
+                  //                 itemCount: 1,
+                  //               ),
+                  //             ))
+                  //         .toList(),
+                  //   ),
+                  // ),
+
                   HomeScreenTopic(callback: () {}, title: 'All Stores'),
                   ListView.separated(
                       physics: const NeverScrollableScrollPhysics(),
@@ -1152,10 +1165,12 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                             title: AppText(text: store.name),
                             contentPadding: EdgeInsets.zero,
                             trailing: Icon(
-                              store.isFavorite
+                              favoriteStores.any(
+                                (element) => element.id == store.id,
+                              )
                                   ? Icons.favorite
                                   : Icons.favorite_outline,
-                              color: AppColors.neutral300,
+                              color: Colors.white,
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1173,7 +1188,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                             ? store.openingTime.hour -
                                                         timeOfDayNow.hour >
                                                     1
-                                                ? 'Available at ${AppFunctions.formatTime(store.openingTime)}'
+                                                ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
                                                 : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
                                             : '\$${store.delivery.fee} Delivery Fee',
                                         color: store.delivery.fee < 1
@@ -1270,6 +1285,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   child: Ink(
                     child: const AppTextFormField(
                       enabled: false,
+                      constraintWidth: 40,
                       hintText: 'Search grocery, drinks, stores',
                       radius: 50,
                       prefixIcon: Padding(

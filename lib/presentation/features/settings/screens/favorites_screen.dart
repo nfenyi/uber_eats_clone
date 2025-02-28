@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 
+import '../../../../models/store/store_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
@@ -24,7 +25,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     super.initState();
     TimeOfDay timeOfDayNow = TimeOfDay.now();
     for (var store in stores) {
-      if (store.isFavorite) {
+      if (favoriteStores.any((element) => element.id == store.id)) {
         if (timeOfDayNow.hour < store.openingTime.hour ||
             (timeOfDayNow.hour >= store.closingTime.hour &&
                 timeOfDayNow.minute >= store.closingTime.minute)) {

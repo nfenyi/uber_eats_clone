@@ -139,7 +139,7 @@ class AppTextFormField extends ConsumerWidget {
           vertical: height,
         ),
         hintText: hintText,
-        counterText: counterText,
+        counterText: counterText ?? '',
         hintStyle: TextStyle(
           fontSize: AppSizes.bodySmaller,
           color: hintStyleColor,

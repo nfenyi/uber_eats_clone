@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app_functions.dart';
-import '../../../main.dart';
+import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
@@ -77,7 +77,9 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                     onTap: () {},
                     child: Ink(
                       child: Icon(
-                        groceryStore.isFavorite
+                        favoriteStores.any(
+                          (element) => element.id == groceryStore.id,
+                        )
                             ? Icons.favorite
                             : Icons.favorite_outline,
                         color: AppColors.neutral500,
@@ -100,7 +102,7 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                                   ? groceryStore.openingTime.hour -
                                               timeOfDayNow.hour >
                                           1
-                                      ? 'Available at ${AppFunctions.formatTime(groceryStore.openingTime)}'
+                                      ? 'Available at ${AppFunctions.formatDate(groceryStore.openingTime.toString(), format: 'h:i A')}'
                                       : 'Available in ${groceryStore.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${groceryStore.openingTime.minute - timeOfDayNow.minute} mins'}'
                                   : '\$${groceryStore.delivery.fee} Delivery Fee',
                               color: groceryStore.delivery.fee < 1

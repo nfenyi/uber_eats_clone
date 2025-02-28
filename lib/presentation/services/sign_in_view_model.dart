@@ -149,6 +149,8 @@ class AuthenticatoViewModel {
 class FirestoreCollections {
   static String devices = 'devices';
   static String users = 'users';
+  static String stores = 'stores';
+  static String products = 'products';
 
   FirestoreCollections._();
 }

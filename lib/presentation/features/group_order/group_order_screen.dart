@@ -7,11 +7,12 @@ import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/features/group_order/group_order_complete_screen.dart';
 import 'package:collection/collection.dart';
 import '../../../app_functions.dart';
+import '../../../models/order/order_model.dart';
+import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../../core/widgets.dart';
-import '../home/home_screen.dart';
 
 class GroupOrderScreen extends ConsumerStatefulWidget {
   final Store? store;
@@ -300,99 +301,99 @@ class _GroupOrderScreenState extends ConsumerState<GroupOrderScreen> {
                                                         width: 30,
                                                       )),
                                                   children: [
-                                                    ListView.separated(
-                                                        physics:
-                                                            const NeverScrollableScrollPhysics(),
-                                                        shrinkWrap: true,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          final productNQuantity =
-                                                              personalOrderItem
-                                                                  .first
-                                                                  .productsAndQuantities
-                                                                  .entries
-                                                                  .elementAt(
-                                                                      index);
-                                                          return ListTile(
-                                                            subtitle:
-                                                                productNQuantity
-                                                                            .key
-                                                                            .options !=
-                                                                        null
-                                                                    ? Column(
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.min,
-                                                                        children: [
-                                                                          ListView
-                                                                              .builder(
-                                                                            itemBuilder:
-                                                                                (context, index) {
-                                                                              final option = productNQuantity.key.options![index];
-                                                                              return Column(
-                                                                                children: [
-                                                                                  AppText(text: 'Item !: ${option.name}'),
-                                                                                  if (option.subOptions != null)
-                                                                                    AppText(
-                                                                                      text: option.subOptions!.first.name,
-                                                                                      color: AppColors.neutral500,
-                                                                                    ),
-                                                                                ],
-                                                                              );
-                                                                            },
-                                                                            itemCount:
-                                                                                productNQuantity.key.options!.length,
-                                                                          )
-                                                                        ],
-                                                                      )
-                                                                    : null,
-                                                            leading: Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              color: AppColors
-                                                                  .neutral100,
-                                                              child: AppText(
-                                                                  text: productNQuantity
-                                                                      .value
-                                                                      .toString()),
-                                                            ),
-                                                            title: AppText(
-                                                              text:
-                                                                  productNQuantity
-                                                                      .key.name,
-                                                              weight: FontWeight
-                                                                  .w600,
-                                                              size: AppSizes
-                                                                  .bodySmaller,
-                                                            ),
-                                                            contentPadding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    left: 50),
-                                                            trailing: Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              children: [
-                                                                AppText(
-                                                                    color: AppColors
-                                                                        .neutral600,
-                                                                    text:
-                                                                        'US\$${((productNQuantity.key.promoPrice ?? productNQuantity.key.initialPrice) * productNQuantity.value).toStringAsFixed(2)}'),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                        separatorBuilder:
-                                                            (context, index) =>
-                                                                const Divider(),
-                                                        itemCount: personalOrderItem
-                                                            .first
-                                                            .productsAndQuantities
-                                                            .length)
+                                                    // ListView.separated(
+                                                    //     physics:
+                                                    //         const NeverScrollableScrollPhysics(),
+                                                    //     shrinkWrap: true,
+                                                    //     itemBuilder:
+                                                    //         (context, index) {
+                                                    //       final productNQuantity =
+                                                    //           personalOrderItem
+                                                    //               .first
+                                                    //               .productsAndQuantities
+                                                    //               .entries
+                                                    //               .elementAt(
+                                                    //                   index);
+                                                    //       return ListTile(
+                                                    //         subtitle:
+                                                    //             productNQuantity
+                                                    //                         .key
+                                                    //                         .options !=
+                                                    //                     null
+                                                    //                 ? Column(
+                                                    //                     mainAxisSize:
+                                                    //                         MainAxisSize.min,
+                                                    //                     children: [
+                                                    //                       ListView
+                                                    //                           .builder(
+                                                    //                         itemBuilder:
+                                                    //                             (context, index) {
+                                                    //                           final option = productNQuantity.key.options![index];
+                                                    //                           return Column(
+                                                    //                             children: [
+                                                    //                               AppText(text: 'Item !: ${option.name}'),
+                                                    //                               if (option.subOptions != null)
+                                                    //                                 AppText(
+                                                    //                                   text: option.subOptions!.first.name,
+                                                    //                                   color: AppColors.neutral500,
+                                                    //                                 ),
+                                                    //                             ],
+                                                    //                           );
+                                                    //                         },
+                                                    //                         itemCount:
+                                                    //                             productNQuantity.key.options!.length,
+                                                    //                       )
+                                                    //                     ],
+                                                    //                   )
+                                                    //                 : null,
+                                                    //         leading: Container(
+                                                    //           padding:
+                                                    //               const EdgeInsets
+                                                    //                   .all(5),
+                                                    //           color: AppColors
+                                                    //               .neutral100,
+                                                    //           child: AppText(
+                                                    //               text: productNQuantity
+                                                    //                   .value
+                                                    //                   .toString()),
+                                                    //         ),
+                                                    //         title: AppText(
+                                                    //           text:
+                                                    //               productNQuantity
+                                                    //                   .key.name,
+                                                    //           weight: FontWeight
+                                                    //               .w600,
+                                                    //           size: AppSizes
+                                                    //               .bodySmaller,
+                                                    //         ),
+                                                    //         contentPadding:
+                                                    //             const EdgeInsets
+                                                    //                 .only(
+                                                    //                 left: 50),
+                                                    //         trailing: Column(
+                                                    //           mainAxisAlignment:
+                                                    //               MainAxisAlignment
+                                                    //                   .start,
+                                                    //           mainAxisSize:
+                                                    //               MainAxisSize
+                                                    //                   .min,
+                                                    //           children: [
+                                                    //             AppText(
+                                                    //                 color: AppColors
+                                                    //                     .neutral600,
+                                                    //                 text:
+                                                    //                     'US\$${((productNQuantity.key.promoPrice ?? productNQuantity.key.initialPrice) * productNQuantity.value).toStringAsFixed(2)}'),
+                                                    //           ],
+                                                    //         ),
+                                                    //       );
+                                                    //     },
+                                                    //     separatorBuilder:
+                                                    //         (context, index) =>
+                                                    //             const Divider(),
+                                                    //     itemCount: personalOrderItem
+                                                    //         .first
+                                                    //         .productsAndQuantities
+                                                    //         .length)
                                                   ],
                                                 ),
                                               const Divider(),
@@ -431,98 +432,99 @@ class _GroupOrderScreenState extends ConsumerState<GroupOrderScreen> {
                                                           width: 30,
                                                         )),
                                                     children: [
-                                                      ListView.separated(
-                                                          physics:
-                                                              const NeverScrollableScrollPhysics(),
-                                                          shrinkWrap: true,
-                                                          itemBuilder:
-                                                              (context, index) {
-                                                            final productNQuantity =
-                                                                otherOrderItem
-                                                                    .productsAndQuantities
-                                                                    .entries
-                                                                    .elementAt(
-                                                                        index);
-                                                            return ListTile(
-                                                              subtitle:
-                                                                  productNQuantity
-                                                                              .key
-                                                                              .options !=
-                                                                          null
-                                                                      ? Column(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.min,
-                                                                          children: [
-                                                                            ListView.builder(
-                                                                              itemBuilder: (context, index) {
-                                                                                final option = productNQuantity.key.options![index];
-                                                                                return Column(
-                                                                                  children: [
-                                                                                    AppText(text: 'Item !: ${option.name}'),
-                                                                                    if (option.subOptions != null)
-                                                                                      AppText(
-                                                                                        text: option.subOptions!.first.name,
-                                                                                        color: AppColors.neutral500,
-                                                                                      ),
-                                                                                  ],
-                                                                                );
-                                                                              },
-                                                                              itemCount: productNQuantity.key.options!.length,
-                                                                            )
-                                                                          ],
-                                                                        )
-                                                                      : null,
-                                                              leading:
-                                                                  Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(5),
-                                                                color: AppColors
-                                                                    .neutral100,
-                                                                child: AppText(
-                                                                    text: productNQuantity
-                                                                        .value
-                                                                        .toString()),
-                                                              ),
-                                                              title: AppText(
-                                                                text:
-                                                                    productNQuantity
-                                                                        .key
-                                                                        .name,
-                                                                weight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                size: AppSizes
-                                                                    .bodySmaller,
-                                                              ),
-                                                              contentPadding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 50),
-                                                              trailing: Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .start,
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                children: [
-                                                                  AppText(
-                                                                      color: AppColors
-                                                                          .neutral600,
-                                                                      text:
-                                                                          'US\$${((productNQuantity.key.promoPrice ?? productNQuantity.key.initialPrice) * productNQuantity.value).toStringAsFixed(2)}'),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                          separatorBuilder:
-                                                              (context,
-                                                                      index) =>
-                                                                  const Divider(),
-                                                          itemCount: otherOrderItem
-                                                              .productsAndQuantities
-                                                              .length),
+                                                      // ListView.separated(
+                                                      //     physics:
+                                                      //         const NeverScrollableScrollPhysics(),
+                                                      //     shrinkWrap: true,
+                                                      //     itemBuilder:
+                                                      //         (context, index) {
+                                                      //       final productNQuantity =
+                                                      //           otherOrderItem
+                                                      //               .productsAndQuantities
+                                                      //               .entries
+                                                      //               .elementAt(
+                                                      //                   index);
+                                                      //       return ListTile(
+                                                      //         subtitle:
+                                                      //             productNQuantity
+                                                      //                         .key
+                                                      //                         .options !=
+                                                      //                     null
+                                                      //                 ? Column(
+                                                      //                     mainAxisSize:
+                                                      //                         MainAxisSize.min,
+                                                      //                     children: [
+                                                      //                       ListView.builder(
+                                                      //                         itemBuilder: (context, index) {
+                                                      //                           final option = productNQuantity.key.options![index];
+                                                      //                           return Column(
+                                                      //                             children: [
+                                                      //                               AppText(text: 'Item !: ${option.name}'),
+                                                      //                               if (option.subOptions != null)
+                                                      //                                 AppText(
+                                                      //                                   text: option.subOptions!.first.name,
+                                                      //                                   color: AppColors.neutral500,
+                                                      //                                 ),
+                                                      //                             ],
+                                                      //                           );
+                                                      //                         },
+                                                      //                         itemCount: productNQuantity.key.options!.length,
+                                                      //                       )
+                                                      //                     ],
+                                                      //                   )
+                                                      //                 : null,
+                                                      //         leading:
+                                                      //             Container(
+                                                      //           padding:
+                                                      //               const EdgeInsets
+                                                      //                   .all(5),
+                                                      //           color: AppColors
+                                                      //               .neutral100,
+                                                      //           child: AppText(
+                                                      //               text: productNQuantity
+                                                      //                   .value
+                                                      //                   .toString()),
+                                                      //         ),
+                                                      //         title: AppText(
+                                                      //           text:
+                                                      //               productNQuantity
+                                                      //                   .key
+                                                      //                   .name,
+                                                      //           weight:
+                                                      //               FontWeight
+                                                      //                   .w600,
+                                                      //           size: AppSizes
+                                                      //               .bodySmaller,
+                                                      //         ),
+                                                      //         contentPadding:
+                                                      //             const EdgeInsets
+                                                      //                 .only(
+                                                      //                 left: 50),
+                                                      //         trailing: Column(
+                                                      //           mainAxisAlignment:
+                                                      //               MainAxisAlignment
+                                                      //                   .start,
+                                                      //           mainAxisSize:
+                                                      //               MainAxisSize
+                                                      //                   .min,
+                                                      //           children: [
+                                                      //             AppText(
+                                                      //                 color: AppColors
+                                                      //                     .neutral600,
+                                                      //                 text:
+                                                      //                     'US\$${((productNQuantity.key.promoPrice ?? productNQuantity.key.initialPrice) * productNQuantity.value).toStringAsFixed(2)}'),
+                                                      //           ],
+                                                      //         ),
+                                                      //       );
+                                                      //     },
+                                                      //     separatorBuilder:
+                                                      //         (context,
+                                                      //                 index) =>
+                                                      //             const Divider(),
+                                                      //     itemCount: otherOrderItem
+                                                      //         .productsAndQuantities
+                                                      //         .length),
+
                                                       InkWell(
                                                         onTap: () {
                                                           //TODO: Implement removal of person

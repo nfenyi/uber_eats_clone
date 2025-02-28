@@ -1,10 +1,7 @@
 part of 'widgets.dart';
 
 void showInfoToast(String message,
-    {int seconds = 3,
-    required context,
-    Color color = Colors.black,
-    Widget? icon}) {
+    {int seconds = 3, context, Color color = Colors.black, Widget? icon}) {
   FToast fToast = FToast();
   fToast.init(context);
   Widget toast = Container(

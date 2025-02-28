@@ -7,6 +7,7 @@ import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../../main.dart';
+import '../../../../../models/offer/offer_model.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../constants/asset_names.dart';
 import '../../../../constants/weblinks.dart';
@@ -25,12 +26,12 @@ class UberOneScreen2 extends StatefulWidget {
 class _UberOneScreen2State extends State<UberOneScreen2> {
   final List<Offer> _offers = [
     Offer(
-        product: stores[6].productCategories.first.products.first,
-        store: stores[6],
+        product: products.entries.first.value,
+        store: stores[2],
         noOfOffersAvailable: 2),
     Offer(
-        product: stores[6].productCategories.first.products.first,
-        store: stores[6],
+        product: products.entries.first.value,
+        store: stores[2],
         noOfOffersAvailable: 2),
   ];
 
@@ -299,15 +300,4 @@ class _UberOneScreen2State extends State<UberOneScreen2> {
       ),
     );
   }
-}
-
-class Offer {
-  final Product product;
-  final Store store;
-  final int noOfOffersAvailable;
-
-  Offer(
-      {required this.product,
-      required this.store,
-      required this.noOfOffersAvailable});
 }

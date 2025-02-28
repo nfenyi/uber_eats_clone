@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/end_membership_modal_bottom_sheet.dart';
 
 import '../../../../../app_functions.dart';
+import '../../../../../models/payment_method_model.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../constants/asset_names.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_text.dart';
-import '../../../sign_in/views/payment_method_screen.dart';
 import 'switch_to_annual_plan_screen.dart';
 import 'uber_one_account_screen.dart';
 
@@ -23,7 +22,9 @@ class ManageMembershipScreen extends StatefulWidget {
 
 class _ManageMembershipScreenState extends State<ManageMembershipScreen> {
   final _membershipDetails = MembershipDetails(
-      paymentMethod: PaymentMethod('Mastercard', AssetNames.masterCardLogo,
+      paymentMethod: const PaymentMethod(
+          name: 'Mastercard',
+          assetImage: AssetNames.masterCardLogo,
           cardNumber: '5544454554551'),
       plan: Plan(period: 'Monthly', bill: 9.99),
       dateRenewed: DateTime.now());

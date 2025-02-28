@@ -12,13 +12,12 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
-import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
+import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/weblinks.dart';
 import '../../core/app_colors.dart';
-import '../home/home_screen.dart';
 import '../webview/webview_screen.dart';
 import 'back_up_option_screen.dart';
 
@@ -180,7 +179,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                     itemCount: _product.options!.length,
                     itemBuilder: (context, index) {
                       final option = _product.options![index];
-                      return option.isExclusive
+                      return option.isExclusive == true
                           ? AppRadioListTile(
                               subtitle: option.price?.toString(),
                               groupValue: 'exclusive',

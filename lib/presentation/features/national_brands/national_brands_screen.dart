@@ -5,6 +5,7 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 
 import '../../../main.dart';
+import '../../../models/store/store_model.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../home/home_screen.dart';
@@ -34,7 +35,9 @@ class _NationalBrandsScreenState extends State<NationalBrandsScreen> {
         separatorBuilder: (context, index) => const Gap(10),
         itemBuilder: (context, index) {
           final nationalBrand = widget.nationalBrands[index];
-          bool isFavorite = nationalBrand.isFavorite;
+          bool isFavorite = favoriteStores.any(
+            (element) => element.id == nationalBrand.id,
+          );
           return InkWell(
             onTap: () {
               navigatorKey.currentState!.push(MaterialPageRoute(

@@ -5,8 +5,8 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../main.dart';
+import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
-import '../home/home_screen.dart';
 
 class BackUpOptionScreen extends StatefulWidget {
   final Product product;
@@ -23,23 +23,24 @@ class _BackUpOptionScreenState extends State<BackUpOptionScreen> {
   late final String _categoryName;
   late final List<Product> _products;
   late List<Product> _matchingProducts;
+  // late final List<Product> _backupOptions;
 
   @override
   void initState() {
     super.initState();
     late final ProductCategory matchingCategory;
-    matchingCategory = widget.store.productCategories.firstWhere(
+    matchingCategory = widget.store.productCategories!.firstWhere(
       (productCategory) {
-        return productCategory.products.any(
+        return productCategory.productsAndQuantities.any(
           (product) {
-            return product.name == widget.product.name;
+            return product['id'] == widget.product.id;
           },
         );
       },
     );
     _categoryName = matchingCategory.name;
-    _products = List.from(matchingCategory.products);
-    _products.removeWhere((product) => product.name == widget.product.name);
+    _products = List.from(matchingCategory.productsAndQuantities);
+    _products.removeWhere((product) => product.id == widget.product.id);
     _matchingProducts = _products;
   }
 

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 
+import '../../../../../models/offer/offer_model.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_text.dart';
 import '../../../home/home_screen.dart';
-import 'uber_one_screen2.dart';
 
 class ExclusiveOffersScreen extends StatefulWidget {
   const ExclusiveOffersScreen({super.key});
@@ -19,12 +19,12 @@ class ExclusiveOffersScreen extends StatefulWidget {
 class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
   final List<Offer> _offers = [
     Offer(
-        product: stores[6].productCategories.first.products.first,
-        store: stores[6],
+        product: products.entries.first.value,
+        store: stores[2],
         noOfOffersAvailable: 2),
     Offer(
-        product: stores[6].productCategories.first.products.first,
-        store: stores[6],
+        product: products.entries.first.value,
+        store: stores[2],
         noOfOffersAvailable: 2),
   ];
   @override
@@ -99,7 +99,8 @@ class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
                                 Padding(
                                   padding: const EdgeInsets.only(right: 8.0),
                                   child: Icon(
-                                    offer.store.isFavorite
+                                    favoriteStores.any((element) =>
+                                            element.id == offer.store.id)
                                         ? Icons.favorite
                                         : Icons.favorite_outline,
                                     color: AppColors.neutral300,

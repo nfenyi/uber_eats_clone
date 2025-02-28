@@ -3,12 +3,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 
 import '../../../main.dart';
+import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../../core/widgets.dart';
-import '../home/home_screen.dart';
 import 'group_order_complete_screen.dart';
 import 'group_order_name_screen.dart';
 import 'order_deadline_screen.dart';

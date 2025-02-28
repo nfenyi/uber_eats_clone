@@ -9,12 +9,14 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/order_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery_store/screens/grocery_store_screens.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
-import 'package:uber_eats_clone/presentation/features/promotion/promo_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../main.dart';
+import '../../../../models/order/order_model.dart';
+import '../../../../models/payment/payment_model.dart';
+import '../../../../models/payment_method_model.dart';
+import '../../../../models/promotion/promotion_model.dart';
 import '../../../constants/app_sizes.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -26,33 +28,32 @@ class OrdersScreen extends StatefulWidget {
 
 class _OrdersScreenState extends State<OrdersScreen> {
   final List<IndividualOrder> _allOrders = [
-    IndividualOrder(
-        productsAndQuantities: {
-          stores[6].productCategories.first.products.first: 4,
-          stores[6].productCategories.first.products.first: 4
-        },
-        orderNumber: '15615613',
-        deliveryDate: DateTime.now(),
-        status: 'Completed',
-        store: stores[6],
-        tip: 5.2,
-        courier: 'Dennis Osei',
-        totalFee: 65.0,
-        promo: Promotion(
-            discount: 3,
-            description: 'lajlasklfs',
-            applicableLocation: 'Adenta',
-            expirationDate: DateTime.now().add(const Duration(days: 3))),
-        serviceFee: 2,
-        tax: 1,
-        deliveryFee: 4,
-        payments: [
-          Payment(
-              datePaid: DateTime.now(),
-              cardNumber: '6546516516216',
-              paymentMethod: PaymentMethod('Venmo', AssetNames.venmoLogo),
-              amountPaid: 99)
-        ])
+    // IndividualOrder(
+    //     productsAndQuantities:
+    //         stores[2].productCategories.first.productsAndQuantities,
+    //     orderNumber: '15615613',
+    //     deliveryDate: DateTime.now(),
+    //     status: 'Completed',
+    //     store: stores[2],
+    //     tip: 5.2,
+    //     courier: 'Dennis Osei',
+    //     totalFee: 65.0,
+    //     promo: Promotion(
+    //         discount: 3,
+    //         description: 'lajlasklfs',
+    //         applicableLocation: 'Adenta',
+    //         expirationDate: DateTime.now().add(const Duration(days: 3))),
+    //     serviceFee: 2,
+    //     tax: 1,
+    //     deliveryFee: 4,
+    //     payments: [
+    //       Payment(
+    //           datePaid: DateTime.now(),
+    //           cardNumber: '6546516516216',
+    //           paymentMethod: const PaymentMethod(
+    //               name: 'Venmo', assetImage: AssetNames.venmoLogo),
+    //           amountPaid: 99)
+    //     ])
   ];
   List<IndividualOrder> _ongoingOrders = [];
   List<IndividualOrder> _pastOrders = [];
@@ -390,38 +391,38 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                           final item = order
                                               .productsAndQuantities.entries
                                               .elementAt(index);
-                                          return Column(
-                                            children: [
-                                              CachedNetworkImage(
-                                                imageUrl:
-                                                    item.key.imageUrls.first,
-                                                width: 80,
-                                                height: 80,
-                                                fit: BoxFit.cover,
-                                              ),
-                                              const Gap(5),
-                                              AppText(
-                                                text: item.key.name,
-                                                maxLines: 3,
-                                              ),
-                                              const Gap(5),
-                                              Row(
-                                                children: [
-                                                  AppText(
-                                                      color:
-                                                          AppColors.neutral500,
-                                                      text:
-                                                          '\$${(item.key.promoPrice ?? item.key.initialPrice).toStringAsFixed(2)}'),
-                                                  if (item.key.calories != null)
-                                                    AppText(
-                                                        color: AppColors
-                                                            .neutral500,
-                                                        text:
-                                                            ' • ${item.key.calories}')
-                                                ],
-                                              ),
-                                            ],
-                                          );
+                                          // return Column(
+                                          //   children: [
+                                          //     CachedNetworkImage(
+                                          //       imageUrl:
+                                          //           item.key.imageUrls.first,
+                                          //       width: 80,
+                                          //       height: 80,
+                                          //       fit: BoxFit.cover,
+                                          //     ),
+                                          //     const Gap(5),
+                                          //     AppText(
+                                          //       text: item.key.name,
+                                          //       maxLines: 3,
+                                          //     ),
+                                          //     const Gap(5),
+                                          //     Row(
+                                          //       children: [
+                                          //         AppText(
+                                          //             color:
+                                          //                 AppColors.neutral500,
+                                          //             text:
+                                          //                 '\$${(item.key.promoPrice ?? item.key.initialPrice).toStringAsFixed(2)}'),
+                                          //         if (item.key.calories != null)
+                                          //           AppText(
+                                          //               color: AppColors
+                                          //                   .neutral500,
+                                          //               text:
+                                          //                   ' • ${item.key.calories}')
+                                          //       ],
+                                          //     ),
+                                          //   ],
+                                          // );
                                         },
                                       ),
                                     )

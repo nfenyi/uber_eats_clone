@@ -7,7 +7,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/group_order/group_order_screen.dart';
 import 'package:uber_eats_clone/presentation/features/group_order/group_order_settings.dart';
 import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/search_menu_screen.dart';
@@ -15,10 +14,11 @@ import 'package:uber_eats_clone/presentation/features/store/store_details_screen
 import 'dart:math' as math;
 
 import '../../../main.dart';
+import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
-import '../home/home_screen.dart';
 import '../address/screens/addresses_screen.dart';
+import '../home/home_screen.dart';
 
 class StoreScreen extends StatefulWidget {
   final Store store;
@@ -67,12 +67,12 @@ class _StoreScreenState extends State<StoreScreen> {
     ));
     _store = widget.store;
     _categoryKeys = List.generate(
-      _store.productCategories.length,
+      _store.productCategories!.length,
       (index) => GlobalKey(),
     );
 
     _scrollController.addListener(_animateToTab);
-    _isFavorite = _store.isFavorite;
+    _isFavorite = favoriteStores.any((element) => element.id == _store.id);
   }
 
   @override
@@ -85,7 +85,7 @@ class _StoreScreenState extends State<StoreScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: DefaultTabController(
-        length: _store.productCategories.length,
+        length: _store.productCategories!.length,
         child: NestedScrollView(
           body: CustomScrollView(
             // controller: _scrollController,
@@ -211,14 +211,16 @@ class _StoreScreenState extends State<StoreScreen> {
                 ),
                 const Gap(10),
               ])),
-              (_store.productCategories.isNotEmpty)
+              (_store.productCategories != null &&
+                      _store.productCategories!.isNotEmpty)
                   ? SliverList.separated(
                       separatorBuilder: (context, index) => const Divider(
                         thickness: 3,
                       ),
-                      itemCount: _store.productCategories.length,
+                      itemCount: _store.productCategories!.length,
                       itemBuilder: (context, index) {
-                        final productCategory = _store.productCategories[index];
+                        final productCategory =
+                            _store.productCategories![index];
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -233,129 +235,129 @@ class _StoreScreenState extends State<StoreScreen> {
                               ),
                             ),
                             const Gap(10),
-                            ListView.separated(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              cacheExtent: 300,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSizes.horizontalPaddingSmall),
-                              separatorBuilder: (context, index) =>
-                                  const Divider(),
-                              itemCount: productCategory.products.length,
-                              itemBuilder: (context, index) {
-                                final product = productCategory.products[index];
-                                return InkWell(
-                                  onTap: () {
-                                    navigatorKey.currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => ProductScreen(
-                                        product: product,
-                                        store: _store,
-                                      ),
-                                    ));
-                                  },
-                                  child: Row(
-                                    // crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            AppText(
-                                              text: product.name,
-                                              weight: FontWeight.w600,
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Visibility(
-                                                  visible: product.promoPrice !=
-                                                      null,
-                                                  child: AppText(
-                                                      text:
-                                                          '\$${product.promoPrice} ',
-                                                      color: Colors.green),
-                                                ),
-                                                AppText(
-                                                  text:
-                                                      '\$${product.initialPrice}',
-                                                  decoration:
-                                                      product.promoPrice != null
-                                                          ? TextDecoration
-                                                              .lineThrough
-                                                          : TextDecoration.none,
-                                                ),
-                                                if (product.calories != null)
-                                                  AppText(
-                                                    text:
-                                                        ' • ${product.calories!} Cal.',
-                                                    maxLines: 2,
-                                                    color: AppColors.neutral500,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  )
-                                              ],
-                                            ),
-                                            if (product.description != null)
-                                              AppText(
-                                                text: product.description!,
-                                                maxLines: 2,
-                                                color: AppColors.neutral500,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                      const Gap(20),
-                                      Stack(
-                                        alignment: Alignment.bottomRight,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            child: CachedNetworkImage(
-                                              imageUrl: product.imageUrls.first,
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 8.0, top: 8.0),
-                                            child: InkWell(
-                                              onTap: () {},
-                                              child: Ink(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(5),
-                                                  decoration: BoxDecoration(
-                                                      boxShadow: const [
-                                                        BoxShadow(
-                                                          color: Colors.black12,
-                                                          offset: Offset(2, 2),
-                                                        )
-                                                      ],
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50)),
-                                                  child: const Icon(
-                                                    Icons.add,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            )
+                            // ListView.separated(
+                            //   physics: const NeverScrollableScrollPhysics(),
+                            //   shrinkWrap: true,
+                            //   cacheExtent: 300,
+                            //   padding: const EdgeInsets.symmetric(
+                            //       horizontal: AppSizes.horizontalPaddingSmall),
+                            //   separatorBuilder: (context, index) =>
+                            //       const Divider(),
+                            //   itemCount: productCategory.products.length,
+                            //   itemBuilder: (context, index) {
+                            //     final product = productCategory.products[index];
+                            //     return InkWell(
+                            //       onTap: () {
+                            //         navigatorKey.currentState!
+                            //             .push(MaterialPageRoute(
+                            //           builder: (context) => ProductScreen(
+                            //             product: product,
+                            //             store: _store,
+                            //           ),
+                            //         ));
+                            //       },
+                            //       child: Row(
+                            //         // crossAxisAlignment: CrossAxisAlignment.start,
+                            //         children: [
+                            //           Expanded(
+                            //             child: Column(
+                            //               crossAxisAlignment:
+                            //                   CrossAxisAlignment.start,
+                            //               children: [
+                            //                 AppText(
+                            //                   text: product.name,
+                            //                   weight: FontWeight.w600,
+                            //                   maxLines: 3,
+                            //                   overflow: TextOverflow.ellipsis,
+                            //                 ),
+                            //                 Row(
+                            //                   children: [
+                            //                     Visibility(
+                            //                       visible: product.promoPrice !=
+                            //                           null,
+                            //                       child: AppText(
+                            //                           text:
+                            //                               '\$${product.promoPrice} ',
+                            //                           color: Colors.green),
+                            //                     ),
+                            //                     AppText(
+                            //                       text:
+                            //                           '\$${product.initialPrice}',
+                            //                       decoration:
+                            //                           product.promoPrice != null
+                            //                               ? TextDecoration
+                            //                                   .lineThrough
+                            //                               : TextDecoration.none,
+                            //                     ),
+                            //                     if (product.calories != null)
+                            //                       AppText(
+                            //                         text:
+                            //                             ' • ${product.calories!} Cal.',
+                            //                         maxLines: 2,
+                            //                         color: AppColors.neutral500,
+                            //                         overflow:
+                            //                             TextOverflow.ellipsis,
+                            //                       )
+                            //                   ],
+                            //                 ),
+                            //                 if (product.description != null)
+                            //                   AppText(
+                            //                     text: product.description!,
+                            //                     maxLines: 2,
+                            //                     color: AppColors.neutral500,
+                            //                     overflow: TextOverflow.ellipsis,
+                            //                   ),
+                            //               ],
+                            //             ),
+                            //           ),
+                            //           const Gap(20),
+                            //           Stack(
+                            //             alignment: Alignment.bottomRight,
+                            //             children: [
+                            //               ClipRRect(
+                            //                 borderRadius:
+                            //                     BorderRadius.circular(12),
+                            //                 child: CachedNetworkImage(
+                            //                   imageUrl: product.imageUrls.first,
+                            //                   width: 100,
+                            //                   height: 100,
+                            //                   fit: BoxFit.fill,
+                            //                 ),
+                            //               ),
+                            //               Padding(
+                            //                 padding: const EdgeInsets.only(
+                            //                     right: 8.0, top: 8.0),
+                            //                 child: InkWell(
+                            //                   onTap: () {},
+                            //                   child: Ink(
+                            //                     child: Container(
+                            //                       padding:
+                            //                           const EdgeInsets.all(5),
+                            //                       decoration: BoxDecoration(
+                            //                           boxShadow: const [
+                            //                             BoxShadow(
+                            //                               color: Colors.black12,
+                            //                               offset: Offset(2, 2),
+                            //                             )
+                            //                           ],
+                            //                           color: Colors.white,
+                            //                           borderRadius:
+                            //                               BorderRadius.circular(
+                            //                                   50)),
+                            //                       child: const Icon(
+                            //                         Icons.add,
+                            //                       ),
+                            //                     ),
+                            //                   ),
+                            //                 ),
+                            //               )
+                            //             ],
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     );
+                            //   },
+                            // )
                           ],
                         );
                       },
@@ -383,7 +385,7 @@ class _StoreScreenState extends State<StoreScreen> {
               bottom: TabBar(
                 padding: EdgeInsets.zero,
                 isScrollable: true,
-                tabs: _store.productCategories
+                tabs: _store.productCategories!
                     .map(
                       (category) => AppText(
                         text: category.name,

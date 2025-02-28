@@ -5,16 +5,15 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/uber_one_screen.dart';
 import 'package:uber_eats_clone/presentation/features/uber_one/join_uber_one_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../app_functions.dart';
 import '../../../main.dart';
+import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../constants/weblinks.dart';
 import '../../core/app_text.dart';
-import '../home/home_screen.dart';
 import '../webview/webview_screen.dart';
 
 class StoreDetailsScreen extends StatefulWidget {
@@ -115,8 +114,8 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
                                       widget.store.closingTime.hour &&
                                   timeOfDayNow.minute >=
                                       widget.store.closingTime.minute)
-                          ? "Opens at ${AppFunctions.formatTime(widget.store.openingTime)}"
-                          : "Opens until ${AppFunctions.formatTime(widget.store.closingTime)}"),
+                          ? "Opens at ${AppFunctions.formatDate(widget.store.openingTime.toString(), format: 'h:i A')}"
+                          : "Opens until ${AppFunctions.formatDate(widget.store.closingTime.toString(), format: 'h:i A')}"),
                   trailing: _timeExpanded
                       ? const Iconify(
                           Octicon.dash_16,
@@ -132,19 +131,19 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
                     ),
                     AppText(
                       text:
-                          "${AppFunctions.formatTime(widget.store.openingTime)} - ${AppFunctions.formatTime(widget.store.closingTime)}",
+                          "${AppFunctions.formatDate(widget.store.openingTime.toString(), format: 'h:i A')} - ${AppFunctions.formatDate(widget.store.closingTime.toString(), format: 'h:i A')}",
                       color: AppColors.neutral500,
                     ),
                     const AppText(text: 'Monday - Friday'),
                     AppText(
                       text:
-                          "${AppFunctions.formatTime(widget.store.openingTime)} - ${AppFunctions.formatTime(widget.store.closingTime)}",
+                          "${AppFunctions.formatDate(widget.store.openingTime.toString(), format: 'h:i A')} - ${AppFunctions.formatDate(widget.store.closingTime.toString(), format: 'h:i A')}",
                       color: AppColors.neutral500,
                     ),
                     const AppText(text: 'Saturday'),
                     AppText(
                       text:
-                          "${AppFunctions.formatTime(widget.store.openingTime)} - ${AppFunctions.formatTime(widget.store.closingTime)}",
+                          "${AppFunctions.formatDate(widget.store.openingTime.toString(), format: 'h:i A')} - ${AppFunctions.formatDate(widget.store.closingTime.toString(), format: 'h:i A')}",
                       color: AppColors.neutral500,
                     ),
                     const Gap(10),

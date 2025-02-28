@@ -8,6 +8,7 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../main.dart';
+import '../../../models/promotion/promotion_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../core/app_colors.dart';
 import '../address/screens/addresses_screen.dart';
@@ -427,17 +428,4 @@ class _PromoScreenState extends State<PromoScreen> {
       ),
     );
   }
-}
-
-class Promotion {
-  final double discount;
-  final String description;
-  final DateTime expirationDate;
-  final String applicableLocation;
-
-  Promotion(
-      {required this.discount,
-      required this.description,
-      required this.applicableLocation,
-      required this.expirationDate});
 }

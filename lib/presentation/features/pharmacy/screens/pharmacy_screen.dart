@@ -7,6 +7,7 @@ import 'package:gap/gap.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../main.dart';
+import '../../../../models/store/store_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/other_constants.dart';
@@ -955,42 +956,46 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                   HomeScreenTopic(
                       callback: () {},
                       title: 'Prep brunch for Mum',
-                      subtitle: 'From ${stores[6].name}',
-                      imageUrl: stores[6].logo),
-                  SizedBox(
-                    height: 200,
-                    child: CustomScrollView(
-                      scrollDirection: Axis.horizontal,
-                      slivers: stores[6]
-                          .productCategories
-                          .map((productCategory) => SliverPadding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                sliver: SliverList.separated(
-                                  separatorBuilder: (context, index) =>
-                                      const Gap(10),
-                                  itemBuilder: (context, index) =>
-                                      ListView.separated(
-                                          scrollDirection: Axis.horizontal,
-                                          // TODO: find a way to do lazy loading and remove shrinkWrap
-                                          shrinkWrap: true,
-                                          itemCount:
-                                              productCategory.products.length,
-                                          separatorBuilder: (context, index) =>
-                                              const Gap(15),
-                                          itemBuilder: (context, index) {
-                                            final product =
-                                                productCategory.products[index];
-                                            return ProductGridTile(
-                                                product: product,
-                                                store: stores[6]);
-                                          }),
-                                  itemCount: 1,
-                                ),
-                              ))
-                          .toList(),
-                    ),
-                  ),
+                      subtitle: 'From ${stores[2].name}',
+                      imageUrl: stores[2].logo),
+                  // SizedBox(
+                  //   height: 200,
+                  //   child: CustomScrollView(
+                  //     scrollDirection: Axis.horizontal,
+                  //     slivers: stores[2]
+                  //         .productCategories
+                  //         .map((productCategory) {
+                  //           final productIds = productCategory.productsAndQuantities.keys.toList();
+                  //           final searchedProducts = products.entries.where((element) => element.key == produ,);
+                  //           return SliverPadding(
+                  //               padding:
+                  //                   const EdgeInsets.symmetric(horizontal: 10),
+                  //               sliver: SliverList.separated(
+                  //                 separatorBuilder: (context, index) =>
+                  //                     const Gap(10),
+                  //                 itemBuilder: (context, index) =>
+                  //                     ListView.separated(
+                  //                         scrollDirection: Axis.horizontal,
+                  //                         // TODO: find a way to do lazy loading and remove shrinkWrap
+                  //                         shrinkWrap: true,
+                  //                         itemCount:
+                  //                             .length,
+                  //                         separatorBuilder: (context, index) =>
+                  //                             const Gap(15),
+                  //                         itemBuilder: (context, index) {
+                  //                           final product =
+                  //                               productCategory.productsAndQuantities.entries.elementAt(index);
+                  //                           return ProductGridTile(
+                  //                               product: product.key,
+                  //                               store: stores[2]);
+                  //                         }),
+                  //                 itemCount: 1,
+                  //               ),
+                  //             );
+                  //         })
+                  //         .toList(),
+                  //   ),
+                  // ),
                   HomeScreenTopic(callback: () {}, title: 'All Stores'),
                   ListView.separated(
                       physics: const NeverScrollableScrollPhysics(),
@@ -1024,7 +1029,9 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                             title: AppText(text: store.name),
                             contentPadding: EdgeInsets.zero,
                             trailing: Icon(
-                              store.isFavorite
+                              favoriteStores.any(
+                                (element) => element.id == store.id,
+                              )
                                   ? Icons.favorite
                                   : Icons.favorite_outline,
                               color: AppColors.neutral300,
@@ -1045,7 +1052,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                                             ? store.openingTime.hour -
                                                         timeOfDayNow.hour >
                                                     1
-                                                ? 'Available at ${AppFunctions.formatTime(store.openingTime)}'
+                                                ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
                                                 : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
                                             : '\$${store.delivery.fee} Delivery Fee',
                                         color: store.delivery.fee < 1

@@ -4,6 +4,7 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/send_gifts_screen.dart';
 
 import '../../../../main.dart';
+import '../../../../models/store/store_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/widgets.dart';
@@ -120,14 +121,37 @@ class _BrowseScreenState extends State<BrowseScreen> {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.horizontalPaddingSmall),
             child: NestedScrollView(
+              floatHeaderSlivers: true,
               headerSliverBuilder: (context, innerBoxIsScrolled) {
                 return [
-                  SliverAppBar(
-                    //TODO: change appbar 'surfaceTintColor' at the main screen level
-                    surfaceTintColor: Colors.white,
-                    pinned: true,
-                    floating: true,
-                    title: InkWell(
+                  // SliverAppBar(
+                  //   //TODO: change appbar 'surfaceTintColor' at the main screen level
+                  //   surfaceTintColor: Colors.white,
+                  //   pinned: true,
+                  //   floating: true,
+                  //   title: InkWell(
+                  //     onTap: () =>
+                  //         navigatorKey.currentState!.push(MaterialPageRoute(
+                  //       builder: (context) => SearchScreen(
+                  //         stores: stores,
+                  //       ),
+                  //     )),
+                  //     child: Ink(
+                  //       child: const AppTextFormField(
+                  //         enabled: false,
+                  //         hintText: 'Search Uber Eats',
+                  //         constraintWidth: 40,
+                  //         radius: 50,
+                  //         prefixIcon: Icon(
+                  //           Icons.search,
+                  //           color: Colors.black,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  SliverToBoxAdapter(
+                    child: InkWell(
                       onTap: () =>
                           navigatorKey.currentState!.push(MaterialPageRoute(
                         builder: (context) => SearchScreen(
@@ -138,10 +162,11 @@ class _BrowseScreenState extends State<BrowseScreen> {
                         child: const AppTextFormField(
                           enabled: false,
                           hintText: 'Search Uber Eats',
+                          constraintWidth: 40,
                           radius: 50,
-                          prefixIcon: Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Icon(Icons.search),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.black,
                           ),
                         ),
                       ),

@@ -33,48 +33,60 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
   void initState() {
     super.initState();
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
-      if (FirebaseAuth.instance
-          .isSignInWithEmailLink(dynamicLinkData.link.toString())) {
-        // The client SDK will parse the code from the link for you.
-        await FirebaseAuth.instance
-            .signInWithEmailLink(
-                email: Hive.box(AppBoxes.appState).get('email'),
-                emailLink: dynamicLinkData.link.toString())
-            .then((credential) async {
-          await Hive.box(AppBoxes.appState).delete('email');
-
-          await Hive.box(AppBoxes.appState).put('isVerifiedViaLink', true);
-          try {
-            final snapshot = await FirebaseFirestore.instance
-                .collection(FirestoreCollections.users)
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .get();
-
-            if (snapshot.exists &&
-                snapshot.data() != null &&
-                snapshot.data()!['onboarded'] == true) {
-              navigatorKey.currentState!.push(
-                  MaterialPageRoute(builder: (context) => const MainScreen()));
-            } else {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                  builder: (context) => const PhoneNumberScreen()));
-            }
-          } catch (e) {
-            showAppInfoDialog(context, description: e.toString());
-          }
-        }, onError: (error) {
-          if (mounted) {
-            showAppInfoDialog(context, description: error.toString());
-          }
-        });
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await user.reload();
+        if (user.emailVerified) {
+          await navigatorKey.currentState!.push(
+              MaterialPageRoute(builder: (context) => const NameScreen()));
+        } else {
+          await showAppInfoDialog(navigatorKey.currentContext!,
+              description:
+                  'Seems you used the wrong link to verify your email. Try again.');
+        }
       } else {
-        showAppInfoDialog(navigatorKey.currentContext!,
-            description:
-                'Seems the link in the email has not been acknowledged.');
+        if (FirebaseAuth.instance
+            .isSignInWithEmailLink(dynamicLinkData.link.toString())) {
+          // The client SDK will parse the code from the link for you.
+          await FirebaseAuth.instance
+              .signInWithEmailLink(
+                  email: widget.email,
+                  emailLink: dynamicLinkData.link.toString())
+              .then((credential) async {
+            try {
+              await Hive.box(AppBoxes.appState).delete(BoxKeys.email);
+
+              final snapshot = await FirebaseFirestore.instance
+                  .collection(FirestoreCollections.users)
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .get();
+              if (snapshot.exists &&
+                  snapshot.data() != null &&
+                  snapshot.data()!['onboarded'] == true) {
+                await navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) => const MainScreen()));
+              } else {
+                await navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) => const PhoneNumberScreen()));
+              }
+            } catch (e) {
+              if (mounted) {
+                await showAppInfoDialog(navigatorKey.currentContext!,
+                    description: e.toString());
+              }
+            }
+          }, onError: (error) {
+            if (mounted) {
+              showAppInfoDialog(navigatorKey.currentContext!,
+                  description: error.toString());
+            }
+          });
+        } else {
+          await showAppInfoDialog(navigatorKey.currentContext!,
+              description:
+                  'Seems the link in the email has not been acknowledged.');
+        }
       }
-    }).onError((error) {
-      showAppInfoDialog(navigatorKey.currentContext!,
-          description: error.toString());
     });
   }
 
@@ -152,10 +164,10 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                                   });
                                   showInfoToast(
                                       'Email has been resent. Please check your mail',
-                                      context: context);
+                                      context: navigatorKey.currentContext);
                                 },
                                         onError: (onError) => showAppInfoDialog(
-                                              context,
+                                              navigatorKey.currentContext!,
                                               title: 'Error sending email',
                                               description: '$onError',
                                             ));

@@ -10,6 +10,7 @@ import 'package:iconify_flutter/icons/ph.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../main.dart';
+import '../../../../models/store/store_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/other_constants.dart';
@@ -918,10 +919,11 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                                             onTap: () {},
                                             child: Ink(
                                               child: Icon(
-                                                store.isFavorite
+                                                favoriteStores.any((element) =>
+                                                        element.id == store.id)
                                                     ? Icons.favorite
                                                     : Icons.favorite_outline,
-                                                color: Colors.white,
+                                                color: AppColors.neutral300,
                                               ),
                                             ),
                                           ),
@@ -954,7 +956,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                                           )),
                                       AppText(
                                         text: isClosed
-                                            ? 'Closed • Available at ${AppFunctions.formatTime(store.openingTime)}'
+                                            ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
                                             : '\$${store.delivery.fee} Delivery Fee',
                                         // color: store.delivery.fee < 1
                                         //     ? const Color.fromARGB(

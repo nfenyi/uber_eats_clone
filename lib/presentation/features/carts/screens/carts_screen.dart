@@ -18,6 +18,10 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_meth
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 
 import '../../../../main.dart';
+import '../../../../models/order/order_model.dart';
+import '../../../../models/payment/payment_model.dart';
+import '../../../../models/payment_method_model.dart';
+import '../../../../models/promotion/promotion_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../home/home_screen.dart';
 
@@ -30,87 +34,83 @@ class CartsScreen extends ConsumerStatefulWidget {
 
 class _CartsScreenState extends ConsumerState<CartsScreen> {
   final List<IndividualOrder> _individualOrders = [
-    IndividualOrder(
-        orderNumber: '372932',
-        status: 'Completed',
-        totalFee: 58.6,
-        store: stores[6],
-        productsAndQuantities: {
-          stores[6].productCategories.first.products.first: 2,
-          stores[6].productCategories.first.products.last: 2,
-        },
-        deliveryDate: DateTime.now().add(const Duration(days: 1)),
-        tip: 0.5,
-        courier: 'Sally',
-        promo: Promotion(
-            discount: 3.5,
-            description: 'njanndfknald',
-            applicableLocation: '1226 University Dr',
-            expirationDate: DateTime.now().add(const Duration(days: 2))),
-        serviceFee: 2.4,
-        tax: 0.4,
-        caDriverBenefits: 0.2,
-        deliveryFee: 5,
-        membershipBenefit: 4.3,
-        payments: [
-          Payment(
-              datePaid: DateTime.now(),
-              cardNumber: '383934',
-              paymentMethod:
-                  PaymentMethod('Mastercard', AssetNames.masterCardLogo),
-              amountPaid: 50)
-        ])
+    // IndividualOrder(
+    //     orderNumber: '372932',
+    //     status: 'Completed',
+    //     totalFee: 58.6,
+    //     store: stores[2],
+    //     productsAndQuantities:
+    //         stores[2].productCategories.first.productsAndQuantities,
+    //     deliveryDate: DateTime.now().add(const Duration(days: 1)),
+    //     tip: 0.5,
+    //     courier: 'Sally',
+    //     promo: Promotion(
+    //         discount: 3.5,
+    //         description: 'njanndfknald',
+    //         applicableLocation: '1226 University Dr',
+    //         expirationDate: DateTime.now().add(const Duration(days: 2))),
+    //     serviceFee: 2.4,
+    //     tax: 0.4,
+    //     caDriverBenefits: 0.2,
+    //     deliveryFee: 5,
+    //     membershipBenefit: 4.3,
+    //     payments: [
+    //       Payment(
+    //           datePaid: DateTime.now(),
+    //           cardNumber: '383934',
+    //           paymentMethod: const PaymentMethod(
+    //               name: 'Mastercard', assetImage: AssetNames.masterCardLogo),
+    //           amountPaid: 50)
+    //     ])
   ];
 
   final List<GroupOrder> _groupOrders = [
-    GroupOrder(
-        repeat: 'Monthly',
-        name: 'Havanna unana',
-        createdBy: 'Nana',
-        location: '1226 University Dr',
-        stores: [
-          stores[6],
-          stores[7]
-        ],
-        orderSchedules: [
-          OrderSchedule(
-              orderNumber: '9240230',
-              status: 'Ongoing',
-              totalFee: 35,
-              deliveryDate: DateTime.now().add(const Duration(days: 1)),
-              store: stores[6],
-              orderItems: [
-                OrderItem(
-                  person: 'Nana',
-                  productsAndQuantities: {
-                    stores[6].productCategories.first.products.first: 2,
-                    stores[6].productCategories.first.products.last: 2,
-                  },
-                ),
-                OrderItem(
-                  person: 'Clement',
-                  productsAndQuantities: {
-                    stores[6].productCategories.first.products.last: 2,
-                  },
-                ),
-              ],
-              courier: 'Courier',
-              serviceFee: 0.00,
-              tax: 1,
-              deliveryFee: 0.00,
-              payments: [
-                Payment(
-                    datePaid: DateTime.now(),
-                    cardNumber: '555615616',
-                    paymentMethod: PaymentMethod('Venmo', AssetNames.venmoLogo),
-                    amountPaid: 69)
-              ]),
-        ],
-        persons: [
-          'Kwame',
-          'Nana',
-          'Mark'
-        ])
+    // GroupOrder(
+    //     repeat: 'Monthly',
+    //     name: 'Havanna unana',
+    //     createdBy: 'Nana',
+    //     location: '1226 University Dr',
+    //     stores: [
+    //       stores[2],
+    //       stores[7]
+    //     ],
+    //     orderSchedules: [
+    //       OrderSchedule(
+    //           orderNumber: '9240230',
+    //           status: 'Ongoing',
+    //           totalFee: 35,
+    //           deliveryDate: DateTime.now().add(const Duration(days: 1)),
+    //           store: stores[2],
+    //           orderItems: [
+    //             OrderItem(
+    //               person: 'Nana',
+    //               productsAndQuantities:
+    //                   stores[2].productCategories.first.productsAndQuantities,
+    //             ),
+    //             OrderItem(
+    //               person: 'Clement',
+    //               productsAndQuantities:
+    //                   stores[2].productCategories.first.productsAndQuantities,
+    //             ),
+    //           ],
+    //           courier: 'Courier',
+    //           serviceFee: 0.00,
+    //           tax: 1,
+    //           deliveryFee: 0.00,
+    //           payments: [
+    //             Payment(
+    //                 datePaid: DateTime.now(),
+    //                 cardNumber: '555615616',
+    //                 paymentMethod: const PaymentMethod(
+    //                     name: 'Venmo', assetImage: AssetNames.venmoLogo),
+    //                 amountPaid: 69)
+    //           ]),
+    //     ],
+    //     persons: [
+    //       'Kwame',
+    //       'Nana',
+    //       'Mark'
+    //     ])
   ];
 
   @override
@@ -283,9 +283,9 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                                           itemBuilder:
                                                               (context, index) {
                                                             final product = store
-                                                                .productCategories
+                                                                .productCategories!
                                                                 .first
-                                                                .products[index];
+                                                                .productsAndQuantities[index];
                                                             return ListTile(
                                                               trailing:
                                                                   Container(
@@ -338,23 +338,24 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                                               // contentPadding:
                                                               //     EdgeInsets
                                                               //         .zero,
-                                                              leading: SizedBox(
-                                                                width: 60,
-                                                                height: 60,
-                                                                child: CachedNetworkImage(
-                                                                    imageUrl: product
-                                                                        .imageUrls
-                                                                        .first),
-                                                              ),
-                                                              title: AppText(
-                                                                text: product
-                                                                    .name,
-                                                                weight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                size: AppSizes
-                                                                    .bodySmall,
-                                                              ),
+                                                              // leading: SizedBox(
+                                                              //   width: 60,
+                                                              //   height: 60,
+                                                              //   child: CachedNetworkImage(
+                                                              //       imageUrl: product[
+                                                              //               'imageUrls']
+                                                              //           .imageUrls
+                                                              //           .first),
+                                                              // ),
+                                                              // title: AppText(
+                                                              //   text: product
+                                                              //       .name,
+                                                              //   weight:
+                                                              //       FontWeight
+                                                              //           .w600,
+                                                              //   size: AppSizes
+                                                              //       .bodySmall,
+                                                              // ),
                                                               subtitle: Column(
                                                                 children: [
                                                                   const Row(
@@ -385,23 +386,23 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                                                       ),
                                                                     ],
                                                                   ),
-                                                                  if (product
-                                                                          .options !=
-                                                                      null)
-                                                                    const Row(
-                                                                      children: [
-                                                                        AppText(
-                                                                          text:
-                                                                              'nkanknasjn Comes With ',
-                                                                          weight:
-                                                                              FontWeight.w600,
-                                                                        ),
-                                                                        AppText(
-                                                                          text:
-                                                                              'Ice',
-                                                                        ),
-                                                                      ],
-                                                                    ),
+                                                                  // if (product
+                                                                  //         .options !=
+                                                                  //     null)
+                                                                  //   const Row(
+                                                                  //     children: [
+                                                                  //       AppText(
+                                                                  //         text:
+                                                                  //             'nkanknasjn Comes With ',
+                                                                  //         weight:
+                                                                  //             FontWeight.w600,
+                                                                  //       ),
+                                                                  //       AppText(
+                                                                  //         text:
+                                                                  //             'Ice',
+                                                                  //       ),
+                                                                  //     ],
+                                                                  //   ),
                                                                 ],
                                                               ),
                                                             );
@@ -411,9 +412,9 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                                                       index) =>
                                                                   const Gap(10),
                                                           itemCount: store
-                                                              .productCategories
+                                                              .productCategories!
                                                               .first
-                                                              .products
+                                                              .productsAndQuantities
                                                               .length),
                                                       const Gap(10),
                                                       Padding(

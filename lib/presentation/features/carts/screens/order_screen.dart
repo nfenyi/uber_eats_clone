@@ -9,9 +9,9 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/payment_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/receipt_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/what_delivery_people_see_screen.dart';
-import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 
 import '../../../../main.dart';
+import '../../../../models/order/order_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_text.dart';
 
@@ -67,7 +67,7 @@ class _OrderScreenState extends State<OrderScreen> {
             color: AppColors.neutral200,
             child: AppText(
                 text:
-                    'Opens at ${AppFunctions.formatTime(widget.order.store.openingTime)}'),
+                    'Opens at ${AppFunctions.formatDate(widget.order.store.openingTime.toString(), format: 'h:i A')}'),
           ),
           const Gap(10),
           Padding(
@@ -130,7 +130,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           child: AppText(text: item.value.toString()),
                         ),
                         const Gap(5),
-                        AppText(text: item.key.name)
+                        // AppText(text: item.key.name)
                       ],
                     );
                   },

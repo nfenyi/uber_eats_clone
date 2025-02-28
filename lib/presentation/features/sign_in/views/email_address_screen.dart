@@ -10,7 +10,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/name_screen.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
@@ -134,8 +133,8 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
                                             // minimumVersion
                                             androidMinimumVersion: '12'))
                                     .then((value) async {
-                                  // await Hive.box(AppBoxes.appState).put(
-                                  //     BoxKeys.email, _emailController.text);
+                                  await Hive.box(AppBoxes.appState).put(
+                                      BoxKeys.email, _emailController.text);
                                   await Hive.box(AppBoxes.appState).put(
                                       BoxKeys.addedEmailToPhoneNumber, true);
 

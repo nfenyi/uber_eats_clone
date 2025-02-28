@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
-import 'package:uber_eats_clone/presentation/features/group_order/order_deadline_screen.dart';
-import 'package:uber_eats_clone/presentation/features/group_order/payment_screen.dart';
-import 'package:uber_eats_clone/presentation/features/group_order/repeat_group_order_screen.dart';
 
+import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../../core/widgets.dart';
-import '../home/home_screen.dart';
 import 'group_order_name_screen.dart';
 
 class GroupOrderCompleteScreen extends ConsumerStatefulWidget {
@@ -58,8 +53,8 @@ class _GroupOrderCompleteScreenState
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
+          const Padding(
+            padding: EdgeInsets.symmetric(
                 horizontal: AppSizes.horizontalPaddingSmall),
             child: AppText(
                 text:

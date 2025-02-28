@@ -147,4 +147,5 @@ class AssetNames {
   static const masterCardLogo = 'assets/images/master_card_logo.jpg';
   static const fastFoodBNW = 'assets/images/fast_food_black_n_white.jpg';
   static String dataNPrivacy2 = 'assets/images/data_n_privacy2.jpg';
+  static const fallenIceCream = 'assets/images/fallen_ice_cream.jpg';
 }

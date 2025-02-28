@@ -154,8 +154,9 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                           validator: FormBuilderValidators.compose(
                               [FormBuilderValidators.required()]),
                           onChanged: (value) async {
-                            if (_debounce?.isActive ?? false)
+                            if (_debounce?.isActive ?? false) {
                               _debounce?.cancel();
+                            }
                             _debounce =
                                 Timer(const Duration(milliseconds: 500), () {
                               setState(() {});
@@ -176,8 +177,9 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                           validator: FormBuilderValidators.compose(
                               [FormBuilderValidators.required()]),
                           onChanged: (value) async {
-                            if (_debounce?.isActive ?? false)
+                            if (_debounce?.isActive ?? false) {
                               _debounce?.cancel();
+                            }
                             _debounce =
                                 Timer(const Duration(milliseconds: 500), () {
                               setState(() {});

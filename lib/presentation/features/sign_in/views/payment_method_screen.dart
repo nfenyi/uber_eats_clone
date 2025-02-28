@@ -7,6 +7,7 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/add_a_card/add_card.dart';
 
 import '../../../../main.dart';
+import '../../../../models/payment_method_model.dart';
 import '../../../constants/app_sizes.dart';
 import 'uber_one_screen.dart';
 
@@ -20,13 +21,17 @@ class PaymentMethodScreen extends ConsumerStatefulWidget {
 
 class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
   final List<PaymentMethod> _paymentMethods = [
-    PaymentMethod('Venmo', AssetNames.venmoLogo),
-    PaymentMethod('Credit or Debit', AssetNames.creditCard),
-    PaymentMethod('PayPal', AssetNames.paypal),
-    PaymentMethod('Gift Card', AssetNames.uberLogo),
-    PaymentMethod('Klarna', AssetNames.klarnaLogo),
-    PaymentMethod('S3 Health Benefits Card', AssetNames.s3HealthBenLogo),
-    PaymentMethod('CVS Pharmacy', AssetNames.cvsPharmLogo),
+    const PaymentMethod(name: 'Venmo', assetImage: AssetNames.venmoLogo),
+    const PaymentMethod(
+        name: 'Credit or Debit', assetImage: AssetNames.creditCard),
+    const PaymentMethod(name: 'PayPal', assetImage: AssetNames.paypal),
+    const PaymentMethod(name: 'Gift Card', assetImage: AssetNames.uberLogo),
+    const PaymentMethod(name: 'Klarna', assetImage: AssetNames.klarnaLogo),
+    const PaymentMethod(
+        name: 'S3 Health Benefits Card',
+        assetImage: AssetNames.s3HealthBenLogo),
+    const PaymentMethod(
+        name: 'CVS Pharmacy', assetImage: AssetNames.cvsPharmLogo),
   ];
 
   @override
@@ -81,7 +86,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
                       onTap: () {
                         if (paymentMethod.name == 'Credit or Debit') {
                           navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => AddCardScreen()));
+                              builder: (context) => const AddCardScreen()));
                         } else {
                           navigatorKey.currentState!.push(MaterialPageRoute(
                             builder: (context) => const UberOneScreen(),
@@ -106,12 +111,4 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
       ),
     );
   }
-}
-
-class PaymentMethod {
-  final String name;
-  final String assetImage;
-  final String? cardNumber;
-
-  PaymentMethod(this.name, this.assetImage, {this.cardNumber});
 }

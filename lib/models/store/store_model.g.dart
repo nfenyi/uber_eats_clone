@@ -1,0 +1,222 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'store_model.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
+      isUberOneShop: json['isUberOneShop'] as bool? ?? false,
+      location: Location.fromJson(json['location'] as Map<String, dynamic>),
+      id: json['id'] as String,
+      priceCategory: json['priceCategory'] as String,
+      isGroupFriendly: json['isGroupFriendly'] as bool,
+      type: json['type'] as String,
+      aisles: (json['aisles'] as List<dynamic>?)
+          ?.map((e) => Aisle.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      name: json['name'] as String,
+      logo: json['logo'] as String,
+      doesPickup: json['doesPickup'] as bool,
+      productCategories: (json['productCategories'] as List<dynamic>?)
+          ?.map((e) => ProductCategory.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      delivery: Delivery.fromJson(json['delivery'] as Map<String, dynamic>),
+      rating: Rating.fromJson(json['rating'] as Map<String, dynamic>),
+      cardImage: json['cardImage'] as String,
+      openingTime: DateTime.parse(json['openingTime'] as String),
+      closingTime: DateTime.parse(json['closingTime'] as String),
+    );
+
+Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
+    <String, dynamic>{
+      'isUberOneShop': instance.isUberOneShop,
+      'location': instance.location.toJson(),
+      'id': instance.id,
+      'priceCategory': instance.priceCategory,
+      'isGroupFriendly': instance.isGroupFriendly,
+      'type': instance.type,
+      'aisles': instance.aisles?.map((e) => e.toJson()).toList(),
+      'name': instance.name,
+      'logo': instance.logo,
+      'doesPickup': instance.doesPickup,
+      'productCategories':
+          instance.productCategories?.map((e) => e.toJson()).toList(),
+      'delivery': instance.delivery.toJson(),
+      'rating': instance.rating.toJson(),
+      'cardImage': instance.cardImage,
+      'openingTime': instance.openingTime.toIso8601String(),
+      'closingTime': instance.closingTime.toIso8601String(),
+    };
+
+_$AisleImpl _$$AisleImplFromJson(Map<String, dynamic> json) => _$AisleImpl(
+      name: json['name'] as String,
+      productCategories: (json['productCategories'] as List<dynamic>)
+          .map((e) => ProductCategory.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$AisleImplToJson(_$AisleImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'productCategories':
+          instance.productCategories.map((e) => e.toJson()).toList(),
+    };
+
+_$RatingImpl _$$RatingImplFromJson(Map<String, dynamic> json) => _$RatingImpl(
+      averageRating: (json['averageRating'] as num).toDouble(),
+      ratings: (json['ratings'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$$RatingImplToJson(_$RatingImpl instance) =>
+    <String, dynamic>{
+      'averageRating': instance.averageRating,
+      'ratings': instance.ratings,
+    };
+
+_$LocationImpl _$$LocationImplFromJson(Map<String, dynamic> json) =>
+    _$LocationImpl(
+      countryOfOrigin: json['countryOfOrigin'] as String,
+      streetAddress: json['streetAddress'] as String,
+    );
+
+Map<String, dynamic> _$$LocationImplToJson(_$LocationImpl instance) =>
+    <String, dynamic>{
+      'countryOfOrigin': instance.countryOfOrigin,
+      'streetAddress': instance.streetAddress,
+    };
+
+_$ProductCategoryImpl _$$ProductCategoryImplFromJson(
+        Map<String, dynamic> json) =>
+    _$ProductCategoryImpl(
+      name: json['name'] as String,
+      products: (json['products'] as List<dynamic>?)
+          ?.map((e) => e as Object)
+          .toList(),
+      productsAndQuantities: (json['productsAndQuantities'] as List<dynamic>)
+          .map((e) => e as Map<String, dynamic>)
+          .toList(),
+    );
+
+Map<String, dynamic> _$$ProductCategoryImplToJson(
+        _$ProductCategoryImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'products': instance.products,
+      'productsAndQuantities': instance.productsAndQuantities,
+    };
+
+_$DeliveryImpl _$$DeliveryImplFromJson(Map<String, dynamic> json) =>
+    _$DeliveryImpl(
+      canDeliver: json['canDeliver'] as bool,
+      estimatedDeliveryTime: json['estimatedDeliveryTime'] as String,
+      fee: (json['fee'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$$DeliveryImplToJson(_$DeliveryImpl instance) =>
+    <String, dynamic>{
+      'canDeliver': instance.canDeliver,
+      'estimatedDeliveryTime': instance.estimatedDeliveryTime,
+      'fee': instance.fee,
+    };
+
+_$ProductImpl _$$ProductImplFromJson(Map<String, dynamic> json) =>
+    _$ProductImpl(
+      name: json['name'] as String,
+      id: json['id'] as String,
+      initialPrice: (json['initialPrice'] as num).toDouble(),
+      promoPrice: (json['promoPrice'] as num?)?.toDouble(),
+      imageUrls:
+          (json['imageUrls'] as List<dynamic>).map((e) => e as String).toList(),
+      frequentlyBoughtTogether:
+          (json['frequentlyBoughtTogether'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList(),
+      nutritionFacts: (json['nutritionFacts'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
+      ingredients: json['ingredients'] as String?,
+      directions: json['directions'] as String?,
+      quantity: json['quantity'] as String?,
+      description: json['description'] as String?,
+      options: (json['options'] as List<dynamic>?)
+          ?.map((e) => Option.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      selectOptionRequired: json['selectOptionRequired'] as bool? ?? false,
+      calories: (json['calories'] as num?)?.toDouble(),
+      isSoldOut: json['isSoldOut'] as bool?,
+      isSponsored: json['isSponsored'] as bool?,
+      noInStock: (json['noInStock'] as num?)?.toInt(),
+      similarProducts: (json['similarProducts'] as List<dynamic>?)
+          ?.map((e) => Product.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$$ProductImplToJson(_$ProductImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'id': instance.id,
+      'initialPrice': instance.initialPrice,
+      'promoPrice': instance.promoPrice,
+      'imageUrls': instance.imageUrls,
+      'frequentlyBoughtTogether': instance.frequentlyBoughtTogether,
+      'nutritionFacts': instance.nutritionFacts,
+      'ingredients': instance.ingredients,
+      'directions': instance.directions,
+      'quantity': instance.quantity,
+      'description': instance.description,
+      'options': instance.options?.map((e) => e.toJson()).toList(),
+      'selectOptionRequired': instance.selectOptionRequired,
+      'calories': instance.calories,
+      'isSoldOut': instance.isSoldOut,
+      'isSponsored': instance.isSponsored,
+      'noInStock': instance.noInStock,
+      'similarProducts':
+          instance.similarProducts?.map((e) => e.toJson()).toList(),
+    };
+
+_$OptionImpl _$$OptionImplFromJson(Map<String, dynamic> json) => _$OptionImpl(
+      name: json['name'] as String,
+      price: (json['price'] as num?)?.toDouble(),
+      isExclusive: json['isExclusive'] as bool? ?? true,
+      subOptions: (json['subOptions'] as List<dynamic>?)
+          ?.map((e) => SubOption.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      calories: (json['calories'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$$OptionImplToJson(_$OptionImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'price': instance.price,
+      'isExclusive': instance.isExclusive,
+      'subOptions': instance.subOptions?.map((e) => e.toJson()).toList(),
+      'calories': instance.calories,
+    };
+
+_$SubOptionImpl _$$SubOptionImplFromJson(Map<String, dynamic> json) =>
+    _$SubOptionImpl(
+      name: json['name'] as String,
+      canBeMultiple: json['canBeMultiple'] as bool,
+      price: (json['price'] as num?)?.toDouble(),
+    );
+
+Map<String, dynamic> _$$SubOptionImplToJson(_$SubOptionImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'canBeMultiple': instance.canBeMultiple,
+      'price': instance.price,
+    };
+
+_$FoodCategoryImpl _$$FoodCategoryImplFromJson(Map<String, dynamic> json) =>
+    _$FoodCategoryImpl(
+      json['name'] as String,
+      json['image'] as String,
+    );
+
+Map<String, dynamic> _$$FoodCategoryImplToJson(_$FoodCategoryImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'image': instance.image,
+    };

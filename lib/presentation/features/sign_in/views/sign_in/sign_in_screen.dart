@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:country_flags/country_flags.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -26,6 +29,7 @@ import '../../../../core/app_colors.dart';
 import '../../../../services/sign_in_view_model.dart';
 import '../../../main_screen/screens/main_screen.dart';
 import '../email_address_screen.dart';
+import '../email_sent_screen.dart';
 import '../phone_number_screen.dart';
 import 'sign_in_provider.dart';
 
@@ -404,17 +408,193 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               ),
               const Gap(10),
               AppButton(
-                buttonColor: Colors.transparent,
-                iconFirst: true,
-                icon: const Icon(Icons.search),
-                isSecondary: true,
-                text: 'Find my account',
-                callback: () async {
-                  final holder =
-                      await FirebaseDynamicLinks.instance.getInitialLink();
-                  logger.d(holder?.link);
-                },
-              ),
+                  buttonColor: Colors.transparent,
+                  iconFirst: true,
+                  icon: const Icon(Icons.search),
+                  isSecondary: true,
+                  text: 'Find my account',
+                  callback: () async {
+                    FirebaseDynamicLinks.instance.onLink
+                        .listen((dynamicLinkData) async {
+                      if (FirebaseAuth.instance.isSignInWithEmailLink(
+                          dynamicLinkData.link.toString())) {
+                        logger.d(FirebaseAuth.instance.isSignInWithEmailLink(
+                            dynamicLinkData.link.toString()));
+                        logger.d(Hive.box(AppBoxes.appState).get('email'));
+                        // The client SDK will parse the code from the link for you.
+                        await FirebaseAuth.instance
+                            .signInWithEmailLink(
+                                email: Hive.box(AppBoxes.appState).get('email'),
+                                emailLink: dynamicLinkData.link.toString())
+                            .then((credential) async {
+                          await Hive.box(AppBoxes.appState).delete('email');
+
+                          await Hive.box(AppBoxes.appState)
+                              .put('isVerifiedViaLink', true);
+                          // try {
+                          //   final snapshot = await FirebaseFirestore.instance
+                          //       .collection(FirestoreCollections.users)
+                          //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                          //       .get();
+
+                          //   if (snapshot.exists &&
+                          //       snapshot.data() != null &&
+                          //       snapshot.data()!['onboarded'] == true) {
+                          //     navigatorKey.currentState!.push(
+                          //         MaterialPageRoute(builder: (context) => const MainScreen()));
+                          //   } else {
+                          //     if (Hive.box(AppBoxes.appState)
+                          //         .get(BoxKeys.addedEmailToPhoneNumber)) {
+                          //       navigatorKey.currentState!.push(MaterialPageRoute(
+                          //           builder: (context) => const NameScreen()));
+                          //     } else {
+                          //       navigatorKey.currentState!.push(MaterialPageRoute(
+                          //           builder: (context) => const PhoneNumberScreen()));
+                          //     }
+                          //   }
+                          // } catch (e) {
+                          //   showAppInfoDialog(context, description: e.toString());
+                          // }
+                        }, onError: (error) {
+                          if (mounted) {
+                            showAppInfoDialog(context,
+                                description: error.toString());
+                          }
+                        });
+                      } else {
+                        showAppInfoDialog(navigatorKey.currentContext!,
+                            description:
+                                'Seems the link in the email has not been acknowledged.');
+                      }
+                    }).onError((error) {
+                      showAppInfoDialog(navigatorKey.currentContext!,
+                          description: error.toString());
+                    });
+                  }
+
+                  //  {
+                  //   late String deviceId;
+                  //   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+                  //   if (Platform.isAndroid) {
+                  //     AndroidDeviceInfo androidInfo =
+                  //         await deviceInfo.androidInfo;
+                  //     deviceId = androidInfo.id;
+                  //     // Unique ID on Android (may not persist across factory resets)
+                  //     // Other potentially useful properties on AndroidDeviceInfo:
+                  //     // androidInfo.androidId; // More likely to persist, but not guaranteed
+                  //     // androidInfo.imei;       // International Mobile Equipment Identity (if available) - requires permissions
+                  //     // androidInfo.meid;       // Mobile Equipment Identifier (if available) - requires permissions
+                  //   } else if (Platform.isIOS) {
+                  //     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+                  //     deviceId = iosInfo
+                  //         .identifierForVendor!; // A unique ID for the *vendor* (your app developer), persists across app reinstalls, but changes if all apps by the vendor are uninstalled.
+                  //     // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
+                  //   }
+
+                  //   final contacts = await FirebaseFirestore.instance
+                  //       .collection(FirestoreCollections.devices)
+                  //       .doc(deviceId)
+                  //       .get();
+                  //   if (contacts.exists && contacts.data() != null) {
+                  //     if (contacts['phoneNumber'] != null) {
+                  //       await FirebaseAuth.instance.verifyPhoneNumber(
+                  //         phoneNumber:
+                  //             '${_selectedCountry!.dialCode}${_phoneNumberController.text.trim()}',
+                  //         verificationCompleted:
+                  //             (PhoneAuthCredential credential) async {
+                  //           await FirebaseAuth.instance
+                  //               .signInWithCredential(credential);
+                  //           final snapshot = await FirebaseFirestore.instance
+                  //               .collection(FirestoreCollections.users)
+                  //               .doc(FirebaseAuth.instance.currentUser!.uid)
+                  //               .get();
+
+                  //           if (snapshot.exists &&
+                  //               snapshot.data() != null &&
+                  //               snapshot.data()!['onboarded'] == true) {
+                  //             navigatorKey.currentState!.push(MaterialPageRoute(
+                  //               builder: (context) => const MainScreen(),
+                  //             ));
+                  //           } else {
+                  //             navigatorKey.currentState!.push(MaterialPageRoute(
+                  //               builder: (context) => const EmailAddressScreen(),
+                  //             ));
+                  //           }
+                  //         },
+                  //         // autoRetrievedSmsCodeForTesting: '',
+                  //         verificationFailed: (FirebaseAuthException e) {
+                  //           showAppInfoDialog(
+                  //             context,
+                  //             description: '${e.code}${e.code}',
+                  //           );
+                  //           setState(() {
+                  //             _isLoading = false;
+                  //           });
+                  //         },
+                  //         codeSent: (String verificationId, int? resendToken) {
+                  //           navigatorKey.currentState!.push(MaterialPageRoute(
+                  //             builder: (context) => VerifyPhoneNumber(
+                  //               verificationId: verificationId,
+                  //               phoneNumber:
+                  //                   '${_selectedCountry?.dialCode}${_phoneNumberController.text}',
+                  //             ),
+                  //           ));
+                  //         },
+                  //         timeout: const Duration(minutes: 2),
+                  //         codeAutoRetrievalTimeout: (String verificationId) {},
+                  //       );
+                  //     } else if (contacts['email'] != null) {
+                  //       await FirebaseAuth.instance.currentUser!
+                  //           .verifyBeforeUpdateEmail(
+                  //               contacts['email'],
+                  //               ActionCodeSettings(
+                  //                   // URL you want to redirect back to. The domain (www.example.com) for this
+                  //                   // URL must be whitelisted in the Firebase Console.
+                  //                   url:
+                  //                       'https://ubereatsclone.page.link/email-verification-link',
+                  //                   // This must be true
+                  //                   handleCodeInApp: true,
+                  //                   iOSBundleId: 'com.example.uberEatsClone',
+                  //                   androidPackageName:
+                  //                       'com.example.uber_eats_clone',
+                  //                   // installIfNotAvailable
+                  //                   androidInstallApp: true,
+                  //                   // minimumVersion
+                  //                   androidMinimumVersion: '12'))
+                  //           .then((value) async {
+                  //         // await Hive.box(AppBoxes.appState).put(
+                  //         //     BoxKeys.email, _emailController.text);
+                  //         await Hive.box(AppBoxes.appState)
+                  //             .put(BoxKeys.addedEmailToPhoneNumber, true);
+
+                  //         navigatorKey.currentState!.push(MaterialPageRoute(
+                  //           builder: (context) => EmailSentScreen(
+                  //             email: contacts['email'],
+                  //           ),
+                  //         ));
+                  //       }, onError: (e) {
+                  //         if (e is FirebaseAuthException) {
+                  //           return showAppInfoDialog(
+                  //               title: 'Error sending email verification:',
+                  //               description: '${e.message}',
+                  //               context);
+                  //         } else {
+                  //           return showAppInfoDialog(
+                  //               title: 'Error sending email verification:',
+                  //               description: '$e',
+                  //               context);
+                  //         }
+                  //       });
+                  //     }
+                  //   } else {
+                  //     showInfoToast(
+                  //         'You don\'t seem to have a contact with us yet.',
+                  //         context: context);
+                  //   }
+                  // },
+
+                  ),
               const Gap(15),
               const AppText(
                   color: Colors.grey,

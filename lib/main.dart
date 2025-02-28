@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -13,11 +14,13 @@ import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
 
 import 'hive_models/country/country_ip_model.dart';
+import 'presentation/constants/app_sizes.dart';
 import 'presentation/features/main_screen/screens/main_screen.dart';
 import 'presentation/features/sign_in/views/get_started/get_started_screen.dart';
 import 'presentation/features/sign_in/views/name_screen.dart';
 import 'presentation/features/sign_in/views/phone_number_screen.dart';
 import 'presentation/features/sign_in/views/sign_in/sign_in_screen.dart';
+import 'presentation/services/sign_in_view_model.dart';
 
 final Logger logger = Logger();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -34,24 +37,45 @@ void main() async {
       await FirebaseDynamicLinks.instance.getInitialLink();
 
   if (initialLink != null) {
-    if (FirebaseAuth.instance
-        .isSignInWithEmailLink(initialLink.link.toString())) {
-      // final Uri deepLink = initialLink.link;
-      // // Example of using the dynamic link to push the user to a different screen
-      // Navigator.pushNamed(context, deepLink.path);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.reload();
+      if (user.emailVerified) {
+        await Hive.box(AppBoxes.appState)
+            .put(BoxKeys.addedEmailToPhoneNumber, true);
+      }
+    } else {
+      if (FirebaseAuth.instance
+          .isSignInWithEmailLink(initialLink.link.toString())) {
+        // The client SDK will parse the code from the link for you.
+        await FirebaseAuth.instance
+            .signInWithEmailLink(
+                email: Hive.box(AppBoxes.appState).get(BoxKeys.email),
+                emailLink: initialLink.link.toString())
+            .then((credential) async {
+          try {
+            await Hive.box(AppBoxes.appState).delete(BoxKeys.email);
 
-      await FirebaseAuth.instance
-          .signInWithEmailLink(
-              email: Hive.box(AppBoxes.appState).get('email'),
-              emailLink: initialLink.link.toString())
-          .then(
-        onError: (error, stackTrace) {
+            final snapshot = await FirebaseFirestore.instance
+                .collection(FirestoreCollections.users)
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .get();
+            if (snapshot.exists &&
+                snapshot.data() != null &&
+                snapshot.data()!['onboarded'] == true) {
+              await Hive.box(AppBoxes.appState)
+                  .put(BoxKeys.authenticated, true);
+            } else {
+              await Hive.box(AppBoxes.appState)
+                  .put(BoxKeys.signedInWithEmail, true);
+            }
+          } catch (e) {
+            logger.d(e.toString());
+          }
+        }, onError: (error) {
           logger.d(error.toString());
-        },
-        (credential) async {
-          await Hive.box(AppBoxes.appState).put('isVerifiedViaLink', true);
-        },
-      );
+        });
+      }
     }
   }
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -86,7 +110,7 @@ Future<void> registerHiveAdpapters() async {
 
 Future<void> openBoxes() async {
   await Hive.openBox(AppBoxes.appState);
-  // await Hive.openBox<AppUser>(AppBoxes.users);
+  await Hive.openBox<String>(AppBoxes.recentSearches);
   // await Hive.openBox<Account>(AppBoxes.accounts);
   // await Hive.openBox<Budget>(AppBoxes.budgets);
   // await Hive.openBox<AppNotification>(AppBoxes.notifications);
@@ -155,6 +179,11 @@ class UberEatsClone extends StatelessWidget {
             fillColor: WidgetStateProperty.all(Colors.black),
           ),
           tabBarTheme: const TabBarTheme(
+            indicatorColor: Colors.black,
+            labelPadding: EdgeInsets.symmetric(
+                horizontal: AppSizes.horizontalPadding, vertical: 8),
+            dividerColor: AppColors.neutral500,
+            dividerHeight: 30,
             labelColor: Colors.black,
             tabAlignment: TabAlignment.start,
           ),
@@ -206,18 +235,14 @@ class Wrapper extends ConsumerWidget {
           if (showGetStarted) {
             return const GetStartedScreen();
           }
-          if (Hive.box(AppBoxes.appState).get('isVerifiedViaLink') == true) {
-            if (Hive.box(AppBoxes.appState)
-                    .get(BoxKeys.addedEmailToPhoneNumber) ==
-                true) {
-              return const NameScreen();
-              //was testing:
-              // return const EmailAddressScreen();
-            }
-            //if signed in with email initially
+          if (Hive.box(AppBoxes.appState).get(BoxKeys.signedInWithEmail) ==
+              true) {
             return const PhoneNumberScreen();
-            // //was testing:
-            // return const AddCardScreen();
+          }
+          if (Hive.box(AppBoxes.appState)
+                  .get(BoxKeys.addedEmailToPhoneNumber) ==
+              true) {
+            return const NameScreen();
           }
 
           if (Hive.box(AppBoxes.appState).get(BoxKeys.addressDetailsSaved) ==
@@ -239,10 +264,11 @@ class Wrapper extends ConsumerWidget {
 
 class AppBoxes {
   static const String appState = 'app_state';
+  static const String recentSearches = 'recent_searches';
 }
 
 class BoxKeys {
-  static const String isVerifiedViaLink = 'isVerifiedViaLink';
+  static const String signedInWithEmail = 'signedInWithEmail';
   static const String addedEmailToPhoneNumber = 'addedEmailToPhoneNumber';
   static const String authenticated = 'authenticated';
   static const String addressDetailsSaved = 'addressDetailsSaved';

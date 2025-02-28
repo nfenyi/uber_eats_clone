@@ -7,9 +7,9 @@ import 'package:iconify_flutter/icons/ph.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 
 import '../../../../main.dart';
+import '../../../../models/order/order_model.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 
@@ -210,90 +210,91 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                   ),
                 ),
                 const Divider(),
-                ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: widget.order.productsAndQuantities.length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    final productNQuantity = widget
-                        .order.productsAndQuantities.entries
-                        .elementAt(index);
-                    subtotal += (productNQuantity.key.promoPrice ??
-                            productNQuantity.key.initialPrice) *
-                        productNQuantity.value;
-                    logger.d(subtotal);
-                    // logger.d(productNQuantity.key.initialPrice);
-                    return ListTile(
-                      // dense: true,
-                      subtitle: productNQuantity.key.options != null
-                          ? Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  itemBuilder: (context, index) {
-                                    final option =
-                                        productNQuantity.key.options![index];
-                                    if (option.price != null) {
-                                      subtotal += option.price!;
-                                      logger.d(subtotal);
-                                    }
-                                    if (option.subOptions?.first.price !=
-                                        null) {
-                                      subtotal +=
-                                          option.subOptions!.first.price!;
-                                      logger.d(subtotal);
-                                    }
-                                    return Column(
-                                      children: [
-                                        const AppText(text: 'Select Option'),
-                                        AppText(
-                                          text:
-                                              '${option.name} US\$${option.price ?? 0.00}',
-                                          color: AppColors.neutral500,
-                                        ),
-                                        if (option.subOptions != null)
-                                          AppText(
-                                            text: '${option.name} Comes With',
-                                          ),
-                                        AppText(
-                                          text:
-                                              '${option.subOptions!.first.name} US\$${option.subOptions?.first.price ?? 0.00}',
-                                          color: AppColors.neutral500,
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                  itemCount:
-                                      productNQuantity.key.options!.length,
-                                )
-                              ],
-                            )
-                          : null,
-                      leading: Container(
-                        padding: const EdgeInsets.all(5),
-                        color: AppColors.neutral100,
-                        child: AppText(text: productNQuantity.value.toString()),
-                      ),
-                      title: AppText(
-                        text: productNQuantity.key.name,
-                        weight: FontWeight.w600,
-                        size: AppSizes.bodySmaller,
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AppText(
-                              color: AppColors.neutral600,
-                              text:
-                                  'US\$${((productNQuantity.key.promoPrice ?? productNQuantity.key.initialPrice) * productNQuantity.value).toStringAsFixed(2)}'),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                // ListView.builder(
+                //   padding: EdgeInsets.zero,
+                //   itemCount: widget.order.productsAndQuantities.length,
+                //   physics: const NeverScrollableScrollPhysics(),
+                //   shrinkWrap: true,
+                //   itemBuilder: (context, index) {
+                //     final productNQuantity = widget
+                //         .order.productsAndQuantities.entries
+                //         .elementAt(index);
+                //     subtotal += (productNQuantity.key.promoPrice ??
+                //             productNQuantity.key.initialPrice) *
+                //         productNQuantity.value;
+                //     logger.d(subtotal);
+                //     // logger.d(productNQuantity.key.initialPrice);
+                //     return ListTile(
+                //       // dense: true,
+                //       subtitle: productNQuantity.key.options != null
+                //           ? Column(
+                //               mainAxisSize: MainAxisSize.min,
+                //               children: [
+                //                 ListView.builder(
+                //                   padding: EdgeInsets.zero,
+                //                   itemBuilder: (context, index) {
+                //                     final option =
+                //                         productNQuantity.key.options![index];
+                //                     if (option.price != null) {
+                //                       subtotal += option.price!;
+                //                       logger.d(subtotal);
+                //                     }
+                //                     if (option.subOptions?.first.price !=
+                //                         null) {
+                //                       subtotal +=
+                //                           option.subOptions!.first.price!;
+                //                       logger.d(subtotal);
+                //                     }
+                //                     return Column(
+                //                       children: [
+                //                         const AppText(text: 'Select Option'),
+                //                         AppText(
+                //                           text:
+                //                               '${option.name} US\$${option.price ?? 0.00}',
+                //                           color: AppColors.neutral500,
+                //                         ),
+                //                         if (option.subOptions != null)
+                //                           AppText(
+                //                             text: '${option.name} Comes With',
+                //                           ),
+                //                         AppText(
+                //                           text:
+                //                               '${option.subOptions!.first.name} US\$${option.subOptions?.first.price ?? 0.00}',
+                //                           color: AppColors.neutral500,
+                //                         ),
+                //                       ],
+                //                     );
+                //                   },
+                //                   itemCount:
+                //                       productNQuantity.key.options!.length,
+                //                 )
+                //               ],
+                //             )
+                //           : null,
+                //       leading: Container(
+                //         padding: const EdgeInsets.all(5),
+                //         color: AppColors.neutral100,
+                //         child: AppText(text: productNQuantity.value.toString()),
+                //       ),
+                //       title: AppText(
+                //         text: productNQuantity.key.name,
+                //         weight: FontWeight.w600,
+                //         size: AppSizes.bodySmaller,
+                //       ),
+                //       trailing: Column(
+                //         mainAxisAlignment: MainAxisAlignment.start,
+                //         mainAxisSize: MainAxisSize.min,
+                //         children: [
+                //           AppText(
+                //               color: AppColors.neutral600,
+                //               text:
+                //                   'US\$${((productNQuantity.key.promoPrice ?? productNQuantity.key.initialPrice) * productNQuantity.value).toStringAsFixed(2)}'),
+                //         ],
+                //       ),
+                //     );
+                //   },
+                // ),
+
                 const Divider(),
                 const Gap(10),
                 Padding(
