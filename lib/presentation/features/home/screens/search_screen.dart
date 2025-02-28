@@ -54,7 +54,7 @@ class _SearchScreenState extends State<SearchScreen>
     }
     if (_selectedFilters.contains('Offers')) {
       filteredSearchedStores = filteredSearchedStores.where(
-        (store) => store.offers.isNotEmpty,
+        (store) => store.offers != null && store.offers!.isNotEmpty,
       );
     }
     if (_selectedFilters.contains('Delivery fee')) {
