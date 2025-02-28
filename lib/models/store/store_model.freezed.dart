@@ -26,6 +26,7 @@ mixin _$Store {
   String get priceCategory => throw _privateConstructorUsedError;
   bool get isGroupFriendly => throw _privateConstructorUsedError;
   String get type => throw _privateConstructorUsedError;
+  List<Offer>? get offers => throw _privateConstructorUsedError;
   List<Aisle>? get aisles => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get logo => throw _privateConstructorUsedError;
@@ -60,6 +61,7 @@ abstract class $StoreCopyWith<$Res> {
       String priceCategory,
       bool isGroupFriendly,
       String type,
+      List<Offer>? offers,
       List<Aisle>? aisles,
       String name,
       String logo,
@@ -97,6 +99,7 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
     Object? priceCategory = null,
     Object? isGroupFriendly = null,
     Object? type = null,
+    Object? offers = freezed,
     Object? aisles = freezed,
     Object? name = null,
     Object? logo = null,
@@ -133,6 +136,10 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
+      offers: freezed == offers
+          ? _value.offers
+          : offers // ignore: cast_nullable_to_non_nullable
+              as List<Offer>?,
       aisles: freezed == aisles
           ? _value.aisles
           : aisles // ignore: cast_nullable_to_non_nullable
@@ -221,6 +228,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       String priceCategory,
       bool isGroupFriendly,
       String type,
+      List<Offer>? offers,
       List<Aisle>? aisles,
       String name,
       String logo,
@@ -259,6 +267,7 @@ class __$$StoreImplCopyWithImpl<$Res>
     Object? priceCategory = null,
     Object? isGroupFriendly = null,
     Object? type = null,
+    Object? offers = freezed,
     Object? aisles = freezed,
     Object? name = null,
     Object? logo = null,
@@ -295,6 +304,10 @@ class __$$StoreImplCopyWithImpl<$Res>
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
+      offers: freezed == offers
+          ? _value._offers
+          : offers // ignore: cast_nullable_to_non_nullable
+              as List<Offer>?,
       aisles: freezed == aisles
           ? _value._aisles
           : aisles // ignore: cast_nullable_to_non_nullable
@@ -349,6 +362,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       required this.priceCategory,
       required this.isGroupFriendly,
       required this.type,
+      final List<Offer>? offers,
       final List<Aisle>? aisles,
       required this.name,
       required this.logo,
@@ -359,7 +373,8 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       required this.cardImage,
       required this.openingTime,
       required this.closingTime})
-      : _aisles = aisles,
+      : _offers = offers,
+        _aisles = aisles,
         _productCategories = productCategories;
 
   factory _$StoreImpl.fromJson(Map<String, dynamic> json) =>
@@ -378,6 +393,16 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   final bool isGroupFriendly;
   @override
   final String type;
+  final List<Offer>? _offers;
+  @override
+  List<Offer>? get offers {
+    final value = _offers;
+    if (value == null) return null;
+    if (_offers is EqualUnmodifiableListView) return _offers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   final List<Aisle>? _aisles;
   @override
   List<Aisle>? get aisles {
@@ -419,7 +444,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, priceCategory: $priceCategory, isGroupFriendly: $isGroupFriendly, type: $type, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, openingTime: $openingTime, closingTime: $closingTime)';
+    return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, priceCategory: $priceCategory, isGroupFriendly: $isGroupFriendly, type: $type, offers: $offers, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, openingTime: $openingTime, closingTime: $closingTime)';
   }
 
   @override
@@ -433,6 +458,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       ..add(DiagnosticsProperty('priceCategory', priceCategory))
       ..add(DiagnosticsProperty('isGroupFriendly', isGroupFriendly))
       ..add(DiagnosticsProperty('type', type))
+      ..add(DiagnosticsProperty('offers', offers))
       ..add(DiagnosticsProperty('aisles', aisles))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('logo', logo))
@@ -460,6 +486,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
             (identical(other.isGroupFriendly, isGroupFriendly) ||
                 other.isGroupFriendly == isGroupFriendly) &&
             (identical(other.type, type) || other.type == type) &&
+            const DeepCollectionEquality().equals(other._offers, _offers) &&
             const DeepCollectionEquality().equals(other._aisles, _aisles) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.logo, logo) || other.logo == logo) &&
@@ -488,6 +515,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       priceCategory,
       isGroupFriendly,
       type,
+      const DeepCollectionEquality().hash(_offers),
       const DeepCollectionEquality().hash(_aisles),
       name,
       logo,
@@ -523,6 +551,7 @@ abstract class _Store implements Store {
       required final String priceCategory,
       required final bool isGroupFriendly,
       required final String type,
+      final List<Offer>? offers,
       final List<Aisle>? aisles,
       required final String name,
       required final String logo,
@@ -548,6 +577,8 @@ abstract class _Store implements Store {
   bool get isGroupFriendly;
   @override
   String get type;
+  @override
+  List<Offer>? get offers;
   @override
   List<Aisle>? get aisles;
   @override
@@ -1117,8 +1148,8 @@ ProductCategory _$ProductCategoryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ProductCategory {
-  String get name => throw _privateConstructorUsedError;
-  List<Object>? get products => throw _privateConstructorUsedError;
+  String get name =>
+      throw _privateConstructorUsedError; // List<Object>? products,
   List<Map<String, dynamic>> get productsAndQuantities =>
       throw _privateConstructorUsedError;
 
@@ -1138,10 +1169,7 @@ abstract class $ProductCategoryCopyWith<$Res> {
           ProductCategory value, $Res Function(ProductCategory) then) =
       _$ProductCategoryCopyWithImpl<$Res, ProductCategory>;
   @useResult
-  $Res call(
-      {String name,
-      List<Object>? products,
-      List<Map<String, dynamic>> productsAndQuantities});
+  $Res call({String name, List<Map<String, dynamic>> productsAndQuantities});
 }
 
 /// @nodoc
@@ -1160,7 +1188,6 @@ class _$ProductCategoryCopyWithImpl<$Res, $Val extends ProductCategory>
   @override
   $Res call({
     Object? name = null,
-    Object? products = freezed,
     Object? productsAndQuantities = null,
   }) {
     return _then(_value.copyWith(
@@ -1168,10 +1195,6 @@ class _$ProductCategoryCopyWithImpl<$Res, $Val extends ProductCategory>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      products: freezed == products
-          ? _value.products
-          : products // ignore: cast_nullable_to_non_nullable
-              as List<Object>?,
       productsAndQuantities: null == productsAndQuantities
           ? _value.productsAndQuantities
           : productsAndQuantities // ignore: cast_nullable_to_non_nullable
@@ -1188,10 +1211,7 @@ abstract class _$$ProductCategoryImplCopyWith<$Res>
       __$$ProductCategoryImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String name,
-      List<Object>? products,
-      List<Map<String, dynamic>> productsAndQuantities});
+  $Res call({String name, List<Map<String, dynamic>> productsAndQuantities});
 }
 
 /// @nodoc
@@ -1208,7 +1228,6 @@ class __$$ProductCategoryImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = null,
-    Object? products = freezed,
     Object? productsAndQuantities = null,
   }) {
     return _then(_$ProductCategoryImpl(
@@ -1216,10 +1235,6 @@ class __$$ProductCategoryImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      products: freezed == products
-          ? _value._products
-          : products // ignore: cast_nullable_to_non_nullable
-              as List<Object>?,
       productsAndQuantities: null == productsAndQuantities
           ? _value._productsAndQuantities
           : productsAndQuantities // ignore: cast_nullable_to_non_nullable
@@ -1235,27 +1250,17 @@ class _$ProductCategoryImpl
     implements _ProductCategory {
   _$ProductCategoryImpl(
       {required this.name,
-      final List<Object>? products,
       required final List<Map<String, dynamic>> productsAndQuantities})
-      : _products = products,
-        _productsAndQuantities = productsAndQuantities;
+      : _productsAndQuantities = productsAndQuantities;
 
   factory _$ProductCategoryImpl.fromJson(Map<String, dynamic> json) =>
       _$$ProductCategoryImplFromJson(json);
 
   @override
   final String name;
-  final List<Object>? _products;
-  @override
-  List<Object>? get products {
-    final value = _products;
-    if (value == null) return null;
-    if (_products is EqualUnmodifiableListView) return _products;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
-
+// List<Object>? products,
   final List<Map<String, dynamic>> _productsAndQuantities;
+// List<Object>? products,
   @override
   List<Map<String, dynamic>> get productsAndQuantities {
     if (_productsAndQuantities is EqualUnmodifiableListView)
@@ -1266,7 +1271,7 @@ class _$ProductCategoryImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ProductCategory(name: $name, products: $products, productsAndQuantities: $productsAndQuantities)';
+    return 'ProductCategory(name: $name, productsAndQuantities: $productsAndQuantities)';
   }
 
   @override
@@ -1275,7 +1280,6 @@ class _$ProductCategoryImpl
     properties
       ..add(DiagnosticsProperty('type', 'ProductCategory'))
       ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('products', products))
       ..add(
           DiagnosticsProperty('productsAndQuantities', productsAndQuantities));
   }
@@ -1286,17 +1290,13 @@ class _$ProductCategoryImpl
         (other.runtimeType == runtimeType &&
             other is _$ProductCategoryImpl &&
             (identical(other.name, name) || other.name == name) &&
-            const DeepCollectionEquality().equals(other._products, _products) &&
             const DeepCollectionEquality()
                 .equals(other._productsAndQuantities, _productsAndQuantities));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      const DeepCollectionEquality().hash(_products),
+  int get hashCode => Object.hash(runtimeType, name,
       const DeepCollectionEquality().hash(_productsAndQuantities));
 
   /// Create a copy of ProductCategory
@@ -1319,7 +1319,6 @@ class _$ProductCategoryImpl
 abstract class _ProductCategory implements ProductCategory {
   factory _ProductCategory(
           {required final String name,
-          final List<Object>? products,
           required final List<Map<String, dynamic>> productsAndQuantities}) =
       _$ProductCategoryImpl;
 
@@ -1327,9 +1326,7 @@ abstract class _ProductCategory implements ProductCategory {
       _$ProductCategoryImpl.fromJson;
 
   @override
-  String get name;
-  @override
-  List<Object>? get products;
+  String get name; // List<Object>? products,
   @override
   List<Map<String, dynamic>> get productsAndQuantities;
 
