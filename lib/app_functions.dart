@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_format/date_time_format.dart';
 // import 'package:flutter/material.dart';
 
+import 'models/store/store_model.dart';
 import 'presentation/constants/other_constants.dart';
 
 class AppFunctions {
@@ -17,5 +19,12 @@ class AppFunctions {
         : date == '--'
             ? '--'
             : DateTimeFormat.format(DateTime.parse(date), format: format);
+  }
+
+  static Future<Product> loadProductReference(
+      DocumentReference reference) async {
+    final snapshot = await reference.get();
+
+    return Product.fromJson(snapshot.data() as Map<String, dynamic>);
   }
 }

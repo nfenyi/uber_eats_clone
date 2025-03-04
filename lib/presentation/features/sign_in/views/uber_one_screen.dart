@@ -84,14 +84,20 @@ class UberOneScreen extends StatelessWidget {
                           }
                           await Hive.box(AppBoxes.appState)
                               .put('authenticated', true);
-                          final contacts = <String, dynamic>{
+                          final info = <String, dynamic>{
+                            'name': userCredential.displayName,
+                            'profilePic': userCredential.photoURL,
                             "email": userCredential.email,
                             "phoneNumber": userCredential.phoneNumber
                           };
                           await FirebaseFirestore.instance
                               .collection(FirestoreCollections.devices)
                               .doc(deviceId)
-                              .set(contacts);
+                              .set(info);
+                          await FirebaseFirestore.instance
+                              .collection(FirestoreCollections.favoriteStores)
+                              .doc(userCredential.uid)
+                              .set({});
                           navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                 builder: (context) => const MainScreen(),
@@ -229,14 +235,21 @@ class UberOneScreen extends StatelessWidget {
                   // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
                 }
                 await Hive.box(AppBoxes.appState).put('authenticated', true);
-                final contacts = <String, dynamic>{
+                final info = <String, dynamic>{
+                  'name': userCredential.displayName,
+                  'profilePic': userCredential.photoURL,
                   "email": userCredential.email,
                   "phoneNumber": userCredential.phoneNumber
                 };
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.devices)
                     .doc(deviceId)
-                    .set(contacts);
+                    .set(info);
+
+                await FirebaseFirestore.instance
+                    .collection(FirestoreCollections.favoriteStores)
+                    .doc(userCredential.uid)
+                    .set({});
                 navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const MainScreen(),

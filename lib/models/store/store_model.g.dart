@@ -10,6 +10,7 @@ _$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
       isUberOneShop: json['isUberOneShop'] as bool? ?? false,
       location: Location.fromJson(json['location'] as Map<String, dynamic>),
       id: json['id'] as String,
+      dietary: json['dietary'] as String?,
       priceCategory: json['priceCategory'] as String,
       isGroupFriendly: json['isGroupFriendly'] as bool,
       type: json['type'] as String,
@@ -28,6 +29,7 @@ _$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
       delivery: Delivery.fromJson(json['delivery'] as Map<String, dynamic>),
       rating: Rating.fromJson(json['rating'] as Map<String, dynamic>),
       cardImage: json['cardImage'] as String,
+      visits: (json['visits'] as num?)?.toInt() ?? 0,
       openingTime: DateTime.parse(json['openingTime'] as String),
       closingTime: DateTime.parse(json['closingTime'] as String),
     );
@@ -37,6 +39,7 @@ Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
       'isUberOneShop': instance.isUberOneShop,
       'location': instance.location.toJson(),
       'id': instance.id,
+      'dietary': instance.dietary,
       'priceCategory': instance.priceCategory,
       'isGroupFriendly': instance.isGroupFriendly,
       'type': instance.type,
@@ -50,6 +53,7 @@ Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
       'delivery': instance.delivery.toJson(),
       'rating': instance.rating.toJson(),
       'cardImage': instance.cardImage,
+      'visits': instance.visits,
       'openingTime': instance.openingTime.toIso8601String(),
       'closingTime': instance.closingTime.toIso8601String(),
     };

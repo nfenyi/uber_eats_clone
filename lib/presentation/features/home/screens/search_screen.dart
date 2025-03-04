@@ -433,20 +433,20 @@ class _SearchScreenState extends State<SearchScreen>
             const Gap(10),
             Column(
               children: [
-                Row(
-                  children: [
-                    TabBar(
-                      isScrollable: true,
-                      tabs: const [
-                        AppText(text: 'All'),
-                        AppText(text: 'Restaurants'),
-                        AppText(text: 'Grocery'),
-                        AppText(text: 'Alcohol'),
-                      ],
-                      controller: _tabController,
-                    ),
+                // Row(
+                //   children: [
+                TabBar(
+                  isScrollable: true,
+                  tabs: const [
+                    AppText(text: 'All'),
+                    AppText(text: 'Restaurants'),
+                    AppText(text: 'Grocery'),
+                    AppText(text: 'Alcohol'),
                   ],
+                  controller: _tabController,
                 ),
+                //   ],
+                // ),
                 const Gap(10),
                 if (_searchController.text.isNotEmpty)
                   ChipsChoice<String>.multiple(
@@ -473,7 +473,7 @@ class _SearchScreenState extends State<SearchScreen>
                     choiceStyle: C2ChipStyle.filled(
                       selectedStyle: const C2ChipStyle(
                         foregroundColor: Colors.white,
-                        backgroundColor: AppColors.neutral900,
+                        backgroundColor: Colors.black,
                         borderRadius: BorderRadius.all(
                           Radius.circular(100),
                         ),

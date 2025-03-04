@@ -23,6 +23,7 @@ mixin _$Store {
   bool get isUberOneShop => throw _privateConstructorUsedError;
   Location get location => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
+  String? get dietary => throw _privateConstructorUsedError;
   String get priceCategory => throw _privateConstructorUsedError;
   bool get isGroupFriendly => throw _privateConstructorUsedError;
   String get type => throw _privateConstructorUsedError;
@@ -35,8 +36,8 @@ mixin _$Store {
       throw _privateConstructorUsedError;
   Delivery get delivery => throw _privateConstructorUsedError;
   Rating get rating => throw _privateConstructorUsedError;
-  String get cardImage =>
-      throw _privateConstructorUsedError; // required bool isFavorite,
+  String get cardImage => throw _privateConstructorUsedError;
+  int get visits => throw _privateConstructorUsedError;
   DateTime get openingTime => throw _privateConstructorUsedError;
   DateTime get closingTime => throw _privateConstructorUsedError;
 
@@ -58,6 +59,7 @@ abstract class $StoreCopyWith<$Res> {
       {bool isUberOneShop,
       Location location,
       String id,
+      String? dietary,
       String priceCategory,
       bool isGroupFriendly,
       String type,
@@ -70,6 +72,7 @@ abstract class $StoreCopyWith<$Res> {
       Delivery delivery,
       Rating rating,
       String cardImage,
+      int visits,
       DateTime openingTime,
       DateTime closingTime});
 
@@ -96,6 +99,7 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
     Object? isUberOneShop = null,
     Object? location = null,
     Object? id = null,
+    Object? dietary = freezed,
     Object? priceCategory = null,
     Object? isGroupFriendly = null,
     Object? type = null,
@@ -108,6 +112,7 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
     Object? delivery = null,
     Object? rating = null,
     Object? cardImage = null,
+    Object? visits = null,
     Object? openingTime = null,
     Object? closingTime = null,
   }) {
@@ -124,6 +129,10 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      dietary: freezed == dietary
+          ? _value.dietary
+          : dietary // ignore: cast_nullable_to_non_nullable
+              as String?,
       priceCategory: null == priceCategory
           ? _value.priceCategory
           : priceCategory // ignore: cast_nullable_to_non_nullable
@@ -172,6 +181,10 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
           ? _value.cardImage
           : cardImage // ignore: cast_nullable_to_non_nullable
               as String,
+      visits: null == visits
+          ? _value.visits
+          : visits // ignore: cast_nullable_to_non_nullable
+              as int,
       openingTime: null == openingTime
           ? _value.openingTime
           : openingTime // ignore: cast_nullable_to_non_nullable
@@ -225,6 +238,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       {bool isUberOneShop,
       Location location,
       String id,
+      String? dietary,
       String priceCategory,
       bool isGroupFriendly,
       String type,
@@ -237,6 +251,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       Delivery delivery,
       Rating rating,
       String cardImage,
+      int visits,
       DateTime openingTime,
       DateTime closingTime});
 
@@ -264,6 +279,7 @@ class __$$StoreImplCopyWithImpl<$Res>
     Object? isUberOneShop = null,
     Object? location = null,
     Object? id = null,
+    Object? dietary = freezed,
     Object? priceCategory = null,
     Object? isGroupFriendly = null,
     Object? type = null,
@@ -276,6 +292,7 @@ class __$$StoreImplCopyWithImpl<$Res>
     Object? delivery = null,
     Object? rating = null,
     Object? cardImage = null,
+    Object? visits = null,
     Object? openingTime = null,
     Object? closingTime = null,
   }) {
@@ -292,6 +309,10 @@ class __$$StoreImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      dietary: freezed == dietary
+          ? _value.dietary
+          : dietary // ignore: cast_nullable_to_non_nullable
+              as String?,
       priceCategory: null == priceCategory
           ? _value.priceCategory
           : priceCategory // ignore: cast_nullable_to_non_nullable
@@ -340,6 +361,10 @@ class __$$StoreImplCopyWithImpl<$Res>
           ? _value.cardImage
           : cardImage // ignore: cast_nullable_to_non_nullable
               as String,
+      visits: null == visits
+          ? _value.visits
+          : visits // ignore: cast_nullable_to_non_nullable
+              as int,
       openingTime: null == openingTime
           ? _value.openingTime
           : openingTime // ignore: cast_nullable_to_non_nullable
@@ -359,6 +384,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       {this.isUberOneShop = false,
       required this.location,
       required this.id,
+      this.dietary,
       required this.priceCategory,
       required this.isGroupFriendly,
       required this.type,
@@ -371,6 +397,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       required this.delivery,
       required this.rating,
       required this.cardImage,
+      this.visits = 0,
       required this.openingTime,
       required this.closingTime})
       : _offers = offers,
@@ -387,6 +414,8 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   final Location location;
   @override
   final String id;
+  @override
+  final String? dietary;
   @override
   final String priceCategory;
   @override
@@ -436,7 +465,9 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   final Rating rating;
   @override
   final String cardImage;
-// required bool isFavorite,
+  @override
+  @JsonKey()
+  final int visits;
   @override
   final DateTime openingTime;
   @override
@@ -444,7 +475,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, priceCategory: $priceCategory, isGroupFriendly: $isGroupFriendly, type: $type, offers: $offers, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, openingTime: $openingTime, closingTime: $closingTime)';
+    return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, dietary: $dietary, priceCategory: $priceCategory, isGroupFriendly: $isGroupFriendly, type: $type, offers: $offers, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, visits: $visits, openingTime: $openingTime, closingTime: $closingTime)';
   }
 
   @override
@@ -455,6 +486,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       ..add(DiagnosticsProperty('isUberOneShop', isUberOneShop))
       ..add(DiagnosticsProperty('location', location))
       ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('dietary', dietary))
       ..add(DiagnosticsProperty('priceCategory', priceCategory))
       ..add(DiagnosticsProperty('isGroupFriendly', isGroupFriendly))
       ..add(DiagnosticsProperty('type', type))
@@ -467,6 +499,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       ..add(DiagnosticsProperty('delivery', delivery))
       ..add(DiagnosticsProperty('rating', rating))
       ..add(DiagnosticsProperty('cardImage', cardImage))
+      ..add(DiagnosticsProperty('visits', visits))
       ..add(DiagnosticsProperty('openingTime', openingTime))
       ..add(DiagnosticsProperty('closingTime', closingTime));
   }
@@ -481,6 +514,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
             (identical(other.location, location) ||
                 other.location == location) &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.dietary, dietary) || other.dietary == dietary) &&
             (identical(other.priceCategory, priceCategory) ||
                 other.priceCategory == priceCategory) &&
             (identical(other.isGroupFriendly, isGroupFriendly) ||
@@ -499,6 +533,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
             (identical(other.rating, rating) || other.rating == rating) &&
             (identical(other.cardImage, cardImage) ||
                 other.cardImage == cardImage) &&
+            (identical(other.visits, visits) || other.visits == visits) &&
             (identical(other.openingTime, openingTime) ||
                 other.openingTime == openingTime) &&
             (identical(other.closingTime, closingTime) ||
@@ -507,25 +542,28 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      isUberOneShop,
-      location,
-      id,
-      priceCategory,
-      isGroupFriendly,
-      type,
-      const DeepCollectionEquality().hash(_offers),
-      const DeepCollectionEquality().hash(_aisles),
-      name,
-      logo,
-      doesPickup,
-      const DeepCollectionEquality().hash(_productCategories),
-      delivery,
-      rating,
-      cardImage,
-      openingTime,
-      closingTime);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        isUberOneShop,
+        location,
+        id,
+        dietary,
+        priceCategory,
+        isGroupFriendly,
+        type,
+        const DeepCollectionEquality().hash(_offers),
+        const DeepCollectionEquality().hash(_aisles),
+        name,
+        logo,
+        doesPickup,
+        const DeepCollectionEquality().hash(_productCategories),
+        delivery,
+        rating,
+        cardImage,
+        visits,
+        openingTime,
+        closingTime
+      ]);
 
   /// Create a copy of Store
   /// with the given fields replaced by the non-null parameter values.
@@ -548,6 +586,7 @@ abstract class _Store implements Store {
       {final bool isUberOneShop,
       required final Location location,
       required final String id,
+      final String? dietary,
       required final String priceCategory,
       required final bool isGroupFriendly,
       required final String type,
@@ -560,6 +599,7 @@ abstract class _Store implements Store {
       required final Delivery delivery,
       required final Rating rating,
       required final String cardImage,
+      final int visits,
       required final DateTime openingTime,
       required final DateTime closingTime}) = _$StoreImpl;
 
@@ -571,6 +611,8 @@ abstract class _Store implements Store {
   Location get location;
   @override
   String get id;
+  @override
+  String? get dietary;
   @override
   String get priceCategory;
   @override
@@ -594,7 +636,9 @@ abstract class _Store implements Store {
   @override
   Rating get rating;
   @override
-  String get cardImage; // required bool isFavorite,
+  String get cardImage;
+  @override
+  int get visits;
   @override
   DateTime get openingTime;
   @override

@@ -179,11 +179,11 @@ class UberEatsClone extends StatelessWidget {
             fillColor: WidgetStateProperty.all(Colors.black),
           ),
           tabBarTheme: const TabBarTheme(
-            indicatorColor: Colors.black,
+            // indicatorColor: Colors.black,
             labelPadding: EdgeInsets.symmetric(
                 horizontal: AppSizes.horizontalPadding, vertical: 8),
-            dividerColor: AppColors.neutral500,
-            dividerHeight: 30,
+            dividerColor: AppColors.neutral300,
+            dividerHeight: 4,
             labelColor: Colors.black,
             tabAlignment: TabAlignment.start,
           ),
@@ -208,7 +208,7 @@ class UberEatsClone extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           fontFamily: 'UberMove',
           // colorSchemeSeed: Colors.black,
-          useMaterial3: false,
+          useMaterial3: true,
         ),
         home: ResponsiveSizer(builder: (BuildContext context,
             Orientation orientation, ScreenType screenType) {

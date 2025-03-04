@@ -151,6 +151,19 @@ class FirestoreCollections {
   static String users = 'users';
   static String stores = 'stores';
   static String products = 'products';
+  static String foodCategories = 'food categories';
+  static String favoriteStores = 'favorite stores';
+  static String adverts = 'adverts';
 
   FirestoreCollections._();
+}
+
+class FirebaseStorageRefs {
+  static String foodCategoryImages = '/food category images';
+  // static String users = 'users';
+  // static String stores = 'stores';
+  // static String products = 'products';
+  // static String foodCategories = 'food categories';
+
+  FirebaseStorageRefs._();
 }

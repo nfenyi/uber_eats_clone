@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,6 +12,7 @@ class Store with _$Store {
     @Default(false) bool isUberOneShop,
     required Location location,
     required String id,
+    String? dietary,
     required String priceCategory,
     required bool isGroupFriendly,
     required String type,
@@ -25,7 +25,7 @@ class Store with _$Store {
     required Delivery delivery,
     required Rating rating,
     required String cardImage,
-    // required bool isFavorite,
+    @Default(0) int visits,
     required DateTime openingTime,
     required DateTime closingTime,
   }) = _Store;

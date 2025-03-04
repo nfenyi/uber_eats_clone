@@ -23,7 +23,7 @@ class BrowseScreen extends StatefulWidget {
 }
 
 class _BrowseScreenState extends State<BrowseScreen> {
-  final List<FoodCategory> _shopNearYou = [
+  final List<FoodCategory> _shopsNearYou = [
     FoodCategory('Grocery', AssetNames.grocery2),
     FoodCategory('Convenience', AssetNames.convenience),
     FoodCategory('Alcohol', AssetNames.alcohol),
@@ -124,34 +124,13 @@ class _BrowseScreenState extends State<BrowseScreen> {
               floatHeaderSlivers: true,
               headerSliverBuilder: (context, innerBoxIsScrolled) {
                 return [
-                  // SliverAppBar(
-                  //   //TODO: change appbar 'surfaceTintColor' at the main screen level
-                  //   surfaceTintColor: Colors.white,
-                  //   pinned: true,
-                  //   floating: true,
-                  //   title: InkWell(
-                  //     onTap: () =>
-                  //         navigatorKey.currentState!.push(MaterialPageRoute(
-                  //       builder: (context) => SearchScreen(
-                  //         stores: stores,
-                  //       ),
-                  //     )),
-                  //     child: Ink(
-                  //       child: const AppTextFormField(
-                  //         enabled: false,
-                  //         hintText: 'Search Uber Eats',
-                  //         constraintWidth: 40,
-                  //         radius: 50,
-                  //         prefixIcon: Icon(
-                  //           Icons.search,
-                  //           color: Colors.black,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  SliverToBoxAdapter(
-                    child: InkWell(
+                  SliverAppBar(
+                    titleSpacing: 0,
+                    //TODO: change appbar 'surfaceTintColor' at the main screen level
+                    surfaceTintColor: Colors.white,
+                    pinned: true,
+                    floating: true,
+                    title: InkWell(
                       onTap: () =>
                           navigatorKey.currentState!.push(MaterialPageRoute(
                         builder: (context) => SearchScreen(
@@ -172,6 +151,28 @@ class _BrowseScreenState extends State<BrowseScreen> {
                       ),
                     ),
                   ),
+                  // SliverToBoxAdapter(
+                  //   child: InkWell(
+                  //     onTap: () =>
+                  //         navigatorKey.currentState!.push(MaterialPageRoute(
+                  //       builder: (context) => SearchScreen(
+                  //         stores: stores,
+                  //       ),
+                  //     )),
+                  //     child: Ink(
+                  //       child: const AppTextFormField(
+                  //         enabled: false,
+                  //         hintText: 'Search Uber Eats',
+                  //         constraintWidth: 40,
+                  //         radius: 50,
+                  //         prefixIcon: Icon(
+                  //           Icons.search,
+                  //           color: Colors.black,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ];
               },
               body: CustomScrollView(
@@ -182,7 +183,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
                       children: [
                         Gap(10),
                         AppText(
-                          text: 'Shop near you',
+                          text: 'Shops near you',
                           size: AppSizes.heading6,
                           weight: FontWeight.w600,
                         ),
@@ -191,14 +192,14 @@ class _BrowseScreenState extends State<BrowseScreen> {
                     ),
                   ),
                   SliverGrid.builder(
-                    itemCount: _shopNearYou.length,
+                    itemCount: _shopsNearYou.length,
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(
                             maxCrossAxisExtent: 80,
                             mainAxisSpacing: 10,
                             crossAxisSpacing: 10),
                     itemBuilder: (context, index) {
-                      final shopNearYou = _shopNearYou[index];
+                      final shopNearYou = _shopsNearYou[index];
                       return InkWell(
                         onTap: () {
                           if (shopNearYou.name == 'Grocery') {
