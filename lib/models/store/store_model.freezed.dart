@@ -21,7 +21,7 @@ Store _$StoreFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Store {
   bool get isUberOneShop => throw _privateConstructorUsedError;
-  Location get location => throw _privateConstructorUsedError;
+  StoreLocation get location => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
   String? get dietary => throw _privateConstructorUsedError;
   String get priceCategory => throw _privateConstructorUsedError;
@@ -57,7 +57,7 @@ abstract class $StoreCopyWith<$Res> {
   @useResult
   $Res call(
       {bool isUberOneShop,
-      Location location,
+      StoreLocation location,
       String id,
       String? dietary,
       String priceCategory,
@@ -76,7 +76,7 @@ abstract class $StoreCopyWith<$Res> {
       DateTime openingTime,
       DateTime closingTime});
 
-  $LocationCopyWith<$Res> get location;
+  $StoreLocationCopyWith<$Res> get location;
   $DeliveryCopyWith<$Res> get delivery;
   $RatingCopyWith<$Res> get rating;
 }
@@ -124,7 +124,7 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
       location: null == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
-              as Location,
+              as StoreLocation,
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -200,8 +200,8 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $LocationCopyWith<$Res> get location {
-    return $LocationCopyWith<$Res>(_value.location, (value) {
+  $StoreLocationCopyWith<$Res> get location {
+    return $StoreLocationCopyWith<$Res>(_value.location, (value) {
       return _then(_value.copyWith(location: value) as $Val);
     });
   }
@@ -236,7 +236,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
   @useResult
   $Res call(
       {bool isUberOneShop,
-      Location location,
+      StoreLocation location,
       String id,
       String? dietary,
       String priceCategory,
@@ -256,7 +256,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       DateTime closingTime});
 
   @override
-  $LocationCopyWith<$Res> get location;
+  $StoreLocationCopyWith<$Res> get location;
   @override
   $DeliveryCopyWith<$Res> get delivery;
   @override
@@ -304,7 +304,7 @@ class __$$StoreImplCopyWithImpl<$Res>
       location: null == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
-              as Location,
+              as StoreLocation,
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -411,7 +411,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   @JsonKey()
   final bool isUberOneShop;
   @override
-  final Location location;
+  final StoreLocation location;
   @override
   final String id;
   @override
@@ -584,7 +584,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
 abstract class _Store implements Store {
   factory _Store(
       {final bool isUberOneShop,
-      required final Location location,
+      required final StoreLocation location,
       required final String id,
       final String? dietary,
       required final String priceCategory,
@@ -608,7 +608,7 @@ abstract class _Store implements Store {
   @override
   bool get isUberOneShop;
   @override
-  Location get location;
+  StoreLocation get location;
   @override
   String get id;
   @override
@@ -1009,50 +1009,57 @@ abstract class _Rating implements Rating {
       throw _privateConstructorUsedError;
 }
 
-Location _$LocationFromJson(Map<String, dynamic> json) {
-  return _Location.fromJson(json);
+StoreLocation _$StoreLocationFromJson(Map<String, dynamic> json) {
+  return _StoreLocation.fromJson(json);
 }
 
 /// @nodoc
-mixin _$Location {
+mixin _$StoreLocation {
   String get countryOfOrigin => throw _privateConstructorUsedError;
   String get streetAddress => throw _privateConstructorUsedError;
+  @GeoPointConverter()
+  GeoPoint get latlng => throw _privateConstructorUsedError;
 
-  /// Serializes this Location to a JSON map.
+  /// Serializes this StoreLocation to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of Location
+  /// Create a copy of StoreLocation
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $LocationCopyWith<Location> get copyWith =>
+  $StoreLocationCopyWith<StoreLocation> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $LocationCopyWith<$Res> {
-  factory $LocationCopyWith(Location value, $Res Function(Location) then) =
-      _$LocationCopyWithImpl<$Res, Location>;
+abstract class $StoreLocationCopyWith<$Res> {
+  factory $StoreLocationCopyWith(
+          StoreLocation value, $Res Function(StoreLocation) then) =
+      _$StoreLocationCopyWithImpl<$Res, StoreLocation>;
   @useResult
-  $Res call({String countryOfOrigin, String streetAddress});
+  $Res call(
+      {String countryOfOrigin,
+      String streetAddress,
+      @GeoPointConverter() GeoPoint latlng});
 }
 
 /// @nodoc
-class _$LocationCopyWithImpl<$Res, $Val extends Location>
-    implements $LocationCopyWith<$Res> {
-  _$LocationCopyWithImpl(this._value, this._then);
+class _$StoreLocationCopyWithImpl<$Res, $Val extends StoreLocation>
+    implements $StoreLocationCopyWith<$Res> {
+  _$StoreLocationCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Location
+  /// Create a copy of StoreLocation
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? countryOfOrigin = null,
     Object? streetAddress = null,
+    Object? latlng = null,
   }) {
     return _then(_value.copyWith(
       countryOfOrigin: null == countryOfOrigin
@@ -1063,38 +1070,46 @@ class _$LocationCopyWithImpl<$Res, $Val extends Location>
           ? _value.streetAddress
           : streetAddress // ignore: cast_nullable_to_non_nullable
               as String,
+      latlng: null == latlng
+          ? _value.latlng
+          : latlng // ignore: cast_nullable_to_non_nullable
+              as GeoPoint,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$LocationImplCopyWith<$Res>
-    implements $LocationCopyWith<$Res> {
-  factory _$$LocationImplCopyWith(
-          _$LocationImpl value, $Res Function(_$LocationImpl) then) =
-      __$$LocationImplCopyWithImpl<$Res>;
+abstract class _$$StoreLocationImplCopyWith<$Res>
+    implements $StoreLocationCopyWith<$Res> {
+  factory _$$StoreLocationImplCopyWith(
+          _$StoreLocationImpl value, $Res Function(_$StoreLocationImpl) then) =
+      __$$StoreLocationImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String countryOfOrigin, String streetAddress});
+  $Res call(
+      {String countryOfOrigin,
+      String streetAddress,
+      @GeoPointConverter() GeoPoint latlng});
 }
 
 /// @nodoc
-class __$$LocationImplCopyWithImpl<$Res>
-    extends _$LocationCopyWithImpl<$Res, _$LocationImpl>
-    implements _$$LocationImplCopyWith<$Res> {
-  __$$LocationImplCopyWithImpl(
-      _$LocationImpl _value, $Res Function(_$LocationImpl) _then)
+class __$$StoreLocationImplCopyWithImpl<$Res>
+    extends _$StoreLocationCopyWithImpl<$Res, _$StoreLocationImpl>
+    implements _$$StoreLocationImplCopyWith<$Res> {
+  __$$StoreLocationImplCopyWithImpl(
+      _$StoreLocationImpl _value, $Res Function(_$StoreLocationImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Location
+  /// Create a copy of StoreLocation
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? countryOfOrigin = null,
     Object? streetAddress = null,
+    Object? latlng = null,
   }) {
-    return _then(_$LocationImpl(
+    return _then(_$StoreLocationImpl(
       countryOfOrigin: null == countryOfOrigin
           ? _value.countryOfOrigin
           : countryOfOrigin // ignore: cast_nullable_to_non_nullable
@@ -1103,86 +1118,106 @@ class __$$LocationImplCopyWithImpl<$Res>
           ? _value.streetAddress
           : streetAddress // ignore: cast_nullable_to_non_nullable
               as String,
+      latlng: null == latlng
+          ? _value.latlng
+          : latlng // ignore: cast_nullable_to_non_nullable
+              as GeoPoint,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$LocationImpl with DiagnosticableTreeMixin implements _Location {
-  _$LocationImpl({required this.countryOfOrigin, required this.streetAddress});
+class _$StoreLocationImpl
+    with DiagnosticableTreeMixin
+    implements _StoreLocation {
+  _$StoreLocationImpl(
+      {required this.countryOfOrigin,
+      required this.streetAddress,
+      @GeoPointConverter() required this.latlng});
 
-  factory _$LocationImpl.fromJson(Map<String, dynamic> json) =>
-      _$$LocationImplFromJson(json);
+  factory _$StoreLocationImpl.fromJson(Map<String, dynamic> json) =>
+      _$$StoreLocationImplFromJson(json);
 
   @override
   final String countryOfOrigin;
   @override
   final String streetAddress;
+  @override
+  @GeoPointConverter()
+  final GeoPoint latlng;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Location(countryOfOrigin: $countryOfOrigin, streetAddress: $streetAddress)';
+    return 'StoreLocation(countryOfOrigin: $countryOfOrigin, streetAddress: $streetAddress, latlng: $latlng)';
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(DiagnosticsProperty('type', 'Location'))
+      ..add(DiagnosticsProperty('type', 'StoreLocation'))
       ..add(DiagnosticsProperty('countryOfOrigin', countryOfOrigin))
-      ..add(DiagnosticsProperty('streetAddress', streetAddress));
+      ..add(DiagnosticsProperty('streetAddress', streetAddress))
+      ..add(DiagnosticsProperty('latlng', latlng));
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$LocationImpl &&
+            other is _$StoreLocationImpl &&
             (identical(other.countryOfOrigin, countryOfOrigin) ||
                 other.countryOfOrigin == countryOfOrigin) &&
             (identical(other.streetAddress, streetAddress) ||
-                other.streetAddress == streetAddress));
+                other.streetAddress == streetAddress) &&
+            (identical(other.latlng, latlng) || other.latlng == latlng));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, countryOfOrigin, streetAddress);
+  int get hashCode =>
+      Object.hash(runtimeType, countryOfOrigin, streetAddress, latlng);
 
-  /// Create a copy of Location
+  /// Create a copy of StoreLocation
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$LocationImplCopyWith<_$LocationImpl> get copyWith =>
-      __$$LocationImplCopyWithImpl<_$LocationImpl>(this, _$identity);
+  _$$StoreLocationImplCopyWith<_$StoreLocationImpl> get copyWith =>
+      __$$StoreLocationImplCopyWithImpl<_$StoreLocationImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$LocationImplToJson(
+    return _$$StoreLocationImplToJson(
       this,
     );
   }
 }
 
-abstract class _Location implements Location {
-  factory _Location(
-      {required final String countryOfOrigin,
-      required final String streetAddress}) = _$LocationImpl;
+abstract class _StoreLocation implements StoreLocation {
+  factory _StoreLocation(
+          {required final String countryOfOrigin,
+          required final String streetAddress,
+          @GeoPointConverter() required final GeoPoint latlng}) =
+      _$StoreLocationImpl;
 
-  factory _Location.fromJson(Map<String, dynamic> json) =
-      _$LocationImpl.fromJson;
+  factory _StoreLocation.fromJson(Map<String, dynamic> json) =
+      _$StoreLocationImpl.fromJson;
 
   @override
   String get countryOfOrigin;
   @override
   String get streetAddress;
+  @override
+  @GeoPointConverter()
+  GeoPoint get latlng;
 
-  /// Create a copy of Location
+  /// Create a copy of StoreLocation
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$LocationImplCopyWith<_$LocationImpl> get copyWith =>
+  _$$StoreLocationImplCopyWith<_$StoreLocationImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1192,8 +1227,7 @@ ProductCategory _$ProductCategoryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ProductCategory {
-  String get name =>
-      throw _privateConstructorUsedError; // List<Object>? products,
+  String get name => throw _privateConstructorUsedError;
   List<Map<String, dynamic>> get productsAndQuantities =>
       throw _privateConstructorUsedError;
 
@@ -1302,9 +1336,7 @@ class _$ProductCategoryImpl
 
   @override
   final String name;
-// List<Object>? products,
   final List<Map<String, dynamic>> _productsAndQuantities;
-// List<Object>? products,
   @override
   List<Map<String, dynamic>> get productsAndQuantities {
     if (_productsAndQuantities is EqualUnmodifiableListView)
@@ -1370,7 +1402,7 @@ abstract class _ProductCategory implements ProductCategory {
       _$ProductCategoryImpl.fromJson;
 
   @override
-  String get name; // List<Object>? products,
+  String get name;
   @override
   List<Map<String, dynamic>> get productsAndQuantities;
 

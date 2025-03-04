@@ -136,6 +136,9 @@ class UberEatsClone extends StatelessWidget {
         navigatorKey: navigatorKey,
         title: 'Uber Eats Clone',
         theme: ThemeData(
+          sliderTheme:
+              const SliderThemeData(inactiveTrackColor: AppColors.neutral100),
+          dividerTheme: const DividerThemeData(color: AppColors.neutral300),
           listTileTheme: const ListTileThemeData(
               iconColor: Colors.black,
               titleAlignment: ListTileTitleAlignment.center),

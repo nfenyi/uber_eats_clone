@@ -1115,7 +1115,7 @@ packages:
     source: hosted
     version: "8.0.0"
   location_platform_interface:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: location_platform_interface
       sha256: a3404ea6d74e89b121630be62ed8edcc7b39fd108bd19805d0ae55c397135dd7

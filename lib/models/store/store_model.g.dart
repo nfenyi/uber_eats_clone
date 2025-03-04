@@ -8,7 +8,8 @@ part of 'store_model.dart';
 
 _$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
       isUberOneShop: json['isUberOneShop'] as bool? ?? false,
-      location: Location.fromJson(json['location'] as Map<String, dynamic>),
+      location:
+          StoreLocation.fromJson(json['location'] as Map<String, dynamic>),
       id: json['id'] as String,
       dietary: json['dietary'] as String?,
       priceCategory: json['priceCategory'] as String,
@@ -83,16 +84,18 @@ Map<String, dynamic> _$$RatingImplToJson(_$RatingImpl instance) =>
       'ratings': instance.ratings,
     };
 
-_$LocationImpl _$$LocationImplFromJson(Map<String, dynamic> json) =>
-    _$LocationImpl(
-      countryOfOrigin: json['countryOfOrigin'] as String,
-      streetAddress: json['streetAddress'] as String,
-    );
+_$StoreLocationImpl _$$StoreLocationImplFromJson(Map<String, dynamic> json) =>
+    _$StoreLocationImpl(
+        countryOfOrigin: json['countryOfOrigin'] as String,
+        streetAddress: json['streetAddress'] as String,
+        //removed wrapping fromJsonMethod
+        latlng: json['latlng']);
 
-Map<String, dynamic> _$$LocationImplToJson(_$LocationImpl instance) =>
+Map<String, dynamic> _$$StoreLocationImplToJson(_$StoreLocationImpl instance) =>
     <String, dynamic>{
       'countryOfOrigin': instance.countryOfOrigin,
       'streetAddress': instance.streetAddress,
+      'latlng': const GeoPointConverter().toJson(instance.latlng),
     };
 
 _$ProductCategoryImpl _$$ProductCategoryImplFromJson(

@@ -32,10 +32,10 @@ class _GroceryStoreMainScreenState
       // GroceryShopScreen(
       //   groceryStore: _groceryStore,
       // ),
-      // AislesScreen(
-      //   groceryStore: _groceryStore,
-      // ),
-      // Container(),
+      AislesScreen(
+        groceryStore: _groceryStore,
+      ),
+      Container(),
       // OrderAgainScreen(),
     ];
   }
@@ -110,20 +110,20 @@ class _GroceryStoreMainScreenState
               label: 'Deals'
               // 'Home',
               ),
-          // BottomNavigationBarItem(
-          //     activeIcon: Icon(
-          //       Icons.repeat,
-          //       size: 27,
-          //       // color: AppColors.primary,
-          //     ),
-          //     icon: Icon(
-          //       Icons.repeat_outlined,
-          //       size: 27,
-          //       // color: Colors.transparent,
-          //     ),
-          //     label: 'Order Again'
-          //     // 'Home',
-          //     ),
+          BottomNavigationBarItem(
+              activeIcon: Icon(
+                Icons.repeat,
+                size: 27,
+                // color: AppColors.primary,
+              ),
+              icon: Icon(
+                Icons.repeat_outlined,
+                size: 27,
+                // color: Colors.transparent,
+              ),
+              label: 'Order Again'
+              // 'Home',
+              ),
         ],
       ),
     );

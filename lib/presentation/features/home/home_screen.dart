@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:location/location.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
@@ -14,6 +15,7 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/grocery_store/screens/grocery_store_screens.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/uber_one_screen2.dart';
@@ -341,7 +343,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   int? _selectedDeliveryFeeIndex;
   int? _selectedRatingIndex;
-  String? _selectedPrice;
+  String? _selectedPriceCategory;
   List<String> _selectedDietaryOptions = [];
   String? _selectedSort;
   final _scrollController = ScrollController();
@@ -356,6 +358,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late List<Advert> _adverts;
 
   int? _currentFoodCategoryIndex;
+
+  final List<String> _sortOptions = ['Recommended', 'Rating', 'Delivery time'];
 
   @override
   void initState() {
@@ -409,7 +413,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     //       .collection(FirestoreCollections.foodCategories)
     //       .add(category.toJson());
     // }
-    // _getStoresAndProducts();
+    _getStoresAndProducts();
 
     DateTime dateTimeNow = DateTime.now();
     return SafeArea(
@@ -697,12 +701,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               .ratingsFilters[_selectedRatingIndex!]);
                     }
                   } else if (i == 5) {
-                    if (_selectedPrice == null) {
+                    if (_selectedPriceCategory == null) {
                       return AppText(
                         text: item.label,
                       );
                     } else {
-                      return AppText(text: _selectedPrice!);
+                      return AppText(text: _selectedPriceCategory!);
                     }
                   } else if (i == 6) {
                     if (_selectedDietaryOptions.isEmpty) {
@@ -735,172 +739,167 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     horizontal: AppSizes.horizontalPaddingSmall),
                 value: _selectedFilters,
                 onChanged: (value) {
-                  // logger.d(value);
+                  logger.d(value);
 
                   late String newFilter;
-                  if (value.any(
-                        (element) {
+
+                  if (value.isEmpty) {
+                    newFilter = _selectedFilters.first;
+                  } else if (_selectedFilters.isNotEmpty) {
+                    _selectedFilters.any(
+                      (element) {
+                        if (!value.contains(element)) {
                           newFilter = element;
-                          return !_selectedFilters.contains(element);
-                        },
-                      ) ||
-                      (value.isEmpty && _selectedFilters.isNotEmpty)) {
-                    if (_selectedFilters.isNotEmpty) {
-                      newFilter = _selectedFilters.first;
-                    }
-                    if (OtherConstants.filters.indexOf(newFilter) == 0) {
-                      setState(() {
+                          return true;
+                        }
+                        return false;
+                      },
+                    );
+                  } else if (value.length == 1) {
+                    newFilter = value.first;
+                  }
+                  if (OtherConstants.filters.indexOf(newFilter) == 0) {
+                    setState(() {
+                      if (_selectedFilters.contains(newFilter)) {
+                        _selectedFilters.remove(newFilter);
+                      } else {
                         _selectedFilters.add(newFilter);
-                        _onFilterScreen = true;
-                      });
-                    } else if (OtherConstants.filters.indexOf(newFilter) == 1) {
-                      setState(() {
+                        if (_onFilterScreen == false) {
+                          _onFilterScreen = true;
+                        }
+                      }
+                    });
+                  } else if (OtherConstants.filters.indexOf(newFilter) == 1) {
+                    setState(() {
+                      if (_selectedFilters.contains(newFilter)) {
+                        _selectedFilters.remove(newFilter);
+                      } else {
                         _selectedFilters.add(newFilter);
-                        _onFilterScreen = true;
-                      });
-                    } else if (OtherConstants.filters.indexOf(newFilter) == 2) {
-                      setState(() {
+                        if (_onFilterScreen == false) {
+                          _onFilterScreen = true;
+                        }
+                      }
+                    });
+                  } else if (OtherConstants.filters.indexOf(newFilter) == 2) {
+                    setState(() {
+                      if (_selectedFilters.contains(newFilter)) {
+                        _selectedFilters.remove(newFilter);
+                      } else {
                         _selectedFilters.add(newFilter);
-                        _onFilterScreen = true;
-                      });
-                    } else if (OtherConstants.filters.indexOf(newFilter) == 3) {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          late int temp;
-                          // logger.d(_selectedDeliveryFeeIndex);
-                          if (_selectedDeliveryFeeIndex == null) {
-                            temp = 3;
-                          } else {
-                            temp = _selectedDeliveryFeeIndex!;
-                          }
-                          return StatefulBuilder(builder: (context, setState) {
-                            return Container(
-                              color: Colors.white,
-                              child: Padding(
-                                padding: const EdgeInsets.all(
-                                    // horizontal:
-                                    AppSizes.horizontalPaddingSmall),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Center(
-                                        child: AppText(
-                                      text: 'Delivery fee',
-                                      size: AppSizes.bodySmall,
-                                      weight: FontWeight.w600,
-                                    )),
-                                    AppText(
-                                        text: temp == 0
-                                            ? 'Under \$1'
-                                            : temp == 1
-                                                ? 'Under \$3'
-                                                : temp == 2
-                                                    ? 'Under \$5'
-                                                    : 'Any amount'),
-                                    Padding(
-                                      padding: const EdgeInsets.all(25.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children:
-                                            OtherConstants.deliveryPriceFilters
-                                                .map(
-                                                  (e) => AppText(text: e),
-                                                )
-                                                .toList(),
-                                      ),
+                        if (_onFilterScreen == false) {
+                          _onFilterScreen = true;
+                        }
+                      }
+                    });
+                  } else if (OtherConstants.filters.indexOf(newFilter) == 3) {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        late int temp;
+                        // logger.d(_selectedDeliveryFeeIndex);
+                        if (_selectedDeliveryFeeIndex == null) {
+                          temp = 3;
+                        } else {
+                          temp = _selectedDeliveryFeeIndex!;
+                        }
+                        return StatefulBuilder(builder: (context, setState) {
+                          return Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.all(
+                                  // horizontal:
+                                  AppSizes.horizontalPaddingSmall),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Center(
+                                      child: AppText(
+                                    text: 'Delivery fee',
+                                    size: AppSizes.bodySmall,
+                                    weight: FontWeight.w600,
+                                  )),
+                                  const Gap(10),
+                                  const Divider(),
+                                  const Gap(10),
+                                  AppText(
+                                      text: temp == 0
+                                          ? 'Under \$1'
+                                          : temp == 1
+                                              ? 'Under \$3'
+                                              : temp == 2
+                                                  ? 'Under \$5'
+                                                  : 'Any amount'),
+                                  Padding(
+                                    padding: const EdgeInsets.all(25.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children:
+                                          OtherConstants.deliveryPriceFilters
+                                              .map(
+                                                (e) => AppText(text: e),
+                                              )
+                                              .toList(),
                                     ),
-                                    Slider.adaptive(
-                                        thumbColor: Colors.white,
-                                        min: 0,
-                                        max: OtherConstants
-                                                .deliveryPriceFilters.length -
-                                            1,
-                                        divisions: OtherConstants
-                                                .deliveryPriceFilters.length -
-                                            1,
-                                        value: temp.toDouble(),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            temp = value.toInt();
-                                            // logger.d(temp);
-                                          });
-                                        }),
-                                    AppButton(
-                                      text: 'Apply',
-                                      callback: () {
-                                        _selectedDeliveryFeeIndex = temp;
-                                        // logger.d(_selectedDeliveryFeeIndex);
-                                        //                      setState(() {
-                                        //   _currentlySelectedFilters = value;
-                                        // });
-                                        navigatorKey.currentState!.pop();
+                                  ),
+                                  Slider.adaptive(
+                                      thumbColor: Colors.white,
+                                      min: 0,
+                                      max: OtherConstants
+                                              .deliveryPriceFilters.length -
+                                          1,
+                                      divisions: OtherConstants
+                                              .deliveryPriceFilters.length -
+                                          1,
+                                      value: temp.toDouble(),
+                                      onChanged: (value) {
                                         setState(() {
-                                          _selectedFilters = value;
-                                          if (value.isNotEmpty) {
-                                            _onFilterScreen = true;
-                                          } else {
-                                            _onFilterScreen = false;
-                                          }
+                                          temp = value.toInt();
+                                          // logger.d(temp);
                                         });
+                                      }),
+                                  AppButton(
+                                    text: 'Apply',
+                                    callback: () {
+                                      _selectedDeliveryFeeIndex = temp;
+                                      // logger.d(_selectedDeliveryFeeIndex);
+                                      //                      setState(() {
+                                      //   _currentlySelectedFilters = value;
+                                      // });
+
+                                      setStateWithModal(value, newFilter);
+                                    },
+                                  ),
+                                  Center(
+                                    child: AppTextButton(
+                                      size: AppSizes.bodySmall,
+                                      text: 'Reset',
+                                      callback: () {
+                                        _selectedDeliveryFeeIndex = null;
+                                        resetFilter(value, 3);
                                       },
                                     ),
-                                    Center(
-                                      child: AppTextButton(
-                                        size: AppSizes.bodySmall,
-                                        text: 'Reset',
-                                        callback: () {
-                                          // setState(() {
-                                          //   _currentlySelectedFilters =
-                                          //       List.from(value);
-                                          //   _currentlySelectedFilters.removeWhere(
-                                          //     (element) =>
-                                          //         element == 'Delivery fee',
-                                          //   );
-                                          // });
-                                          navigatorKey.currentState!.pop();
-                                          setState(() {
-                                            List<String> temp =
-                                                List<String>.from(value);
-
-                                            temp.removeWhere(
-                                              (element) =>
-                                                  element ==
-                                                  OtherConstants.filters[3],
-                                            );
-
-                                            _selectedFilters = temp;
-                                            _selectedDeliveryFeeIndex = null;
-
-                                            if (temp.isNotEmpty) {
-                                              _onFilterScreen = true;
-                                            } else {
-                                              _onFilterScreen = false;
-                                            }
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            );
-                          });
-                        },
-                      );
-                    } else if (OtherConstants.filters.indexOf(newFilter) == 4) {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          late int temp;
-                          // logger.d(_selectedRatingIndex);
-                          if (_selectedRatingIndex == null) {
-                            temp = 0;
-                          } else {
-                            temp = _selectedRatingIndex!;
-                          }
+                            ),
+                          );
+                        });
+                      },
+                    );
+                  } else if (OtherConstants.filters.indexOf(newFilter) == 4) {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        late int temp;
+                        // logger.d(_selectedRatingIndex);
+                        if (_selectedRatingIndex == null) {
+                          temp = 0;
+                        } else {
+                          temp = _selectedRatingIndex!;
+                        }
+                        return StatefulBuilder(builder: (context, setState) {
                           return Container(
                             color: Colors.white,
                             child: Padding(
@@ -917,6 +916,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     size: AppSizes.bodySmall,
                                     weight: FontWeight.w600,
                                   )),
+                                  const Gap(10),
+                                  const Divider(),
+                                  const Gap(10),
                                   AppText(
                                       text: temp == 0
                                           ? 'Over 3'
@@ -963,15 +965,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       //                      setState(() {
                                       //   _currentlySelectedFilters = value;
                                       // });
-                                      navigatorKey.currentState!.pop();
-                                      setState(() {
-                                        _selectedFilters = value;
-                                        if (value.isNotEmpty) {
-                                          _onFilterScreen = true;
-                                        } else {
-                                          _onFilterScreen = false;
-                                        }
-                                      });
+
+                                      setStateWithModal(value, newFilter);
                                     },
                                   ),
                                   Center(
@@ -988,22 +983,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         //   );
                                         // });
                                         navigatorKey.currentState!.pop();
-                                        setState(() {
-                                          List<String> temp =
-                                              List<String>.from(value);
-                                          temp.removeWhere(
-                                            (element) =>
-                                                element ==
-                                                OtherConstants.filters[4],
-                                          );
-                                          _selectedFilters = temp;
-                                          _selectedRatingIndex = null;
-                                          if (temp.isNotEmpty) {
-                                            _onFilterScreen = true;
-                                          } else {
-                                            _onFilterScreen = false;
-                                          }
-                                        });
+
+                                        _selectedRatingIndex = null;
+                                        resetFilter(value, 4);
                                       },
                                     ),
                                   ),
@@ -1011,17 +993,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               ),
                             ),
                           );
-                        },
-                      );
-                    } else if (OtherConstants.filters.indexOf(newFilter) == 5) {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          String? temp;
-                          if (_selectedPrice != null) {
-                            temp = _selectedPrice;
-                          }
+                        });
+                      },
+                    );
+                  } else if (OtherConstants.filters.indexOf(newFilter) == 5) {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        String? temp;
+                        if (_selectedPriceCategory != null) {
+                          temp = _selectedPriceCategory;
+                        }
 
+                        return StatefulBuilder(builder: (context, setState) {
                           return Container(
                             color: Colors.white,
                             child: Padding(
@@ -1038,6 +1022,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     size: AppSizes.bodySmall,
                                     weight: FontWeight.w600,
                                   )),
+                                  const Gap(5),
+                                  const Divider(),
+                                  const Gap(5),
                                   Center(
                                     child: ChipsChoice.single(
                                         choiceItems:
@@ -1073,17 +1060,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   AppButton(
                                     text: 'Apply',
                                     callback: () {
-                                      _selectedPrice = temp;
+                                      if (temp != null) {
+                                        _selectedPriceCategory = temp;
 
-                                      navigatorKey.currentState!.pop();
-                                      setState(() {
-                                        _selectedFilters = value;
-                                        if (value.isNotEmpty) {
-                                          _onFilterScreen = true;
-                                        } else {
-                                          _onFilterScreen = false;
-                                        }
-                                      });
+                                        setStateWithModal(value, newFilter);
+                                      }
                                     },
                                   ),
                                   Center(
@@ -1091,24 +1072,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       size: AppSizes.bodySmall,
                                       text: 'Reset',
                                       callback: () {
-                                        navigatorKey.currentState!.pop();
-
-                                        setState(() {
-                                          List<String> temp =
-                                              List<String>.from(value);
-                                          temp.removeWhere(
-                                            (element) =>
-                                                element ==
-                                                OtherConstants.filters[5],
-                                          );
-                                          _selectedFilters = temp;
-                                          _selectedPrice = null;
-                                          if (value.isNotEmpty) {
-                                            _onFilterScreen = true;
-                                          } else {
-                                            _onFilterScreen = false;
-                                          }
-                                        });
+                                        _selectedPriceCategory = null;
+                                        resetFilter(value, 5);
                                       },
                                     ),
                                   ),
@@ -1116,14 +1081,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               ),
                             ),
                           );
-                        },
-                      );
-                    } else if (OtherConstants.filters.indexOf(newFilter) == 6) {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          List<String> temp = _selectedDietaryOptions;
+                        });
+                      },
+                    );
+                  } else if (OtherConstants.filters.indexOf(newFilter) == 6) {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        List<String> temp = _selectedDietaryOptions;
 
+                        return StatefulBuilder(builder: (context, setState) {
                           return Container(
                             color: Colors.white,
                             child: Padding(
@@ -1221,17 +1188,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   AppButton(
                                     text: 'Apply',
                                     callback: () {
-                                      _selectedDietaryOptions = temp;
+                                      if (temp.isNotEmpty) {
+                                        _selectedDietaryOptions = temp;
 
-                                      navigatorKey.currentState!.pop();
-                                      setState(() {
-                                        _selectedFilters = value;
-                                        if (value.isNotEmpty) {
-                                          _onFilterScreen = true;
-                                        } else {
-                                          _onFilterScreen = false;
-                                        }
-                                      });
+                                        setStateWithModal(value, newFilter);
+                                      }
                                     },
                                   ),
                                   Center(
@@ -1239,23 +1200,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       size: AppSizes.bodySmall,
                                       text: 'Reset',
                                       callback: () {
-                                        navigatorKey.currentState!.pop();
-                                        setState(() {
-                                          List<String> temp2 =
-                                              List<String>.from(value);
-                                          temp2.removeWhere(
-                                            (element) =>
-                                                element ==
-                                                OtherConstants.filters[6],
-                                          );
-                                          _selectedFilters = temp2;
-                                          _selectedDietaryOptions = [];
-                                          if (value.isNotEmpty) {
-                                            _onFilterScreen = true;
-                                          } else {
-                                            _onFilterScreen = false;
-                                          }
-                                        });
+                                        _selectedDietaryOptions = [];
+
+                                        resetFilter(value, 6);
                                       },
                                     ),
                                   ),
@@ -1263,14 +1210,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               ),
                             ),
                           );
-                        },
-                      );
-                    } else if (OtherConstants.filters.indexOf(newFilter) == 7) {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          String? temp;
+                        });
+                      },
+                    );
+                  } else if (OtherConstants.filters.indexOf(newFilter) == 7) {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        var temp = _selectedSort;
 
+                        return StatefulBuilder(builder: (context, setState) {
                           return Container(
                             color: Colors.white,
                             child: Padding(
@@ -1287,38 +1236,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     size: AppSizes.bodySmall,
                                     weight: FontWeight.w600,
                                   )),
-                                  ListView(
+                                  ListView.builder(
                                     shrinkWrap: true,
-                                    children: const [
-                                      AppRadioListTile(
-                                        groupValue: 'Sort',
-                                        value: 'Recommended',
-                                      ),
-                                      AppRadioListTile(
-                                        groupValue: 'Sort',
-                                        value: 'Rating',
-                                      ),
-                                      AppRadioListTile(
-                                        groupValue: 'Sort',
-                                        value: 'Delivery time',
-                                      ),
-                                    ],
+                                    itemCount: 3,
+                                    itemBuilder: (context, index) {
+                                      final sortOption = _sortOptions[index];
+                                      return RadioListTile<String>.adaptive(
+                                        value: sortOption,
+                                        title: AppText(text: sortOption),
+                                        groupValue: temp,
+                                        controlAffinity:
+                                            ListTileControlAffinity.trailing,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            temp = value;
+                                          });
+                                        },
+                                      );
+                                      // AppRadioListTile(
+                                      //   groupValue: 'Sort',
+                                      //   value: 'Recommended',
+                                      // ),
+                                      // AppRadioListTile(
+                                      //   groupValue: 'Sort',
+                                      //   value: 'Rating',
+                                      // ),
+                                      // AppRadioListTile(
+                                      //   groupValue: 'Sort',
+                                      //   value: 'Delivery time',
+                                      // ),
+                                    },
                                   ),
                                   const Gap(20),
                                   AppButton(
                                     text: 'Apply',
                                     callback: () {
-                                      _selectedSort = temp;
+                                      if (temp != null) {
+                                        _selectedSort = temp;
 
-                                      navigatorKey.currentState!.pop();
-                                      setState(() {
-                                        _selectedFilters = value;
-                                        if (value.isNotEmpty) {
-                                          _onFilterScreen = true;
-                                        } else {
-                                          _onFilterScreen = false;
-                                        }
-                                      });
+                                        setStateWithModal(value, newFilter);
+                                      }
                                     },
                                   ),
                                   Center(
@@ -1326,24 +1283,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       size: AppSizes.bodySmall,
                                       text: 'Reset',
                                       callback: () {
-                                        navigatorKey.currentState!.pop();
-                                        setState(() {
-                                          List<String> temp =
-                                              List<String>.from(value);
-
-                                          temp.removeWhere(
-                                            (element) =>
-                                                element ==
-                                                OtherConstants.filters[7],
-                                          );
-                                          _selectedFilters = temp;
-                                          _selectedSort = null;
-                                          if (value.isNotEmpty) {
-                                            _onFilterScreen = true;
-                                          } else {
-                                            _onFilterScreen = false;
-                                          }
-                                        });
+                                        _selectedSort = null;
+                                        resetFilter(value, 7);
                                       },
                                     ),
                                   ),
@@ -1351,9 +1292,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               ),
                             ),
                           );
-                        },
-                      );
-                    }
+                        });
+                      },
+                    );
                   }
                 },
                 choiceItems: C2Choice.listFrom<String, String>(
@@ -1375,279 +1316,369 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
               ),
               _onFilterScreen
-                  ? FutureBuilder(
-                      future: _getFilterdStores(
-                          category: _selectedFoodCategory?.name,
-                          selectedFilters: _selectedFilters),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            child: Skeletonizer(
-                              enabled: true,
-                              child: Column(
-                                children: [
-                                  ListView.separated(
-                                    separatorBuilder: (context, index) =>
-                                        const Gap(20),
-                                    itemCount: 6,
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) {
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Container(
-                                              // decoration: BoxDecoration(
-                                              //     borderRadius: BorderRadius.circular(10),
-                                              //     color: Colors.blue),
-                                              color: Colors.blue,
-                                              width: double.infinity,
-                                              height: 150,
-                                            ),
-                                          ),
-                                          const Gap(15),
-                                          const AppText(text: 'klmalmlamkla'),
-                                          const Gap(5),
-                                          const AppText(
-                                              text:
-                                                  'klmalmlamklakamlkm;ksasamklk'),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Column(
-                            // mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Gap(100),
-                              Image.asset(
-                                AssetNames.fallenIceCream,
-                                width: 180,
-                              ),
-                              const Gap(10),
-                              const AppText(
-                                text: 'Sorry, something went wrong.',
-                                weight: FontWeight.bold,
-                                size: AppSizes.body,
-                              ),
-                              // TODO: UNCOMMENT
-                              AppText(text: snapshot.error.toString())
-                            ],
-                          );
-                        }
-                        return SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            child: Column(
-                              children: [
-                                const Gap(10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    AppText(
-                                      size: AppSizes.bodySmall,
-                                      text:
-                                          '${stores.length} ${stores.length == 1 ? 'result' : 'results'}',
-                                      weight: FontWeight.w600,
-                                    ),
-                                    AppButton2(
-                                      text: 'Reset',
-                                      callback: () {
-                                        setState(() {
-                                          _selectedFoodCategory = null;
-                                          _selectedFilters = [];
-                                          _onFilterScreen = false;
-                                          _selectedDeliveryFeeIndex = null;
-                                          _selectedRatingIndex = null;
-                                          _selectedPrice = null;
-                                          _selectedDietaryOptions = [];
-                                          _selectedSort = null;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                const Gap(10),
-                                InkWell(
-                                  onTap: () => navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) => const MapScreen(),
-                                  )),
-                                  child: Ink(
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Image.asset(AssetNames.map,
-                                            width: double.infinity),
-                                        Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
+                  ? RefreshIndicator(
+                      color: Colors.black,
+                      onRefresh: () async {
+                        setState(() {});
+                      },
+                      child: FutureBuilder(
+                          future: _getFilterdStores(
+                              category: _selectedFoodCategory?.name,
+                              selectedFilters: _selectedFilters),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal:
+                                        AppSizes.horizontalPaddingSmall),
+                                child: Skeletonizer(
+                                  enabled: true,
+                                  child: Column(
+                                    children: [
+                                      ListView.separated(
+                                        separatorBuilder: (context, index) =>
+                                            const Gap(20),
+                                        itemCount: 6,
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              ClipRRect(
                                                 borderRadius:
-                                                    BorderRadius.circular(50)),
-                                            child:
-                                                const AppText(text: 'View map'))
+                                                    BorderRadius.circular(10),
+                                                child: Container(
+                                                  // decoration: BoxDecoration(
+                                                  //     borderRadius: BorderRadius.circular(10),
+                                                  //     color: Colors.blue),
+                                                  color: Colors.blue,
+                                                  width: double.infinity,
+                                                  height: 150,
+                                                ),
+                                              ),
+                                              const Gap(15),
+                                              const AppText(
+                                                  text: 'klmalmlamkla'),
+                                              const Gap(5),
+                                              const AppText(
+                                                  text:
+                                                      'klmalmlamklakamlkm;ksasamklk'),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Column(
+                                // mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Gap(100),
+                                  Image.asset(
+                                    AssetNames.fallenIceCream,
+                                    width: 180,
+                                  ),
+                                  const Gap(10),
+                                  const AppText(
+                                    text: 'Sorry, something went wrong.',
+                                    weight: FontWeight.bold,
+                                    size: AppSizes.body,
+                                  ),
+                                  // TODO: UNCOMMENT
+                                  AppText(text: snapshot.error.toString())
+                                ],
+                              );
+                            }
+                            return SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal:
+                                        AppSizes.horizontalPaddingSmall),
+                                child: Column(
+                                  children: [
+                                    const Gap(10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        AppText(
+                                          size: AppSizes.bodySmall,
+                                          text:
+                                              '${stores.length} ${stores.length == 1 ? 'result' : 'results'}',
+                                          weight: FontWeight.w600,
+                                        ),
+                                        AppButton2(
+                                          text: 'Reset',
+                                          callback: () {
+                                            setState(() {
+                                              _selectedFoodCategory = null;
+                                              _selectedFilters = [];
+                                              _onFilterScreen = false;
+                                              _selectedDeliveryFeeIndex = null;
+                                              _selectedRatingIndex = null;
+                                              _selectedPriceCategory = null;
+                                              _selectedDietaryOptions = [];
+                                              _selectedSort = null;
+                                            });
+                                          },
+                                        ),
                                       ],
                                     ),
-                                  ),
-                                ),
-                                const Gap(20),
-                                ListView.separated(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) {
-                                      final store = stores[index];
-                                      final bool isClosed = dateTimeNow.hour <
-                                              store.openingTime.hour ||
-                                          (dateTimeNow.hour >=
-                                                  store.closingTime.hour &&
-                                              dateTimeNow.minute >=
-                                                  store.closingTime.minute);
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            child: Stack(
-                                              alignment: Alignment.topRight,
-                                              children: [
-                                                CachedNetworkImage(
-                                                  imageUrl: store.cardImage,
-                                                  width: double.infinity,
-                                                  height: 170,
-                                                  fit: BoxFit.fill,
-                                                ),
-                                                isClosed
-                                                    ? Container(
-                                                        color: Colors.black
-                                                            .withOpacity(0.5),
-                                                        width: double.infinity,
-                                                        height: 170,
-                                                        child: const Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            AppText(
-                                                              text: 'Closed',
+                                    (stores.isNotEmpty)
+                                        ? Column(
+                                            children: [
+                                              const Gap(10),
+                                              InkWell(
+                                                onTap: () async {
+                                                  final userLocation =
+                                                      await Location()
+                                                          .getLocation();
+
+                                                  navigatorKey.currentState!
+                                                      .push(MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        MapScreen(
+                                                      userLocation:
+                                                          userLocation,
+                                                      filteredStores: stores,
+                                                      selectedFilters:
+                                                          _selectedFilters,
+                                                    ),
+                                                  ));
+                                                },
+                                                child: Ink(
+                                                  child: Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      Image.asset(
+                                                          AssetNames.map,
+                                                          width:
+                                                              double.infinity),
+                                                      Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8),
+                                                          decoration: BoxDecoration(
                                                               color:
                                                                   Colors.white,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          50)),
+                                                          child: const AppText(
+                                                              text: 'View map'))
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const Gap(20),
+                                              ListView.separated(
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final store = stores[index];
+                                                    final bool isClosed = dateTimeNow
+                                                                .hour <
+                                                            store.openingTime
+                                                                .hour ||
+                                                        (dateTimeNow.hour >=
+                                                                store
+                                                                    .closingTime
+                                                                    .hour &&
+                                                            dateTimeNow
+                                                                    .minute >=
+                                                                store
+                                                                    .closingTime
+                                                                    .minute);
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        navigatorKey
+                                                            .currentState!
+                                                            .push(
+                                                                MaterialPageRoute(
+                                                          builder: (context) {
+                                                            if (store.type
+                                                                .toLowerCase()
+                                                                .contains(
+                                                                    'grocery')) {
+                                                              return GroceryStoreMainScreen(
+                                                                  store);
+                                                            } else {
+                                                              return StoreScreen(
+                                                                  store);
+                                                            }
+                                                          },
+                                                        ));
+                                                      },
+                                                      child: Ink(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          12),
+                                                              child: Stack(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .topRight,
+                                                                children: [
+                                                                  CachedNetworkImage(
+                                                                    imageUrl: store
+                                                                        .cardImage,
+                                                                    width: double
+                                                                        .infinity,
+                                                                    height: 170,
+                                                                    fit: BoxFit
+                                                                        .fill,
+                                                                  ),
+                                                                  isClosed
+                                                                      ? Container(
+                                                                          color: Colors
+                                                                              .black
+                                                                              .withOpacity(0.5),
+                                                                          width:
+                                                                              double.infinity,
+                                                                          height:
+                                                                              170,
+                                                                          child:
+                                                                              const Column(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.center,
+                                                                            children: [
+                                                                              AppText(
+                                                                                text: 'Closed',
+                                                                                color: Colors.white,
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        )
+                                                                      : !store.delivery
+                                                                              .canDeliver
+                                                                          ? Container(
+                                                                              color: Colors.black.withOpacity(0.5),
+                                                                              width: double.infinity,
+                                                                              height: 170,
+                                                                              child: const Column(
+                                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                children: [
+                                                                                  AppText(
+                                                                                    text: 'Pick up',
+                                                                                    color: Colors.white,
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            )
+                                                                          : const SizedBox
+                                                                              .shrink(),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            8.0,
+                                                                        top:
+                                                                            8.0),
+                                                                    child: FavouriteButton(
+                                                                        store:
+                                                                            store),
+                                                                  )
+                                                                ],
+                                                              ),
                                                             ),
-                                                          ],
-                                                        ),
-                                                      )
-                                                    : !store.delivery.canDeliver
-                                                        ? Container(
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                    0.5),
-                                                            width:
-                                                                double.infinity,
-                                                            height: 170,
-                                                            child: const Column(
+                                                            const Gap(5),
+                                                            Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
-                                                                      .center,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .center,
+                                                                      .spaceBetween,
                                                               children: [
                                                                 AppText(
-                                                                  text:
-                                                                      'Pick up',
-                                                                  color: Colors
-                                                                      .white,
+                                                                  text: store
+                                                                      .name,
+                                                                  weight:
+                                                                      FontWeight
+                                                                          .w600,
                                                                 ),
+                                                                Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: AppColors
+                                                                            .neutral200,
+                                                                        borderRadius: BorderRadius.circular(
+                                                                            20)),
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        horizontal:
+                                                                            5,
+                                                                        vertical:
+                                                                            2),
+                                                                    child: AppText(
+                                                                        text: store
+                                                                            .rating
+                                                                            .averageRating
+                                                                            .toString()))
                                                               ],
                                                             ),
-                                                          )
-                                                        : const SizedBox
-                                                            .shrink(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 8.0, top: 8.0),
-                                                  child: FavouriteButton(
-                                                      store: store),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          const Gap(5),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              AppText(
-                                                text: store.name,
-                                                weight: FontWeight.w600,
-                                              ),
-                                              Container(
-                                                  decoration: BoxDecoration(
-                                                      color:
-                                                          AppColors.neutral200,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20)),
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 5,
-                                                      vertical: 2),
-                                                  child: AppText(
-                                                      text: store
-                                                          .rating.averageRating
-                                                          .toString()))
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Visibility(
-                                                  visible:
-                                                      store.delivery.fee < 1,
-                                                  child: Image.asset(
-                                                    AssetNames.uberOneSmall,
-                                                    height: 10,
-                                                  )),
-                                              AppText(
-                                                text: isClosed
-                                                    ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
-                                                    : '\$${store.delivery.fee} Delivery Fee',
-                                              ),
-                                              AppText(
-                                                  text:
-                                                      ' • ${store.delivery.estimatedDeliveryTime} min'),
+                                                            Row(
+                                                              children: [
+                                                                Visibility(
+                                                                    visible: store
+                                                                            .delivery
+                                                                            .fee <
+                                                                        1,
+                                                                    child: Image
+                                                                        .asset(
+                                                                      AssetNames
+                                                                          .uberOneSmall,
+                                                                      height:
+                                                                          10,
+                                                                    )),
+                                                                AppText(
+                                                                  text: isClosed
+                                                                      ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                                                      : '\$${store.delivery.fee} Delivery Fee',
+                                                                ),
+                                                                AppText(
+                                                                    text:
+                                                                        ' • ${store.delivery.estimatedDeliveryTime} min'),
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  separatorBuilder:
+                                                      (context, index) =>
+                                                          const Gap(10),
+                                                  itemCount: stores.length),
                                             ],
                                           )
-                                        ],
-                                      );
-                                    },
-                                    separatorBuilder: (context, index) =>
-                                        const Gap(10),
-                                    itemCount: stores.length),
-                              ],
-                            ),
-                          ),
-                        );
-                      })
+                                        : const Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                                // AppText(
+                                                //   text: 'No matches',
+                                                // )
+                                              ])
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+                    )
                   : FutureBuilder(
                       future: _getStoresAndProducts(),
                       builder: (context, snapshot) {
@@ -1748,8 +1779,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         onTap: () {
                                           navigatorKey.currentState!
                                               .push(MaterialPageRoute(
-                                            builder: (context) =>
-                                                StoreScreen(store),
+                                            builder: (context) {
+                                              if (store.type
+                                                  .toLowerCase()
+                                                  .contains('grocery')) {
+                                                return GroceryStoreMainScreen(
+                                                    store);
+                                              } else {
+                                                return StoreScreen(store);
+                                              }
+                                            },
                                           ));
                                         },
                                         child: Ink(
@@ -2108,7 +2147,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 ),
                                 const Gap(10),
                                 SizedBox(
-                                  height: 160,
+                                  height: 140,
                                   child: ListView(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal:
@@ -2117,7 +2156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     children: [
                                       Container(
                                           width: 350,
-                                          height: 150,
+                                          height: 140,
                                           decoration: BoxDecoration(
                                             color: Colors.brown,
                                             borderRadius:
@@ -2128,8 +2167,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               Expanded(
                                                 flex: 2,
                                                 child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      15.0),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 15.0,
+                                                      vertical: 10),
                                                   child: Column(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -2148,8 +2189,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                   Colors.white,
                                                               text:
                                                                   '\$0 Delivery Fee + up to 10% off with Uber One',
-                                                              size:
-                                                                  AppSizes.body,
+                                                              size: AppSizes
+                                                                  .bodySmall,
                                                             ),
                                                           ]),
                                                       AppButton2(
@@ -2190,7 +2231,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       const Gap(10),
                                       Container(
                                           width: 350,
-                                          height: 150,
+                                          height: 140,
                                           decoration: BoxDecoration(
                                             color: Colors.black38,
                                             borderRadius:
@@ -2201,8 +2242,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               Expanded(
                                                 flex: 2,
                                                 child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      15.0),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 15.0,
+                                                      vertical: 10),
                                                   child: Column(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -2221,15 +2264,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                   Colors.white,
                                                               text:
                                                                   'Use your promo and get there for less',
-                                                              size:
-                                                                  AppSizes.body,
+                                                              size: AppSizes
+                                                                  .bodySmall,
                                                             ),
-                                                            Gap(10),
+                                                            Gap(3),
                                                             AppText(
                                                               color:
                                                                   Colors.white,
                                                               text:
                                                                   'Save on your next ride',
+                                                              size: AppSizes
+                                                                  .bodySmallest,
                                                             ),
                                                           ]),
                                                       AppButton2(
@@ -2277,61 +2322,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     itemBuilder: (context, index) {
                                       final popularStore =
                                           _popularNearYou[index];
-                                      return SizedBox(
-                                        width: 200,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              child: Stack(
-                                                alignment: Alignment.topRight,
-                                                children: [
-                                                  CachedNetworkImage(
-                                                    imageUrl:
-                                                        popularStore.cardImage,
-                                                    width: 200,
-                                                    height: 120,
-                                                    fit: BoxFit.fill,
-                                                  ),
-                                                  (dateTimeNow.hour <
-                                                              popularStore
-                                                                  .openingTime
-                                                                  .hour ||
-                                                          (dateTimeNow.hour >=
+                                      return InkWell(
+                                        onTap: () => navigatorKey.currentState!
+                                            .push(MaterialPageRoute(
+                                          builder: (context) {
+                                            if (popularStore.type
+                                                .toLowerCase()
+                                                .contains('grocery')) {
+                                              return GroceryStoreMainScreen(
+                                                  popularStore);
+                                            } else {
+                                              return StoreScreen(popularStore);
+                                            }
+                                          },
+                                        )),
+                                        child: Ink(
+                                          child: SizedBox(
+                                            width: 200,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  child: Stack(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    children: [
+                                                      CachedNetworkImage(
+                                                        imageUrl: popularStore
+                                                            .cardImage,
+                                                        width: 200,
+                                                        height: 120,
+                                                        fit: BoxFit.fill,
+                                                      ),
+                                                      (dateTimeNow.hour <
                                                                   popularStore
-                                                                      .closingTime
-                                                                      .hour &&
-                                                              dateTimeNow
-                                                                      .minute >=
-                                                                  popularStore
-                                                                      .closingTime
-                                                                      .minute))
-                                                      ? Container(
-                                                          color: Colors.black
-                                                              .withOpacity(0.5),
-                                                          width: 200,
-                                                          height: 120,
-                                                          child: const Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              AppText(
-                                                                text: 'Closed',
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        )
-                                                      : !popularStore.delivery
-                                                              .canDeliver
+                                                                      .openingTime
+                                                                      .hour ||
+                                                              (dateTimeNow.hour >=
+                                                                      popularStore
+                                                                          .closingTime
+                                                                          .hour &&
+                                                                  dateTimeNow
+                                                                          .minute >=
+                                                                      popularStore
+                                                                          .closingTime
+                                                                          .minute))
                                                           ? Container(
                                                               color: Colors
                                                                   .black
@@ -2350,66 +2388,100 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                 children: [
                                                                   AppText(
                                                                     text:
-                                                                        'Pick up',
+                                                                        'Closed',
                                                                     color: Colors
                                                                         .white,
                                                                   ),
                                                                 ],
                                                               ),
                                                             )
-                                                          : const SizedBox
-                                                              .shrink(),
-                                                  Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0,
-                                                              top: 8.0),
-                                                      child: FavouriteButton(
-                                                          store: popularStore)),
-                                                ],
-                                              ),
-                                            ),
-                                            const Gap(5),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                AppText(
-                                                  text: popularStore.name,
-                                                  weight: FontWeight.w600,
+                                                          : !popularStore
+                                                                  .delivery
+                                                                  .canDeliver
+                                                              ? Container(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                          0.5),
+                                                                  width: 200,
+                                                                  height: 120,
+                                                                  child:
+                                                                      const Column(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      AppText(
+                                                                        text:
+                                                                            'Pick up',
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              : const SizedBox
+                                                                  .shrink(),
+                                                      Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  right: 8.0,
+                                                                  top: 8.0),
+                                                          child: FavouriteButton(
+                                                              store:
+                                                                  popularStore)),
+                                                    ],
+                                                  ),
                                                 ),
-                                                Container(
-                                                    decoration: BoxDecoration(
-                                                        color: AppColors
-                                                            .neutral200,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20)),
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 5,
-                                                        vertical: 2),
-                                                    child: AppText(
-                                                        text: popularStore
-                                                            .rating
-                                                            .averageRating
-                                                            .toString()))
-                                              ],
-                                            ),
-                                            AppText(
-                                                text:
-                                                    '\$${popularStore.delivery.fee} Delivery Fee',
-                                                color:
-                                                    popularStore.delivery.fee ==
+                                                const Gap(5),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    AppText(
+                                                      text: popularStore.name,
+                                                      weight: FontWeight.w600,
+                                                    ),
+                                                    Container(
+                                                        decoration: BoxDecoration(
+                                                            color: AppColors
+                                                                .neutral200,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20)),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 5,
+                                                                vertical: 2),
+                                                        child: AppText(
+                                                            text: popularStore
+                                                                .rating
+                                                                .averageRating
+                                                                .toString()))
+                                                  ],
+                                                ),
+                                                AppText(
+                                                    text:
+                                                        '\$${popularStore.delivery.fee} Delivery Fee',
+                                                    color: popularStore
+                                                                .delivery.fee ==
                                                             0
                                                         ? const Color.fromARGB(
                                                             255, 163, 133, 42)
                                                         : null),
-                                            AppText(
-                                                text:
-                                                    '${popularStore.delivery.estimatedDeliveryTime} min')
-                                          ],
+                                                AppText(
+                                                    text:
+                                                        '${popularStore.delivery.estimatedDeliveryTime} min')
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       );
                                     },
@@ -2702,6 +2774,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
+  void resetFilter(
+    List<String> value,
+    int filterIndex,
+  ) {
+    navigatorKey.currentState!.pop();
+    setState(() {
+      List<String> temp = List<String>.from(value);
+
+      temp.removeWhere(
+        (element) => element == OtherConstants.filters[filterIndex],
+      );
+
+      _selectedFilters = temp;
+
+      if (value.isEmpty) {
+        _onFilterScreen = false;
+      }
+    });
+  }
+
+  void setStateWithModal(List<String> value, String newFilter) {
+    navigatorKey.currentState!.pop();
+    setState(() {
+      if (!_selectedFilters.contains(newFilter)) {
+        _selectedFilters.add(newFilter);
+      }
+
+      _onFilterScreen = true;
+    });
+  }
+
   Future<void> _getStoresAndProducts() async {
     //all stores
     final storesSnapshot = await FirebaseFirestore.instance
@@ -2709,6 +2812,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         .get();
     stores = storesSnapshot.docs.map(
       (snapshot) {
+        logger.d(snapshot.data());
         return Store.fromJson(snapshot.data());
       },
     ).toList();
@@ -2820,16 +2924,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             }
           },
         );
+      } else if (filter == 'Price') {
+        storesIterable = storesIterable.where(
+          (element) => element.priceCategory == _selectedPriceCategory,
+        );
       } else if (filter == 'Dietary') {
         storesIterable = storesIterable.where(
-          (element) => element.dietary != null,
+          (element) => _selectedDietaryOptions.contains(element.dietary),
         );
       } else if (filter == 'Delivery fee' &&
           _selectedDeliveryFeeIndex !=
               OtherConstants.deliveryPriceFilters.length - 1) {
         storesIterable = storesIterable.where(
           (element) {
-            return element.delivery.fee ==
+            return element.delivery.fee <
                 int.parse(OtherConstants
                     .deliveryPriceFilters[_selectedDeliveryFeeIndex!]
                     .split('\$')
@@ -2840,14 +2948,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         storesList = storesIterable.toList();
         if (_selectedSort == 'Rating') {
           storesList.sort(
-            (a, b) => a.rating.averageRating.compareTo(b.rating.averageRating),
+            (a, b) => b.rating.averageRating.compareTo(a.rating.averageRating),
           );
         } else if (_selectedSort == 'Delivery time') {
           storesList.sort(
             (a, b) =>
-                int.parse(a.delivery.estimatedDeliveryTime.split(' ').first)
+                int.parse(a.delivery.estimatedDeliveryTime.split('-').first)
                     .compareTo(int.parse(
-                        b.delivery.estimatedDeliveryTime.split(' ').first)),
+                        b.delivery.estimatedDeliveryTime.split('-').first)),
           );
         }
       }
@@ -3126,22 +3234,9 @@ class AllStoresResultDisplay extends StatelessWidget {
                                     )
                                   : const SizedBox.shrink(),
                           Padding(
-                            padding:
-                                const EdgeInsets.only(right: 8.0, top: 8.0),
-                            child: InkWell(
-                              onTap: () {},
-                              child: Ink(
-                                child: Icon(
-                                  favoriteStores.any(
-                                    (element) => element.id == store.id,
-                                  )
-                                      ? Icons.favorite
-                                      : Icons.favorite_outline,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          )
+                              padding:
+                                  const EdgeInsets.only(right: 8.0, top: 8.0),
+                              child: FavouriteButton(store: store))
                         ],
                       ),
                     ),

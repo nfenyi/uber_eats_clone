@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:location/location.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
@@ -212,10 +213,15 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   ),
                   const Gap(10),
                   InkWell(
-                    onTap: () =>
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => const MapScreen(),
-                    )),
+                    onTap: () async {
+                      final userLocation = await Location().getLocation();
+                      navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => MapScreen(
+                          userLocation: userLocation,
+                          filteredStores: [],
+                        ),
+                      ));
+                    },
                     child: Ink(
                       child: Stack(
                         alignment: Alignment.center,

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -10,7 +11,7 @@ part 'store_model.g.dart';
 class Store with _$Store {
   factory Store({
     @Default(false) bool isUberOneShop,
-    required Location location,
+    required StoreLocation location,
     required String id,
     String? dietary,
     required String priceCategory,
@@ -54,21 +55,37 @@ class Rating with _$Rating {
 }
 
 @freezed
-class Location with _$Location {
-  factory Location({
+class StoreLocation with _$StoreLocation {
+  factory StoreLocation({
     required String countryOfOrigin,
     required String streetAddress,
-  }) = _Location;
+    @GeoPointConverter() required GeoPoint latlng,
+    // required GeoPoint latlng,
+  }) = _StoreLocation;
 
-  factory Location.fromJson(Map<String, Object?> json) =>
-      _$LocationFromJson(json);
+  factory StoreLocation.fromJson(Map<String, Object?> json) =>
+      _$StoreLocationFromJson(json);
+}
+
+class GeoPointConverter
+    implements JsonConverter<GeoPoint, Map<String, dynamic>> {
+  const GeoPointConverter();
+
+  @override
+  GeoPoint fromJson(Map<String, dynamic> json) {
+    return GeoPoint(json['latitude'] as double, json['longitude'] as double);
+  }
+
+  @override
+  Map<String, dynamic> toJson(GeoPoint geoPoint) {
+    return {'latitude': geoPoint.latitude, 'longitude': geoPoint.longitude};
+  }
 }
 
 @freezed
 class ProductCategory with _$ProductCategory {
   factory ProductCategory({
     required String name,
-    // List<Object>? products,
     required List<Map<String, dynamic>> productsAndQuantities,
   }) = _ProductCategory;
 

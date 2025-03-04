@@ -92,7 +92,6 @@ class _ConfirmLocationState extends ConsumerState<ConfirmLocationScreen>
                           _mapController.complete(controller);
                         },
                         onCameraMove: (position) {
-                          position.bearing;
                           _setLocation = position.target;
                         },
                         onCameraIdle: () async {
