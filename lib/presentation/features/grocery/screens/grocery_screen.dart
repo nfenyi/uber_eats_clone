@@ -26,7 +26,7 @@ import '../../alcohol/alcohol_screen.dart';
 import '../../grocery_store/screens/grocery_store_screens.dart';
 import '../../home/home_screen.dart';
 import '../../home/map/map_screen.dart';
-import '../../national_brands/national_brands_screen.dart';
+import '../../stores_list_screen/stores_list_screen.dart';
 import '../../pharmacy/screens/pharmacy_screen.dart';
 import '../../store/store_screen.dart';
 import '../../webview/webview_screen.dart';
@@ -536,8 +536,10 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   HomeScreenTopic(
                     callback: () {
                       navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => NationalBrandsScreen(
-                            nationalBrands: _groceryScreenStores),
+                        builder: (context) => StoresListScreen(
+                          stores: _groceryScreenStores,
+                          screenTitle: 'Grocery Stores',
+                        ),
                       ));
                     },
                     title: 'Stock up on groceries',
@@ -695,8 +697,10 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   HomeScreenTopic(
                     callback: () {
                       navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => NationalBrandsScreen(
-                            nationalBrands: _groceryScreenStores),
+                        builder: (context) => StoresListScreen(
+                          stores: _groceryScreenStores,
+                          screenTitle: 'Grocery Stores',
+                        ),
                       ));
                     },
                     title: 'Quick essentials',

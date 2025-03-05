@@ -28,11 +28,11 @@ class _UberOneScreen2State extends State<UberOneScreen2> {
     Offer(
         product: products.entries.first.value,
         store: stores[2],
-        noOfOffersAvailable: 2),
+        title: "Buy 1 get 1 free"),
     Offer(
         product: products.entries.first.value,
         store: stores[2],
-        noOfOffersAvailable: 2),
+        title: "Buy 1 get 1 free"),
   ];
 
   final _webViewcontroller = WebViewControllerPlus();
@@ -180,11 +180,11 @@ class _UberOneScreen2State extends State<UberOneScreen2> {
                           AppText(
                               text:
                                   '${offer.store.delivery.estimatedDeliveryTime} min'),
-                          AppText(
-                            text:
-                                '${offer.noOfOffersAvailable} offers available',
-                            color: Colors.brown,
-                          )
+                          // AppText(
+                          //   text:
+                          //       '${offer.noOfOffersAvailable} offers available',
+                          //   color: Colors.brown,
+                          // )
                         ],
                       ),
                     ],

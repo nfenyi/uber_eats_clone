@@ -21,11 +21,11 @@ class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
     Offer(
         product: products.entries.first.value,
         store: stores[2],
-        noOfOffersAvailable: 2),
+        title: "Buy 1 get 1 free"),
     Offer(
         product: products.entries.first.value,
         store: stores[2],
-        noOfOffersAvailable: 2),
+        title: "Buy 1 get 1 free"),
   ];
   @override
   Widget build(BuildContext context) {
@@ -90,11 +90,11 @@ class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
                                       borderRadius: BorderRadius.only(
                                           topRight: Radius.circular(50),
                                           bottomRight: Radius.circular(50))),
-                                  child: AppText(
-                                    text:
-                                        '${offer.noOfOffersAvailable} Offers Available',
-                                    color: Colors.white,
-                                  ),
+                                  // child: AppText(
+                                  //   text:
+                                  //       '${offer.noOfOffersAvailable} Offers Available',
+                                  //   color: Colors.white,
+                                  // ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(right: 8.0),

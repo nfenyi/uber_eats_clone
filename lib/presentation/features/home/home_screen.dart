@@ -29,7 +29,7 @@ import '../../constants/asset_names.dart';
 import '../../constants/other_constants.dart';
 import '../../constants/weblinks.dart';
 import '../../services/sign_in_view_model.dart';
-import '../national_brands/national_brands_screen.dart';
+import '../stores_list_screen/stores_list_screen.dart';
 import '../product/product_screen.dart';
 import '../promotion/promo_screen.dart';
 import '../store/store_screen.dart';
@@ -2058,10 +2058,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     callback: () {
                                       navigatorKey.currentState!
                                           .push(MaterialPageRoute(
-                                        builder: (context) =>
-                                            NationalBrandsScreen(
-                                                nationalBrands:
-                                                    _nationalBrands),
+                                        builder: (context) => StoresListScreen(
+                                            screenTitle: 'National Brands',
+                                            stores: _nationalBrands),
                                       ));
                                     },
                                     title: 'National Brands'),

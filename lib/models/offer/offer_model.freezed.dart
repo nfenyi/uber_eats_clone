@@ -22,7 +22,7 @@ Offer _$OfferFromJson(Map<String, dynamic> json) {
 mixin _$Offer {
   Product get product => throw _privateConstructorUsedError;
   Store get store => throw _privateConstructorUsedError;
-  int get noOfOffersAvailable => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
 
   /// Serializes this Offer to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -38,7 +38,7 @@ abstract class $OfferCopyWith<$Res> {
   factory $OfferCopyWith(Offer value, $Res Function(Offer) then) =
       _$OfferCopyWithImpl<$Res, Offer>;
   @useResult
-  $Res call({Product product, Store store, int noOfOffersAvailable});
+  $Res call({Product product, Store store, String title});
 
   $ProductCopyWith<$Res> get product;
   $StoreCopyWith<$Res> get store;
@@ -61,7 +61,7 @@ class _$OfferCopyWithImpl<$Res, $Val extends Offer>
   $Res call({
     Object? product = null,
     Object? store = null,
-    Object? noOfOffersAvailable = null,
+    Object? title = null,
   }) {
     return _then(_value.copyWith(
       product: null == product
@@ -72,10 +72,10 @@ class _$OfferCopyWithImpl<$Res, $Val extends Offer>
           ? _value.store
           : store // ignore: cast_nullable_to_non_nullable
               as Store,
-      noOfOffersAvailable: null == noOfOffersAvailable
-          ? _value.noOfOffersAvailable
-          : noOfOffersAvailable // ignore: cast_nullable_to_non_nullable
-              as int,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 
@@ -107,7 +107,7 @@ abstract class _$$OfferImplCopyWith<$Res> implements $OfferCopyWith<$Res> {
       __$$OfferImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({Product product, Store store, int noOfOffersAvailable});
+  $Res call({Product product, Store store, String title});
 
   @override
   $ProductCopyWith<$Res> get product;
@@ -130,7 +130,7 @@ class __$$OfferImplCopyWithImpl<$Res>
   $Res call({
     Object? product = null,
     Object? store = null,
-    Object? noOfOffersAvailable = null,
+    Object? title = null,
   }) {
     return _then(_$OfferImpl(
       product: null == product
@@ -141,10 +141,10 @@ class __$$OfferImplCopyWithImpl<$Res>
           ? _value.store
           : store // ignore: cast_nullable_to_non_nullable
               as Store,
-      noOfOffersAvailable: null == noOfOffersAvailable
-          ? _value.noOfOffersAvailable
-          : noOfOffersAvailable // ignore: cast_nullable_to_non_nullable
-              as int,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -153,9 +153,7 @@ class __$$OfferImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$OfferImpl implements _Offer {
   const _$OfferImpl(
-      {required this.product,
-      required this.store,
-      required this.noOfOffersAvailable});
+      {required this.product, required this.store, required this.title});
 
   factory _$OfferImpl.fromJson(Map<String, dynamic> json) =>
       _$$OfferImplFromJson(json);
@@ -165,11 +163,11 @@ class _$OfferImpl implements _Offer {
   @override
   final Store store;
   @override
-  final int noOfOffersAvailable;
+  final String title;
 
   @override
   String toString() {
-    return 'Offer(product: $product, store: $store, noOfOffersAvailable: $noOfOffersAvailable)';
+    return 'Offer(product: $product, store: $store, title: $title)';
   }
 
   @override
@@ -179,14 +177,12 @@ class _$OfferImpl implements _Offer {
             other is _$OfferImpl &&
             (identical(other.product, product) || other.product == product) &&
             (identical(other.store, store) || other.store == store) &&
-            (identical(other.noOfOffersAvailable, noOfOffersAvailable) ||
-                other.noOfOffersAvailable == noOfOffersAvailable));
+            (identical(other.title, title) || other.title == title));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, product, store, noOfOffersAvailable);
+  int get hashCode => Object.hash(runtimeType, product, store, title);
 
   /// Create a copy of Offer
   /// with the given fields replaced by the non-null parameter values.
@@ -208,7 +204,7 @@ abstract class _Offer implements Offer {
   const factory _Offer(
       {required final Product product,
       required final Store store,
-      required final int noOfOffersAvailable}) = _$OfferImpl;
+      required final String title}) = _$OfferImpl;
 
   factory _Offer.fromJson(Map<String, dynamic> json) = _$OfferImpl.fromJson;
 
@@ -217,7 +213,7 @@ abstract class _Offer implements Offer {
   @override
   Store get store;
   @override
-  int get noOfOffersAvailable;
+  String get title;
 
   /// Create a copy of Offer
   /// with the given fields replaced by the non-null parameter values.

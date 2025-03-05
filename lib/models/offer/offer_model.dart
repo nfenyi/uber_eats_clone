@@ -10,7 +10,7 @@ class Offer with _$Offer {
   const factory Offer({
     required Product product,
     required Store store,
-    required int noOfOffersAvailable,
+    required String title,
   }) = _Offer;
 
   factory Offer.fromJson(Map<String, Object?> json) => _$OfferFromJson(json);
