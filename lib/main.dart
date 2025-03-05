@@ -111,7 +111,7 @@ Future<void> registerHiveAdpapters() async {
 Future<void> openBoxes() async {
   await Hive.openBox(AppBoxes.appState);
   await Hive.openBox<String>(AppBoxes.recentSearches);
-  // await Hive.openBox<Account>(AppBoxes.accounts);
+  await Hive.openBox(AppBoxes.cart);
   // await Hive.openBox<Budget>(AppBoxes.budgets);
   // await Hive.openBox<AppNotification>(AppBoxes.notifications);
   // await Hive.openBox<AccountTransaction>(AppBoxes.transactions);
@@ -268,6 +268,9 @@ class Wrapper extends ConsumerWidget {
 class AppBoxes {
   static const String appState = 'app_state';
   static const String recentSearches = 'recent_searches';
+  static const String cart = 'cart';
+
+  const AppBoxes._();
 }
 
 class BoxKeys {
@@ -279,4 +282,7 @@ class BoxKeys {
   static const String showGetStarted = 'showGetStarted';
   static const String onboarded = 'onboarded';
   static const String country = 'country';
+  static const String userInfo = 'userInfo';
+
+  const BoxKeys._();
 }

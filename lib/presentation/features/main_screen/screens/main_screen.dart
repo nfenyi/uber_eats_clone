@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/account_screen.dart';
@@ -129,25 +131,27 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             // 'Budgets',
           ),
           BottomNavigationBarItem(
-            activeIcon: Consumer(
-              builder: (context, ref, child) {
-                final isPersonal =
-                    ref.watch(accountStateProvider).type == 'Personal';
-                final hasUberOne = ref.watch(accountStateProvider).hasUberOne;
+            activeIcon: ValueListenableBuilder(
+              valueListenable: Hive.box(AppBoxes.appState)
+                  .listenable(keys: [BoxKeys.userInfo]),
+              builder: (context, value, child) {
+                final isBusiness =
+                    value.get(BoxKeys.userInfo)['type'] == 'Business';
+                final hasUberOne = value.get(BoxKeys.userInfo)['hasUberOne'];
                 return Stack(
                   alignment: Alignment.bottomRight,
                   children: [
-                    isPersonal
-                        ? const Icon(
+                    isBusiness
+                        ? const Iconify(
+                            Mdi.briefcase,
+                            size: 26,
+                          )
+                        : const Icon(
                             Icons.person,
                             // color: AppColors.primary,
                             size: 27,
-                          )
-                        : const Iconify(
-                            Mdi.briefcase,
-                            size: 26,
                           ),
-                    if (hasUberOne)
+                    if (hasUberOne == true)
                       Container(
                         decoration: BoxDecoration(
                             color: Colors.white,
@@ -161,24 +165,27 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 );
               },
             ),
-            icon: Consumer(
-              builder: (context, ref, child) {
-                final isPersonal =
-                    ref.watch(accountStateProvider).type == 'Personal';
-                final hasUberOne = ref.watch(accountStateProvider).hasUberOne;
+
+            icon: ValueListenableBuilder(
+              valueListenable: Hive.box(AppBoxes.appState)
+                  .listenable(keys: [BoxKeys.userInfo]),
+              builder: (context, value, child) {
+                final isBusiness =
+                    value.get(BoxKeys.userInfo)['type'] == 'Business';
+                final hasUberOne = value.get(BoxKeys.userInfo)['hasUberOne'];
                 return Stack(
                   alignment: Alignment.bottomRight,
                   children: [
-                    isPersonal
-                        ? const Icon(
-                            Icons.person_outline,
-                            size: 27,
-                          )
-                        : const Iconify(
-                            Mdi.briefcase_outline,
+                    isBusiness
+                        ? const Iconify(
+                            Mdi.briefcase,
                             size: 26,
+                          )
+                        : const Icon(
+                            Icons.person,
+                            size: 27,
                           ),
-                    if (hasUberOne)
+                    if (hasUberOne == true)
                       Container(
                         decoration: BoxDecoration(
                             color: Colors.white,
@@ -192,6 +199,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 );
               },
             ),
+
             label: 'Account',
             //  'User',
           ),

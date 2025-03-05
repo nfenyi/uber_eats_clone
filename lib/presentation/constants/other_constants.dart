@@ -1,6 +1,7 @@
 import 'asset_names.dart';
 
 class OtherConstants {
+  const OtherConstants._();
   // final List<FoodCategory> _foodCategories = [
   //   FoodCategory('Breakfast', AssetNames.breakfast),
   //   FoodCategory('Coffee', AssetNames.coffee),
@@ -40,6 +41,12 @@ class OtherConstants {
     '\$5',
     '\$5+'
   ];
+  static const List<String> sortOptions = [
+    'Recommended',
+    'Rating',
+    'Delivery time'
+  ];
+
   static const List<String> ratingsFilters = ['3+', '3.5+', '4+', '4.5+', '5'];
   static const List<String> pricesFilters = [
     '\$',

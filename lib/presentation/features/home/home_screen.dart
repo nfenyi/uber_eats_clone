@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:location/location.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
@@ -359,8 +360,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   int? _currentFoodCategoryIndex;
 
-  final List<String> _sortOptions = ['Recommended', 'Rating', 'Delivery time'];
-
   @override
   void initState() {
     super.initState();
@@ -413,7 +412,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     //       .collection(FirestoreCollections.foodCategories)
     //       .add(category.toJson());
     // }
-    _getStoresAndProducts();
+    // _getStoresAndProducts();
 
     DateTime dateTimeNow = DateTime.now();
     return SafeArea(
@@ -427,19 +426,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             floating: true,
             pinned: true,
             actions: [
-              TextButton(
-                style: TextButton.styleFrom(
-                    fixedSize: const Size(10, 10),
-                    backgroundColor: AppColors.neutral100,
-                    shape: const CircleBorder()),
-                child: const Badge(
-                    backgroundColor: AppColors.primary2,
-                    child: Icon(Icons.notifications_outlined)),
-                onPressed: () =>
-                    navigatorKey.currentState!.push(MaterialPageRoute(
-                  builder: (context) => const PromoScreen(),
-                )),
-              ),
+              FutureBuilder<int>(
+                  future: _getRedeemedPromosCount(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return TextButton(
+                          style: TextButton.styleFrom(
+                              fixedSize: const Size(10, 10),
+                              backgroundColor: AppColors.neutral100,
+                              shape: const CircleBorder()),
+                          child: const Icon(
+                            Icons.notifications_outlined,
+                            size: 20,
+                          ),
+                          onPressed: () {});
+                    } else if (snapshot.hasError) {
+                      return TextButton(
+                          style: TextButton.styleFrom(
+                              fixedSize: const Size(10, 10),
+                              backgroundColor: AppColors.neutral100,
+                              shape: const CircleBorder()),
+                          child: const Badge(
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              label: AppText(
+                                text: '!',
+                                size: AppSizes.bodySmallest,
+                              ),
+                              child: Icon(
+                                Icons.notifications_outlined,
+                                size: 20,
+                              )),
+                          onPressed: () {});
+                    }
+                    return TextButton(
+                      style: TextButton.styleFrom(
+                          fixedSize: const Size(10, 10),
+                          backgroundColor: AppColors.neutral100,
+                          shape: const CircleBorder()),
+                      child: snapshot.data == 0
+                          ? const Icon(
+                              Icons.notifications_outlined,
+                              size: 20,
+                            )
+                          : Badge(
+                              label: AppText(
+                                text: '${snapshot.data!}',
+                                size: AppSizes.bodySmallest,
+                              ),
+                              backgroundColor: AppColors.primary2,
+                              child: const Icon(
+                                Icons.notifications_outlined,
+                                size: 20,
+                              )),
+                      onPressed: () =>
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => const PromoScreen(),
+                      )),
+                    );
+                  }),
             ],
             flexibleSpace: FlexibleSpaceBar(
               expandedTitleScale: 1,
@@ -739,8 +784,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     horizontal: AppSizes.horizontalPaddingSmall),
                 value: _selectedFilters,
                 onChanged: (value) {
-                  logger.d(value);
-
                   late String newFilter;
 
                   if (value.isEmpty) {
@@ -1240,7 +1283,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     shrinkWrap: true,
                                     itemCount: 3,
                                     itemBuilder: (context, index) {
-                                      final sortOption = _sortOptions[index];
+                                      final sortOption =
+                                          OtherConstants.sortOptions[index];
                                       return RadioListTile<String>.adaptive(
                                         value: sortOption,
                                         title: AppText(text: sortOption),
@@ -1634,24 +1678,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                               children: [
                                                                 Visibility(
                                                                     visible: store
-                                                                            .delivery
-                                                                            .fee <
-                                                                        1,
+                                                                        .isUberOneShop,
                                                                     child: Image
                                                                         .asset(
                                                                       AssetNames
                                                                           .uberOneSmall,
                                                                       height:
                                                                           10,
+                                                                      color: AppColors
+                                                                          .uberOneGold,
                                                                     )),
                                                                 AppText(
                                                                   text: isClosed
                                                                       ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
                                                                       : '\$${store.delivery.fee} Delivery Fee',
+                                                                  color: AppColors
+                                                                      .neutral500,
                                                                 ),
                                                                 AppText(
-                                                                    text:
-                                                                        ' • ${store.delivery.estimatedDeliveryTime} min'),
+                                                                  text:
+                                                                      ' • ${store.delivery.estimatedDeliveryTime} min',
+                                                                  color: AppColors
+                                                                      .neutral500,
+                                                                ),
                                                               ],
                                                             )
                                                           ],
@@ -1888,14 +1937,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                     )
                                                   ],
                                                 ),
-                                                AppText(
-                                                    text:
-                                                        '\$${store.delivery.fee} Delivery Fee',
-                                                    color: store.delivery.fee <
-                                                            1
-                                                        ? const Color.fromARGB(
-                                                            255, 163, 133, 42)
-                                                        : null),
+                                                Row(
+                                                  children: [
+                                                    Visibility(
+                                                        visible:
+                                                            store.isUberOneShop,
+                                                        child: Row(
+                                                          children: [
+                                                            Image.asset(
+                                                              AssetNames
+                                                                  .uberOneSmall,
+                                                              color: AppColors
+                                                                  .uberOneGold,
+                                                              height: 10,
+                                                            ),
+                                                            const Gap(3),
+                                                          ],
+                                                        )),
+                                                    AppText(
+                                                      text:
+                                                          '\$${store.delivery.fee} Delivery Fee',
+                                                      color: store.isUberOneShop
+                                                          ? const Color
+                                                              .fromARGB(
+                                                              255, 163, 133, 42)
+                                                          : AppColors
+                                                              .neutral500,
+                                                    ),
+                                                  ],
+                                                ),
                                                 Row(
                                                   children: [
                                                     AppText(
@@ -1907,6 +1977,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                       size: 10,
                                                     ),
                                                     AppText(
+                                                        color: AppColors
+                                                            .neutral500,
                                                         text:
                                                             '(${store.rating.ratings}+) • ${store.delivery.estimatedDeliveryTime} min'),
                                                   ],
@@ -2128,17 +2200,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               ],
                                             ),
                                             AppText(
-                                                text:
-                                                    '\$${nationalBrand.delivery.fee} Delivery Fee',
-                                                color: nationalBrand
-                                                            .delivery.fee ==
-                                                        0
-                                                    ? const Color.fromARGB(
-                                                        255, 163, 133, 42)
-                                                    : null),
+                                              text:
+                                                  '\$${nationalBrand.delivery.fee} Delivery Fee',
+                                              color:
+                                                  nationalBrand.delivery.fee ==
+                                                          0
+                                                      ? const Color.fromARGB(
+                                                          255, 163, 133, 42)
+                                                      : AppColors.neutral500,
+                                            ),
                                             AppText(
-                                                text:
-                                                    '${nationalBrand.delivery.estimatedDeliveryTime} min')
+                                              text:
+                                                  '${nationalBrand.delivery.estimatedDeliveryTime} min',
+                                              color: AppColors.neutral500,
+                                            )
                                           ],
                                         ),
                                       );
@@ -2468,17 +2543,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                   ],
                                                 ),
                                                 AppText(
-                                                    text:
-                                                        '\$${popularStore.delivery.fee} Delivery Fee',
-                                                    color: popularStore
-                                                                .delivery.fee ==
-                                                            0
-                                                        ? const Color.fromARGB(
-                                                            255, 163, 133, 42)
-                                                        : null),
+                                                  text:
+                                                      '\$${popularStore.delivery.fee} Delivery Fee',
+                                                  color: popularStore
+                                                              .delivery.fee ==
+                                                          0
+                                                      ? const Color.fromARGB(
+                                                          255, 163, 133, 42)
+                                                      : AppColors.neutral500,
+                                                ),
                                                 AppText(
-                                                    text:
-                                                        '${popularStore.delivery.estimatedDeliveryTime} min')
+                                                  text:
+                                                      '${popularStore.delivery.estimatedDeliveryTime} min',
+                                                  color: AppColors.neutral500,
+                                                )
                                               ],
                                             ),
                                           ),
@@ -2697,23 +2775,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           Row(
                                             children: [
                                               Visibility(
-                                                  visible:
-                                                      store.delivery.fee < 1,
+                                                  visible: store.isUberOneShop,
                                                   child: Image.asset(
                                                     AssetNames.uberOneSmall,
                                                     height: 10,
+                                                    color:
+                                                        AppColors.uberOneGold,
                                                   )),
                                               AppText(
-                                                  text: isClosed
-                                                      ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
-                                                      : '\$${store.delivery.fee} Delivery Fee',
-                                                  color: store.delivery.fee < 1
-                                                      ? const Color.fromARGB(
-                                                          255, 163, 133, 42)
-                                                      : null),
+                                                text: isClosed
+                                                    ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                                    : '\$${store.delivery.fee} Delivery Fee',
+                                                color: store.isUberOneShop
+                                                    ? const Color.fromARGB(
+                                                        255, 163, 133, 42)
+                                                    : AppColors.neutral500,
+                                              ),
                                               AppText(
-                                                  text:
-                                                      ' • ${store.delivery.estimatedDeliveryTime} min'),
+                                                text:
+                                                    ' • ${store.delivery.estimatedDeliveryTime} min',
+                                                color: AppColors.neutral500,
+                                              ),
                                             ],
                                           )
                                         ],
@@ -2812,7 +2894,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         .get();
     stores = storesSnapshot.docs.map(
       (snapshot) {
-        logger.d(snapshot.data());
+        // logger.d(snapshot.data());
         return Store.fromJson(snapshot.data());
       },
     ).toList();
@@ -2981,6 +3063,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       },
     ).toList();
   }
+
+  Future<int> _getRedeemedPromosCount() async {
+    Map<dynamic, dynamic>? userInfo =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    if (userInfo != null) {
+      return userInfo['redeemedPromos'].length;
+    } else {
+      final userInfoSnapshot = await FirebaseFirestore.instance
+          .collection(FirestoreCollections.users)
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+      userInfo = userInfoSnapshot.data()!;
+      await Hive.box(AppBoxes.appState).put(BoxKeys.userInfo, userInfo);
+      return userInfo['redeemedPromos'].length;
+    }
+  }
 }
 
 class FavouriteButton extends StatefulWidget {
@@ -3129,7 +3227,8 @@ class ProductGridTile extends StatelessWidget {
                     ),
                   ),
                   AppText(
-                    text: _product.initialPrice.toString(),
+                    text: "\$${_product.initialPrice}",
+                    color: AppColors.neutral500,
                     decoration: _product.promoPrice != null
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
@@ -3183,38 +3282,34 @@ class AllStoresResultDisplay extends StatelessWidget {
                 final isClosed = _timeOfDayNow.hour < store.openingTime.hour ||
                     (_timeOfDayNow.hour >= store.closingTime.hour &&
                         _timeOfDayNow.minute >= store.closingTime.minute);
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          CachedNetworkImage(
-                            imageUrl: store.cardImage,
-                            width: double.infinity,
-                            height: 180,
-                            fit: BoxFit.fill,
-                          ),
-                          isClosed
-                              ? Container(
-                                  color: Colors.black.withOpacity(0.5),
-                                  width: double.infinity,
-                                  height: 180,
-                                  child: const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      AppText(
-                                        text: 'Closed',
-                                        color: Colors.white,
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : !store.delivery.canDeliver
+                return InkWell(
+                  onTap: () {
+                    navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) {
+                        if (store.type.toLowerCase().contains('grocery')) {
+                          return GroceryStoreMainScreen(store);
+                        } else {
+                          return StoreScreen(store);
+                        }
+                      },
+                    ));
+                  },
+                  child: Ink(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: store.cardImage,
+                                width: double.infinity,
+                                height: 180,
+                                fit: BoxFit.fill,
+                              ),
+                              isClosed
                                   ? Container(
                                       color: Colors.black.withOpacity(0.5),
                                       width: double.infinity,
@@ -3226,58 +3321,82 @@ class AllStoresResultDisplay extends StatelessWidget {
                                             CrossAxisAlignment.center,
                                         children: [
                                           AppText(
-                                            text: 'Pick up',
+                                            text: 'Closed',
                                             color: Colors.white,
                                           ),
                                         ],
                                       ),
                                     )
-                                  : const SizedBox.shrink(),
-                          Padding(
-                              padding:
-                                  const EdgeInsets.only(right: 8.0, top: 8.0),
-                              child: FavouriteButton(store: store))
-                        ],
-                      ),
-                    ),
-                    const Gap(10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        AppText(
-                          text: store.name,
-                          size: AppSizes.bodySmall,
-                          weight: FontWeight.bold,
+                                  : !store.delivery.canDeliver
+                                      ? Container(
+                                          color: Colors.black.withOpacity(0.5),
+                                          width: double.infinity,
+                                          height: 180,
+                                          child: const Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              AppText(
+                                                text: 'Pick up',
+                                                color: Colors.white,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : const SizedBox.shrink(),
+                              Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 8.0, top: 8.0),
+                                  child: FavouriteButton(store: store))
+                            ],
+                          ),
                         ),
-                        Container(
-                            decoration: BoxDecoration(
-                                color: AppColors.neutral200,
-                                borderRadius: BorderRadius.circular(20)),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 5, vertical: 2),
-                            child: AppText(
-                                text: store.rating.averageRating.toString()))
+                        const Gap(10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            AppText(
+                              text: store.name,
+                              size: AppSizes.bodySmall,
+                              weight: FontWeight.bold,
+                            ),
+                            Container(
+                                decoration: BoxDecoration(
+                                    color: AppColors.neutral200,
+                                    borderRadius: BorderRadius.circular(20)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 2),
+                                child: AppText(
+                                    text:
+                                        store.rating.averageRating.toString()))
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Visibility(
+                                visible: store.isUberOneShop,
+                                child: Image.asset(
+                                  AssetNames.uberOneSmall,
+                                  height: 10,
+                                  color: AppColors.uberOneGold,
+                                )),
+                            AppText(
+                                text: '\$${store.delivery.fee} Delivery Fee',
+                                color: store.isUberOneShop
+                                    ? const Color.fromARGB(255, 163, 133, 42)
+                                    : AppColors.neutral500),
+                            AppText(
+                              text:
+                                  ' • ${store.delivery.estimatedDeliveryTime} min',
+                              color: AppColors.neutral500,
+                            ),
+                          ],
+                        )
                       ],
                     ),
-                    Row(
-                      children: [
-                        Visibility(
-                            visible: store.delivery.fee < 1,
-                            child: Image.asset(
-                              AssetNames.uberOneSmall,
-                              height: 10,
-                            )),
-                        AppText(
-                            text: '\$${store.delivery.fee} Delivery Fee',
-                            color: store.delivery.fee < 1
-                                ? const Color.fromARGB(255, 163, 133, 42)
-                                : null),
-                        AppText(
-                            text:
-                                ' • ${store.delivery.estimatedDeliveryTime} min'),
-                      ],
-                    )
-                  ],
+                  ),
                 );
               },
               separatorBuilder: (context, index) => const Gap(20),
@@ -3356,175 +3475,224 @@ class SearchResultDisplay extends StatelessWidget {
                 }
               }
               // logger.d(matchingProducts);
-              return Column(
-                children: [
-                  ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
-                      child: CachedNetworkImage(
-                        imageUrl: store.logo,
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                    title: AppText(
-                      text: store.name,
-                      size: AppSizes.bodySmall,
-                      weight: FontWeight.bold,
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+              return InkWell(
+                onTap: () {
+                  navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) {
+                      if (store.type.toLowerCase().contains('grocery')) {
+                        return GroceryStoreMainScreen(store);
+                      } else {
+                        return StoreScreen(store);
+                      }
+                    },
+                  ));
+                },
+                child: Ink(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          child: CachedNetworkImage(
+                            imageUrl: store.logo,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        title: AppText(
+                          text: store.name,
+                          size: AppSizes.bodySmall,
+                          weight: FontWeight.bold,
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Visibility(
-                                visible: store.delivery.fee < 1,
-                                child: Image.asset(
-                                  AssetNames.uberOneSmall,
-                                  height: 10,
-                                )),
-                            AppText(
-                                text: '\$${store.delivery.fee} Delivery Fee',
-                                color: store.delivery.fee < 1
-                                    ? const Color.fromARGB(255, 163, 133, 42)
-                                    : null),
-                            AppText(
-                                text:
-                                    ' • ${store.delivery.estimatedDeliveryTime} min'),
+                            Row(
+                              children: [
+                                Visibility(
+                                    visible: store.isUberOneShop,
+                                    child: Image.asset(
+                                      AssetNames.uberOneSmall,
+                                      height: 10,
+                                      color: AppColors.uberOneGold,
+                                    )),
+                                AppText(
+                                    text:
+                                        '\$${store.delivery.fee} Delivery Fee',
+                                    color: store.isUberOneShop
+                                        ? const Color.fromARGB(
+                                            255, 163, 133, 42)
+                                        : AppColors.neutral500),
+                                AppText(
+                                  text:
+                                      ' • ${store.delivery.estimatedDeliveryTime} min',
+                                  color: AppColors.neutral500,
+                                ),
+                              ],
+                            ),
+                            const AppText(
+                              text: 'Offers available',
+                              color: AppColors.primary2,
+                            )
                           ],
                         ),
-                        const AppText(
-                          text: 'Offers available',
-                          color: AppColors.primary2,
-                        )
-                      ],
-                    ),
-                  ),
-                  const Gap(10),
-                  if (showProducts)
-                    SizedBox(
-                      height: 200,
-                      child: ListView.separated(
-                        cacheExtent: 300,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        separatorBuilder: (context, index) => const Gap(10),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: matchingProducts.length,
-                        itemBuilder: (context, index) {
-                          final productReference = matchingProducts[index];
+                      ),
+                      const Gap(10),
+                      if (showProducts)
+                        SizedBox(
+                          height: 200,
+                          child: ListView.separated(
+                            cacheExtent: 300,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AppSizes.horizontalPaddingSmall),
+                            separatorBuilder: (context, index) => const Gap(10),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: matchingProducts.length <= 10
+                                ? matchingProducts.length
+                                : 11,
+                            itemBuilder: (context, index) {
+                              final productReference = matchingProducts[index];
+                              if (index == 11) {
+                                return AppButton2(
+                                  text: 'View Store',
+                                  // isSecondary: true,
+                                  callback: () {
+                                    navigatorKey.currentState!
+                                        .push(MaterialPageRoute(
+                                      builder: (context) {
+                                        if (store.type
+                                            .toLowerCase()
+                                            .contains('grocery')) {
+                                          return GroceryStoreMainScreen(store);
+                                        } else {
+                                          return StoreScreen(store);
+                                        }
+                                      },
+                                    ));
+                                  },
+                                );
+                              }
 
-                          return SizedBox(
-                            width: 100,
-                            child: FutureBuilder<Product>(
-                                future: AppFunctions.loadProductReference(
-                                    productReference),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return Skeletonizer(
-                                        enabled: true,
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          child: Container(
-                                            color: Colors.blue,
-                                            width: 100,
-                                            height: 140,
-                                          ),
-                                        ));
-                                  } else if (snapshot.hasError) {
-                                    return AppText(
-                                        text: snapshot.error.toString());
-                                  }
-                                  final product = snapshot.data!;
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Stack(
-                                          alignment: Alignment.bottomRight,
-                                          children: [
-                                            CachedNetworkImage(
-                                              imageUrl: product.imageUrls.first,
-                                              width: 100,
-                                              height: 120,
-                                              fit: BoxFit.fill,
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 8.0, top: 8.0),
-                                              child: InkWell(
-                                                onTap: () {},
-                                                child: Ink(
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(5),
-                                                    decoration: BoxDecoration(
-                                                        boxShadow: const [
-                                                          BoxShadow(
-                                                            color:
-                                                                Colors.black12,
-                                                            offset:
-                                                                Offset(2, 2),
-                                                          )
-                                                        ],
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50)),
-                                                    child: const Icon(
-                                                      Icons.add,
+                              return SizedBox(
+                                width: 100,
+                                child: FutureBuilder<Product>(
+                                    future: AppFunctions.loadProductReference(
+                                        productReference),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Skeletonizer(
+                                            enabled: true,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: Container(
+                                                color: Colors.blue,
+                                                width: 100,
+                                                height: 140,
+                                              ),
+                                            ));
+                                      } else if (snapshot.hasError) {
+                                        return AppText(
+                                            text: snapshot.error.toString());
+                                      }
+                                      final product = snapshot.data!;
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Stack(
+                                              alignment: Alignment.bottomRight,
+                                              children: [
+                                                CachedNetworkImage(
+                                                  imageUrl:
+                                                      product.imageUrls.first,
+                                                  width: 100,
+                                                  height: 120,
+                                                  fit: BoxFit.fill,
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 8.0, top: 8.0),
+                                                  child: InkWell(
+                                                    onTap: () {},
+                                                    child: Ink(
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5),
+                                                        decoration: BoxDecoration(
+                                                            boxShadow: const [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .black12,
+                                                                offset: Offset(
+                                                                    2, 2),
+                                                              )
+                                                            ],
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50)),
+                                                        child: const Icon(
+                                                          Icons.add,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      const Gap(5),
-                                      AppText(
-                                        text: product.name,
-                                        weight: FontWeight.w600,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Visibility(
-                                            visible: product.promoPrice != null,
-                                            child: Row(
-                                              children: [
-                                                AppText(
-                                                    text:
-                                                        '\$${product.initialPrice}',
-                                                    color: Colors.green),
-                                                const Gap(5),
+                                                )
                                               ],
                                             ),
                                           ),
+                                          const Gap(5),
                                           AppText(
-                                            text:
-                                                product.initialPrice.toString(),
-                                            decoration:
-                                                product.promoPrice != null
-                                                    ? TextDecoration.lineThrough
-                                                    : TextDecoration.none,
-                                          )
+                                            text: product.name,
+                                            weight: FontWeight.w600,
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Visibility(
+                                                visible:
+                                                    product.promoPrice != null,
+                                                child: Row(
+                                                  children: [
+                                                    AppText(
+                                                        text:
+                                                            '\$${product.initialPrice}',
+                                                        color: Colors.green),
+                                                    const Gap(5),
+                                                  ],
+                                                ),
+                                              ),
+                                              AppText(
+                                                text: product.initialPrice
+                                                    .toString(),
+                                                decoration:
+                                                    product.promoPrice != null
+                                                        ? TextDecoration
+                                                            .lineThrough
+                                                        : TextDecoration.none,
+                                              )
+                                            ],
+                                          ),
                                         ],
-                                      ),
-                                    ],
-                                  );
-                                }),
-                          );
-                        },
-                      ),
-                    ),
-                ],
+                                      );
+                                    }),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               );
             },
           ),

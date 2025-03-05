@@ -60,8 +60,9 @@ class UberOneScreen extends StatelessWidget {
                               .doc(userCredential!.uid)
                               .update({
                             'hasUberOne': false,
-                            'type': "Account",
-                            "onboarded": true
+                            'type': "Personal",
+                            "onboarded": true,
+                            "redeemedPromos": []
                           });
 
                           late String deviceId;
@@ -213,8 +214,9 @@ class UberOneScreen extends StatelessWidget {
                     .doc(userCredential!.uid)
                     .update({
                   'hasUberOne': false,
-                  'type': "Account",
-                  "onboarded": true
+                  'type': "Personal",
+                  "onboarded": true,
+                  "redeemedPromos": []
                 });
 
                 late String deviceId;
