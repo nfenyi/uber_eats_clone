@@ -8,7 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
@@ -359,13 +361,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   int? _previousFoodCategoryIndex;
   late List<Store> _popularNearYou;
   late List<Advert> _adverts;
-  late GeoPoint storedUserLocation;
+  late GeoPoint _storedUserLocation;
 
   int? _currentFoodCategoryIndex;
 
   late String _userPlaceDescription;
 
   late LocationData _currentLocation;
+
+  final _locationFarAway = GlobalKey();
 
   @override
   void initState() {
@@ -500,7 +504,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               title: InkWell(
                 onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
                   builder: (context) => SearchScreen(
-                    userLocation: storedUserLocation,
+                    userLocation: _storedUserLocation,
                     stores: stores,
                   ),
                 )),
@@ -588,10 +592,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  AppText(
-                                      text: _userPlaceDescription
-                                          .split(',')
-                                          .first),
+                                  Builder(builder: (context) {
+                                    const distance =
+                                        Distance(roundResult: true);
+                                    final distanceResult = distance.as(
+                                        LengthUnit.Meter,
+                                        LatLng(_currentLocation.latitude!,
+                                            _currentLocation.longitude!),
+                                        LatLng(_storedUserLocation.latitude,
+                                            _storedUserLocation.longitude));
+
+                                    if (distanceResult > 400) {
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) =>
+                                              ShowCaseWidget.of(context)
+                                                  .startShowCase(
+                                                      [_locationFarAway]));
+                                    }
+                                    return Showcase(
+                                      overlayOpacity: 0,
+                                      disableMovingAnimation: true,
+                                      textColor: Colors.white,
+                                      tooltipBackgroundColor: Colors.black87,
+                                      tooltipBorderRadius:
+                                          BorderRadius.circular(5),
+                                      description: 'You seem quite far away',
+                                      key: _locationFarAway,
+                                      child: AppText(
+                                          text: _userPlaceDescription
+                                              .split(',')
+                                              .first),
+                                    );
+                                  }),
                                   const Icon(Icons.keyboard_arrow_down)
                                 ],
                               )
@@ -1545,7 +1577,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                     builder: (context) =>
                                                         MapScreen(
                                                       userLocation:
-                                                          storedUserLocation,
+                                                          _storedUserLocation,
                                                       filteredStores: stores,
                                                       selectedFilters:
                                                           _selectedFilters,
@@ -1615,7 +1647,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                             } else {
                                                               return StoreScreen(
                                                                   userLocation:
-                                                                      storedUserLocation,
+                                                                      _storedUserLocation,
                                                                   store);
                                                             }
                                                           },
@@ -1933,7 +1965,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                 return StoreScreen(
                                                   store,
                                                   userLocation:
-                                                      storedUserLocation,
+                                                      _storedUserLocation,
                                                 );
                                               }
                                             },
@@ -2167,7 +2199,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               .push(MaterialPageRoute(
                                             builder: (context) => StoreScreen(
                                               store,
-                                              userLocation: storedUserLocation,
+                                              userLocation: _storedUserLocation,
                                             ),
                                           ));
                                         },
@@ -2627,7 +2659,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               return StoreScreen(
                                                 popularStore,
                                                 userLocation:
-                                                    storedUserLocation,
+                                                    _storedUserLocation,
                                               );
                                             }
                                           },
@@ -2870,7 +2902,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                       } else {
                                                         return StoreScreen(
                                                             userLocation:
-                                                                storedUserLocation,
+                                                                _storedUserLocation,
                                                             store);
                                                       }
                                                     },
@@ -3447,7 +3479,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       await Hive.box(AppBoxes.appState)
           .put(BoxKeys.userInfo, userInfoForHiveBox);
     }
-    storedUserLocation =
+    _storedUserLocation =
         GeoPoint(userInfo['latlng'].latitude, userInfo['latlng'].longitude);
     _userPlaceDescription = userInfo['placeDescription'];
     final location = Location();

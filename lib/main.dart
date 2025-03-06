@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:uber_eats_clone/firebase_options.dart';
 import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
@@ -213,9 +214,11 @@ class UberEatsClone extends StatelessWidget {
           // colorSchemeSeed: Colors.black,
           useMaterial3: true,
         ),
-        home: ResponsiveSizer(builder: (BuildContext context,
-            Orientation orientation, ScreenType screenType) {
-          return const Wrapper();
+        home: ShowCaseWidget(builder: (context) {
+          return ResponsiveSizer(builder: (BuildContext context,
+              Orientation orientation, ScreenType screenType) {
+            return const Wrapper();
+          });
         }),
       ),
     );

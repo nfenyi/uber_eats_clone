@@ -218,7 +218,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   }
 
   Future<void> _getAccountStatus() async {
-    Map<String, dynamic>? userInfo =
+    Map<dynamic, dynamic>? userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
     if (userInfo == null) {
       final userInfoSnapshot = await FirebaseFirestore.instance

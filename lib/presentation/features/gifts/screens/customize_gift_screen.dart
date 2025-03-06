@@ -191,7 +191,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                   setState(() {
                     _selectedMessageOption = value;
                   });
-                  logger.d(value);
+                  // logger.d(value);
                   if (value == 'Record video') {
                     // await ImagePicker().pickVideo(
                     //   source: ImageSource.camera,
