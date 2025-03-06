@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/send_gifts_screen.dart';
 
@@ -134,6 +135,8 @@ class _BrowseScreenState extends State<BrowseScreen> {
                       onTap: () =>
                           navigatorKey.currentState!.push(MaterialPageRoute(
                         builder: (context) => SearchScreen(
+                          userLocation: Hive.box(AppBoxes.appState)
+                              .get(BoxKeys.userInfo)['latlng'],
                           stores: stores,
                         ),
                       )),

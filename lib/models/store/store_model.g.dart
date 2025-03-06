@@ -86,16 +86,16 @@ Map<String, dynamic> _$$RatingImplToJson(_$RatingImpl instance) =>
 
 _$StoreLocationImpl _$$StoreLocationImplFromJson(Map<String, dynamic> json) =>
     _$StoreLocationImpl(
-        countryOfOrigin: json['countryOfOrigin'] as String,
-        streetAddress: json['streetAddress'] as String,
-        //removed wrapping fromJsonMethod
-        latlng: json['latlng']);
+      countryOfOrigin: json['countryOfOrigin'] as String,
+      streetAddress: json['streetAddress'] as String,
+      latlng: json['latlng'],
+    );
 
 Map<String, dynamic> _$$StoreLocationImplToJson(_$StoreLocationImpl instance) =>
     <String, dynamic>{
       'countryOfOrigin': instance.countryOfOrigin,
       'streetAddress': instance.streetAddress,
-      'latlng': const GeoPointConverter().toJson(instance.latlng),
+      'latlng': instance.latlng,
     };
 
 _$ProductCategoryImpl _$$ProductCategoryImplFromJson(

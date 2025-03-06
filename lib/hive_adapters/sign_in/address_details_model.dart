@@ -2,7 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 part 'address_details_model.g.dart';
 
-@HiveType(typeId: 0, adapterName: 'AddressDetailsAdapter')
+@HiveType(typeId: 1, adapterName: 'AddressDetailsAdapter')
 class HiveAddressDetails extends HiveObject {
   @HiveField(0)
   final String instruction;

@@ -22,8 +22,10 @@ AddressDetails _$AddressDetailsFromJson(Map<String, dynamic> json) {
 mixin _$AddressDetails {
   String get instruction => throw _privateConstructorUsedError;
   String get apartment => throw _privateConstructorUsedError;
-  String get latLng => throw _privateConstructorUsedError;
+  @GeoPointConverter()
+  GeoPoint get latlng => throw _privateConstructorUsedError;
   String get addressLabel => throw _privateConstructorUsedError;
+  String get placeDescription => throw _privateConstructorUsedError;
   String get building => throw _privateConstructorUsedError;
   String get dropoffOption => throw _privateConstructorUsedError;
 
@@ -46,8 +48,9 @@ abstract class $AddressDetailsCopyWith<$Res> {
   $Res call(
       {String instruction,
       String apartment,
-      String latLng,
+      @GeoPointConverter() GeoPoint latlng,
       String addressLabel,
+      String placeDescription,
       String building,
       String dropoffOption});
 }
@@ -69,8 +72,9 @@ class _$AddressDetailsCopyWithImpl<$Res, $Val extends AddressDetails>
   $Res call({
     Object? instruction = null,
     Object? apartment = null,
-    Object? latLng = null,
+    Object? latlng = null,
     Object? addressLabel = null,
+    Object? placeDescription = null,
     Object? building = null,
     Object? dropoffOption = null,
   }) {
@@ -83,13 +87,17 @@ class _$AddressDetailsCopyWithImpl<$Res, $Val extends AddressDetails>
           ? _value.apartment
           : apartment // ignore: cast_nullable_to_non_nullable
               as String,
-      latLng: null == latLng
-          ? _value.latLng
-          : latLng // ignore: cast_nullable_to_non_nullable
-              as String,
+      latlng: null == latlng
+          ? _value.latlng
+          : latlng // ignore: cast_nullable_to_non_nullable
+              as GeoPoint,
       addressLabel: null == addressLabel
           ? _value.addressLabel
           : addressLabel // ignore: cast_nullable_to_non_nullable
+              as String,
+      placeDescription: null == placeDescription
+          ? _value.placeDescription
+          : placeDescription // ignore: cast_nullable_to_non_nullable
               as String,
       building: null == building
           ? _value.building
@@ -114,8 +122,9 @@ abstract class _$$AddressDetailsImplCopyWith<$Res>
   $Res call(
       {String instruction,
       String apartment,
-      String latLng,
+      @GeoPointConverter() GeoPoint latlng,
       String addressLabel,
+      String placeDescription,
       String building,
       String dropoffOption});
 }
@@ -135,8 +144,9 @@ class __$$AddressDetailsImplCopyWithImpl<$Res>
   $Res call({
     Object? instruction = null,
     Object? apartment = null,
-    Object? latLng = null,
+    Object? latlng = null,
     Object? addressLabel = null,
+    Object? placeDescription = null,
     Object? building = null,
     Object? dropoffOption = null,
   }) {
@@ -149,13 +159,17 @@ class __$$AddressDetailsImplCopyWithImpl<$Res>
           ? _value.apartment
           : apartment // ignore: cast_nullable_to_non_nullable
               as String,
-      latLng: null == latLng
-          ? _value.latLng
-          : latLng // ignore: cast_nullable_to_non_nullable
-              as String,
+      latlng: null == latlng
+          ? _value.latlng
+          : latlng // ignore: cast_nullable_to_non_nullable
+              as GeoPoint,
       addressLabel: null == addressLabel
           ? _value.addressLabel
           : addressLabel // ignore: cast_nullable_to_non_nullable
+              as String,
+      placeDescription: null == placeDescription
+          ? _value.placeDescription
+          : placeDescription // ignore: cast_nullable_to_non_nullable
               as String,
       building: null == building
           ? _value.building
@@ -177,8 +191,9 @@ class _$AddressDetailsImpl
   const _$AddressDetailsImpl(
       {required this.instruction,
       required this.apartment,
-      required this.latLng,
+      @GeoPointConverter() required this.latlng,
       required this.addressLabel,
+      required this.placeDescription,
       required this.building,
       required this.dropoffOption});
 
@@ -190,9 +205,12 @@ class _$AddressDetailsImpl
   @override
   final String apartment;
   @override
-  final String latLng;
+  @GeoPointConverter()
+  final GeoPoint latlng;
   @override
   final String addressLabel;
+  @override
+  final String placeDescription;
   @override
   final String building;
   @override
@@ -200,7 +218,7 @@ class _$AddressDetailsImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'AddressDetails(instruction: $instruction, apartment: $apartment, latLng: $latLng, addressLabel: $addressLabel, building: $building, dropoffOption: $dropoffOption)';
+    return 'AddressDetails(instruction: $instruction, apartment: $apartment, latlng: $latlng, addressLabel: $addressLabel, placeDescription: $placeDescription, building: $building, dropoffOption: $dropoffOption)';
   }
 
   @override
@@ -210,8 +228,9 @@ class _$AddressDetailsImpl
       ..add(DiagnosticsProperty('type', 'AddressDetails'))
       ..add(DiagnosticsProperty('instruction', instruction))
       ..add(DiagnosticsProperty('apartment', apartment))
-      ..add(DiagnosticsProperty('latLng', latLng))
+      ..add(DiagnosticsProperty('latlng', latlng))
       ..add(DiagnosticsProperty('addressLabel', addressLabel))
+      ..add(DiagnosticsProperty('placeDescription', placeDescription))
       ..add(DiagnosticsProperty('building', building))
       ..add(DiagnosticsProperty('dropoffOption', dropoffOption));
   }
@@ -225,9 +244,11 @@ class _$AddressDetailsImpl
                 other.instruction == instruction) &&
             (identical(other.apartment, apartment) ||
                 other.apartment == apartment) &&
-            (identical(other.latLng, latLng) || other.latLng == latLng) &&
+            (identical(other.latlng, latlng) || other.latlng == latlng) &&
             (identical(other.addressLabel, addressLabel) ||
                 other.addressLabel == addressLabel) &&
+            (identical(other.placeDescription, placeDescription) ||
+                other.placeDescription == placeDescription) &&
             (identical(other.building, building) ||
                 other.building == building) &&
             (identical(other.dropoffOption, dropoffOption) ||
@@ -236,8 +257,8 @@ class _$AddressDetailsImpl
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, instruction, apartment, latLng,
-      addressLabel, building, dropoffOption);
+  int get hashCode => Object.hash(runtimeType, instruction, apartment, latlng,
+      addressLabel, placeDescription, building, dropoffOption);
 
   /// Create a copy of AddressDetails
   /// with the given fields replaced by the non-null parameter values.
@@ -260,8 +281,9 @@ abstract class _AddressDetails implements AddressDetails {
   const factory _AddressDetails(
       {required final String instruction,
       required final String apartment,
-      required final String latLng,
+      @GeoPointConverter() required final GeoPoint latlng,
       required final String addressLabel,
+      required final String placeDescription,
       required final String building,
       required final String dropoffOption}) = _$AddressDetailsImpl;
 
@@ -273,9 +295,12 @@ abstract class _AddressDetails implements AddressDetails {
   @override
   String get apartment;
   @override
-  String get latLng;
+  @GeoPointConverter()
+  GeoPoint get latlng;
   @override
   String get addressLabel;
+  @override
+  String get placeDescription;
   @override
   String get building;
   @override

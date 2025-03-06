@@ -10,6 +10,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uuid/uuid.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
@@ -86,20 +87,22 @@ class UberOneScreen extends StatelessWidget {
                           await Hive.box(AppBoxes.appState)
                               .put('authenticated', true);
                           final info = <String, dynamic>{
-                            'name': userCredential.displayName,
-                            'profilePic': userCredential.photoURL,
-                            "email": userCredential.email,
-                            "phoneNumber": userCredential.phoneNumber
+                            const Uuid().v4(): {
+                              'name': userCredential.displayName,
+                              'profilePic': userCredential.photoURL,
+                              "email": userCredential.email,
+                              "phoneNumber": userCredential.phoneNumber
+                            }
                           };
                           await FirebaseFirestore.instance
                               .collection(FirestoreCollections.devices)
                               .doc(deviceId)
-                              .set(info);
+                              .set(info, SetOptions(merge: true));
                           await FirebaseFirestore.instance
                               .collection(FirestoreCollections.favoriteStores)
                               .doc(userCredential.uid)
                               .set({});
-                          navigatorKey.currentState!.pushAndRemoveUntil(
+                          await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                 builder: (context) => const MainScreen(),
                               ), (r) {
@@ -238,15 +241,17 @@ class UberOneScreen extends StatelessWidget {
                 }
                 await Hive.box(AppBoxes.appState).put('authenticated', true);
                 final info = <String, dynamic>{
-                  'name': userCredential.displayName,
-                  'profilePic': userCredential.photoURL,
-                  "email": userCredential.email,
-                  "phoneNumber": userCredential.phoneNumber
+                  const Uuid().v4(): {
+                    'name': userCredential.displayName,
+                    'profilePic': userCredential.photoURL,
+                    "email": userCredential.email,
+                    "phoneNumber": userCredential.phoneNumber
+                  }
                 };
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.devices)
                     .doc(deviceId)
-                    .set(info);
+                    .set(info, SetOptions(merge: true));
 
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.favoriteStores)

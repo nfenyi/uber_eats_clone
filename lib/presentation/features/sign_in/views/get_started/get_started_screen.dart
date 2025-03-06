@@ -8,7 +8,7 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
-import '../../../../../hive_models/country/country_ip_model.dart';
+import '../../../../../hive_adapters/country/country_ip_model.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../core/app_colors.dart';
 import '../sign_in/sign_in_screen.dart';
@@ -80,11 +80,12 @@ class _GetStartedScreenState extends ConsumerState<GetStartedScreen> {
                                 ip: countryResponse?.ip,
                                 code: countryResponse?.countryCode,
                                 country: countryResponse?.country));
-                        navigatorKey.currentState!.pushReplacement(
+                        await navigatorKey.currentState!.pushReplacement(
                             MaterialPageRoute(
                                 builder: (context) => const SignInScreen()));
                       } on Exception catch (e) {
-                        showAppInfoDialog(context, description: e.toString());
+                        await showAppInfoDialog(context,
+                            description: e.toString());
                       }
                     },
                   )

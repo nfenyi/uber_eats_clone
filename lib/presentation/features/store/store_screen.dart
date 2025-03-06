@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -22,7 +24,9 @@ import '../home/home_screen.dart';
 
 class StoreScreen extends StatefulWidget {
   final Store store;
-  const StoreScreen(this.store, {super.key});
+
+  final GeoPoint userLocation;
+  const StoreScreen(this.store, {super.key, required this.userLocation});
 
   @override
   State<StoreScreen> createState() => _StoreScreenState();
@@ -32,7 +36,7 @@ class _StoreScreenState extends State<StoreScreen> {
   late final Store _store;
   late final List<GlobalKey> _categoryKeys;
   final _scrollController = ScrollController();
-
+  late Distance _distance;
   int? _retrievalFilter = 0;
   late bool _isFavorite;
 
@@ -73,6 +77,9 @@ class _StoreScreenState extends State<StoreScreen> {
 
     _scrollController.addListener(_animateToTab);
     _isFavorite = favoriteStores.any((element) => element.id == _store.id);
+    _distance = const Distance(
+      roundResult: true,
+    );
   }
 
   @override
@@ -500,7 +507,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                                 MaterialPageRoute(
                                                           builder: (context) =>
                                                               SearchMenuScreen(
-                                                                  widget.store),
+                                                                  _store),
                                                         ));
                                                       },
                                                       child: Ink(
@@ -567,7 +574,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                                                             MaterialPageRoute(
                                                                       builder: (context) =>
                                                                           StoreDetailsScreen(
-                                                                              widget.store),
+                                                                              _store),
                                                                     ));
                                                                   },
                                                                   leading:
@@ -638,21 +645,39 @@ class _StoreScreenState extends State<StoreScreen> {
                                               weight: FontWeight.w600,
                                             ),
                                             const Gap(5),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                AppText(
-                                                  text: '${_store.rating}',
+                                            InkWell(
+                                              onTap: () {
+                                                navigatorKey.currentState!
+                                                    .push(MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      StoreDetailsScreen(
+                                                          widget.store),
+                                                ));
+                                              },
+                                              child: Ink(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    AppText(
+                                                      text:
+                                                          '${_store.rating.averageRating}',
+                                                    ),
+                                                    const Icon(
+                                                      Icons.star,
+                                                      size: 10,
+                                                    ),
+                                                    AppText(
+                                                        text:
+                                                            '(${_store.rating.ratings}+) • ${_store.isUberOneShop ? 'Uber One' : ''} ${_store.delivery.estimatedDeliveryTime} min'),
+                                                    AppText(
+                                                        text:
+                                                            '${_distance.as(LengthUnit.Kilometer, LatLng(_store.location.latlng.latitude, _store.location.latlng.longitude), LatLng(widget.userLocation.latitude!, widget.userLocation.longitude!))} km '),
+                                                    const Icon(Icons
+                                                        .keyboard_arrow_right)
+                                                  ],
                                                 ),
-                                                const Icon(
-                                                  Icons.star,
-                                                  size: 10,
-                                                ),
-                                                AppText(
-                                                    text:
-                                                        '(${_store.rating.ratings}+) • ${_store.delivery.estimatedDeliveryTime} min'),
-                                              ],
+                                              ),
                                             ),
                                             const Gap(10),
                                             Row(

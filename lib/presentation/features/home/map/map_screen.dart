@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chips_choice/chips_choice.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
@@ -32,7 +33,7 @@ class MapScreen extends StatefulWidget {
   final String? selectedPriceCategory;
   final List<String>? selectedDietaryOptions;
   final String? selectedSort;
-  final LocationData userLocation;
+  final GeoPoint userLocation;
   const MapScreen(
       {super.key,
       required this.filteredStores,

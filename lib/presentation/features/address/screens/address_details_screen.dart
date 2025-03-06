@@ -306,9 +306,11 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                     _isLoading = true;
                   });
                   var addressDetails = AddressDetails(
+                      placeDescription: _placeDescription,
                       instruction: _instructionsController.text,
                       apartment: _aptController.text,
-                      latLng: '${_setLocation.latitude}',
+                      latlng: GeoPoint(
+                          _setLocation.latitude, _setLocation.longitude),
                       addressLabel: _addressLabelController.text,
                       building: _buildingNameController.text,
                       dropoffOption: _dropOffOption);
@@ -321,19 +323,21 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                     await Hive.box(AppBoxes.appState)
                         .put('addressDetailsSaved', true);
 
-                    navigatorKey.currentState!.pushAndRemoveUntil(
+                    await navigatorKey.currentState!.pushAndRemoveUntil(
                         MaterialPageRoute(
                             builder: (context) => const PaymentMethodScreen()),
                         (r) {
                       return false;
                     });
                   } on FirebaseException catch (e) {
-                    showAppInfoDialog(context, description: e.code);
+                    await showAppInfoDialog(navigatorKey.currentContext!,
+                        description: e.code);
                     setState(() {
                       _isLoading = false;
                     });
                   } on Exception catch (e) {
-                    showAppInfoDialog(context, description: e.toString());
+                    await showAppInfoDialog(navigatorKey.currentContext!,
+                        description: e.toString());
                     setState(() {
                       _isLoading = false;
                     });

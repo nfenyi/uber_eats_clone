@@ -9,7 +9,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phonecodes/phonecodes.dart';
-import 'package:uber_eats_clone/hive_models/country/country_ip_model.dart';
+import 'package:uber_eats_clone/hive_adapters/country/country_ip_model.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';

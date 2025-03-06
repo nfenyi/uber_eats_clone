@@ -1,12 +1,14 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:location/location.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
@@ -26,7 +28,7 @@ import '../../alcohol/alcohol_screen.dart';
 import '../../grocery_store/screens/grocery_store_screens.dart';
 import '../../home/home_screen.dart';
 import '../../home/map/map_screen.dart';
-import '../../stores_list_screen/stores_list_screen.dart';
+import '../../stores_list/stores_list_screen.dart';
 import '../../pharmacy/screens/pharmacy_screen.dart';
 import '../../store/store_screen.dart';
 import '../../webview/webview_screen.dart';
@@ -82,6 +84,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
   final List<Store> _petSuppliesStores = [];
   final List<Store> _flowerStores = [];
   final List<Store> _retailStores = [];
+  late final GeoPoint storedUserLocation;
 
   bool _showFilters = true;
 
@@ -94,6 +97,8 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarColor: Colors.white,
     ));
+    storedUserLocation =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo)['latlng'];
 
     _hottestDeals = List.from(stores);
     _hottestDeals.sort(
@@ -214,10 +219,9 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   const Gap(10),
                   InkWell(
                     onTap: () async {
-                      final userLocation = await Location().getLocation();
                       navigatorKey.currentState!.push(MaterialPageRoute(
                         builder: (context) => MapScreen(
-                          userLocation: userLocation,
+                          userLocation: storedUserLocation,
                           filteredStores: [],
                         ),
                       ));
@@ -421,13 +425,19 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                           borderRadius: BorderRadius.circular(12),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(12),
-                            onTap: () {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
+                            onTap: () async {
+                              final location = Location();
+                              final userLocation = await location.getLocation();
+                              await navigatorKey.currentState!
+                                  .push(MaterialPageRoute(
                                 builder: (context) {
                                   if (store.type.contains('Grocery')) {
                                     return GroceryStoreMainScreen(store);
                                   } else {
-                                    return StoreScreen(store);
+                                    return StoreScreen(
+                                      store,
+                                      userLocation: storedUserLocation,
+                                    );
                                   }
                                 },
                               ));
@@ -1289,6 +1299,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   onTap: () =>
                       navigatorKey.currentState!.push(MaterialPageRoute(
                     builder: (context) => SearchScreen(
+                      userLocation: storedUserLocation,
                       stores: _groceryScreenStores,
                     ),
                   )),

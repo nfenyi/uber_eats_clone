@@ -23,13 +23,15 @@ import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../app_functions.dart';
+import '../../../hive_adapters/geopoint/geopoint_adapter.dart';
 import '../../../models/advert/advert_model.dart';
+import '../../../models/offer/offer_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../constants/other_constants.dart';
 import '../../constants/weblinks.dart';
 import '../../services/sign_in_view_model.dart';
-import '../stores_list_screen/stores_list_screen.dart';
+import '../stores_list/stores_list_screen.dart';
 import '../product/product_screen.dart';
 import '../promotion/promo_screen.dart';
 import '../store/store_screen.dart';
@@ -357,8 +359,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   int? _previousFoodCategoryIndex;
   late List<Store> _popularNearYou;
   late List<Advert> _adverts;
+  late GeoPoint storedUserLocation;
 
   int? _currentFoodCategoryIndex;
+
+  late String _userPlaceDescription;
+
+  late LocationData _currentLocation;
 
   @override
   void initState() {
@@ -493,6 +500,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               title: InkWell(
                 onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
                   builder: (context) => SearchScreen(
+                    userLocation: storedUserLocation,
                     stores: stores,
                   ),
                 )),
@@ -512,34 +520,87 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                 ),
               ),
-              background: Padding(
-                padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-                child: InkWell(
-                  onTap: () =>
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) => const AddressesScreen(),
-                  )),
-                  child: Ink(
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AppText(
-                          text: 'Deliver now',
-                          color: AppColors.neutral500,
+              background: FutureBuilder(
+                  future: _getLocation(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Padding(
+                        padding:
+                            EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+                        child: Skeletonizer(
+                          enabled: true,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              AppText(
+                                text: 'bnbnmbkbkbj',
+                                color: AppColors.neutral500,
+                              ),
+                              AppText(
+                                  text: 'vjvjbhhnklnlklsljkslkjajlkaslkaasklf')
+                            ],
+                          ),
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            AppText(text: '1226 University Dr'),
-                            Icon(Icons.keyboard_arrow_down)
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                      );
+                    } else if (snapshot.hasError) {
+                      logger.d(snapshot.error.toString());
+                      return Padding(
+                        padding: const EdgeInsets.all(
+                            AppSizes.horizontalPaddingSmall),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {});
+                          },
+                          child: Ink(
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AppText(
+                                  text: 'Error',
+                                  color: AppColors.neutral500,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return Padding(
+                      padding:
+                          const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+                      child: InkWell(
+                        onTap: () =>
+                            navigatorKey.currentState!.push(MaterialPageRoute(
+                          builder: (context) => const AddressesScreen(),
+                        )),
+                        child: Ink(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const AppText(
+                                text: 'Deliver now',
+                                color: AppColors.neutral500,
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  AppText(
+                                      text: _userPlaceDescription
+                                          .split(',')
+                                          .first),
+                                  const Icon(Icons.keyboard_arrow_down)
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
             ),
           )
         ],
@@ -1478,16 +1539,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               const Gap(10),
                                               InkWell(
                                                 onTap: () async {
-                                                  final userLocation =
-                                                      await Location()
-                                                          .getLocation();
-
-                                                  navigatorKey.currentState!
+                                                  await navigatorKey
+                                                      .currentState!
                                                       .push(MaterialPageRoute(
                                                     builder: (context) =>
                                                         MapScreen(
                                                       userLocation:
-                                                          userLocation,
+                                                          storedUserLocation,
                                                       filteredStores: stores,
                                                       selectedFilters:
                                                           _selectedFilters,
@@ -1556,6 +1614,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                   store);
                                                             } else {
                                                               return StoreScreen(
+                                                                  userLocation:
+                                                                      storedUserLocation,
                                                                   store);
                                                             }
                                                           },
@@ -1577,14 +1637,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                     Alignment
                                                                         .topRight,
                                                                 children: [
-                                                                  CachedNetworkImage(
-                                                                    imageUrl: store
-                                                                        .cardImage,
-                                                                    width: double
-                                                                        .infinity,
-                                                                    height: 170,
-                                                                    fit: BoxFit
-                                                                        .fill,
+                                                                  Stack(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .topLeft,
+                                                                    children: [
+                                                                      CachedNetworkImage(
+                                                                        imageUrl:
+                                                                            store.cardImage,
+                                                                        width: double
+                                                                            .infinity,
+                                                                        height:
+                                                                            170,
+                                                                        fit: BoxFit
+                                                                            .fill,
+                                                                      ),
+                                                                      if (store.offers !=
+                                                                              null &&
+                                                                          store
+                                                                              .offers!
+                                                                              .isNotEmpty)
+                                                                        Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.only(left: 8.0, top: 8.0),
+                                                                            child: Container(
+                                                                              decoration: BoxDecoration(
+                                                                                borderRadius: BorderRadius.circular(5),
+                                                                                color: Colors.green.shade900,
+                                                                              ),
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                                                              child: Row(
+                                                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                mainAxisSize: MainAxisSize.min,
+                                                                                children: [
+                                                                                  AppText(color: Colors.white, size: AppSizes.bodySmallest, text: '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                                                ],
+                                                                              ),
+                                                                            ))
+                                                                    ],
                                                                   ),
                                                                   isClosed
                                                                       ? Container(
@@ -1801,8 +1891,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               children: [
                                 HomeScreenTopic(
                                   title: 'Top 10 hottest this week',
-                                  callback: () =>
-                                      navigatorKey.currentState!.push,
+                                  callback: () => navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) => StoresListScreen(
+                                        stores: _hottestDeals,
+                                        screenTitle:
+                                            'Top 10 hottest this week'),
+                                  )),
                                 ),
                                 SizedBox(
                                   height: 200,
@@ -1835,7 +1930,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                 return GroceryStoreMainScreen(
                                                     store);
                                               } else {
-                                                return StoreScreen(store);
+                                                return StoreScreen(
+                                                  store,
+                                                  userLocation:
+                                                      storedUserLocation,
+                                                );
                                               }
                                             },
                                           ));
@@ -1854,6 +1953,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                   borderRadius:
                                                       BorderRadius.circular(12),
                                                   child: Stack(
+                                                    alignment:
+                                                        Alignment.topLeft,
                                                     children: [
                                                       CachedNetworkImage(
                                                         imageUrl:
@@ -1862,6 +1963,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                         height: 120,
                                                         fit: BoxFit.fill,
                                                       ),
+                                                      if (store.offers !=
+                                                              null &&
+                                                          store.offers!
+                                                              .isNotEmpty)
+                                                        Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 8.0,
+                                                                    top: 8.0),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5),
+                                                                color: Colors
+                                                                    .green
+                                                                    .shade900,
+                                                              ),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          5,
+                                                                      vertical:
+                                                                          2),
+                                                              child: Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .center,
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                children: [
+                                                                  AppText(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      size: AppSizes
+                                                                          .bodySmallest,
+                                                                      text:
+                                                                          '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                                ],
+                                                              ),
+                                                            )),
                                                       isClosed
                                                           ? Container(
                                                               color: Colors
@@ -1992,7 +2139,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   ),
                                 ),
                                 HomeScreenTopic(
-                                    callback: () {}, title: 'Stores near you'),
+                                    callback: () => navigatorKey.currentState!
+                                            .push(MaterialPageRoute(
+                                          builder: (context) =>
+                                              StoresListScreen(
+                                                  stores: stores,
+                                                  screenTitle:
+                                                      'Stores near you'),
+                                        )),
+                                    title: 'Stores near you'),
                                 SizedBox(
                                   height: 100,
                                   child: ListView.separated(
@@ -2010,8 +2165,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         onTap: () {
                                           navigatorKey.currentState!
                                               .push(MaterialPageRoute(
-                                            builder: (context) =>
-                                                StoreScreen(store),
+                                            builder: (context) => StoreScreen(
+                                              store,
+                                              userLocation: storedUserLocation,
+                                            ),
                                           ));
                                         },
                                         child: Ink(
@@ -2090,12 +2247,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               child: Stack(
                                                 alignment: Alignment.topRight,
                                                 children: [
-                                                  CachedNetworkImage(
-                                                    imageUrl:
-                                                        nationalBrand.cardImage,
-                                                    width: 200,
-                                                    height: 120,
-                                                    fit: BoxFit.fill,
+                                                  Stack(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    children: [
+                                                      CachedNetworkImage(
+                                                        imageUrl: nationalBrand
+                                                            .cardImage,
+                                                        width: 200,
+                                                        height: 120,
+                                                        fit: BoxFit.fill,
+                                                      ),
+                                                      if (nationalBrand
+                                                                  .offers !=
+                                                              null &&
+                                                          nationalBrand.offers!
+                                                              .isNotEmpty)
+                                                        Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 8.0,
+                                                                    top: 8.0),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5),
+                                                                color: Colors
+                                                                    .green
+                                                                    .shade900,
+                                                              ),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          5,
+                                                                      vertical:
+                                                                          2),
+                                                              child: Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .center,
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                children: [
+                                                                  AppText(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      size: AppSizes
+                                                                          .bodySmallest,
+                                                                      text:
+                                                                          '${nationalBrand.offers?.length == 1 ? nationalBrand.offers?.first.title : '${nationalBrand.offers?.length} Offers available'}'),
+                                                                ],
+                                                              ),
+                                                            ))
+                                                    ],
                                                   ),
                                                   (dateTimeNow.hour <
                                                               nationalBrand
@@ -2381,7 +2591,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   ),
                                 ),
                                 HomeScreenTopic(
-                                    callback: () {}, title: 'Popular near you'),
+                                    callback: () => navigatorKey.currentState!
+                                            .push(MaterialPageRoute(
+                                          builder: (context) =>
+                                              StoresListScreen(
+                                                  stores: _popularNearYou,
+                                                  screenTitle:
+                                                      'Popular near you'),
+                                        )),
+                                    title: 'Popular near you'),
                                 SizedBox(
                                   height: 200,
                                   child: ListView.separated(
@@ -2406,7 +2624,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               return GroceryStoreMainScreen(
                                                   popularStore);
                                             } else {
-                                              return StoreScreen(popularStore);
+                                              return StoreScreen(
+                                                popularStore,
+                                                userLocation:
+                                                    storedUserLocation,
+                                              );
                                             }
                                           },
                                         )),
@@ -2424,12 +2646,68 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                     alignment:
                                                         Alignment.topRight,
                                                     children: [
-                                                      CachedNetworkImage(
-                                                        imageUrl: popularStore
-                                                            .cardImage,
-                                                        width: 200,
-                                                        height: 120,
-                                                        fit: BoxFit.fill,
+                                                      Stack(
+                                                        alignment:
+                                                            Alignment.topLeft,
+                                                        children: [
+                                                          CachedNetworkImage(
+                                                            imageUrl:
+                                                                popularStore
+                                                                    .cardImage,
+                                                            width: 200,
+                                                            height: 120,
+                                                            fit: BoxFit.fill,
+                                                          ),
+                                                          if (popularStore
+                                                                      .offers !=
+                                                                  null &&
+                                                              popularStore
+                                                                  .offers!
+                                                                  .isNotEmpty)
+                                                            Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            8.0,
+                                                                        top:
+                                                                            8.0),
+                                                                child:
+                                                                    Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(5),
+                                                                    color: Colors
+                                                                        .green
+                                                                        .shade900,
+                                                                  ),
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          5,
+                                                                      vertical:
+                                                                          2),
+                                                                  child: Row(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min,
+                                                                    children: [
+                                                                      AppText(
+                                                                          color: Colors
+                                                                              .white,
+                                                                          size: AppSizes
+                                                                              .bodySmallest,
+                                                                          text:
+                                                                              '${popularStore.offers?.length == 1 ? popularStore.offers?.first.title : '${popularStore.offers?.length} Offers available'}'),
+                                                                    ],
+                                                                  ),
+                                                                ))
+                                                        ],
                                                       ),
                                                       (dateTimeNow.hour <
                                                                   popularStore
@@ -2579,7 +2857,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       return Column(
                                         children: [
                                           HomeScreenTopic(
-                                              callback: () {},
+                                              callback: () => navigatorKey
+                                                      .currentState!
+                                                      .push(MaterialPageRoute(
+                                                    builder: (context) {
+                                                      if (store.type
+                                                          .toLowerCase()
+                                                          .contains(
+                                                              'grocery')) {
+                                                        return GroceryStoreMainScreen(
+                                                            store);
+                                                      } else {
+                                                        return StoreScreen(
+                                                            userLocation:
+                                                                storedUserLocation,
+                                                            store);
+                                                      }
+                                                    },
+                                                  )),
                                               title: advert.title,
                                               subtitle: 'From ${store.name}',
                                               imageUrl: store.logo),
@@ -2654,7 +2949,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       );
                                     }),
                                 HomeScreenTopic(
-                                    callback: () {}, title: 'All Stores'),
+                                    callback: () => navigatorKey.currentState!
+                                            .push(MaterialPageRoute(
+                                          builder: (context) =>
+                                              StoresListScreen(
+                                                  stores: stores,
+                                                  screenTitle: 'All Stores'),
+                                        )),
+                                    title: 'All Stores'),
                                 ListView.separated(
                                     physics:
                                         const NeverScrollableScrollPhysics(),
@@ -2680,11 +2982,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                             child: Stack(
                                               alignment: Alignment.topRight,
                                               children: [
-                                                CachedNetworkImage(
-                                                  imageUrl: store.cardImage,
-                                                  width: double.infinity,
-                                                  height: 170,
-                                                  fit: BoxFit.fill,
+                                                Stack(
+                                                  alignment: Alignment.topLeft,
+                                                  children: [
+                                                    CachedNetworkImage(
+                                                      imageUrl: store.cardImage,
+                                                      width: double.infinity,
+                                                      height: 170,
+                                                      fit: BoxFit.fill,
+                                                    ),
+                                                    if (store.offers != null &&
+                                                        store
+                                                            .offers!.isNotEmpty)
+                                                      Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 8.0,
+                                                                  top: 8.0),
+                                                          child: Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5),
+                                                              color: Colors
+                                                                  .green
+                                                                  .shade900,
+                                                            ),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        5,
+                                                                    vertical:
+                                                                        2),
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                AppText(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    size: AppSizes
+                                                                        .bodySmallest,
+                                                                    text:
+                                                                        '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                              ],
+                                                            ),
+                                                          ))
+                                                  ],
                                                 ),
                                                 isClosed
                                                     ? Container(
@@ -2946,12 +3298,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         return Advert.fromJson(snapshot.data());
       },
     ).toList();
-
-    // List<Map> adStoreAndProduct = [];
-    // for (var advert in _adverts) {
-    //   advert
-    //   adStoreAndProduct.add()
-    // }
   }
 
   Future<void> _getFilterdStores(
@@ -3066,17 +3412,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Future<int> _getRedeemedPromosCount() async {
     Map<dynamic, dynamic>? userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    if (userInfo != null) {
-      return userInfo['redeemedPromos'].length;
-    } else {
+    if (userInfo == null) {
       final userInfoSnapshot = await FirebaseFirestore.instance
           .collection(FirestoreCollections.users)
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get();
-      userInfo = userInfoSnapshot.data()!;
-      await Hive.box(AppBoxes.appState).put(BoxKeys.userInfo, userInfo);
-      return userInfo['redeemedPromos'].length;
+      userInfo = userInfoSnapshot.data();
+      var userInfoForHiveBox = userInfo!;
+      userInfoForHiveBox['latlng'] = HiveGeoPoint(
+          latitude: userInfo['latlng'].latitude,
+          longitude: userInfo['latlng'].longitude);
+
+      await Hive.box(AppBoxes.appState)
+          .put(BoxKeys.userInfo, userInfoForHiveBox);
     }
+    return userInfo['redeemedPromos'].length;
+  }
+
+  Future<void> _getLocation() async {
+    Map<dynamic, dynamic>? userInfo =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    if (userInfo == null) {
+      final userInfoSnapshot = await FirebaseFirestore.instance
+          .collection(FirestoreCollections.users)
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+      userInfo = userInfoSnapshot.data();
+
+      var userInfoForHiveBox = userInfo!;
+      userInfoForHiveBox['latlng'] = HiveGeoPoint(
+          latitude: userInfo['latlng'].latitude,
+          longitude: userInfo['latlng'].longitude);
+
+      await Hive.box(AppBoxes.appState)
+          .put(BoxKeys.userInfo, userInfoForHiveBox);
+    }
+    storedUserLocation =
+        GeoPoint(userInfo['latlng'].latitude, userInfo['latlng'].longitude);
+    _userPlaceDescription = userInfo['placeDescription'];
+    final location = Location();
+    _currentLocation = await location.getLocation();
   }
 }
 
@@ -3245,13 +3620,15 @@ class ProductGridTile extends StatelessWidget {
 class AllStoresResultDisplay extends StatelessWidget {
   const AllStoresResultDisplay({
     super.key,
-    required TimeOfDay timeOfDayNow,
-    required List<Store> storesWithNameOrProduct,
-  })  : _stores = storesWithNameOrProduct,
-        _timeOfDayNow = timeOfDayNow;
+    required this.timeOfDayNow,
+    required this.storesWithNameOrProduct,
+    required this.storedUserLocation,
+  });
 
-  final List<Store> _stores;
-  final TimeOfDay _timeOfDayNow;
+  final List<Store> storesWithNameOrProduct;
+  final TimeOfDay timeOfDayNow;
+
+  final GeoPoint storedUserLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -3264,7 +3641,7 @@ class AllStoresResultDisplay extends StatelessWidget {
               horizontal: AppSizes.horizontalPaddingSmall),
           child: AppText(
             text:
-                '${_stores.length} ${_stores.length == 1 ? 'result' : 'results'}',
+                '${storesWithNameOrProduct.length} ${storesWithNameOrProduct.length == 1 ? 'result' : 'results'}',
             size: AppSizes.bodySmall,
           ),
         ),
@@ -3277,18 +3654,21 @@ class AllStoresResultDisplay extends StatelessWidget {
                   horizontal: AppSizes.horizontalPaddingSmall),
               // shrinkWrap: true,
               itemBuilder: (context, index) {
-                final store = _stores[index];
-                final isClosed = _timeOfDayNow.hour < store.openingTime.hour ||
-                    (_timeOfDayNow.hour >= store.closingTime.hour &&
-                        _timeOfDayNow.minute >= store.closingTime.minute);
+                final store = storesWithNameOrProduct[index];
+                final isClosed = timeOfDayNow.hour < store.openingTime.hour ||
+                    (timeOfDayNow.hour >= store.closingTime.hour &&
+                        timeOfDayNow.minute >= store.closingTime.minute);
                 return InkWell(
-                  onTap: () {
-                    navigatorKey.currentState!.push(MaterialPageRoute(
+                  onTap: () async {
+                    await navigatorKey.currentState!.push(MaterialPageRoute(
                       builder: (context) {
                         if (store.type.toLowerCase().contains('grocery')) {
                           return GroceryStoreMainScreen(store);
                         } else {
-                          return StoreScreen(store);
+                          return StoreScreen(
+                            store,
+                            userLocation: storedUserLocation,
+                          );
                         }
                       },
                     ));
@@ -3399,7 +3779,7 @@ class AllStoresResultDisplay extends StatelessWidget {
                 );
               },
               separatorBuilder: (context, index) => const Gap(20),
-              itemCount: _stores.length),
+              itemCount: storesWithNameOrProduct.length),
         ),
       ],
     );
@@ -3412,14 +3792,17 @@ class SearchResultDisplay extends StatelessWidget {
     required this.storesWithProduct,
     required this.showProducts,
     required this.query,
+    required this.storedUserLocation,
   });
 
   final List<Store> storesWithProduct;
   final String query;
   final bool showProducts;
+  final GeoPoint storedUserLocation;
 
   @override
   Widget build(BuildContext context) {
+    List<Offer> offers = [];
     List<DocumentReference> matchingProducts = [];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3481,7 +3864,10 @@ class SearchResultDisplay extends StatelessWidget {
                       if (store.type.toLowerCase().contains('grocery')) {
                         return GroceryStoreMainScreen(store);
                       } else {
-                        return StoreScreen(store);
+                        return StoreScreen(
+                          store,
+                          userLocation: storedUserLocation,
+                        );
                       }
                     },
                   ));
@@ -3565,7 +3951,10 @@ class SearchResultDisplay extends StatelessWidget {
                                             .contains('grocery')) {
                                           return GroceryStoreMainScreen(store);
                                         } else {
-                                          return StoreScreen(store);
+                                          return StoreScreen(
+                                            store,
+                                            userLocation: storedUserLocation,
+                                          );
                                         }
                                       },
                                     ));
@@ -3650,12 +4039,6 @@ class SearchResultDisplay extends StatelessWidget {
                                             ),
                                           ),
                                           const Gap(5),
-                                          AppText(
-                                            text: product.name,
-                                            weight: FontWeight.w600,
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
                                           Row(
                                             children: [
                                               Visibility(
@@ -3682,6 +4065,31 @@ class SearchResultDisplay extends StatelessWidget {
                                               )
                                             ],
                                           ),
+                                          AppText(
+                                            text: product.name,
+                                            weight: FontWeight.w600,
+                                            maxLines: 3,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Builder(builder: (context) {
+                                            late Offer matchingOffer;
+                                            return (offers.any(
+                                              (element) {
+                                                matchingOffer = element;
+                                                return element.product.id ==
+                                                        product.id &&
+                                                    element.store.id ==
+                                                        store.id;
+                                              },
+                                            ))
+                                                ? AppText(
+                                                    text: matchingOffer.title,
+                                                    color:
+                                                        Colors.green.shade900,
+                                                    size: AppSizes.bodySmallest,
+                                                  )
+                                                : const SizedBox.shrink();
+                                          }),
                                         ],
                                       );
                                     }),

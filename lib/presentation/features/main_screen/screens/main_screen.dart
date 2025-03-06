@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -13,6 +17,7 @@ import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_category_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery/screens/grocery_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
+import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 import 'package:uber_eats_clone/state/account_state_provider.dart';
 
 import '../../../constants/app_sizes.dart';
@@ -36,6 +41,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     const CartsScreen(),
     const AccountScreen()
   ];
+
+  bool _hasUberOne = false;
+
+  String _accountType = 'Personal';
 
   @override
   void initState() {
@@ -131,74 +140,74 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             // 'Budgets',
           ),
           BottomNavigationBarItem(
-            activeIcon: ValueListenableBuilder(
-              valueListenable: Hive.box(AppBoxes.appState)
-                  .listenable(keys: [BoxKeys.userInfo]),
-              builder: (context, value, child) {
-                final isBusiness =
-                    value.get(BoxKeys.userInfo)['type'] == 'Business';
-                final hasUberOne = value.get(BoxKeys.userInfo)['hasUberOne'];
-                return Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    isBusiness
-                        ? const Iconify(
-                            Mdi.briefcase,
-                            size: 26,
-                          )
-                        : const Icon(
-                            Icons.person,
-                            // color: AppColors.primary,
-                            size: 27,
-                          ),
-                    if (hasUberOne == true)
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Image.asset(
-                          AssetNames.uberOneSmall,
-                          width: 17,
-                        ),
+            activeIcon: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                _accountType == 'Personal'
+                    ? const Icon(
+                        Icons.person,
+                        // color: AppColors.primary,
+                        size: 27,
+                      )
+                    : const Iconify(
+                        Mdi.briefcase,
+                        size: 26,
                       ),
-                  ],
-                );
-              },
+                if (_hasUberOne == true)
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50)),
+                    child: Image.asset(
+                      AssetNames.uberOneSmall,
+                      width: 17,
+                    ),
+                  ),
+              ],
             ),
 
-            icon: ValueListenableBuilder(
-              valueListenable: Hive.box(AppBoxes.appState)
-                  .listenable(keys: [BoxKeys.userInfo]),
-              builder: (context, value, child) {
-                final isBusiness =
-                    value.get(BoxKeys.userInfo)['type'] == 'Business';
-                final hasUberOne = value.get(BoxKeys.userInfo)['hasUberOne'];
-                return Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    isBusiness
-                        ? const Iconify(
-                            Mdi.briefcase,
-                            size: 26,
-                          )
-                        : const Icon(
-                            Icons.person,
-                            size: 27,
+            icon: FutureBuilder(
+                future: _getAccountStatus(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Skeletonizer(
+                        child: Container(
+                      height: 35,
+                      width: 35,
+                      color: Colors.blue,
+                    ));
+                  } else if (snapshot.hasError) {
+                    logger.d(snapshot.error.toString());
+                    return const AppText(text: 'Error');
+                  }
+
+                  final isPersonal = _accountType == 'Personal';
+
+                  return Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      isPersonal
+                          ? const Icon(
+                              Icons.person,
+                              size: 27,
+                            )
+                          : const Iconify(
+                              Mdi.briefcase,
+                              size: 26,
+                            ),
+                      if (_hasUberOne == true)
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(50)),
+                          child: Image.asset(
+                            AssetNames.uberOneSmall,
+                            width: 17,
                           ),
-                    if (hasUberOne == true)
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Image.asset(
-                          AssetNames.uberOneSmall,
-                          width: 17,
                         ),
-                      ),
-                  ],
-                );
-              },
-            ),
+                    ],
+                  );
+                }),
 
             label: 'Account',
             //  'User',
@@ -206,5 +215,26 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _getAccountStatus() async {
+    Map<String, dynamic>? userInfo =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    if (userInfo == null) {
+      final userInfoSnapshot = await FirebaseFirestore.instance
+          .collection(FirestoreCollections.users)
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+      userInfo = userInfoSnapshot.data();
+      var userInfoForHiveBox = userInfo!;
+      userInfoForHiveBox['latlng'] = HiveGeoPoint(
+          latitude: userInfo['latlng'].latitude,
+          longitude: userInfo['latlng'].longitude);
+
+      await Hive.box(AppBoxes.appState)
+          .put(BoxKeys.userInfo, userInfoForHiveBox);
+    }
+    _hasUberOne = userInfo['hasUberOne'];
+    _accountType = userInfo['type'];
   }
 }

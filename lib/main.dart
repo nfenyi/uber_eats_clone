@@ -10,10 +10,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/firebase_options.dart';
+import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
-
-import 'hive_models/country/country_ip_model.dart';
+import 'hive_adapters/country/country_ip_model.dart';
 import 'presentation/constants/app_sizes.dart';
 import 'presentation/features/main_screen/screens/main_screen.dart';
 import 'presentation/features/sign_in/views/get_started/get_started_screen.dart';
@@ -100,7 +100,7 @@ void main() async {
 
 Future<void> registerHiveAdpapters() async {
   Hive.registerAdapter(CountryResponseAdapter());
-  // Hive.registerAdapter(AccountAdapter());
+  Hive.registerAdapter(HiveGeoPointAdapter());
   // Hive.registerAdapter(BudgetAdapter());
   // Hive.registerAdapter(TransactionAdapter());
   // Hive.registerAdapter(TransactionCategoryAdapter());

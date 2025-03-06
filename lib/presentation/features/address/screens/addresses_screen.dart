@@ -160,222 +160,18 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(30)))),
               controller: _addressController,
             ),
-            Visibility(
-                visible: _addressController.text.isNotEmpty,
-                child: Column(
-                  children: [
-                    const Gap(10),
-                    //  TODO: wrap widget with flexible or expanded to account for popping of
-                    //keyboard to prevent overflow and allow user to scroll to see content 'behind'
-                    //keyboard
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        final prediction = _predictions[index];
-                        return ListTile(
-                          onTap: () async {
-                            try {
-                              final result = await GoogleMapsServices()
-                                  .fetchDetailsFromPlaceID(
-                                      id: prediction.placeId!);
-                              final List<PlaceResult> payload = result.payload;
-                              final location = payload.first.geometry!.location;
-                              final BitmapDescriptor bitmapDescriptor =
-                                  await BitmapDescriptor.asset(
-                                const ImageConfiguration(
-                                    size:
-                                        Size(30, 46)), // Adjust size as needed
-                                AssetNames.mapMarker, // Path to your asset
-                              );
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) {
-                                  return AddressDetailsScreen(
-                                      placeDescription: prediction.description!,
-                                      markerIcon: bitmapDescriptor,
-                                      location: location!);
-                                },
-                              ));
-                            } on Exception catch (e) {
-                              showAppInfoDialog(context,
-                                  description: e.toString());
-                            }
-                          },
-                          titleAlignment: ListTileTitleAlignment.center,
-                          horizontalTitleGap: 0,
-                          leading: const Iconify(
-                            size: 20,
-                            Ph.map_pin,
-                            color: AppColors.neutral500,
-                          ),
-                          title: AppText(
-                            text: prediction.structuredFormatting!.mainText!,
-                            weight: FontWeight.bold,
-                          ),
-                          subtitle: AppText(
-                              text: prediction
-                                      .structuredFormatting?.secondaryText ??
-                                  "null"),
-                        );
-                      },
-                      itemCount:
-                          _predictions.length <= 10 ? _predictions.length : 10,
-                    ),
-                  ],
-                )),
             const Gap(20),
-            Visibility(
-              visible: _addressController.text.isEmpty,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const AppText(
-                    text: 'Explore nearby',
-                    weight: FontWeight.w600,
-                    size: AppSizes.heading6,
-                  ),
-                  ListTile(
-                    contentPadding: const EdgeInsets.only(left: 15),
-                    leading: const Iconify(
-                      Bi.cursor,
-                      size: 15,
-                    ),
-                    titleAlignment: ListTileTitleAlignment.center,
-                    // dense: true,
-                    title: const AppText(
-                      text: 'Use current location',
-                      size: AppSizes.bodySmaller,
-                    ),
-                    trailing: AppButton2(
-                      text: _isLoading ? 'Please wait...' : 'Enable',
-                      callback: () async {
-                        if (_permissionGranted != PermissionStatus.granted &&
-                            _permissionGranted !=
-                                PermissionStatus.grantedLimited) {
-                          await showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              bool allowButtonIsLoading = false;
-                              return StatefulBuilder(
-                                  builder: (context, setState) {
-                                return Container(
-                                  decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10))),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppSizes.horizontalPaddingSmall),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Center(
-                                          child: AppText(
-                                            text: 'Allow location access',
-                                            size: AppSizes.heading6,
-                                            weight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const Gap(5),
-                                        const Divider(),
-                                        const Gap(5),
-                                        Row(
-                                          children: [
-                                            const Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  AppText(
-                                                      text:
-                                                          'This lets us show you which restaurants and stores you can order from'),
-                                                  Gap(15),
-                                                  AppText(
-                                                      text:
-                                                          'Please go to permissions → Location and allow access'),
-                                                ],
-                                              ),
-                                            ),
-                                            Image.asset(
-                                              AssetNames.allowLocation,
-                                              width: 60,
-                                            ),
-                                          ],
-                                        ),
-                                        const Gap(20),
-                                        AppButton(
-                                          isLoading: allowButtonIsLoading,
-                                          text: 'Allow',
-                                          callback: () async {
-                                            setState(() {
-                                              allowButtonIsLoading = true;
-                                            });
-                                            await _getCurrentLocation();
-
-                                            final result =
-                                                await GoogleMapsServices()
-                                                    .fetchDetailsFromLatlng(
-                                                        latlng: LatLng(
-                                                            _userLocationData!
-                                                                .latitude!,
-                                                            _userLocationData!
-                                                                .longitude!));
-                                            final List<PlaceResult> payload =
-                                                result.payload;
-                                            final location = payload
-                                                .first.geometry!.location;
-                                            final BitmapDescriptor
-                                                bitmapDescriptor =
-                                                await BitmapDescriptor.asset(
-                                              const ImageConfiguration(
-                                                  size: Size(30,
-                                                      46)), // Adjust size as needed
-                                              AssetNames
-                                                  .mapMarker, // Path to your asset
-                                            );
-                                            navigatorKey.currentState!.pop();
-                                            navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) {
-                                                return AddressDetailsScreen(
-                                                    placeDescription: result
-                                                        .payload[1]
-                                                        .formattedAddress,
-                                                    markerIcon:
-                                                        bitmapDescriptor,
-                                                    location: location!);
-                                              },
-                                            ));
-                                          },
-                                        ),
-                                        const Gap(10),
-                                        Center(
-                                          child: AppTextButton(
-                                            text: 'Close',
-                                            callback: () => navigatorKey
-                                                .currentState!
-                                                .pop(),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              });
-                            },
-                          );
-                        } else {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          await _getCurrentLocation();
-                          // logger.d(_userLocationData);
+            Expanded(
+              child: Visibility(
+                visible: _addressController.text.isEmpty,
+                replacement: ListView.builder(
+                  itemBuilder: (context, index) {
+                    final prediction = _predictions[index];
+                    return ListTile(
+                      onTap: () async {
+                        try {
                           final result = await GoogleMapsServices()
-                              .fetchDetailsFromLatlng(
-                                  latlng: LatLng(_userLocationData!.latitude!,
-                                      _userLocationData!.longitude!));
+                              .fetchDetailsFromPlaceID(id: prediction.placeId!);
                           final List<PlaceResult> payload = result.payload;
                           final location = payload.first.geometry!.location;
                           final BitmapDescriptor bitmapDescriptor =
@@ -384,23 +180,217 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                 size: Size(30, 46)), // Adjust size as needed
                             AssetNames.mapMarker, // Path to your asset
                           );
-                          setState(() {
-                            _isLoading = false;
-                          });
                           navigatorKey.currentState!.push(MaterialPageRoute(
                             builder: (context) {
                               return AddressDetailsScreen(
-                                  placeDescription:
-                                      result.payload[1].formattedAddress,
+                                  placeDescription: prediction.description!,
                                   markerIcon: bitmapDescriptor,
                                   location: location!);
                             },
                           ));
+                        } on Exception catch (e) {
+                          showAppInfoDialog(context, description: e.toString());
                         }
                       },
+                      titleAlignment: ListTileTitleAlignment.center,
+                      horizontalTitleGap: 0,
+                      leading: const Iconify(
+                        size: 20,
+                        Ph.map_pin,
+                        color: AppColors.neutral500,
+                      ),
+                      title: AppText(
+                        text: prediction.structuredFormatting!.mainText!,
+                        weight: FontWeight.bold,
+                      ),
+                      subtitle: AppText(
+                          text:
+                              prediction.structuredFormatting?.secondaryText ??
+                                  "null"),
+                    );
+                  },
+                  itemCount:
+                      _predictions.length <= 10 ? _predictions.length : 10,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const AppText(
+                      text: 'Explore nearby',
+                      weight: FontWeight.w600,
+                      size: AppSizes.heading6,
                     ),
-                  ),
-                ],
+                    ListTile(
+                      contentPadding: const EdgeInsets.only(left: 15),
+                      leading: const Iconify(
+                        Bi.cursor,
+                        size: 15,
+                      ),
+                      titleAlignment: ListTileTitleAlignment.center,
+                      // dense: true,
+                      title: const AppText(
+                        text: 'Use current location',
+                        size: AppSizes.bodySmaller,
+                      ),
+                      trailing: AppButton2(
+                        text: _isLoading ? 'Please wait...' : 'Enable',
+                        callback: () async {
+                          if (_permissionGranted != PermissionStatus.granted &&
+                              _permissionGranted !=
+                                  PermissionStatus.grantedLimited) {
+                            await showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                bool allowButtonIsLoading = false;
+                                return StatefulBuilder(
+                                    builder: (context, setState) {
+                                  return Container(
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10))),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(
+                                          AppSizes.horizontalPaddingSmall),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Center(
+                                            child: AppText(
+                                              text: 'Allow location access',
+                                              size: AppSizes.heading6,
+                                              weight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const Gap(5),
+                                          const Divider(),
+                                          const Gap(5),
+                                          Row(
+                                            children: [
+                                              const Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    AppText(
+                                                        text:
+                                                            'This lets us show you which restaurants and stores you can order from'),
+                                                    Gap(15),
+                                                    AppText(
+                                                        text:
+                                                            'Please go to permissions → Location and allow access'),
+                                                  ],
+                                                ),
+                                              ),
+                                              Image.asset(
+                                                AssetNames.allowLocation,
+                                                width: 60,
+                                              ),
+                                            ],
+                                          ),
+                                          const Gap(20),
+                                          AppButton(
+                                            isLoading: allowButtonIsLoading,
+                                            text: 'Allow',
+                                            callback: () async {
+                                              setState(() {
+                                                allowButtonIsLoading = true;
+                                              });
+                                              await _getCurrentLocation();
+
+                                              final result =
+                                                  await GoogleMapsServices()
+                                                      .fetchDetailsFromLatlng(
+                                                          latlng: LatLng(
+                                                              _userLocationData!
+                                                                  .latitude!,
+                                                              _userLocationData!
+                                                                  .longitude!));
+                                              final List<PlaceResult> payload =
+                                                  result.payload;
+                                              final location = payload
+                                                  .first.geometry!.location;
+                                              final BitmapDescriptor
+                                                  bitmapDescriptor =
+                                                  await BitmapDescriptor.asset(
+                                                const ImageConfiguration(
+                                                    size: Size(30,
+                                                        46)), // Adjust size as needed
+                                                AssetNames
+                                                    .mapMarker, // Path to your asset
+                                              );
+                                              navigatorKey.currentState!.pop();
+                                              navigatorKey.currentState!
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) {
+                                                  return AddressDetailsScreen(
+                                                      placeDescription: result
+                                                          .payload[1]
+                                                          .formattedAddress,
+                                                      markerIcon:
+                                                          bitmapDescriptor,
+                                                      location: location!);
+                                                },
+                                              ));
+                                            },
+                                          ),
+                                          const Gap(10),
+                                          Center(
+                                            child: AppTextButton(
+                                              text: 'Close',
+                                              callback: () => navigatorKey
+                                                  .currentState!
+                                                  .pop(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                });
+                              },
+                            );
+                          } else {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            await _getCurrentLocation();
+                            // logger.d(_userLocationData);
+                            final result = await GoogleMapsServices()
+                                .fetchDetailsFromLatlng(
+                                    latlng: LatLng(_userLocationData!.latitude!,
+                                        _userLocationData!.longitude!));
+                            final List<PlaceResult> payload = result.payload;
+                            final location = payload.first.geometry!.location;
+                            final BitmapDescriptor bitmapDescriptor =
+                                await BitmapDescriptor.asset(
+                              const ImageConfiguration(
+                                  size: Size(30, 46)), // Adjust size as needed
+                              AssetNames.mapMarker, // Path to your asset
+                            );
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            await navigatorKey.currentState!
+                                .push(MaterialPageRoute(
+                              builder: (context) {
+                                return AddressDetailsScreen(
+                                    placeDescription:
+                                        result.payload[1].formattedAddress,
+                                    markerIcon: bitmapDescriptor,
+                                    location: location!);
+                              },
+                            ));
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             if (!_firstLogIn)

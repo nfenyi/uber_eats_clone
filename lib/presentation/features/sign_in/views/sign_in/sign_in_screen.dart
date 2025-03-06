@@ -441,26 +441,29 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       .get();
                   if (info.exists && info.data() != null) {
                     await showModalBottomSheet(
+                        shape: const RoundedRectangleBorder(),
+                        backgroundColor: Colors.white,
                         context: context,
                         builder: (context) {
                           return Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              const AppText(
-                                text: 'Continue with account',
-                                size: AppSizes.heading6,
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8.0),
+                                child: AppText(
+                                  text: 'Continue with account',
+                                  size: AppSizes.heading6,
+                                ),
                               ),
                               const Divider(),
                               ListView.separated(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal:
-                                        AppSizes.horizontalPaddingSmall),
+                                // padding: const EdgeInsets.symmetric(
+                                //     horizontal:
+                                //         AppSizes.horizontalPaddingSmall),
                                 itemBuilder: (context, index) {
-                                  final item = info
-                                      .data()!
-                                      .entries
-                                      .elementAt(index)
-                                      .value;
+                                  final item = info.data()!;
                                   return ListTile(
+                                    dense: true,
                                     onTap: () async {
                                       if (info['phoneNumber'] != null) {
                                         await FirebaseAuth.instance
@@ -469,7 +472,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                           verificationCompleted:
                                               (PhoneAuthCredential
                                                   credential) async {
-                                            navigatorKey.currentState!
+                                            await navigatorKey.currentState!
                                                 .push(MaterialPageRoute(
                                               builder: (context) =>
                                                   const MainScreen(),
@@ -528,7 +531,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                           await Hive.box(AppBoxes.appState)
                                               .put('email', info['email']);
 
-                                          navigatorKey.currentState!
+                                          await navigatorKey.currentState!
                                               .push(MaterialPageRoute(
                                             builder: (context) =>
                                                 EmailSentScreen(
@@ -550,8 +553,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                               alignment: Alignment.center,
                                               children: [
                                                 Container(
-                                                  height: 35,
-                                                  width: 35,
+                                                  height: 45,
+                                                  width: 45,
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -569,7 +572,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                                   ),
                                                 ),
                                                 Transform.translate(
-                                                  offset: const Offset(0, -8),
+                                                  offset: const Offset(0, -4),
                                                   child: Image.asset(
                                                     AssetNames.noProfilePic,
                                                     width: 25,
@@ -577,9 +580,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                                 ),
                                               ],
                                             )
-                                          : CachedNetworkImage(
-                                              width: 35,
-                                              imageUrl: item['profilePic']),
+                                          : ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              child: CachedNetworkImage(
+                                                  width: 45,
+                                                  height: 45,
+                                                  fit: BoxFit.cover,
+                                                  imageUrl: item['profilePic']),
+                                            ),
                                     ),
                                     title: item['name'] == null
                                         ? null
@@ -588,6 +597,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                             size: AppSizes.body,
                                           ),
                                     subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         if (item['phoneNumber'] != null)
                                           AppText(text: info['phoneNumber']),
@@ -601,13 +612,14 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                 shrinkWrap: true,
                                 separatorBuilder: (context, index) =>
                                     const Divider(
-                                  indent: 40,
+                                  indent: 50,
                                 ),
                               ),
                               const Divider(
-                                indent: 40,
+                                indent: 50,
                               ),
                               ListTile(
+                                dense: true,
                                 leading: const Icon(Icons.person),
                                 title: const AppText(
                                   text: 'Use another account',

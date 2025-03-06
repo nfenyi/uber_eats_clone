@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:location/location.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -20,7 +22,9 @@ import '../../../../models/promotion/promotion_model.dart';
 import '../../../constants/app_sizes.dart';
 
 class OrdersScreen extends StatefulWidget {
-  const OrdersScreen({super.key});
+  final GeoPoint storedUserLocation;
+
+  const OrdersScreen({super.key, required this.storedUserLocation});
 
   @override
   State<OrdersScreen> createState() => _OrdersScreenState();
@@ -186,8 +190,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                         height: 35,
                                         width: 90,
                                         text: 'View store',
-                                        callback: () {
-                                          navigatorKey.currentState!
+                                        callback: () async {
+                                          await navigatorKey.currentState!
                                               .push(MaterialPageRoute(
                                             builder: (context) {
                                               return ongoingOrder.store.type
@@ -195,6 +199,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                   ? GroceryStoreMainScreen(
                                                       ongoingOrder.store)
                                                   : StoreScreen(
+                                                      userLocation: widget
+                                                          .storedUserLocation,
                                                       ongoingOrder.store);
                                             },
                                           ));
@@ -252,8 +258,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                         height: 35,
                                         width: 90,
                                         text: 'View store',
-                                        callback: () {
-                                          navigatorKey.currentState!
+                                        callback: () async {
+                                          await navigatorKey.currentState!
                                               .push(MaterialPageRoute(
                                             builder: (context) {
                                               return pastOrder.store.type
@@ -261,6 +267,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                   ? GroceryStoreMainScreen(
                                                       pastOrder.store)
                                                   : StoreScreen(
+                                                      userLocation: widget
+                                                          .storedUserLocation,
                                                       pastOrder.store);
                                             },
                                           ));

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_card_onboarding_screen.dart';
@@ -112,6 +113,8 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
                     onTap: () =>
                         navigatorKey.currentState!.push(MaterialPageRoute(
                       builder: (context) => SearchScreen(
+                        userLocation: Hive.box(AppBoxes.appState)
+                            .get(BoxKeys.userInfo)['latlng'],
                         stores: stores,
                       ),
                     )),

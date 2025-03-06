@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
@@ -50,7 +51,11 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
               ListTile(
                   onTap: () => navigatorKey.currentState!
                           .pushReplacement(MaterialPageRoute(
-                        builder: (context) => StoreScreen(widget.store),
+                        builder: (context) => StoreScreen(
+                          widget.store,
+                          userLocation: Hive.box(AppBoxes.appState)
+                              .get(BoxKeys.userInfo)['latlng'],
+                        ),
                       )),
                   leading: Container(
                     padding: const EdgeInsets.all(2),

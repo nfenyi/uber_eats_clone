@@ -10,8 +10,9 @@ _$AddressDetailsImpl _$$AddressDetailsImplFromJson(Map<String, dynamic> json) =>
     _$AddressDetailsImpl(
       instruction: json['instruction'] as String,
       apartment: json['apartment'] as String,
-      latLng: json['latLng'] as String,
+      latlng: json['latlng'],
       addressLabel: json['addressLabel'] as String,
+      placeDescription: json['placeDescription'] as String,
       building: json['building'] as String,
       dropoffOption: json['dropoffOption'] as String,
     );
@@ -21,8 +22,9 @@ Map<String, dynamic> _$$AddressDetailsImplToJson(
     <String, dynamic>{
       'instruction': instance.instruction,
       'apartment': instance.apartment,
-      'latLng': instance.latLng,
+      'latlng': instance.latlng,
       'addressLabel': instance.addressLabel,
+      'placeDescription': instance.placeDescription,
       'building': instance.building,
       'dropoffOption': instance.dropoffOption,
     };

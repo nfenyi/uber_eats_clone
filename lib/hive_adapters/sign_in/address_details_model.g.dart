@@ -8,7 +8,7 @@ part of 'address_details_model.dart';
 
 class AddressDetailsAdapter extends TypeAdapter<HiveAddressDetails> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
   HiveAddressDetails read(BinaryReader reader) {

@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
+import 'package:location/location.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
@@ -33,6 +36,7 @@ class CartsScreen extends ConsumerStatefulWidget {
 }
 
 class _CartsScreenState extends ConsumerState<CartsScreen> {
+  late final GeoPoint _storedUserLocation;
   final List<IndividualOrder> _individualOrders = [
     // IndividualOrder(
     //     orderNumber: '372932',
@@ -114,6 +118,13 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _storedUserLocation =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo)['latlng'];
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: NestedScrollView(
@@ -140,7 +151,9 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                             InkWell(
                               onTap: () => navigatorKey.currentState!
                                   .push(MaterialPageRoute(
-                                builder: (context) => const OrdersScreen(),
+                                builder: (context) => OrdersScreen(
+                                  storedUserLocation: _storedUserLocation,
+                                ),
                               )),
                               child: Container(
                                 padding: const EdgeInsets.all(10),
@@ -787,8 +800,8 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                 children: [
                                   const Gap(10),
                                   AppButton(
-                                    callback: () {
-                                      navigatorKey.currentState!
+                                    callback: () async {
+                                      await navigatorKey.currentState!
                                           .push(MaterialPageRoute(
                                         builder: (context) {
                                           return groupOrder.stores.first.type
@@ -796,6 +809,8 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                               ? GroceryStoreMainScreen(
                                                   groupOrder.stores.first)
                                               : StoreScreen(
+                                                  userLocation:
+                                                      _storedUserLocation,
                                                   groupOrder.stores.first);
                                         },
                                       ));

@@ -19,10 +19,13 @@ import '../home_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   final List<Store> stores;
+  final GeoPoint userLocation;
   // final List<Product> products;
   const SearchScreen({
     super.key,
     required this.stores,
+    required this.userLocation,
+
     // required this.products
   });
 
@@ -501,6 +504,7 @@ class _SearchScreenState extends State<SearchScreen>
                           ? NoSearchResult(_tabController)
                           //all stores
                           : AllStoresResultDisplay(
+                              storedUserLocation: widget.userLocation,
                               timeOfDayNow: timeOfDayNow,
                               storesWithNameOrProduct: _stores),
                   _searchController.text.isEmpty
@@ -512,6 +516,7 @@ class _SearchScreenState extends State<SearchScreen>
                           ? NoSearchResult(_tabController)
                           //restaurants
                           : SearchResultDisplay(
+                              storedUserLocation: widget.userLocation,
                               query: _searchController.text,
                               showProducts: _restaurantsWithProduct.isNotEmpty,
                               storesWithProduct: _restaurantsWithProduct.isEmpty
@@ -527,6 +532,7 @@ class _SearchScreenState extends State<SearchScreen>
                           ? NoSearchResult(_tabController)
                           //groceries
                           : SearchResultDisplay(
+                              storedUserLocation: widget.userLocation,
                               showProducts:
                                   _groceryStoresWithProduct.isNotEmpty,
                               query: _searchController.text,
@@ -544,6 +550,7 @@ class _SearchScreenState extends State<SearchScreen>
                           ? NoSearchResult(_tabController)
                           //alcohol
                           : SearchResultDisplay(
+                              storedUserLocation: widget.userLocation,
                               showProducts:
                                   _alcoholStoresWithProduct.isNotEmpty,
                               query: _searchController.text,

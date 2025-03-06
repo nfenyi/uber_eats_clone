@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/ant_design.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
@@ -12,6 +11,7 @@ import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
+import '../grocery_store/screens/grocery_store_screens.dart';
 import '../home/home_screen.dart';
 
 class StoresListScreen extends StatefulWidget {
@@ -45,7 +45,17 @@ class _StoresListScreenState extends State<StoresListScreen> {
           return InkWell(
             onTap: () {
               navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => StoreScreen(store),
+                builder: (context) {
+                  if (store.type.toLowerCase().contains('grocery')) {
+                    return GroceryStoreMainScreen(store);
+                  } else {
+                    return StoreScreen(
+                      store,
+                      userLocation: Hive.box(AppBoxes.appState)
+                          .get(BoxKeys.userInfo)['latlng'],
+                    );
+                  }
+                },
               ));
             },
             child: Column(
@@ -77,16 +87,17 @@ class _StoresListScreenState extends State<StoresListScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Iconify(
-                                  AntDesign.trophy_filled,
-                                  color: Colors.white,
-                                  size: 15,
-                                ),
+                                // const Iconify(
+                                //   AntDesign.trophy_filled,
+                                //   color: Colors.white,
+                                //   size: 15,
+                                // ),
                                 AppText(
                                     color: Colors.white,
                                     size: AppSizes.bodySmallest,
                                     text:
-                                        ' Top offer • ${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                        // ' Top offer •
+                                        '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
                               ],
                             ),
                           ))
