@@ -136,7 +136,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
                           navigatorKey.currentState!.push(MaterialPageRoute(
                         builder: (context) => SearchScreen(
                           userLocation: Hive.box(AppBoxes.appState)
-                              .get(BoxKeys.userInfo)['latlng'],
+                              .get(BoxKeys.userInfo)['addresses']['latlng'],
                           stores: stores,
                         ),
                       )),

@@ -20,7 +20,7 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
   late final List<DateTime> _days = [];
   late final List<DateTime> _times = [];
 
-  DateTime? _selectedTime;
+  late DateTime _selectedTime;
 
   late DateTime _selectedDay;
 
@@ -56,7 +56,16 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
             AppButton(
               text: 'Schedule',
               callback: () {
-                navigatorKey.currentState!.pop(_selectedTime);
+                if (_selectedTime.difference(DateTime.now()) >
+                        const Duration(hours: 1) ||
+                    _selectedDay.isAfter(DateTime.now())) {
+                  navigatorKey.currentState!.pop(_selectedDay.copyWith(
+                      hour: _selectedTime.hour, minute: _selectedTime.minute));
+                } else {
+                  showInfoToast(
+                      'The time schedule time selected must be at least an hour ahead of now',
+                      context: context);
+                }
               },
             ),
             const Gap(10),
@@ -67,7 +76,7 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                     text: 'Cancel',
-                    callback: () => navigatorKey.currentState!.pop(null),
+                    callback: () => navigatorKey.currentState!.pop(),
                   ),
                 ),
               ],
@@ -78,7 +87,16 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
       appBar: AppBar(
         leading: InkWell(
           onTap: () {
-            navigatorKey.currentState!.pop(_selectedTime);
+            if (_selectedTime.difference(DateTime.now()) >
+                    const Duration(hours: 1) ||
+                _selectedDay.isAfter(DateTime.now())) {
+              navigatorKey.currentState!.pop(_selectedDay.copyWith(
+                  hour: _selectedTime.hour, minute: _selectedTime.minute));
+            } else {
+              showInfoToast(
+                  'The time schedule time selected must be at least an hour ahead of now',
+                  context: context);
+            }
           },
           child: Ink(
             child: const Icon(Icons.arrow_back),
@@ -147,15 +165,20 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
             ),
             const Gap(10),
             Expanded(
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => const Divider(
+                  color: AppColors.neutral100,
+                ),
                 itemCount: _times.length,
                 itemBuilder: (context, index) {
                   final time = _times[index];
                   return RadioListTile(
                     onChanged: (value) {
-                      setState(() {
-                        _selectedTime = value;
-                      });
+                      if (value != null) {
+                        setState(() {
+                          _selectedTime = value;
+                        });
+                      }
                     },
                     controlAffinity: ListTileControlAffinity.trailing,
                     groupValue: _selectedTime,

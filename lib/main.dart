@@ -36,46 +36,62 @@ void main() async {
 // Check if you received the link via `getInitialLink` first
   final PendingDynamicLinkData? initialLink =
       await FirebaseDynamicLinks.instance.getInitialLink();
-
+//TODO: Test receival of group order link
   if (initialLink != null) {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      await user.reload();
-      if (user.emailVerified) {
-        await Hive.box(AppBoxes.appState)
-            .put(BoxKeys.addedEmailToPhoneNumber, true);
-      }
-    } else {
-      if (FirebaseAuth.instance
-          .isSignInWithEmailLink(initialLink.link.toString())) {
-        // The client SDK will parse the code from the link for you.
-        await FirebaseAuth.instance
-            .signInWithEmailLink(
-                email: Hive.box(AppBoxes.appState).get(BoxKeys.email),
-                emailLink: initialLink.link.toString())
-            .then((credential) async {
-          try {
-            await Hive.box(AppBoxes.appState).delete(BoxKeys.email);
+    if (FirebaseAuth.instance
+        .isSignInWithEmailLink(initialLink.link.toString())) {
+      // The client SDK will parse the code from the link for you.
+      await FirebaseAuth.instance
+          .signInWithEmailLink(
+              email: Hive.box(AppBoxes.appState).get(BoxKeys.email),
+              emailLink: initialLink.link.toString())
+          .then((credential) async {
+        try {
+          await Hive.box(AppBoxes.appState).delete(BoxKeys.email);
 
-            final snapshot = await FirebaseFirestore.instance
-                .collection(FirestoreCollections.users)
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .get();
-            if (snapshot.exists &&
-                snapshot.data() != null &&
-                snapshot.data()!['onboarded'] == true) {
-              await Hive.box(AppBoxes.appState)
-                  .put(BoxKeys.authenticated, true);
-            } else {
-              await Hive.box(AppBoxes.appState)
-                  .put(BoxKeys.signedInWithEmail, true);
-            }
-          } catch (e) {
-            logger.d(e.toString());
+          final snapshot = await FirebaseFirestore.instance
+              .collection(FirestoreCollections.users)
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .get();
+
+          if (snapshot.exists &&
+              snapshot.data() != null &&
+              snapshot.data()!['onboarded'] == true) {
+            await Hive.box(AppBoxes.appState).put(BoxKeys.authenticated, true);
+          } else {
+            await Hive.box(AppBoxes.appState)
+                .put(BoxKeys.signedInWithEmail, true);
           }
-        }, onError: (error) {
-          logger.d(error.toString());
-        });
+        } catch (e) {
+          logger.d(e.toString());
+        }
+      }, onError: (error) {
+        logger.d(error.toString());
+      });
+    } else {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        if (initialLink.link.toString().contains('group-order')) {
+          var groupOrderId = initialLink.link.toString().split('%').last;
+          DocumentReference groupOrderRef = FirebaseFirestore.instance
+              .collection(FirestoreCollections.groupOrders)
+              .doc(groupOrderId);
+          await groupOrderRef.update({
+            'persons': FieldValue.arrayUnion([user.uid])
+          });
+          await FirebaseFirestore.instance
+              .collection(FirestoreCollections.users)
+              .doc(user.uid)
+              .update({
+            'groupOrders': FieldValue.arrayUnion([groupOrderRef])
+          });
+        } else {
+          await user.reload();
+          if (user.emailVerified) {
+            await Hive.box(AppBoxes.appState)
+                .put(BoxKeys.addedEmailToPhoneNumber, true);
+          }
+        }
       }
     }
   }
@@ -113,8 +129,6 @@ Future<void> openBoxes() async {
   await Hive.openBox(AppBoxes.appState);
   await Hive.openBox<String>(AppBoxes.recentSearches);
   await Hive.openBox(AppBoxes.cart);
-  // await Hive.openBox<Budget>(AppBoxes.budgets);
-  // await Hive.openBox<AppNotification>(AppBoxes.notifications);
   // await Hive.openBox<AccountTransaction>(AppBoxes.transactions);
   // await Hive.openBox<TransactionCategory>(AppBoxes.transactionsCategories);
   // await Hive.openBox<Goal>(AppBoxes.goals);
@@ -137,6 +151,7 @@ class UberEatsClone extends StatelessWidget {
         navigatorKey: navigatorKey,
         title: 'Uber Eats Clone',
         theme: ThemeData(
+          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
           sliderTheme:
               const SliderThemeData(inactiveTrackColor: AppColors.neutral100),
           dividerTheme: const DividerThemeData(color: AppColors.neutral300),
@@ -146,6 +161,8 @@ class UberEatsClone extends StatelessWidget {
           iconTheme: const IconThemeData(
             color: Colors.black,
           ),
+          bottomSheetTheme:
+              const BottomSheetThemeData(modalBackgroundColor: Colors.white),
           checkboxTheme: CheckboxThemeData(
             fillColor: WidgetStateProperty.resolveWith<Color>(
                 (Set<WidgetState> states) {
@@ -174,10 +191,29 @@ class UberEatsClone extends StatelessWidget {
             // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // Adjust tap target size
           ),
 
-          // switchTheme:  SwitchThemeData(
-          //     thumbColor: WidgetStateProperty.lerp(Colors.white, Colors.black,0.5,(){}),
-          //     trackColor: WidgetStateProperty.all(AppColors.neutral300),
-          //     ),
+          switchTheme: SwitchThemeData(
+            trackOutlineColor: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+              if (states.contains(WidgetState.disabled) || states.isEmpty) {
+                return AppColors.neutral500; // Active/checked color
+              }
+              return Colors.black; // Inactive/unchecked color
+            }),
+            thumbColor: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+              if (states.contains(WidgetState.disabled) || states.isEmpty) {
+                return AppColors.neutral600;
+              }
+              return Colors.white;
+            }),
+            trackColor: WidgetStateProperty.resolveWith<Color>(
+                (Set<WidgetState> states) {
+              if (states.contains(WidgetState.disabled) || states.isEmpty) {
+                return AppColors.neutral200;
+              }
+              return Colors.black;
+            }),
+          ),
           badgeTheme: BadgeThemeData(backgroundColor: Colors.green.shade800),
           radioTheme: RadioThemeData(
             fillColor: WidgetStateProperty.all(Colors.black),
@@ -233,8 +269,8 @@ class Wrapper extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ValueListenableBuilder(
-        valueListenable:
-            Hive.box(AppBoxes.appState).listenable(keys: ['authenticated']),
+        valueListenable: Hive.box(AppBoxes.appState)
+            .listenable(keys: [BoxKeys.authenticated]),
         builder: (context, appStateBox, child) {
           bool showGetStarted =
               appStateBox.get(BoxKeys.showGetStarted, defaultValue: true);
@@ -272,6 +308,7 @@ class AppBoxes {
   static const String appState = 'app_state';
   static const String recentSearches = 'recent_searches';
   static const String cart = 'cart';
+  // static const String groupOrder = 'group_orders';
 
   const AppBoxes._();
 }
@@ -286,6 +323,7 @@ class BoxKeys {
   static const String onboarded = 'onboarded';
   static const String country = 'country';
   static const String userInfo = 'userInfo';
+  static const String activatedPromoPath = 'activatedPromoPath';
 
   const BoxKeys._();
 }

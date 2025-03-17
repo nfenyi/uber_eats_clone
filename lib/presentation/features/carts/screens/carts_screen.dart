@@ -9,6 +9,7 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:location/location.dart';
 import 'package:uber_eats_clone/app_functions.dart';
+import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -21,6 +22,7 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_meth
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 
 import '../../../../main.dart';
+import '../../../../models/group_order/group_order_model.dart';
 import '../../../../models/order/order_model.dart';
 import '../../../../models/payment/payment_model.dart';
 import '../../../../models/payment_method_model.dart';
@@ -120,8 +122,9 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
   @override
   void initState() {
     super.initState();
-    _storedUserLocation =
-        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo)['latlng'];
+    HiveGeoPoint temp = Hive.box(AppBoxes.appState)
+        .get(BoxKeys.userInfo)['addresses']['latlng'];
+    _storedUserLocation = GeoPoint(temp.latitude, temp.longitude);
   }
 
   @override
@@ -628,15 +631,15 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                             ListTile(
                               minLeadingWidth: 45,
                               contentPadding: EdgeInsets.zero,
-                              //cart item.stores == 1 ? name of store : $userlocation.name orders
+                              //cart item.storeIds == 1 ? name of store : $userlocation.name orders
                               title: AppText(
-                                text: groupOrder.stores.length == 1
-                                    ? groupOrder.stores.first.name
-                                    : groupOrder.name,
+                                text: groupOrder.storeIds.length == 1
+                                    ? groupOrder.storeIds.first
+                                    : groupOrder.name!,
                                 weight: FontWeight.w600,
                                 size: AppSizes.bodySmall,
                               ),
-                              leading: groupOrder.stores.length > 1
+                              leading: groupOrder.storeIds.length > 1
                                   ? Stack(
                                       children: [
                                         ClipRRect(
@@ -644,13 +647,14 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                               BorderRadius.circular(50),
                                           child: Stack(
                                             children: [
-                                              CachedNetworkImage(
-                                                imageUrl: groupOrder
-                                                    .stores.first.cardImage,
-                                                width: 30,
-                                                height: 30,
-                                                fit: BoxFit.cover,
-                                              ),
+                                              // CachedNetworkImage(
+                                              //   imageUrl: groupOrder
+                                              //       .storeIds.first.cardImage,
+                                              //   width: 30,
+                                              //   height: 30,
+                                              //   fit: BoxFit.cover,
+                                              // ),
+
                                               Container(
                                                 color: Colors.black38,
                                                 width: 30,
@@ -678,15 +682,16 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                                     BorderRadius.circular(50),
                                                 child: Stack(
                                                   children: [
-                                                    CachedNetworkImage(
-                                                      imageUrl: groupOrder
-                                                          .stores
-                                                          .first
-                                                          .cardImage,
-                                                      width: 30,
-                                                      height: 30,
-                                                      fit: BoxFit.cover,
-                                                    ),
+                                                    // CachedNetworkImage(
+                                                    //   imageUrl: groupOrder
+                                                    //       .storeIds
+                                                    //       .first
+                                                    //       .cardImage,
+                                                    //   width: 30,
+                                                    //   height: 30,
+                                                    //   fit: BoxFit.cover,
+                                                    // ),
+
                                                     Container(
                                                       color: Colors.black38,
                                                       width: 30,
@@ -707,13 +712,13 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                       borderRadius: BorderRadius.circular(50),
                                       child: Stack(
                                         children: [
-                                          CachedNetworkImage(
-                                            imageUrl: groupOrder
-                                                .stores.first.cardImage,
-                                            width: 50,
-                                            height: 50,
-                                            fit: BoxFit.cover,
-                                          ),
+                                          // CachedNetworkImage(
+                                          //   imageUrl: groupOrder
+                                          //       .storeIds.first.cardImage,
+                                          //   width: 50,
+                                          //   height: 50,
+                                          //   fit: BoxFit.cover,
+                                          // ),
                                           Container(
                                             color: Colors.black38,
                                             width: 50,
@@ -730,7 +735,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (groupOrder.repeat != null)
+                                  if (groupOrder.frequency != null)
                                     Row(
                                       children: [
                                         Row(children: [
@@ -740,16 +745,17 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                           ),
                                           const Gap(5),
                                           AppText(
-                                            text: groupOrder.repeat!,
+                                            text: groupOrder.frequency!,
                                           ),
                                           const AppText(
                                             text: ' • ',
                                           ),
                                         ]),
                                         AppText(
-                                            text: groupOrder.stores.length == 1
-                                                ? groupOrder.name
-                                                : 'Created by ${groupOrder.createdBy}')
+                                            text: groupOrder.storeIds.length ==
+                                                    1
+                                                ? groupOrder.name!
+                                                : 'Created by ${groupOrder.ownerId}')
                                       ],
                                     ),
                                   if (nextOrder != null)
@@ -784,36 +790,36 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                             ),
                             const Gap(10),
                             AppButton(
-                              text: groupOrder.stores.length == 1
+                              text: groupOrder.storeIds.length == 1
                                   ? 'View order'
                                   : 'View orders',
-                              callback: () {
-                                navigatorKey.currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      GroupOrderScreen(groupOrder: groupOrder),
-                                ));
-                              },
+                              // callback: () {
+                              //   navigatorKey.currentState!
+                              //       .push(MaterialPageRoute(
+                              //     builder: (context) => GroupOrderScreen(
+                              //         groupOrderPaths: groupOrder),
+                              //   ));
+                              // },
                             ),
-                            if (groupOrder.stores.length == 1)
+                            if (groupOrder.storeIds.length == 1)
                               Column(
                                 children: [
                                   const Gap(10),
                                   AppButton(
                                     callback: () async {
-                                      await navigatorKey.currentState!
-                                          .push(MaterialPageRoute(
-                                        builder: (context) {
-                                          return groupOrder.stores.first.type
-                                                  .contains('Grocery')
-                                              ? GroceryStoreMainScreen(
-                                                  groupOrder.stores.first)
-                                              : StoreScreen(
-                                                  userLocation:
-                                                      _storedUserLocation,
-                                                  groupOrder.stores.first);
-                                        },
-                                      ));
+                                      // await navigatorKey.currentState!
+                                      //     .push(MaterialPageRoute(
+                                      //   builder: (context) {
+                                      //     return groupOrder.storeIds.first.type
+                                      //             .contains('Grocery')
+                                      //         ? GroceryStoreMainScreen(
+                                      //             groupOrder.storeIds.first)
+                                      //         : StoreScreen(
+                                      //             userLocation:
+                                      //                 _storedUserLocation,
+                                      //             groupOrder.storeIds.first);
+                                      //   },
+                                      // ));
                                     },
                                     text: 'View store',
                                     isSecondary: true,

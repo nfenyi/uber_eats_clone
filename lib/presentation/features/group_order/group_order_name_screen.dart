@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
+import '../../../main.dart';
+
 class GroupOrderNameScreen extends ConsumerStatefulWidget {
-  const GroupOrderNameScreen({super.key});
+  final String orderName;
+  const GroupOrderNameScreen(this.orderName, {super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -15,11 +17,17 @@ class GroupOrderNameScreen extends ConsumerStatefulWidget {
 }
 
 class _GroupOrderNameScreenState extends ConsumerState<GroupOrderNameScreen> {
-  final _controller = TextEditingController();
+  final _nameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.orderName;
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -45,23 +53,28 @@ class _GroupOrderNameScreenState extends ConsumerState<GroupOrderNameScreen> {
                 const AppText(text: 'Example: Halloween lunch party'),
                 const Gap(20),
                 AppTextFormField(
-                  //TODO: fix trailing icon not appearing
-                  suffixIcon: _controller.text.isNotEmpty
+                  controller: _nameController,
+                  suffixIcon: _nameController.text.isNotEmpty
                       ? GestureDetector(
                           onTap: () {
                             setState(() {
-                              _controller.clear();
+                              _nameController.clear();
                             });
                           },
-                          child: const Icon(FontAwesomeIcons.circleXmark))
+                          child: const Icon(Icons.cancel))
                       : null,
                 ),
               ],
             ),
-            const Column(
+            Column(
               children: [
-                AppButton(text: 'Save'),
-                Gap(10),
+                AppButton(
+                  text: 'Save',
+                  callback: () {
+                    navigatorKey.currentState!.pop(_nameController.text);
+                  },
+                ),
+                const Gap(10),
               ],
             )
           ],

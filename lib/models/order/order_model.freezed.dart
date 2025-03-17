@@ -544,325 +544,6 @@ abstract class _IndividualOrder implements IndividualOrder {
       throw _privateConstructorUsedError;
 }
 
-GroupOrder _$GroupOrderFromJson(Map<String, dynamic> json) {
-  return _GroupOrder.fromJson(json);
-}
-
-/// @nodoc
-mixin _$GroupOrder {
-  String get name => throw _privateConstructorUsedError;
-  String get createdBy => throw _privateConstructorUsedError;
-  String get location => throw _privateConstructorUsedError;
-  List<Store> get stores => throw _privateConstructorUsedError;
-  List<OrderSchedule> get orderSchedules => throw _privateConstructorUsedError;
-  List<String> get persons => throw _privateConstructorUsedError;
-  String? get repeat => throw _privateConstructorUsedError;
-
-  /// Serializes this GroupOrder to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of GroupOrder
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $GroupOrderCopyWith<GroupOrder> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $GroupOrderCopyWith<$Res> {
-  factory $GroupOrderCopyWith(
-          GroupOrder value, $Res Function(GroupOrder) then) =
-      _$GroupOrderCopyWithImpl<$Res, GroupOrder>;
-  @useResult
-  $Res call(
-      {String name,
-      String createdBy,
-      String location,
-      List<Store> stores,
-      List<OrderSchedule> orderSchedules,
-      List<String> persons,
-      String? repeat});
-}
-
-/// @nodoc
-class _$GroupOrderCopyWithImpl<$Res, $Val extends GroupOrder>
-    implements $GroupOrderCopyWith<$Res> {
-  _$GroupOrderCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of GroupOrder
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? createdBy = null,
-    Object? location = null,
-    Object? stores = null,
-    Object? orderSchedules = null,
-    Object? persons = null,
-    Object? repeat = freezed,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdBy: null == createdBy
-          ? _value.createdBy
-          : createdBy // ignore: cast_nullable_to_non_nullable
-              as String,
-      location: null == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String,
-      stores: null == stores
-          ? _value.stores
-          : stores // ignore: cast_nullable_to_non_nullable
-              as List<Store>,
-      orderSchedules: null == orderSchedules
-          ? _value.orderSchedules
-          : orderSchedules // ignore: cast_nullable_to_non_nullable
-              as List<OrderSchedule>,
-      persons: null == persons
-          ? _value.persons
-          : persons // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      repeat: freezed == repeat
-          ? _value.repeat
-          : repeat // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$GroupOrderImplCopyWith<$Res>
-    implements $GroupOrderCopyWith<$Res> {
-  factory _$$GroupOrderImplCopyWith(
-          _$GroupOrderImpl value, $Res Function(_$GroupOrderImpl) then) =
-      __$$GroupOrderImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String name,
-      String createdBy,
-      String location,
-      List<Store> stores,
-      List<OrderSchedule> orderSchedules,
-      List<String> persons,
-      String? repeat});
-}
-
-/// @nodoc
-class __$$GroupOrderImplCopyWithImpl<$Res>
-    extends _$GroupOrderCopyWithImpl<$Res, _$GroupOrderImpl>
-    implements _$$GroupOrderImplCopyWith<$Res> {
-  __$$GroupOrderImplCopyWithImpl(
-      _$GroupOrderImpl _value, $Res Function(_$GroupOrderImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of GroupOrder
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? createdBy = null,
-    Object? location = null,
-    Object? stores = null,
-    Object? orderSchedules = null,
-    Object? persons = null,
-    Object? repeat = freezed,
-  }) {
-    return _then(_$GroupOrderImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdBy: null == createdBy
-          ? _value.createdBy
-          : createdBy // ignore: cast_nullable_to_non_nullable
-              as String,
-      location: null == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String,
-      stores: null == stores
-          ? _value._stores
-          : stores // ignore: cast_nullable_to_non_nullable
-              as List<Store>,
-      orderSchedules: null == orderSchedules
-          ? _value._orderSchedules
-          : orderSchedules // ignore: cast_nullable_to_non_nullable
-              as List<OrderSchedule>,
-      persons: null == persons
-          ? _value._persons
-          : persons // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      repeat: freezed == repeat
-          ? _value.repeat
-          : repeat // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
-  const _$GroupOrderImpl(
-      {required this.name,
-      required this.createdBy,
-      required this.location,
-      required final List<Store> stores,
-      required final List<OrderSchedule> orderSchedules,
-      required final List<String> persons,
-      this.repeat})
-      : _stores = stores,
-        _orderSchedules = orderSchedules,
-        _persons = persons;
-
-  factory _$GroupOrderImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GroupOrderImplFromJson(json);
-
-  @override
-  final String name;
-  @override
-  final String createdBy;
-  @override
-  final String location;
-  final List<Store> _stores;
-  @override
-  List<Store> get stores {
-    if (_stores is EqualUnmodifiableListView) return _stores;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_stores);
-  }
-
-  final List<OrderSchedule> _orderSchedules;
-  @override
-  List<OrderSchedule> get orderSchedules {
-    if (_orderSchedules is EqualUnmodifiableListView) return _orderSchedules;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_orderSchedules);
-  }
-
-  final List<String> _persons;
-  @override
-  List<String> get persons {
-    if (_persons is EqualUnmodifiableListView) return _persons;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_persons);
-  }
-
-  @override
-  final String? repeat;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'GroupOrder(name: $name, createdBy: $createdBy, location: $location, stores: $stores, orderSchedules: $orderSchedules, persons: $persons, repeat: $repeat)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'GroupOrder'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('createdBy', createdBy))
-      ..add(DiagnosticsProperty('location', location))
-      ..add(DiagnosticsProperty('stores', stores))
-      ..add(DiagnosticsProperty('orderSchedules', orderSchedules))
-      ..add(DiagnosticsProperty('persons', persons))
-      ..add(DiagnosticsProperty('repeat', repeat));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$GroupOrderImpl &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.createdBy, createdBy) ||
-                other.createdBy == createdBy) &&
-            (identical(other.location, location) ||
-                other.location == location) &&
-            const DeepCollectionEquality().equals(other._stores, _stores) &&
-            const DeepCollectionEquality()
-                .equals(other._orderSchedules, _orderSchedules) &&
-            const DeepCollectionEquality().equals(other._persons, _persons) &&
-            (identical(other.repeat, repeat) || other.repeat == repeat));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      createdBy,
-      location,
-      const DeepCollectionEquality().hash(_stores),
-      const DeepCollectionEquality().hash(_orderSchedules),
-      const DeepCollectionEquality().hash(_persons),
-      repeat);
-
-  /// Create a copy of GroupOrder
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$GroupOrderImplCopyWith<_$GroupOrderImpl> get copyWith =>
-      __$$GroupOrderImplCopyWithImpl<_$GroupOrderImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GroupOrderImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _GroupOrder implements GroupOrder {
-  const factory _GroupOrder(
-      {required final String name,
-      required final String createdBy,
-      required final String location,
-      required final List<Store> stores,
-      required final List<OrderSchedule> orderSchedules,
-      required final List<String> persons,
-      final String? repeat}) = _$GroupOrderImpl;
-
-  factory _GroupOrder.fromJson(Map<String, dynamic> json) =
-      _$GroupOrderImpl.fromJson;
-
-  @override
-  String get name;
-  @override
-  String get createdBy;
-  @override
-  String get location;
-  @override
-  List<Store> get stores;
-  @override
-  List<OrderSchedule> get orderSchedules;
-  @override
-  List<String> get persons;
-  @override
-  String? get repeat;
-
-  /// Create a copy of GroupOrder
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GroupOrderImplCopyWith<_$GroupOrderImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
 OrderSchedule _$OrderScheduleFromJson(Map<String, dynamic> json) {
   return _OrderSchedule.fromJson(json);
 }
@@ -870,18 +551,18 @@ OrderSchedule _$OrderScheduleFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$OrderSchedule {
   DateTime get deliveryDate => throw _privateConstructorUsedError;
-  Store get store => throw _privateConstructorUsedError;
+  String get storeId => throw _privateConstructorUsedError;
   String get orderNumber => throw _privateConstructorUsedError;
   List<OrderItem> get orderItems => throw _privateConstructorUsedError;
-  double? get tip => throw _privateConstructorUsedError;
+  double get tip => throw _privateConstructorUsedError;
   String get courier => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
   Promotion? get promo => throw _privateConstructorUsedError;
   double get serviceFee => throw _privateConstructorUsedError;
   double get tax => throw _privateConstructorUsedError;
-  double? get caDriverBenefits => throw _privateConstructorUsedError;
+  double get caDriverBenefits => throw _privateConstructorUsedError;
   double get deliveryFee => throw _privateConstructorUsedError;
-  double? get membershipBenefit => throw _privateConstructorUsedError;
+  double get membershipBenefit => throw _privateConstructorUsedError;
   List<Payment> get payments => throw _privateConstructorUsedError;
   double get totalFee => throw _privateConstructorUsedError;
 
@@ -903,22 +584,21 @@ abstract class $OrderScheduleCopyWith<$Res> {
   @useResult
   $Res call(
       {DateTime deliveryDate,
-      Store store,
+      String storeId,
       String orderNumber,
       List<OrderItem> orderItems,
-      double? tip,
+      double tip,
       String courier,
       String status,
       Promotion? promo,
       double serviceFee,
       double tax,
-      double? caDriverBenefits,
+      double caDriverBenefits,
       double deliveryFee,
-      double? membershipBenefit,
+      double membershipBenefit,
       List<Payment> payments,
       double totalFee});
 
-  $StoreCopyWith<$Res> get store;
   $PromotionCopyWith<$Res>? get promo;
 }
 
@@ -938,18 +618,18 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
   @override
   $Res call({
     Object? deliveryDate = null,
-    Object? store = null,
+    Object? storeId = null,
     Object? orderNumber = null,
     Object? orderItems = null,
-    Object? tip = freezed,
+    Object? tip = null,
     Object? courier = null,
     Object? status = null,
     Object? promo = freezed,
     Object? serviceFee = null,
     Object? tax = null,
-    Object? caDriverBenefits = freezed,
+    Object? caDriverBenefits = null,
     Object? deliveryFee = null,
-    Object? membershipBenefit = freezed,
+    Object? membershipBenefit = null,
     Object? payments = null,
     Object? totalFee = null,
   }) {
@@ -958,10 +638,10 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
           ? _value.deliveryDate
           : deliveryDate // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      store: null == store
-          ? _value.store
-          : store // ignore: cast_nullable_to_non_nullable
-              as Store,
+      storeId: null == storeId
+          ? _value.storeId
+          : storeId // ignore: cast_nullable_to_non_nullable
+              as String,
       orderNumber: null == orderNumber
           ? _value.orderNumber
           : orderNumber // ignore: cast_nullable_to_non_nullable
@@ -970,10 +650,10 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
           ? _value.orderItems
           : orderItems // ignore: cast_nullable_to_non_nullable
               as List<OrderItem>,
-      tip: freezed == tip
+      tip: null == tip
           ? _value.tip
           : tip // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as double,
       courier: null == courier
           ? _value.courier
           : courier // ignore: cast_nullable_to_non_nullable
@@ -994,18 +674,18 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
           ? _value.tax
           : tax // ignore: cast_nullable_to_non_nullable
               as double,
-      caDriverBenefits: freezed == caDriverBenefits
+      caDriverBenefits: null == caDriverBenefits
           ? _value.caDriverBenefits
           : caDriverBenefits // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as double,
       deliveryFee: null == deliveryFee
           ? _value.deliveryFee
           : deliveryFee // ignore: cast_nullable_to_non_nullable
               as double,
-      membershipBenefit: freezed == membershipBenefit
+      membershipBenefit: null == membershipBenefit
           ? _value.membershipBenefit
           : membershipBenefit // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as double,
       payments: null == payments
           ? _value.payments
           : payments // ignore: cast_nullable_to_non_nullable
@@ -1015,16 +695,6 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
           : totalFee // ignore: cast_nullable_to_non_nullable
               as double,
     ) as $Val);
-  }
-
-  /// Create a copy of OrderSchedule
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $StoreCopyWith<$Res> get store {
-    return $StoreCopyWith<$Res>(_value.store, (value) {
-      return _then(_value.copyWith(store: value) as $Val);
-    });
   }
 
   /// Create a copy of OrderSchedule
@@ -1052,23 +722,21 @@ abstract class _$$OrderScheduleImplCopyWith<$Res>
   @useResult
   $Res call(
       {DateTime deliveryDate,
-      Store store,
+      String storeId,
       String orderNumber,
       List<OrderItem> orderItems,
-      double? tip,
+      double tip,
       String courier,
       String status,
       Promotion? promo,
       double serviceFee,
       double tax,
-      double? caDriverBenefits,
+      double caDriverBenefits,
       double deliveryFee,
-      double? membershipBenefit,
+      double membershipBenefit,
       List<Payment> payments,
       double totalFee});
 
-  @override
-  $StoreCopyWith<$Res> get store;
   @override
   $PromotionCopyWith<$Res>? get promo;
 }
@@ -1087,18 +755,18 @@ class __$$OrderScheduleImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? deliveryDate = null,
-    Object? store = null,
+    Object? storeId = null,
     Object? orderNumber = null,
     Object? orderItems = null,
-    Object? tip = freezed,
+    Object? tip = null,
     Object? courier = null,
     Object? status = null,
     Object? promo = freezed,
     Object? serviceFee = null,
     Object? tax = null,
-    Object? caDriverBenefits = freezed,
+    Object? caDriverBenefits = null,
     Object? deliveryFee = null,
-    Object? membershipBenefit = freezed,
+    Object? membershipBenefit = null,
     Object? payments = null,
     Object? totalFee = null,
   }) {
@@ -1107,10 +775,10 @@ class __$$OrderScheduleImplCopyWithImpl<$Res>
           ? _value.deliveryDate
           : deliveryDate // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      store: null == store
-          ? _value.store
-          : store // ignore: cast_nullable_to_non_nullable
-              as Store,
+      storeId: null == storeId
+          ? _value.storeId
+          : storeId // ignore: cast_nullable_to_non_nullable
+              as String,
       orderNumber: null == orderNumber
           ? _value.orderNumber
           : orderNumber // ignore: cast_nullable_to_non_nullable
@@ -1119,10 +787,10 @@ class __$$OrderScheduleImplCopyWithImpl<$Res>
           ? _value._orderItems
           : orderItems // ignore: cast_nullable_to_non_nullable
               as List<OrderItem>,
-      tip: freezed == tip
+      tip: null == tip
           ? _value.tip
           : tip // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as double,
       courier: null == courier
           ? _value.courier
           : courier // ignore: cast_nullable_to_non_nullable
@@ -1143,18 +811,18 @@ class __$$OrderScheduleImplCopyWithImpl<$Res>
           ? _value.tax
           : tax // ignore: cast_nullable_to_non_nullable
               as double,
-      caDriverBenefits: freezed == caDriverBenefits
+      caDriverBenefits: null == caDriverBenefits
           ? _value.caDriverBenefits
           : caDriverBenefits // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as double,
       deliveryFee: null == deliveryFee
           ? _value.deliveryFee
           : deliveryFee // ignore: cast_nullable_to_non_nullable
               as double,
-      membershipBenefit: freezed == membershipBenefit
+      membershipBenefit: null == membershipBenefit
           ? _value.membershipBenefit
           : membershipBenefit // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as double,
       payments: null == payments
           ? _value._payments
           : payments // ignore: cast_nullable_to_non_nullable
@@ -1174,20 +842,20 @@ class _$OrderScheduleImpl
     implements _OrderSchedule {
   const _$OrderScheduleImpl(
       {required this.deliveryDate,
-      required this.store,
+      required this.storeId,
       required this.orderNumber,
-      required final List<OrderItem> orderItems,
-      this.tip,
-      required this.courier,
-      required this.status,
+      final List<OrderItem> orderItems = const [],
+      this.tip = 0,
+      this.courier = 'Bernard',
+      this.status = 'Processing',
       this.promo,
-      required this.serviceFee,
-      required this.tax,
-      this.caDriverBenefits,
-      required this.deliveryFee,
-      this.membershipBenefit,
-      required final List<Payment> payments,
-      required this.totalFee})
+      this.serviceFee = 0,
+      this.tax = 0,
+      this.caDriverBenefits = 0,
+      this.deliveryFee = 0,
+      this.membershipBenefit = 0,
+      final List<Payment> payments = const [],
+      this.totalFee = 0})
       : _orderItems = orderItems,
         _payments = payments;
 
@@ -1197,11 +865,12 @@ class _$OrderScheduleImpl
   @override
   final DateTime deliveryDate;
   @override
-  final Store store;
+  final String storeId;
   @override
   final String orderNumber;
   final List<OrderItem> _orderItems;
   @override
+  @JsonKey()
   List<OrderItem> get orderItems {
     if (_orderItems is EqualUnmodifiableListView) return _orderItems;
     // ignore: implicit_dynamic_type
@@ -1209,25 +878,34 @@ class _$OrderScheduleImpl
   }
 
   @override
-  final double? tip;
+  @JsonKey()
+  final double tip;
   @override
+  @JsonKey()
   final String courier;
   @override
+  @JsonKey()
   final String status;
   @override
   final Promotion? promo;
   @override
+  @JsonKey()
   final double serviceFee;
   @override
+  @JsonKey()
   final double tax;
   @override
-  final double? caDriverBenefits;
+  @JsonKey()
+  final double caDriverBenefits;
   @override
+  @JsonKey()
   final double deliveryFee;
   @override
-  final double? membershipBenefit;
+  @JsonKey()
+  final double membershipBenefit;
   final List<Payment> _payments;
   @override
+  @JsonKey()
   List<Payment> get payments {
     if (_payments is EqualUnmodifiableListView) return _payments;
     // ignore: implicit_dynamic_type
@@ -1235,11 +913,12 @@ class _$OrderScheduleImpl
   }
 
   @override
+  @JsonKey()
   final double totalFee;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'OrderSchedule(deliveryDate: $deliveryDate, store: $store, orderNumber: $orderNumber, orderItems: $orderItems, tip: $tip, courier: $courier, status: $status, promo: $promo, serviceFee: $serviceFee, tax: $tax, caDriverBenefits: $caDriverBenefits, deliveryFee: $deliveryFee, membershipBenefit: $membershipBenefit, payments: $payments, totalFee: $totalFee)';
+    return 'OrderSchedule(deliveryDate: $deliveryDate, storeId: $storeId, orderNumber: $orderNumber, orderItems: $orderItems, tip: $tip, courier: $courier, status: $status, promo: $promo, serviceFee: $serviceFee, tax: $tax, caDriverBenefits: $caDriverBenefits, deliveryFee: $deliveryFee, membershipBenefit: $membershipBenefit, payments: $payments, totalFee: $totalFee)';
   }
 
   @override
@@ -1248,7 +927,7 @@ class _$OrderScheduleImpl
     properties
       ..add(DiagnosticsProperty('type', 'OrderSchedule'))
       ..add(DiagnosticsProperty('deliveryDate', deliveryDate))
-      ..add(DiagnosticsProperty('store', store))
+      ..add(DiagnosticsProperty('storeId', storeId))
       ..add(DiagnosticsProperty('orderNumber', orderNumber))
       ..add(DiagnosticsProperty('orderItems', orderItems))
       ..add(DiagnosticsProperty('tip', tip))
@@ -1271,7 +950,7 @@ class _$OrderScheduleImpl
             other is _$OrderScheduleImpl &&
             (identical(other.deliveryDate, deliveryDate) ||
                 other.deliveryDate == deliveryDate) &&
-            (identical(other.store, store) || other.store == store) &&
+            (identical(other.storeId, storeId) || other.storeId == storeId) &&
             (identical(other.orderNumber, orderNumber) ||
                 other.orderNumber == orderNumber) &&
             const DeepCollectionEquality()
@@ -1299,7 +978,7 @@ class _$OrderScheduleImpl
   int get hashCode => Object.hash(
       runtimeType,
       deliveryDate,
-      store,
+      storeId,
       orderNumber,
       const DeepCollectionEquality().hash(_orderItems),
       tip,
@@ -1333,20 +1012,20 @@ class _$OrderScheduleImpl
 abstract class _OrderSchedule implements OrderSchedule {
   const factory _OrderSchedule(
       {required final DateTime deliveryDate,
-      required final Store store,
+      required final String storeId,
       required final String orderNumber,
-      required final List<OrderItem> orderItems,
-      final double? tip,
-      required final String courier,
-      required final String status,
+      final List<OrderItem> orderItems,
+      final double tip,
+      final String courier,
+      final String status,
       final Promotion? promo,
-      required final double serviceFee,
-      required final double tax,
-      final double? caDriverBenefits,
-      required final double deliveryFee,
-      final double? membershipBenefit,
-      required final List<Payment> payments,
-      required final double totalFee}) = _$OrderScheduleImpl;
+      final double serviceFee,
+      final double tax,
+      final double caDriverBenefits,
+      final double deliveryFee,
+      final double membershipBenefit,
+      final List<Payment> payments,
+      final double totalFee}) = _$OrderScheduleImpl;
 
   factory _OrderSchedule.fromJson(Map<String, dynamic> json) =
       _$OrderScheduleImpl.fromJson;
@@ -1354,13 +1033,13 @@ abstract class _OrderSchedule implements OrderSchedule {
   @override
   DateTime get deliveryDate;
   @override
-  Store get store;
+  String get storeId;
   @override
   String get orderNumber;
   @override
   List<OrderItem> get orderItems;
   @override
-  double? get tip;
+  double get tip;
   @override
   String get courier;
   @override
@@ -1372,11 +1051,11 @@ abstract class _OrderSchedule implements OrderSchedule {
   @override
   double get tax;
   @override
-  double? get caDriverBenefits;
+  double get caDriverBenefits;
   @override
   double get deliveryFee;
   @override
-  double? get membershipBenefit;
+  double get membershipBenefit;
   @override
   List<Payment> get payments;
   @override

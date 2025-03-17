@@ -22,6 +22,7 @@ class AppTextFormField extends ConsumerWidget {
   final double? paddingWidth;
   final String? Function(String?)? validator;
   final void Function(String?)? onChanged;
+  final void Function(String?)? onFieldSubmitted;
   final VoidCallback? onTap;
   final VoidCallback? onEditingComplete;
   final void Function(PointerDownEvent)? onTapOutside;
@@ -48,6 +49,7 @@ class AppTextFormField extends ConsumerWidget {
   final TextStyle? textStyle;
   final AutovalidateMode? autovalidateMode;
   final bool autofocus;
+
   final List<TextInputFormatter>? inputFormatters;
 
   const AppTextFormField(
@@ -74,6 +76,7 @@ class AppTextFormField extends ConsumerWidget {
       this.height = AppSizes.bodySmall,
       this.validator,
       this.onChanged,
+      this.onFieldSubmitted,
       this.onTap,
       this.autofocus = false,
       this.autovalidateMode,
@@ -104,6 +107,7 @@ class AppTextFormField extends ConsumerWidget {
     // logger.d(((ref.watch(themeProvider) == 'System') &&
     //     (MediaQuery.platformBrightnessOf(context) == Brightness.dark)));
     return TextFormField(
+      onFieldSubmitted: onFieldSubmitted,
       inputFormatters: inputFormatters,
       textAlign: textAlign,
       controller: controller,

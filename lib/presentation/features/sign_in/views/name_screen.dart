@@ -131,12 +131,13 @@ class _NameScreenState extends ConsumerState<NameScreen> {
                             await FirebaseAuth.instance.currentUser!
                                 .updateDisplayName(
                                     '${_firstNameController.text} ${_lastNameController.text}');
-                            navigatorKey.currentState!.push(MaterialPageRoute(
+                            await navigatorKey.currentState!
+                                .push(MaterialPageRoute(
                               builder: (context) =>
                                   const TermsNPrivacyNoticeScreen(),
                             ));
                           } on Exception catch (e) {
-                            if (mounted) {
+                            if (context.mounted) {
                               await showAppInfoDialog(
                                   description: e.toString(), context);
                             }

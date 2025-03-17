@@ -20,6 +20,7 @@ Promotion _$PromotionFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Promotion {
+  String get id => throw _privateConstructorUsedError;
   double get discount => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
   DateTime get expirationDate => throw _privateConstructorUsedError;
@@ -41,7 +42,8 @@ abstract class $PromotionCopyWith<$Res> {
       _$PromotionCopyWithImpl<$Res, Promotion>;
   @useResult
   $Res call(
-      {double discount,
+      {String id,
+      double discount,
       String description,
       DateTime expirationDate,
       String applicableLocation});
@@ -62,12 +64,17 @@ class _$PromotionCopyWithImpl<$Res, $Val extends Promotion>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? discount = null,
     Object? description = null,
     Object? expirationDate = null,
     Object? applicableLocation = null,
   }) {
     return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       discount: null == discount
           ? _value.discount
           : discount // ignore: cast_nullable_to_non_nullable
@@ -97,7 +104,8 @@ abstract class _$$PromotionImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {double discount,
+      {String id,
+      double discount,
       String description,
       DateTime expirationDate,
       String applicableLocation});
@@ -116,12 +124,17 @@ class __$$PromotionImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? discount = null,
     Object? description = null,
     Object? expirationDate = null,
     Object? applicableLocation = null,
   }) {
     return _then(_$PromotionImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       discount: null == discount
           ? _value.discount
           : discount // ignore: cast_nullable_to_non_nullable
@@ -146,7 +159,8 @@ class __$$PromotionImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
   const _$PromotionImpl(
-      {required this.discount,
+      {required this.id,
+      required this.discount,
       required this.description,
       required this.expirationDate,
       required this.applicableLocation});
@@ -154,6 +168,8 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
   factory _$PromotionImpl.fromJson(Map<String, dynamic> json) =>
       _$$PromotionImplFromJson(json);
 
+  @override
+  final String id;
   @override
   final double discount;
   @override
@@ -165,7 +181,7 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Promotion(discount: $discount, description: $description, expirationDate: $expirationDate, applicableLocation: $applicableLocation)';
+    return 'Promotion(id: $id, discount: $discount, description: $description, expirationDate: $expirationDate, applicableLocation: $applicableLocation)';
   }
 
   @override
@@ -173,6 +189,7 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'Promotion'))
+      ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('discount', discount))
       ..add(DiagnosticsProperty('description', description))
       ..add(DiagnosticsProperty('expirationDate', expirationDate))
@@ -184,6 +201,7 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PromotionImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.discount, discount) ||
                 other.discount == discount) &&
             (identical(other.description, description) ||
@@ -196,8 +214,8 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, discount, description, expirationDate, applicableLocation);
+  int get hashCode => Object.hash(runtimeType, id, discount, description,
+      expirationDate, applicableLocation);
 
   /// Create a copy of Promotion
   /// with the given fields replaced by the non-null parameter values.
@@ -217,7 +235,8 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
 
 abstract class _Promotion implements Promotion {
   const factory _Promotion(
-      {required final double discount,
+      {required final String id,
+      required final double discount,
       required final String description,
       required final DateTime expirationDate,
       required final String applicableLocation}) = _$PromotionImpl;
@@ -225,6 +244,8 @@ abstract class _Promotion implements Promotion {
   factory _Promotion.fromJson(Map<String, dynamic> json) =
       _$PromotionImpl.fromJson;
 
+  @override
+  String get id;
   @override
   double get discount;
   @override

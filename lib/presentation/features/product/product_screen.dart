@@ -1,11 +1,16 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -14,12 +19,15 @@ import 'package:uber_eats_clone/presentation/features/address/screens/addresses_
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
+import '../../../app_functions.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/weblinks.dart';
 import '../../core/app_colors.dart';
 import '../webview/webview_screen.dart';
 import 'back_up_option_screen.dart';
+import 'product_image_screen.dart';
+import 'sub_option_selection_screen.dart';
 
 class ProductScreen extends ConsumerStatefulWidget {
   final Store store;
@@ -33,23 +41,44 @@ class ProductScreen extends ConsumerStatefulWidget {
 class _ProductScreenState extends ConsumerState<ProductScreen> {
   late final Product _product;
 
-  final _selectedOptions = <String>[];
+  late final List<bool?> _optionalOptions;
 
   final _webViewcontroller = WebViewControllerPlus();
-  String _note = '';
+  final String _note = '';
 
   int _activeIndex = 0;
   int _quantity = 1;
 
   bool _footerButtonTapped = false;
+  late final List<int> _optionQuantities;
 
-  String _backupInstruction = 'Best match';
+  final String _backupInstruction = 'Best match';
 
   final _noteController = TextEditingController();
+
+  String? _selectedExclusiveOption;
+
+  String? _selectedSubOption;
+
   @override
   void initState() {
     super.initState();
     _product = widget.product;
+    if (_product.options != null) {
+      //for listtilecheckboxes
+      _optionalOptions = List.generate(
+          _product.options!.length, (index) => false,
+          growable: false);
+
+      if (_product.options!.any(
+        (element) => element.canBeMultiple,
+      )) {
+        //for listtiles with quantity incrementor and decrementor
+        _optionQuantities = List.generate(
+            _product.options!.length, (index) => 0,
+            growable: false);
+      }
+    }
   }
 
   @override
@@ -67,38 +96,93 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                   pinned: true,
                   floating: true,
                   flexibleSpace: FlexibleSpaceBar(
-                    title: AppText(text: _product.name),
+                    expandedTitleScale: 1.1,
+                    title: AppText(
+                      text: _product.name,
+                      weight: FontWeight.bold,
+                      size: AppSizes.heading6,
+                    ),
                     background: SafeArea(
                       child: Column(
                         children: [
-                          InkWell(
-                            // onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => ProductImageScreen(),)),
-                            child: Ink(
-                                child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: CarouselSlider.builder(
-                                itemCount: _product.imageUrls.length,
-                                itemBuilder: (context, index, realIndex) {
-                                  return CachedNetworkImage(
-                                    // width: double.infinity,
-                                    imageUrl: _product.imageUrls[index],
-                                    height: 80,
-                                    fit: BoxFit.fitHeight,
+                          CarouselSlider.builder(
+                            itemCount: _product.imageUrls.length,
+                            itemBuilder: (context, index, realIndex) {
+                              if (_product.imageUrls.first.startsWith('http')) {
+                                return InkWell(
+                                  onTap: () => navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) => ProductImageScreen(
+                                      imageUrl: _product.imageUrls[index],
+                                      productName: _product.name,
+                                    ),
+                                  )),
+                                  child: Ink(
+                                    child: ClipRRect(
+                                      // borderRadius: BorderRadius.circular(5),
+                                      child: CachedNetworkImage(
+                                        imageUrl: _product.imageUrls[index],
+                                        height: 80,
+                                        // width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else if (_product.imageUrls.first
+                                  .startsWith('data:image')) {
+                                // It's a base64 string
+                                try {
+                                  String base64String =
+                                      _product.imageUrls.first.split(',').last;
+                                  Uint8List bytes = base64Decode(base64String);
+                                  return InkWell(
+                                    onTap: () => navigatorKey.currentState!
+                                        .push(MaterialPageRoute(
+                                      builder: (context) => ProductImageScreen(
+                                        imageUrl: _product.imageUrls[index],
+                                        productName: _product.name,
+                                      ),
+                                    )),
+                                    child: Ink(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Image.memory(
+                                            height: 80,
+                                            fit: BoxFit.fitHeight,
+                                            bytes),
+                                      ),
+                                    ),
                                   );
+                                } catch (e) {
+                                  logger.d('Error decoding base64 image: $e');
+                                  return const AppText(
+                                      text: 'Error loading image');
+                                }
+                              } else {
+                                // Handle invalid image source (neither URL nor base64)
+                                return const AppText(
+                                    text: 'Invalid image source');
+                              }
+
+                              // return CachedNetworkImage(
+                              //   // width: double.infinity,
+                              //   imageUrl: _product.imageUrls[index],
+                              //   height: 80,
+                              //   fit: BoxFit.fitHeight,
+                              // );
+                            },
+                            options: CarouselOptions(
+                                padEnds: false,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    _activeIndex = index;
+                                  });
                                 },
-                                options: CarouselOptions(
-                                    padEnds: false,
-                                    onPageChanged: (index, reason) {
-                                      setState(() {
-                                        _activeIndex = index;
-                                      });
-                                    },
-                                    aspectRatio: 1,
-                                    height: 200,
-                                    enableInfiniteScroll: false,
-                                    viewportFraction: 0.85),
-                              ),
-                            )),
+                                aspectRatio: 1,
+                                height: 200,
+                                enableInfiniteScroll: false,
+                                viewportFraction: 1),
                           ),
                           const Gap(10),
                           if (_product.imageUrls.length > 1)
@@ -126,73 +210,310 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: AppSizes.horizontalPaddingSmall),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Visibility(
-                            visible: _product.promoPrice != null,
-                            child: Row(
-                              children: [
-                                AppText(
-                                    text: '\$${_product.initialPrice}',
-                                    size: AppSizes.bodySmall,
-                                    color: Colors.green),
-                                const Gap(5),
-                              ],
+                          if (_product.calories != null)
+                            AppText(
+                              text: '${_product.calories!.toInt()} Cal.',
+                              size: AppSizes.bodySmall,
                             ),
-                          ),
-                          AppText(
-                            text: '\$${_product.initialPrice}',
-                            size: AppSizes.bodySmall,
-                            decoration: _product.promoPrice != null
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
+                          Row(
+                            children: [
+                              Visibility(
+                                visible: _product.promoPrice != null,
+                                child: Row(
+                                  children: [
+                                    AppText(
+                                        text: '\$${_product.initialPrice}',
+                                        size: AppSizes.body,
+                                        weight: FontWeight.bold,
+                                        color: Colors.green.shade900),
+                                    const Gap(5),
+                                  ],
+                                ),
+                              ),
+                              AppText(
+                                text: '\$${_product.initialPrice}',
+                                size: AppSizes.body,
+                                decoration: _product.promoPrice != null
+                                    ? TextDecoration.lineThrough
+                                    : TextDecoration.none,
+                                color: AppColors.neutral500,
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                     if (_product.options != null)
-                      const Column(
+                      Column(
                         children: [
-                          Divider(
-                            thickness: 4,
+                          const Divider(
+                            thickness: 3,
                           ),
-                          ListTile(
-                            title: AppText(
-                              text: 'Select Option',
-                              size: AppSizes.bodySmall,
-                              weight: FontWeight.w600,
-                            ),
-                            trailing: AppTextBadge(
-                              text: 'Required',
-                            ),
-                          ),
+                          (_product.selectOptionRequired)
+                              ? ListTile(
+                                  title: const AppText(
+                                    text: 'Select Option',
+                                    size: AppSizes.body,
+                                    weight: FontWeight.w600,
+                                  ),
+                                  trailing: Container(
+                                    padding: const EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: _selectedExclusiveOption == null
+                                          ? AppColors.neutral100
+                                          : const Color.fromARGB(
+                                              255, 206, 232, 221),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (_selectedExclusiveOption != null)
+                                          const Icon(
+                                            Icons.check,
+                                            color: AppColors.primary2,
+                                          ),
+                                        const Gap(3),
+                                        AppText(
+                                          text: 'Required',
+                                          color:
+                                              _selectedExclusiveOption == null
+                                                  ? null
+                                                  : AppColors.primary2,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : ListTile(
+                                  title: AppText(
+                                    text: '${_product.name} Additions',
+                                    size: AppSizes.bodySmall,
+                                    weight: FontWeight.w600,
+                                  ),
+                                ),
                         ],
                       ),
                   ],
                 ),
               ),
               if (_product.options != null)
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.horizontalPaddingSmall),
-                  sliver: SliverList.separated(
-                    itemCount: _product.options!.length,
-                    itemBuilder: (context, index) {
-                      final option = _product.options![index];
-                      return option.isExclusive == true
-                          ? AppRadioListTile(
-                              subtitle: option.price?.toString(),
-                              groupValue: 'exclusive',
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              value: option.name)
-                          : AppCheckboxListTile(
-                              controlAffinity: ListTileControlAffinity.trailing,
-                              value: option.name,
-                              onChanged: (value) {},
-                              selectedOptions: _selectedOptions);
-                    },
-                    separatorBuilder: (context, index) => const Divider(),
-                  ),
+                SliverList.separated(
+                  itemCount: _product.options!.length,
+                  itemBuilder: (context, index) {
+                    final option = _product.options![index];
+                    return option.isExclusive == true
+                        ? Column(
+                            children: [
+                              RadioListTile.adaptive(
+                                title: AppText(text: option.name),
+                                value: option.name,
+                                groupValue: _selectedExclusiveOption,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedExclusiveOption = value;
+                                  });
+                                },
+                                controlAffinity:
+                                    ListTileControlAffinity.trailing,
+                                subtitle:
+                                    AppText(text: option.price.toString()),
+                              ),
+                              if (_selectedExclusiveOption == option.name &&
+                                  option.subOptions != null)
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                      color: AppColors.neutral100,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Column(
+                                    children: [
+                                      if (_selectedSubOption != null)
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            AppText(
+                                              text: '${option.name} Additions',
+                                              weight: FontWeight.bold,
+                                              size: AppSizes.body,
+                                            ),
+                                            AppText(
+                                              text: _selectedSubOption!,
+                                              color: AppColors.neutral500,
+                                            )
+                                          ],
+                                        ),
+                                      ListTile(
+                                        onTap: () => navigatorKey.currentState!
+                                            .push(MaterialPageRoute(
+                                          builder: (context) =>
+                                              SubOptionSelectionScreen(
+                                            productPrice: _product.promoPrice ??
+                                                _product.initialPrice,
+                                            option: option,
+                                          ),
+                                        )),
+                                        title: const AppText(
+                                          text: 'Edit selections',
+                                          weight: FontWeight.bold,
+                                        ),
+                                        trailing: const Icon(
+                                          Icons.keyboard_arrow_right,
+                                          color: AppColors.neutral500,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                            ],
+                          )
+                        : option.canBeMultiple
+                            ? ListTile(
+                                trailing: _optionQuantities[index] == 0
+                                    ? TextButton(
+                                        style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.all(0),
+                                            backgroundColor:
+                                                AppColors.neutral100,
+                                            shape: const CircleBorder()),
+                                        onPressed: () {
+                                          setState(() {
+                                            _optionQuantities[index] =
+                                                _optionQuantities[index] + 1;
+                                          });
+                                        },
+                                        child: const AppText(
+                                          text: '+',
+                                          size: AppSizes.body,
+                                        ))
+                                    : Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                            TextButton(
+                                                style: TextButton.styleFrom(
+                                                    padding:
+                                                        const EdgeInsets.all(3),
+                                                    backgroundColor:
+                                                        AppColors.neutral100,
+                                                    shape:
+                                                        const CircleBorder()),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    if (_optionQuantities[
+                                                            index] !=
+                                                        0) {
+                                                      _optionQuantities[index] =
+                                                          _optionQuantities[
+                                                                  index] -
+                                                              1;
+                                                    }
+                                                  });
+                                                },
+                                                child: const AppText(
+                                                    text: '-',
+                                                    size: AppSizes.body)),
+                                            AppText(
+                                                text: _optionQuantities[index]
+                                                    .toString()),
+                                            TextButton(
+                                                style: TextButton.styleFrom(
+                                                    padding:
+                                                        const EdgeInsets.all(3),
+                                                    backgroundColor:
+                                                        AppColors.neutral100,
+                                                    shape:
+                                                        const CircleBorder()),
+                                                onPressed:
+                                                    option.canBeMultipleLimit ==
+                                                                null ||
+                                                            _optionQuantities[
+                                                                    index] <
+                                                                option
+                                                                    .canBeMultipleLimit!
+                                                        ? () {
+                                                            setState(() {
+                                                              if (_optionQuantities[
+                                                                      index] !=
+                                                                  0) {
+                                                                _optionQuantities[
+                                                                        index] =
+                                                                    _optionQuantities[
+                                                                            index] +
+                                                                        1;
+                                                              }
+                                                            });
+                                                          }
+                                                        : null,
+                                                child: const AppText(
+                                                    text: '+',
+                                                    size: AppSizes.body)),
+                                          ]),
+                                title: AppText(
+                                  text: option.name,
+                                ),
+                                subtitle: option.price != null ||
+                                        option.calories != null
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (option.price != null)
+                                            AppText(
+                                              text:
+                                                  '+  ${_optionQuantities[index] == 0 ? '\$${option.price}' : '\$${option.price! * _optionQuantities[index]} (\$${option.price!.toStringAsFixed(2)} ea)'} ',
+                                              color: AppColors.neutral500,
+                                            ),
+                                          if (option.calories != null)
+                                            AppText(
+                                              text:
+                                                  '${option.calories!.toInt()} Cal.',
+                                              color: AppColors.neutral500,
+                                            ),
+                                        ],
+                                      )
+                                    : null,
+                              )
+                            : Builder(builder: (context) {
+                                return CheckboxListTile.adaptive(
+                                  controlAffinity:
+                                      ListTileControlAffinity.trailing,
+                                  title: AppText(
+                                    text: option.name,
+                                  ),
+                                  subtitle: option.price != null ||
+                                          option.calories != null
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (option.price != null)
+                                              AppText(
+                                                text: '+ \$${option.price}',
+                                                color: AppColors.neutral500,
+                                              ),
+                                            if (option.calories != null)
+                                              AppText(
+                                                text:
+                                                    '${option.calories!.toInt()} Cal.',
+                                                color: AppColors.neutral500,
+                                              ),
+                                          ],
+                                        )
+                                      : null,
+                                  value: _optionalOptions[index],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _optionalOptions[index] = value;
+                                    });
+                                  },
+                                );
+                              });
+                  },
+                  separatorBuilder: (context, index) => const Divider(),
                 ),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(
@@ -215,7 +536,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                             children: [
                               InkWell(
                                   onTap: () {
-                                    if (_quantity != 0) {
+                                    if (_quantity != 1) {
                                       setState(() {
                                         _quantity -= 1;
                                         if (_footerButtonTapped == true) {
@@ -225,7 +546,12 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                     }
                                   },
                                   child: Ink(
-                                      child: const Iconify(Octicon.dash_24))),
+                                      child: Iconify(
+                                    Octicon.dash_24,
+                                    color: (_quantity != 1)
+                                        ? Colors.black
+                                        : AppColors.neutral300,
+                                  ))),
                               AppText(
                                 text: _quantity.toString(),
                               ),
@@ -243,163 +569,370 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           ),
                         ),
                       ),
-                      const Gap(10),
-                      ListTile(
-                          onTap: () {
-                            showModalBottomSheet(
-                              isScrollControlled: true,
-                              useSafeArea: true,
-                              context: context,
-                              builder: (context) {
-                                return Container(
-                                  height: double.infinity,
-                                  decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10))),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          AppBar(
-                                            title: const AppText(
-                                              text: 'Add replacement or note',
-                                              size: AppSizes.heading6,
-                                            ),
-                                            leading: GestureDetector(
-                                                onTap: () => navigatorKey
-                                                    .currentState!
-                                                    .pop(),
-                                                child: const Icon(Icons.clear)),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: AppSizes
-                                                    .horizontalPaddingSmall),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const AppText(
-                                                  text: 'Add note',
-                                                  size: AppSizes.bodySmall,
-                                                ),
-                                                const Gap(10),
-                                                AppTextFormField(
-                                                  controller: _noteController,
-                                                  hintText:
-                                                      'e.g. Green bananas please',
-                                                ),
-                                                const Gap(10),
-                                                const AppText(
-                                                  text: 'Backup instructions',
-                                                  size: AppSizes.bodySmall,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          AppRadioListTile(
-                                            controlAffinity:
-                                                ListTileControlAffinity.leading,
-                                            value: 'Best match',
-                                            subtitle:
-                                                'Your shopper will select an item similar price and quality',
-                                            groupValue: _backupInstruction,
-                                          ),
-                                          AppRadioListTile(
-                                            secondary: AppButton2(
-                                                text: 'Select',
-                                                callback: () {
-                                                  navigatorKey.currentState!
-                                                      .push(MaterialPageRoute(
-                                                    builder: (context) {
-                                                      return BackUpOptionScreen(
-                                                          product:
-                                                              widget.product,
-                                                          store: widget.store);
-                                                    },
-                                                  ));
-                                                }),
-                                            controlAffinity:
-                                                ListTileControlAffinity.leading,
-                                            value: 'Specific item',
-                                            subtitle:
-                                                'Select a specific replacement item if your selection is unavailable, your shopper will use Best Match to select a similar replacement.',
-                                            groupValue: _backupInstruction,
-                                          ),
-                                          AppRadioListTile(
-                                            controlAffinity:
-                                                ListTileControlAffinity.leading,
-                                            value: 'Refund item',
-                                            subtitle:
-                                                'Refund item if unavailable',
-                                            groupValue: _backupInstruction,
-                                          ),
-                                        ],
-                                      ),
-                                      const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: AppSizes
-                                                .horizontalPaddingSmall),
-                                        child: Column(
-                                          children: [
-                                            AppButton(text: 'Update'),
-                                            Gap(10),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.repeat),
-                          title: AppText(
-                            text: _note.isEmpty
-                                ? 'Add note or edit replacement'
-                                : _note,
-                            weight: FontWeight.w600,
-                          ),
-                          trailing: const Icon(Icons.keyboard_arrow_right),
-                          subtitle: AppText(text: _backupInstruction))
+                      //Add note
+                      // const Gap(10),
+                      // ListTile(
+                      //     onTap: () {
+                      //       showModalBottomSheet(
+                      //         isScrollControlled: true,
+                      //         useSafeArea: true,
+                      //         context: context,
+                      //         builder: (context) {
+                      //           return Container(
+                      //             height: double.infinity,
+                      //             decoration: const BoxDecoration(
+                      //                 color: Colors.white,
+                      //                 borderRadius: BorderRadius.only(
+                      //                     topLeft: Radius.circular(10),
+                      //                     topRight: Radius.circular(10))),
+                      //             child: Column(
+                      //               mainAxisAlignment:
+                      //                   MainAxisAlignment.spaceBetween,
+                      //               children: [
+                      //                 Column(
+                      //                   crossAxisAlignment:
+                      //                       CrossAxisAlignment.start,
+                      //                   children: [
+                      //                     AppBar(
+                      //                       title: const AppText(
+                      //                         text: 'Add replacement or note',
+                      //                         size: AppSizes.heading6,
+                      //                       ),
+                      //                       leading: GestureDetector(
+                      //                           onTap: () => navigatorKey
+                      //                               .currentState!
+                      //                               .pop(),
+                      //                           child: const Icon(Icons.clear)),
+                      //                     ),
+                      //                     Padding(
+                      //                       padding: const EdgeInsets.symmetric(
+                      //                           horizontal: AppSizes
+                      //                               .horizontalPaddingSmall),
+                      //                       child: Column(
+                      //                         crossAxisAlignment:
+                      //                             CrossAxisAlignment.start,
+                      //                         children: [
+                      //                           const AppText(
+                      //                             text: 'Add note',
+                      //                             size: AppSizes.bodySmall,
+                      //                           ),
+                      //                           const Gap(10),
+                      //                           AppTextFormField(
+                      //                             controller: _noteController,
+                      //                             hintText:
+                      //                                 'e.g. Green bananas please',
+                      //                           ),
+                      //                           const Gap(10),
+                      //                           const AppText(
+                      //                             text: 'Backup instructions',
+                      //                             size: AppSizes.bodySmall,
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                     ),
+                      //                     AppRadioListTile(
+                      //                       controlAffinity:
+                      //                           ListTileControlAffinity.leading,
+                      //                       value: 'Best match',
+                      //                       subtitle:
+                      //                           'Your shopper will select an item similar price and quality',
+                      //                       groupValue: _backupInstruction,
+                      //                     ),
+                      //                     AppRadioListTile(
+                      //                       secondary: AppButton2(
+                      //                           text: 'Select',
+                      //                           callback: () {
+                      //                             navigatorKey.currentState!
+                      //                                 .push(MaterialPageRoute(
+                      //                               builder: (context) {
+                      //                                 return BackUpOptionScreen(
+                      //                                     product:
+                      //                                         widget.product,
+                      //                                     store: widget.store);
+                      //                               },
+                      //                             ));
+                      //                           }),
+                      //                       controlAffinity:
+                      //                           ListTileControlAffinity.leading,
+                      //                       value: 'Specific item',
+                      //                       subtitle:
+                      //                           'Select a specific replacement item if your selection is unavailable, your shopper will use Best Match to select a similar replacement.',
+                      //                       groupValue: _backupInstruction,
+                      //                     ),
+                      //                     AppRadioListTile(
+                      //                       controlAffinity:
+                      //                           ListTileControlAffinity.leading,
+                      //                       value: 'Refund item',
+                      //                       subtitle:
+                      //                           'Refund item if unavailable',
+                      //                       groupValue: _backupInstruction,
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //                 const Padding(
+                      //                   padding: EdgeInsets.symmetric(
+                      //                       horizontal: AppSizes
+                      //                           .horizontalPaddingSmall),
+                      //                   child: Column(
+                      //                     children: [
+                      //                       AppButton(text: 'Update'),
+                      //                       Gap(10),
+                      //                     ],
+                      //                   ),
+                      //                 )
+                      //               ],
+                      //             ),
+                      //           );
+                      //         },
+                      //       );
+                      //     },
+                      //     contentPadding: EdgeInsets.zero,
+                      //     leading: const Icon(Icons.repeat),
+                      //     title: AppText(
+                      //       text: _note.isEmpty
+                      //           ? 'Add note or edit replacement'
+                      //           : _note,
+                      //       weight: FontWeight.w600,
+                      //     ),
+                      //     trailing: const Icon(Icons.keyboard_arrow_right),
+                      //     subtitle: AppText(text: _backupInstruction))
+                      // Gap(10),
                     ],
                   ),
                 ),
               ),
               const SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    Gap(10),
-                    Divider(
-                      thickness: 4,
-                    ),
-                  ],
+                child: Divider(
+                  thickness: 3,
                 ),
               ),
-              if (_product.similarProducts != null &&
-                  _product.similarProducts!.isNotEmpty)
-                const SliverPadding(
-                  padding: EdgeInsets.symmetric(
+              if (_product.frequentlyBoughtTogether != null &&
+                  _product.frequentlyBoughtTogether!.isNotEmpty)
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
                       horizontal: AppSizes.horizontalPaddingSmall),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Gap(10),
-                        AppText(
-                          text: 'Similar items',
-                          weight: FontWeight.w600,
-                          size: AppSizes.heading6,
-                        ),
-                      ],
-                    ),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      const Gap(5),
+                      const AppText(
+                        text: 'Frequently bought together',
+                        weight: FontWeight.w600,
+                        size: AppSizes.heading6,
+                      ),
+                      ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemCount: _product.frequentlyBoughtTogether!.length,
+                        itemBuilder: (context, index) {
+                          final item =
+                              _product.frequentlyBoughtTogether![index];
+
+                          return FutureBuilder<Product>(
+                              future: AppFunctions.loadProductReference(
+                                  item as DocumentReference),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Skeletonizer(
+                                    enabled: true,
+                                    child: Row(
+                                      // crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              AppText(
+                                                text: 'vgjvjvjvj',
+                                              ),
+                                              Row(
+                                                children: [
+                                                  AppText(
+                                                    text: 'bhbjnmnm,',
+                                                  ),
+                                                  AppText(
+                                                    text: 'vggjbbjb n',
+                                                  )
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Gap(20),
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: Container(
+                                            color: Colors.blue,
+                                            width: 100,
+                                            height: 100,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return AppText(
+                                      text: snapshot.error.toString());
+                                }
+                                final product = snapshot.data!;
+                                return InkWell(
+                                  onTap: () {
+                                    navigatorKey.currentState!
+                                        .push(MaterialPageRoute(
+                                      builder: (context) => ProductScreen(
+                                        product: product,
+                                        store: widget.store,
+                                      ),
+                                    ));
+                                  },
+                                  child: Row(
+                                    // crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            AppText(
+                                              text: product.name,
+                                              weight: FontWeight.w600,
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Visibility(
+                                                  visible: product.promoPrice !=
+                                                      null,
+                                                  child: Row(
+                                                    children: [
+                                                      AppText(
+                                                          text:
+                                                              '\$${product.promoPrice}',
+                                                          color: Colors.green),
+                                                      const Gap(5),
+                                                    ],
+                                                  ),
+                                                ),
+                                                AppText(
+                                                  text:
+                                                      '\$${product.initialPrice}',
+                                                  decoration:
+                                                      product.promoPrice != null
+                                                          ? TextDecoration
+                                                              .lineThrough
+                                                          : TextDecoration.none,
+                                                ),
+                                                if (product.calories != null)
+                                                  AppText(
+                                                    text:
+                                                        ' • ${product.calories!.toInt()} Cal.',
+                                                    color: AppColors.neutral500,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  )
+                                              ],
+                                            ),
+                                            if (product.description != null)
+                                              AppText(
+                                                text: product.description!,
+                                                maxLines: 2,
+                                                color: AppColors.neutral500,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Gap(20),
+                                      Stack(
+                                        alignment: Alignment.bottomRight,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Builder(
+                                              builder: (context) {
+                                                if (product.imageUrls.first
+                                                    .startsWith('http')) {
+                                                  return CachedNetworkImage(
+                                                    imageUrl:
+                                                        product.imageUrls.first,
+                                                    width: 100,
+                                                    height: 100,
+                                                    fit: BoxFit.fill,
+                                                  );
+                                                } else if (product
+                                                    .imageUrls.first
+                                                    .startsWith('data:image')) {
+                                                  // It's a base64 string
+                                                  try {
+                                                    String base64String =
+                                                        product.imageUrls.first
+                                                            .split(',')
+                                                            .last;
+                                                    Uint8List bytes =
+                                                        base64Decode(
+                                                            base64String);
+                                                    return Image.memory(
+                                                        width: 100,
+                                                        height: 100,
+                                                        fit: BoxFit.fill,
+                                                        bytes);
+                                                  } catch (e) {
+                                                    // logger.d(
+                                                    //     'Error decoding base64 image: $e');
+                                                    return const AppText(
+                                                        text:
+                                                            'Error loading image');
+                                                  }
+                                                } else {
+                                                  // Handle invalid image source (neither URL nor base64)
+                                                  return const AppText(
+                                                      text:
+                                                          'Invalid image source');
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0, top: 8.0),
+                                            child: InkWell(
+                                              onTap: () {},
+                                              child: Ink(
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(5),
+                                                  decoration: BoxDecoration(
+                                                      boxShadow: const [
+                                                        BoxShadow(
+                                                          color: Colors.black12,
+                                                          offset: Offset(2, 2),
+                                                        )
+                                                      ],
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50)),
+                                                  child: const Icon(
+                                                    Icons.add,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
+                        },
+                      ),
+                    ]),
                   ),
                 ),
               if (_product.similarProducts != null &&
@@ -407,120 +940,169 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSizes.horizontalPaddingSmall),
-                  sliver: SliverList.separated(
-                    separatorBuilder: (context, index) => const Divider(),
-                    itemCount: _product.similarProducts!.length,
-                    itemBuilder: (context, index) {
-                      final similarProduct = _product.similarProducts![index];
-                      return InkWell(
-                        onTap: () {
-                          navigatorKey.currentState!.push(MaterialPageRoute(
-                            builder: (context) => ProductScreen(
-                              product: similarProduct,
-                              store: widget.store,
-                            ),
-                          ));
-                        },
-                        child: Row(
-                          // crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AppText(
-                                    text: similarProduct.name,
-                                    weight: FontWeight.w600,
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Row(
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      const Gap(10),
+                      const AppText(
+                        text: 'Similar items',
+                        weight: FontWeight.w600,
+                        size: AppSizes.heading6,
+                      ),
+                      ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemCount: _product.similarProducts!.length,
+                        itemBuilder: (context, index) {
+                          final similarProduct =
+                              _product.similarProducts![index];
+                          return InkWell(
+                            onTap: () {
+                              navigatorKey.currentState!.push(MaterialPageRoute(
+                                builder: (context) => ProductScreen(
+                                  product: similarProduct,
+                                  store: widget.store,
+                                ),
+                              ));
+                            },
+                            child: Row(
+                              // crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Visibility(
-                                        visible:
-                                            similarProduct.promoPrice != null,
-                                        child: Row(
-                                          children: [
-                                            AppText(
-                                                text:
-                                                    '\$${similarProduct.promoPrice}',
-                                                color: Colors.green),
-                                            const Gap(5),
-                                          ],
-                                        ),
-                                      ),
                                       AppText(
-                                        text:
-                                            '\$${similarProduct.initialPrice}',
-                                        decoration:
-                                            similarProduct.promoPrice != null
-                                                ? TextDecoration.lineThrough
-                                                : TextDecoration.none,
+                                        text: similarProduct.name,
+                                        weight: FontWeight.w600,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      if (similarProduct.calories != null)
+                                      Row(
+                                        children: [
+                                          Visibility(
+                                            visible:
+                                                similarProduct.promoPrice !=
+                                                    null,
+                                            child: Row(
+                                              children: [
+                                                AppText(
+                                                    text:
+                                                        '\$${similarProduct.promoPrice}',
+                                                    color: Colors.green),
+                                                const Gap(5),
+                                              ],
+                                            ),
+                                          ),
+                                          AppText(
+                                            text:
+                                                '\$${similarProduct.initialPrice}',
+                                            decoration:
+                                                similarProduct.promoPrice !=
+                                                        null
+                                                    ? TextDecoration.lineThrough
+                                                    : TextDecoration.none,
+                                          ),
+                                          if (similarProduct.calories != null)
+                                            AppText(
+                                              text:
+                                                  ' • ${similarProduct.calories!.toInt()} Cal.',
+                                              color: AppColors.neutral500,
+                                              overflow: TextOverflow.ellipsis,
+                                            )
+                                        ],
+                                      ),
+                                      if (similarProduct.description != null)
                                         AppText(
-                                          text:
-                                              ' • ${similarProduct.calories!} Cal.',
+                                          text: similarProduct.description!,
                                           maxLines: 2,
                                           color: AppColors.neutral500,
                                           overflow: TextOverflow.ellipsis,
-                                        )
+                                        ),
                                     ],
                                   ),
-                                  if (similarProduct.description != null)
-                                    AppText(
-                                      text: similarProduct.description!,
-                                      maxLines: 2,
-                                      color: AppColors.neutral500,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            const Gap(20),
-                            Stack(
-                              alignment: Alignment.bottomRight,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: CachedNetworkImage(
-                                    imageUrl: similarProduct.imageUrls.first,
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.fill,
-                                  ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 8.0, top: 8.0),
-                                  child: InkWell(
-                                    onTap: () {},
-                                    child: Ink(
-                                      child: Container(
-                                        padding: const EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.black12,
-                                                offset: Offset(2, 2),
-                                              )
-                                            ],
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(50)),
-                                        child: const Icon(
-                                          Icons.add,
-                                        ),
+                                const Gap(20),
+                                Stack(
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Builder(
+                                        builder: (context) {
+                                          if (similarProduct.imageUrls.first
+                                              .startsWith('http')) {
+                                            return CachedNetworkImage(
+                                              imageUrl: similarProduct
+                                                  .imageUrls.first,
+                                              width: 100,
+                                              height: 100,
+                                              fit: BoxFit.fill,
+                                            );
+                                          } else if (similarProduct
+                                              .imageUrls.first
+                                              .startsWith('data:image')) {
+                                            // It's a base64 string
+                                            try {
+                                              String base64String =
+                                                  similarProduct.imageUrls.first
+                                                      .split(',')
+                                                      .last;
+                                              Uint8List bytes =
+                                                  base64Decode(base64String);
+                                              return Image.memory(
+                                                  width: 100,
+                                                  height: 100,
+                                                  fit: BoxFit.fill,
+                                                  bytes);
+                                            } catch (e) {
+                                              // logger.d(
+                                              //     'Error decoding base64 image: $e');
+                                              return const AppText(
+                                                  text: 'Error loading image');
+                                            }
+                                          } else {
+                                            // Handle invalid image source (neither URL nor base64)
+                                            return const AppText(
+                                                text: 'Invalid image source');
+                                          }
+                                        },
                                       ),
                                     ),
-                                  ),
-                                )
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 8.0, top: 8.0),
+                                      child: InkWell(
+                                        onTap: () {},
+                                        child: Ink(
+                                          child: Container(
+                                            padding: const EdgeInsets.all(5),
+                                            decoration: BoxDecoration(
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Colors.black12,
+                                                    offset: Offset(2, 2),
+                                                  )
+                                                ],
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(50)),
+                                            child: const Icon(
+                                              Icons.add,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ],
                             ),
-                          ],
-                        ),
-                      );
-                    },
+                          );
+                        },
+                      ),
+                    ]),
                   ),
                 ),
               SliverPadding(
@@ -634,7 +1216,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                   child: Column(
                     children: [
                       const Divider(
-                        thickness: 4,
+                        thickness: 3,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -657,6 +1239,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                     ..onTap = () {
                                       navigatorKey.currentState!
                                           .push(MaterialPageRoute(
+                                        //TODO: fix webviewscreens not loading. It glitches like the map
                                         builder: (context) => WebViewScreen(
                                           controller: _webViewcontroller,
                                           link: Weblinks.p65Warnings,
@@ -676,22 +1259,38 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
         if (!_footerButtonTapped)
           InkWell(
             onTap: () {
-              setState(() {
-                _footerButtonTapped = true;
-              });
+              if (_product.selectOptionRequired == true &&
+                  _selectedExclusiveOption == null) {
+                showInfoToast('Select an option',
+                    context: navigatorKey.currentContext);
+              } else {
+                setState(() {
+                  _footerButtonTapped = true;
+                });
+              }
             },
             child: Ink(
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 13),
                 decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: _product.selectOptionRequired == false
+                        ? Colors.black
+                        : _product.selectOptionRequired == true &&
+                                _selectedExclusiveOption != null
+                            ? Colors.black
+                            : AppColors.neutral200,
                     borderRadius: BorderRadius.circular(10)),
                 width: double.infinity,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AppText(
-                        color: Colors.white,
+                        color: _product.selectOptionRequired == false
+                            ? Colors.white
+                            : _product.selectOptionRequired == true &&
+                                    _selectedExclusiveOption != null
+                                ? Colors.white
+                                : Colors.black,
                         text:
                             'Add $_quantity to cart • \$${((_product.promoPrice ?? _product.initialPrice) * _quantity).toStringAsFixed(2)}'),
                     Visibility(

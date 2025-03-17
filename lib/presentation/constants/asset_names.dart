@@ -131,6 +131,7 @@ class AssetNames {
   static String voiceCommand3 = 'assets/images/voice_command3.png';
   static String expDate = 'assets/images/exp_date.png';
   static String cvv = 'assets/images/cvv.png';
+  static const greenTag = 'assets/images/green_tag.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';
@@ -141,7 +142,6 @@ class AssetNames {
   static const hamburger = 'assets/images/hamburger.jpg';
   static const whiteCar = 'assets/images/white_car.jpg';
   static const noSearchResult = 'assets/images/no_search_result.jpg';
-  static const greenTag = 'assets/images/green_tag.jpg';
   static const store = 'assets/images/store.jpg';
   static const aisleImage = 'assets/images/aisle_image.jpg';
   static const masterCardLogo = 'assets/images/master_card_logo.jpg';

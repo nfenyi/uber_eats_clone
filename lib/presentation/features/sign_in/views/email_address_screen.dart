@@ -116,7 +116,7 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
                               if (_formKey.currentState!.validate()) {
                                 await FirebaseAuth.instance.currentUser!
                                     .verifyBeforeUpdateEmail(
-                                        _emailController.text,
+                                        _emailController.text.trim(),
                                         ActionCodeSettings(
                                             // URL you want to redirect back to. The domain (www.example.com) for this
                                             // URL must be whitelisted in the Firebase Console.
@@ -134,14 +134,15 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
                                             androidMinimumVersion: '12'))
                                     .then((value) async {
                                   await Hive.box(AppBoxes.appState).put(
-                                      BoxKeys.email, _emailController.text);
+                                      BoxKeys.email,
+                                      _emailController.text.trim());
                                   await Hive.box(AppBoxes.appState).put(
                                       BoxKeys.addedEmailToPhoneNumber, true);
 
-                                  navigatorKey.currentState!
+                                  await navigatorKey.currentState!
                                       .push(MaterialPageRoute(
                                     builder: (context) => EmailSentScreen(
-                                      email: _emailController.text,
+                                      email: _emailController.text.trim(),
                                     ),
                                   ));
                                 }, onError: (e) {

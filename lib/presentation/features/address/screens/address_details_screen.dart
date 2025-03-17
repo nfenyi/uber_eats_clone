@@ -18,6 +18,8 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/confirm_loca
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:uber_eats_clone/presentation/services/place_detail_model.dart';
 
+import '../../../../app_functions.dart';
+import '../../../../hive_adapters/geopoint/geopoint_adapter.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../services/sign_in_view_model.dart';
 import '../../sign_in/views/payment_method_screen.dart';
@@ -25,14 +27,28 @@ import '../../sign_in/views/payment_method_screen.dart';
 class AddressDetailsScreen extends ConsumerStatefulWidget {
   final String placeDescription;
   final PlaceLocation location;
+  final bool addressesAlreadyExist;
+  final String? instruction;
+  final String? apartment;
+  final String? addressLabel;
+  final String? building;
+  final String? dropOffOption;
+  final bool? navigatedWithAddressListTile;
 
   final BitmapDescriptor markerIcon;
 
   const AddressDetailsScreen(
       {super.key,
+      this.instruction,
+      this.apartment,
+      this.navigatedWithAddressListTile,
+      required this.addressesAlreadyExist,
       required this.location,
       required this.placeDescription,
-      required this.markerIcon});
+      required this.markerIcon,
+      this.addressLabel,
+      this.building,
+      this.dropOffOption});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -47,7 +63,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
   final _aptController = TextEditingController();
   final _addressLabelController = TextEditingController();
   final _buildingNameController = TextEditingController();
-  String _dropOffOption = 'Meet at my door';
+  late String _dropOffOption;
 
   bool _isLoading = false;
 
@@ -58,6 +74,15 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
     super.initState();
     _setLocation = LatLng(widget.location.lat!, widget.location.lng!);
     _placeDescription = widget.placeDescription;
+    if (widget.navigatedWithAddressListTile == true) {
+      _instructionsController.text = widget.instruction!;
+      _aptController.text = widget.apartment!;
+      _addressLabelController.text = widget.addressLabel!;
+      _buildingNameController.text = widget.building!;
+    }
+    _dropOffOption = widget.navigatedWithAddressListTile == true
+        ? widget.dropOffOption!
+        : 'Meet at my door';
   }
 
   @override
@@ -256,7 +281,8 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                         AppTextFormField(
                           controller: _instructionsController,
                           minLines: 4,
-                          readOnly: true,
+                          enabled: false,
+
                           maxLines: 15,
                           // textAlign: TextAlign.start,
                           // height: 50,
@@ -299,7 +325,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
             padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
             child: AppButton(
               isLoading: _isLoading,
-              text: 'Save and continue',
+              text: widget.addressesAlreadyExist ? 'Save' : 'Save and continue',
               callback: () async {
                 if (_formKey.currentState!.validate()) {
                   setState(() {
@@ -316,19 +342,64 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                       dropoffOption: _dropOffOption);
 
                   try {
-                    await FirebaseFirestore.instance
-                        .collection(FirestoreCollections.users)
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .set(addressDetails.toJson());
-                    await Hive.box(AppBoxes.appState)
-                        .put('addressDetailsSaved', true);
+                    if (widget.addressesAlreadyExist) {
+                      if (widget.navigatedWithAddressListTile == true) {
+                        var oldAddressDetails = AddressDetails(
+                            instruction: widget.instruction!,
+                            apartment: widget.apartment!,
+                            latlng: GeoPoint(
+                                widget.location.lat!, widget.location.lng!),
+                            addressLabel: widget.addressLabel!,
+                            placeDescription: widget.placeDescription,
+                            building: widget.building!,
+                            dropoffOption: widget.dropOffOption!);
+                        await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.users)
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .update({
+                          'addresses': FieldValue.arrayRemove(
+                              [oldAddressDetails.toJson()])
+                        });
+                        await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.users)
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .update({
+                          'addresses':
+                              FieldValue.arrayUnion([addressDetails.toJson()])
+                        });
+                      } else {
+                        await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.users)
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .update({
+                          'addresses':
+                              FieldValue.arrayUnion([addressDetails.toJson()])
+                        });
+                      }
+                      await AppFunctions.getUserInfo();
+                      navigatorKey.currentState!.pop(true);
+                    } else {
+                      await FirebaseFirestore.instance
+                          .collection(FirestoreCollections.users)
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .set({
+                        'selectedAddress': addressDetails.toJson(),
+                        'addresses': [addressDetails.toJson()]
+                      }, SetOptions(merge: true));
+                      var addressDetailsForHive = addressDetails.toJson();
+                      addressDetailsForHive['latlng'] = HiveGeoPoint(
+                          latitude: addressDetails.latlng.latitude,
+                          longitude: addressDetails.latlng.longitude);
 
-                    await navigatorKey.currentState!.pushAndRemoveUntil(
-                        MaterialPageRoute(
-                            builder: (context) => const PaymentMethodScreen()),
-                        (r) {
-                      return false;
-                    });
+                      await Hive.box(AppBoxes.appState)
+                          .put('addressDetailsSaved', true);
+                      await navigatorKey.currentState!.pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const PaymentMethodScreen()), (r) {
+                        return false;
+                      });
+                    }
                   } on FirebaseException catch (e) {
                     await showAppInfoDialog(navigatorKey.currentContext!,
                         description: e.code);

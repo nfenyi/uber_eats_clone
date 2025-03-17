@@ -13,7 +13,9 @@ class Store with _$Store {
     @Default(false) bool isUberOneShop,
     required StoreLocation location,
     required String id,
+    List<StoreSchedule>? storeSchedules,
     String? dietary,
+    List<Product>? featuredItems,
     required String priceCategory,
     required bool isGroupFriendly,
     required String type,
@@ -32,6 +34,16 @@ class Store with _$Store {
   }) = _Store;
 
   factory Store.fromJson(Map<String, Object?> json) => _$StoreFromJson(json);
+}
+
+@freezed
+class StoreSchedule with _$StoreSchedule {
+  factory StoreSchedule({
+    required String name,
+    required String duration,
+  }) = _StoreSchedule;
+  factory StoreSchedule.fromJson(Map<String, Object?> json) =>
+      _$StoreScheduleFromJson(json);
 }
 
 @freezed
@@ -113,7 +125,7 @@ class Product with _$Product {
     required double initialPrice,
     double? promoPrice,
     required List<String> imageUrls,
-    List<String>? frequentlyBoughtTogether,
+    List<Object>? frequentlyBoughtTogether,
     Map<String, String>? nutritionFacts,
     String? ingredients,
     String? directions,
@@ -140,6 +152,8 @@ class Option with _$Option {
     @Default(true) bool isExclusive,
     List<SubOption>? subOptions,
     double? calories,
+    @Default(false) bool canBeMultiple,
+    int? canBeMultipleLimit,
   }) = _Option;
 
   factory Option.fromJson(Map<String, Object?> json) => _$OptionFromJson(json);
@@ -150,7 +164,9 @@ class SubOption with _$SubOption {
   factory SubOption({
     required String name,
     required bool canBeMultiple,
+    double? calories,
     double? price,
+    int? canBeMultipleLimit,
   }) = _SubOption;
 
   factory SubOption.fromJson(Map<String, Object?> json) =>

@@ -9,6 +9,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phonecodes/phonecodes.dart';
+import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/hive_adapters/country/country_ip_model.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
@@ -18,7 +19,6 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/uber_one_screen.dart';
 
 import '../../../../constants/app_sizes.dart';
-import '../../../../services/sign_in_view_model.dart';
 import 'add_a_card_camera_view.dart';
 import 'select_a_country_screen.dart';
 
@@ -116,7 +116,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                                   await controller.lockCaptureOrientation(
                                       DeviceOrientation.portraitUp);
                                   //TODO: complete camera capture
-                                  navigatorKey.currentState!
+                                  await navigatorKey.currentState!
                                       .push(MaterialPageRoute(
                                     builder: (context) =>
                                         AddACardCameraView(controller),
@@ -125,7 +125,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                                   if (e is CameraException) {
                                     switch (e.code) {
                                       case 'CameraAccessDenied':
-                                        if (mounted) {
+                                        if (context.mounted) {
                                           showAppInfoDialog(
                                               title: 'Camera access denied',
                                               description:
@@ -519,21 +519,27 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                       nickName: _nickyController.text.trim());
 
                   try {
-                    await FirebaseFirestore.instance
-                        .collection(FirestoreCollections.users)
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .update(creditCardDetails.toJson());
+                    // await FirebaseFirestore.instance
+                    //     .collection(FirestoreCollections.users)
+                    //     .doc(FirebaseAuth.instance.currentUser!.uid)
+                    //     .set({
+                    //   'credit cards': [creditCardDetails.toJson()]
+                    // }, SetOptions(merge: true));
+//TODO: to test:
+                    await AppFunctions.addCreditCard(creditCardDetails);
 
-                    navigatorKey.currentState!.push(MaterialPageRoute(
+                    await navigatorKey.currentState!.push(MaterialPageRoute(
                       builder: (context) => const UberOneScreen(),
                     ));
                   } on FirebaseException catch (e) {
-                    showAppInfoDialog(context, description: e.code);
+                    await showAppInfoDialog(navigatorKey.currentContext!,
+                        description: e.code);
                     setState(() {
                       _isLoading = false;
                     });
                   } catch (e) {
-                    showAppInfoDialog(context, description: e.toString());
+                    await showAppInfoDialog(navigatorKey.currentContext!,
+                        description: e.toString());
                     setState(() {
                       _isLoading = false;
                     });

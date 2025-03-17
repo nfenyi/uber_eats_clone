@@ -32,40 +32,40 @@ class IndividualOrder with _$IndividualOrder {
       _$IndividualOrderFromJson(json);
 }
 
-@freezed
-class GroupOrder with _$GroupOrder {
-  const factory GroupOrder({
-    required String name,
-    required String createdBy,
-    required String location,
-    required List<Store> stores,
-    required List<OrderSchedule> orderSchedules,
-    required List<String> persons,
-    String? repeat,
-  }) = _GroupOrder;
+// @freezed
+// class GroupOrder with _$GroupOrder {
+//   const factory GroupOrder({
+//     required String name,
+//     required String createdBy,
+//     required String location,
+//     required List<Store> stores,
+//     required List<OrderSchedule> orderSchedules,
+//     required List<String> persons,
+//     String? repeat,
+//   }) = _GroupOrder;
 
-  factory GroupOrder.fromJson(Map<String, Object?> json) =>
-      _$GroupOrderFromJson(json);
-}
+//   factory GroupOrder.fromJson(Map<String, Object?> json) =>
+//       _$GroupOrderFromJson(json);
+// }
 
 @freezed
 class OrderSchedule with _$OrderSchedule {
   const factory OrderSchedule({
     required DateTime deliveryDate,
-    required Store store,
+    required String storeId,
     required String orderNumber,
-    required List<OrderItem> orderItems,
-    double? tip,
-    required String courier,
-    required String status,
+    @Default([]) List<OrderItem> orderItems,
+    @Default(0) double tip,
+    @Default('Bernard') String courier,
+    @Default('Processing') String status,
     Promotion? promo,
-    required double serviceFee,
-    required double tax,
-    double? caDriverBenefits,
-    required double deliveryFee,
-    double? membershipBenefit,
-    required List<Payment> payments,
-    required double totalFee,
+    @Default(0) double serviceFee,
+    @Default(0) double tax,
+    @Default(0) double caDriverBenefits,
+    @Default(0) double deliveryFee,
+    @Default(0) double membershipBenefit,
+    @Default([]) List<Payment> payments,
+    @Default(0) double totalFee,
   }) = _OrderSchedule;
 
   factory OrderSchedule.fromJson(Map<String, Object?> json) =>

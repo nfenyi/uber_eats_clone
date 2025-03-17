@@ -279,13 +279,15 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                             : () async {
                                 if (_formKey.currentState!.validate()) {
                                   await FirebaseAuth.instance.verifyPhoneNumber(
-                                    phoneNumber:
-                                        '${_selectedCountry!.dialCode}${_phoneNumberController.text.trim()}',
+                                    phoneNumber: _phoneNumberController.text
+                                            .startsWith('0')
+                                        ? '${_selectedCountry?.dialCode}${_phoneNumberController.text.substring(1)}'
+                                        : '${_selectedCountry?.dialCode}${_phoneNumberController.text}',
                                     verificationCompleted:
                                         (PhoneAuthCredential credential) async {
                                       await FirebaseAuth.instance.currentUser!
                                           .updatePhoneNumber(credential);
-                                      navigatorKey.currentState!
+                                      await navigatorKey.currentState!
                                           .push(MaterialPageRoute(
                                         builder: (context) =>
                                             const NameScreen(),
@@ -299,11 +301,15 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                         int? resendToken) {
                                       navigatorKey.currentState!
                                           .push(MaterialPageRoute(
-                                        builder: (context) => VerifyPhoneNumber(
+                                        builder: (context) =>
+                                            VerifyPhoneNumberScreen(
                                           verificationId: verificationId,
                                           signedInWithEmail: true,
-                                          phoneNumber:
-                                              '${_selectedCountry!.dialCode}${_phoneNumberController.text}',
+                                          phoneNumber: _phoneNumberController
+                                                  .text
+                                                  .startsWith('0')
+                                              ? '${_selectedCountry?.dialCode}${_phoneNumberController.text.substring(1)}'
+                                              : '${_selectedCountry?.dialCode}${_phoneNumberController.text}',
                                         ),
                                       ));
                                     },

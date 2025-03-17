@@ -23,7 +23,9 @@ mixin _$Store {
   bool get isUberOneShop => throw _privateConstructorUsedError;
   StoreLocation get location => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
+  List<StoreSchedule>? get storeSchedules => throw _privateConstructorUsedError;
   String? get dietary => throw _privateConstructorUsedError;
+  List<Product>? get featuredItems => throw _privateConstructorUsedError;
   String get priceCategory => throw _privateConstructorUsedError;
   bool get isGroupFriendly => throw _privateConstructorUsedError;
   String get type => throw _privateConstructorUsedError;
@@ -59,7 +61,9 @@ abstract class $StoreCopyWith<$Res> {
       {bool isUberOneShop,
       StoreLocation location,
       String id,
+      List<StoreSchedule>? storeSchedules,
       String? dietary,
+      List<Product>? featuredItems,
       String priceCategory,
       bool isGroupFriendly,
       String type,
@@ -99,7 +103,9 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
     Object? isUberOneShop = null,
     Object? location = null,
     Object? id = null,
+    Object? storeSchedules = freezed,
     Object? dietary = freezed,
+    Object? featuredItems = freezed,
     Object? priceCategory = null,
     Object? isGroupFriendly = null,
     Object? type = null,
@@ -129,10 +135,18 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      storeSchedules: freezed == storeSchedules
+          ? _value.storeSchedules
+          : storeSchedules // ignore: cast_nullable_to_non_nullable
+              as List<StoreSchedule>?,
       dietary: freezed == dietary
           ? _value.dietary
           : dietary // ignore: cast_nullable_to_non_nullable
               as String?,
+      featuredItems: freezed == featuredItems
+          ? _value.featuredItems
+          : featuredItems // ignore: cast_nullable_to_non_nullable
+              as List<Product>?,
       priceCategory: null == priceCategory
           ? _value.priceCategory
           : priceCategory // ignore: cast_nullable_to_non_nullable
@@ -238,7 +252,9 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       {bool isUberOneShop,
       StoreLocation location,
       String id,
+      List<StoreSchedule>? storeSchedules,
       String? dietary,
+      List<Product>? featuredItems,
       String priceCategory,
       bool isGroupFriendly,
       String type,
@@ -279,7 +295,9 @@ class __$$StoreImplCopyWithImpl<$Res>
     Object? isUberOneShop = null,
     Object? location = null,
     Object? id = null,
+    Object? storeSchedules = freezed,
     Object? dietary = freezed,
+    Object? featuredItems = freezed,
     Object? priceCategory = null,
     Object? isGroupFriendly = null,
     Object? type = null,
@@ -309,10 +327,18 @@ class __$$StoreImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      storeSchedules: freezed == storeSchedules
+          ? _value._storeSchedules
+          : storeSchedules // ignore: cast_nullable_to_non_nullable
+              as List<StoreSchedule>?,
       dietary: freezed == dietary
           ? _value.dietary
           : dietary // ignore: cast_nullable_to_non_nullable
               as String?,
+      featuredItems: freezed == featuredItems
+          ? _value._featuredItems
+          : featuredItems // ignore: cast_nullable_to_non_nullable
+              as List<Product>?,
       priceCategory: null == priceCategory
           ? _value.priceCategory
           : priceCategory // ignore: cast_nullable_to_non_nullable
@@ -384,7 +410,9 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       {this.isUberOneShop = false,
       required this.location,
       required this.id,
+      final List<StoreSchedule>? storeSchedules,
       this.dietary,
+      final List<Product>? featuredItems,
       required this.priceCategory,
       required this.isGroupFriendly,
       required this.type,
@@ -400,7 +428,9 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       this.visits = 0,
       required this.openingTime,
       required this.closingTime})
-      : _offers = offers,
+      : _storeSchedules = storeSchedules,
+        _featuredItems = featuredItems,
+        _offers = offers,
         _aisles = aisles,
         _productCategories = productCategories;
 
@@ -414,8 +444,28 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   final StoreLocation location;
   @override
   final String id;
+  final List<StoreSchedule>? _storeSchedules;
+  @override
+  List<StoreSchedule>? get storeSchedules {
+    final value = _storeSchedules;
+    if (value == null) return null;
+    if (_storeSchedules is EqualUnmodifiableListView) return _storeSchedules;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   final String? dietary;
+  final List<Product>? _featuredItems;
+  @override
+  List<Product>? get featuredItems {
+    final value = _featuredItems;
+    if (value == null) return null;
+    if (_featuredItems is EqualUnmodifiableListView) return _featuredItems;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   final String priceCategory;
   @override
@@ -475,7 +525,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, dietary: $dietary, priceCategory: $priceCategory, isGroupFriendly: $isGroupFriendly, type: $type, offers: $offers, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, visits: $visits, openingTime: $openingTime, closingTime: $closingTime)';
+    return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, storeSchedules: $storeSchedules, dietary: $dietary, featuredItems: $featuredItems, priceCategory: $priceCategory, isGroupFriendly: $isGroupFriendly, type: $type, offers: $offers, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, visits: $visits, openingTime: $openingTime, closingTime: $closingTime)';
   }
 
   @override
@@ -486,7 +536,9 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       ..add(DiagnosticsProperty('isUberOneShop', isUberOneShop))
       ..add(DiagnosticsProperty('location', location))
       ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('storeSchedules', storeSchedules))
       ..add(DiagnosticsProperty('dietary', dietary))
+      ..add(DiagnosticsProperty('featuredItems', featuredItems))
       ..add(DiagnosticsProperty('priceCategory', priceCategory))
       ..add(DiagnosticsProperty('isGroupFriendly', isGroupFriendly))
       ..add(DiagnosticsProperty('type', type))
@@ -514,7 +566,11 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
             (identical(other.location, location) ||
                 other.location == location) &&
             (identical(other.id, id) || other.id == id) &&
+            const DeepCollectionEquality()
+                .equals(other._storeSchedules, _storeSchedules) &&
             (identical(other.dietary, dietary) || other.dietary == dietary) &&
+            const DeepCollectionEquality()
+                .equals(other._featuredItems, _featuredItems) &&
             (identical(other.priceCategory, priceCategory) ||
                 other.priceCategory == priceCategory) &&
             (identical(other.isGroupFriendly, isGroupFriendly) ||
@@ -547,7 +603,9 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
         isUberOneShop,
         location,
         id,
+        const DeepCollectionEquality().hash(_storeSchedules),
         dietary,
+        const DeepCollectionEquality().hash(_featuredItems),
         priceCategory,
         isGroupFriendly,
         type,
@@ -586,7 +644,9 @@ abstract class _Store implements Store {
       {final bool isUberOneShop,
       required final StoreLocation location,
       required final String id,
+      final List<StoreSchedule>? storeSchedules,
       final String? dietary,
+      final List<Product>? featuredItems,
       required final String priceCategory,
       required final bool isGroupFriendly,
       required final String type,
@@ -612,7 +672,11 @@ abstract class _Store implements Store {
   @override
   String get id;
   @override
+  List<StoreSchedule>? get storeSchedules;
+  @override
   String? get dietary;
+  @override
+  List<Product>? get featuredItems;
   @override
   String get priceCategory;
   @override
@@ -649,6 +713,185 @@ abstract class _Store implements Store {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$StoreImplCopyWith<_$StoreImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+StoreSchedule _$StoreScheduleFromJson(Map<String, dynamic> json) {
+  return _StoreSchedule.fromJson(json);
+}
+
+/// @nodoc
+mixin _$StoreSchedule {
+  String get name => throw _privateConstructorUsedError;
+  String get duration => throw _privateConstructorUsedError;
+
+  /// Serializes this StoreSchedule to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of StoreSchedule
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $StoreScheduleCopyWith<StoreSchedule> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $StoreScheduleCopyWith<$Res> {
+  factory $StoreScheduleCopyWith(
+          StoreSchedule value, $Res Function(StoreSchedule) then) =
+      _$StoreScheduleCopyWithImpl<$Res, StoreSchedule>;
+  @useResult
+  $Res call({String name, String duration});
+}
+
+/// @nodoc
+class _$StoreScheduleCopyWithImpl<$Res, $Val extends StoreSchedule>
+    implements $StoreScheduleCopyWith<$Res> {
+  _$StoreScheduleCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of StoreSchedule
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? duration = null,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      duration: null == duration
+          ? _value.duration
+          : duration // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$StoreScheduleImplCopyWith<$Res>
+    implements $StoreScheduleCopyWith<$Res> {
+  factory _$$StoreScheduleImplCopyWith(
+          _$StoreScheduleImpl value, $Res Function(_$StoreScheduleImpl) then) =
+      __$$StoreScheduleImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String name, String duration});
+}
+
+/// @nodoc
+class __$$StoreScheduleImplCopyWithImpl<$Res>
+    extends _$StoreScheduleCopyWithImpl<$Res, _$StoreScheduleImpl>
+    implements _$$StoreScheduleImplCopyWith<$Res> {
+  __$$StoreScheduleImplCopyWithImpl(
+      _$StoreScheduleImpl _value, $Res Function(_$StoreScheduleImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of StoreSchedule
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? duration = null,
+  }) {
+    return _then(_$StoreScheduleImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      duration: null == duration
+          ? _value.duration
+          : duration // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$StoreScheduleImpl
+    with DiagnosticableTreeMixin
+    implements _StoreSchedule {
+  _$StoreScheduleImpl({required this.name, required this.duration});
+
+  factory _$StoreScheduleImpl.fromJson(Map<String, dynamic> json) =>
+      _$$StoreScheduleImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final String duration;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'StoreSchedule(name: $name, duration: $duration)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'StoreSchedule'))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('duration', duration));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$StoreScheduleImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.duration, duration) ||
+                other.duration == duration));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, name, duration);
+
+  /// Create a copy of StoreSchedule
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$StoreScheduleImplCopyWith<_$StoreScheduleImpl> get copyWith =>
+      __$$StoreScheduleImplCopyWithImpl<_$StoreScheduleImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$StoreScheduleImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _StoreSchedule implements StoreSchedule {
+  factory _StoreSchedule(
+      {required final String name,
+      required final String duration}) = _$StoreScheduleImpl;
+
+  factory _StoreSchedule.fromJson(Map<String, dynamic> json) =
+      _$StoreScheduleImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String get duration;
+
+  /// Create a copy of StoreSchedule
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$StoreScheduleImplCopyWith<_$StoreScheduleImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1624,7 +1867,7 @@ mixin _$Product {
   double get initialPrice => throw _privateConstructorUsedError;
   double? get promoPrice => throw _privateConstructorUsedError;
   List<String> get imageUrls => throw _privateConstructorUsedError;
-  List<String>? get frequentlyBoughtTogether =>
+  List<Object>? get frequentlyBoughtTogether =>
       throw _privateConstructorUsedError;
   Map<String, String>? get nutritionFacts => throw _privateConstructorUsedError;
   String? get ingredients => throw _privateConstructorUsedError;
@@ -1659,7 +1902,7 @@ abstract class $ProductCopyWith<$Res> {
       double initialPrice,
       double? promoPrice,
       List<String> imageUrls,
-      List<String>? frequentlyBoughtTogether,
+      List<Object>? frequentlyBoughtTogether,
       Map<String, String>? nutritionFacts,
       String? ingredients,
       String? directions,
@@ -1732,7 +1975,7 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
       frequentlyBoughtTogether: freezed == frequentlyBoughtTogether
           ? _value.frequentlyBoughtTogether
           : frequentlyBoughtTogether // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<Object>?,
       nutritionFacts: freezed == nutritionFacts
           ? _value.nutritionFacts
           : nutritionFacts // ignore: cast_nullable_to_non_nullable
@@ -1798,7 +2041,7 @@ abstract class _$$ProductImplCopyWith<$Res> implements $ProductCopyWith<$Res> {
       double initialPrice,
       double? promoPrice,
       List<String> imageUrls,
-      List<String>? frequentlyBoughtTogether,
+      List<Object>? frequentlyBoughtTogether,
       Map<String, String>? nutritionFacts,
       String? ingredients,
       String? directions,
@@ -1869,7 +2112,7 @@ class __$$ProductImplCopyWithImpl<$Res>
       frequentlyBoughtTogether: freezed == frequentlyBoughtTogether
           ? _value._frequentlyBoughtTogether
           : frequentlyBoughtTogether // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<Object>?,
       nutritionFacts: freezed == nutritionFacts
           ? _value._nutritionFacts
           : nutritionFacts // ignore: cast_nullable_to_non_nullable
@@ -1931,7 +2174,7 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
       required this.initialPrice,
       this.promoPrice,
       required final List<String> imageUrls,
-      final List<String>? frequentlyBoughtTogether,
+      final List<Object>? frequentlyBoughtTogether,
       final Map<String, String>? nutritionFacts,
       this.ingredients,
       this.directions,
@@ -1969,9 +2212,9 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
     return EqualUnmodifiableListView(_imageUrls);
   }
 
-  final List<String>? _frequentlyBoughtTogether;
+  final List<Object>? _frequentlyBoughtTogether;
   @override
-  List<String>? get frequentlyBoughtTogether {
+  List<Object>? get frequentlyBoughtTogether {
     final value = _frequentlyBoughtTogether;
     if (value == null) return null;
     if (_frequentlyBoughtTogether is EqualUnmodifiableListView)
@@ -2146,7 +2389,7 @@ abstract class _Product implements Product {
       required final double initialPrice,
       final double? promoPrice,
       required final List<String> imageUrls,
-      final List<String>? frequentlyBoughtTogether,
+      final List<Object>? frequentlyBoughtTogether,
       final Map<String, String>? nutritionFacts,
       final String? ingredients,
       final String? directions,
@@ -2173,7 +2416,7 @@ abstract class _Product implements Product {
   @override
   List<String> get imageUrls;
   @override
-  List<String>? get frequentlyBoughtTogether;
+  List<Object>? get frequentlyBoughtTogether;
   @override
   Map<String, String>? get nutritionFacts;
   @override
@@ -2218,6 +2461,8 @@ mixin _$Option {
   bool get isExclusive => throw _privateConstructorUsedError;
   List<SubOption>? get subOptions => throw _privateConstructorUsedError;
   double? get calories => throw _privateConstructorUsedError;
+  bool get canBeMultiple => throw _privateConstructorUsedError;
+  int? get canBeMultipleLimit => throw _privateConstructorUsedError;
 
   /// Serializes this Option to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2238,7 +2483,9 @@ abstract class $OptionCopyWith<$Res> {
       double? price,
       bool isExclusive,
       List<SubOption>? subOptions,
-      double? calories});
+      double? calories,
+      bool canBeMultiple,
+      int? canBeMultipleLimit});
 }
 
 /// @nodoc
@@ -2261,6 +2508,8 @@ class _$OptionCopyWithImpl<$Res, $Val extends Option>
     Object? isExclusive = null,
     Object? subOptions = freezed,
     Object? calories = freezed,
+    Object? canBeMultiple = null,
+    Object? canBeMultipleLimit = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -2283,6 +2532,14 @@ class _$OptionCopyWithImpl<$Res, $Val extends Option>
           ? _value.calories
           : calories // ignore: cast_nullable_to_non_nullable
               as double?,
+      canBeMultiple: null == canBeMultiple
+          ? _value.canBeMultiple
+          : canBeMultiple // ignore: cast_nullable_to_non_nullable
+              as bool,
+      canBeMultipleLimit: freezed == canBeMultipleLimit
+          ? _value.canBeMultipleLimit
+          : canBeMultipleLimit // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -2299,7 +2556,9 @@ abstract class _$$OptionImplCopyWith<$Res> implements $OptionCopyWith<$Res> {
       double? price,
       bool isExclusive,
       List<SubOption>? subOptions,
-      double? calories});
+      double? calories,
+      bool canBeMultiple,
+      int? canBeMultipleLimit});
 }
 
 /// @nodoc
@@ -2320,6 +2579,8 @@ class __$$OptionImplCopyWithImpl<$Res>
     Object? isExclusive = null,
     Object? subOptions = freezed,
     Object? calories = freezed,
+    Object? canBeMultiple = null,
+    Object? canBeMultipleLimit = freezed,
   }) {
     return _then(_$OptionImpl(
       name: null == name
@@ -2342,6 +2603,14 @@ class __$$OptionImplCopyWithImpl<$Res>
           ? _value.calories
           : calories // ignore: cast_nullable_to_non_nullable
               as double?,
+      canBeMultiple: null == canBeMultiple
+          ? _value.canBeMultiple
+          : canBeMultiple // ignore: cast_nullable_to_non_nullable
+              as bool,
+      canBeMultipleLimit: freezed == canBeMultipleLimit
+          ? _value.canBeMultipleLimit
+          : canBeMultipleLimit // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -2354,7 +2623,9 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
       this.price,
       this.isExclusive = true,
       final List<SubOption>? subOptions,
-      this.calories})
+      this.calories,
+      this.canBeMultiple = false,
+      this.canBeMultipleLimit})
       : _subOptions = subOptions;
 
   factory _$OptionImpl.fromJson(Map<String, dynamic> json) =>
@@ -2379,10 +2650,15 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
 
   @override
   final double? calories;
+  @override
+  @JsonKey()
+  final bool canBeMultiple;
+  @override
+  final int? canBeMultipleLimit;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Option(name: $name, price: $price, isExclusive: $isExclusive, subOptions: $subOptions, calories: $calories)';
+    return 'Option(name: $name, price: $price, isExclusive: $isExclusive, subOptions: $subOptions, calories: $calories, canBeMultiple: $canBeMultiple, canBeMultipleLimit: $canBeMultipleLimit)';
   }
 
   @override
@@ -2394,7 +2670,9 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
       ..add(DiagnosticsProperty('price', price))
       ..add(DiagnosticsProperty('isExclusive', isExclusive))
       ..add(DiagnosticsProperty('subOptions', subOptions))
-      ..add(DiagnosticsProperty('calories', calories));
+      ..add(DiagnosticsProperty('calories', calories))
+      ..add(DiagnosticsProperty('canBeMultiple', canBeMultiple))
+      ..add(DiagnosticsProperty('canBeMultipleLimit', canBeMultipleLimit));
   }
 
   @override
@@ -2409,13 +2687,24 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
             const DeepCollectionEquality()
                 .equals(other._subOptions, _subOptions) &&
             (identical(other.calories, calories) ||
-                other.calories == calories));
+                other.calories == calories) &&
+            (identical(other.canBeMultiple, canBeMultiple) ||
+                other.canBeMultiple == canBeMultiple) &&
+            (identical(other.canBeMultipleLimit, canBeMultipleLimit) ||
+                other.canBeMultipleLimit == canBeMultipleLimit));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, name, price, isExclusive,
-      const DeepCollectionEquality().hash(_subOptions), calories);
+  int get hashCode => Object.hash(
+      runtimeType,
+      name,
+      price,
+      isExclusive,
+      const DeepCollectionEquality().hash(_subOptions),
+      calories,
+      canBeMultiple,
+      canBeMultipleLimit);
 
   /// Create a copy of Option
   /// with the given fields replaced by the non-null parameter values.
@@ -2439,7 +2728,9 @@ abstract class _Option implements Option {
       final double? price,
       final bool isExclusive,
       final List<SubOption>? subOptions,
-      final double? calories}) = _$OptionImpl;
+      final double? calories,
+      final bool canBeMultiple,
+      final int? canBeMultipleLimit}) = _$OptionImpl;
 
   factory _Option.fromJson(Map<String, dynamic> json) = _$OptionImpl.fromJson;
 
@@ -2453,6 +2744,10 @@ abstract class _Option implements Option {
   List<SubOption>? get subOptions;
   @override
   double? get calories;
+  @override
+  bool get canBeMultiple;
+  @override
+  int? get canBeMultipleLimit;
 
   /// Create a copy of Option
   /// with the given fields replaced by the non-null parameter values.
@@ -2470,7 +2765,9 @@ SubOption _$SubOptionFromJson(Map<String, dynamic> json) {
 mixin _$SubOption {
   String get name => throw _privateConstructorUsedError;
   bool get canBeMultiple => throw _privateConstructorUsedError;
+  double? get calories => throw _privateConstructorUsedError;
   double? get price => throw _privateConstructorUsedError;
+  int? get canBeMultipleLimit => throw _privateConstructorUsedError;
 
   /// Serializes this SubOption to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2487,7 +2784,12 @@ abstract class $SubOptionCopyWith<$Res> {
   factory $SubOptionCopyWith(SubOption value, $Res Function(SubOption) then) =
       _$SubOptionCopyWithImpl<$Res, SubOption>;
   @useResult
-  $Res call({String name, bool canBeMultiple, double? price});
+  $Res call(
+      {String name,
+      bool canBeMultiple,
+      double? calories,
+      double? price,
+      int? canBeMultipleLimit});
 }
 
 /// @nodoc
@@ -2507,7 +2809,9 @@ class _$SubOptionCopyWithImpl<$Res, $Val extends SubOption>
   $Res call({
     Object? name = null,
     Object? canBeMultiple = null,
+    Object? calories = freezed,
     Object? price = freezed,
+    Object? canBeMultipleLimit = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -2518,10 +2822,18 @@ class _$SubOptionCopyWithImpl<$Res, $Val extends SubOption>
           ? _value.canBeMultiple
           : canBeMultiple // ignore: cast_nullable_to_non_nullable
               as bool,
+      calories: freezed == calories
+          ? _value.calories
+          : calories // ignore: cast_nullable_to_non_nullable
+              as double?,
       price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as double?,
+      canBeMultipleLimit: freezed == canBeMultipleLimit
+          ? _value.canBeMultipleLimit
+          : canBeMultipleLimit // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -2534,7 +2846,12 @@ abstract class _$$SubOptionImplCopyWith<$Res>
       __$$SubOptionImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, bool canBeMultiple, double? price});
+  $Res call(
+      {String name,
+      bool canBeMultiple,
+      double? calories,
+      double? price,
+      int? canBeMultipleLimit});
 }
 
 /// @nodoc
@@ -2552,7 +2869,9 @@ class __$$SubOptionImplCopyWithImpl<$Res>
   $Res call({
     Object? name = null,
     Object? canBeMultiple = null,
+    Object? calories = freezed,
     Object? price = freezed,
+    Object? canBeMultipleLimit = freezed,
   }) {
     return _then(_$SubOptionImpl(
       name: null == name
@@ -2563,10 +2882,18 @@ class __$$SubOptionImplCopyWithImpl<$Res>
           ? _value.canBeMultiple
           : canBeMultiple // ignore: cast_nullable_to_non_nullable
               as bool,
+      calories: freezed == calories
+          ? _value.calories
+          : calories // ignore: cast_nullable_to_non_nullable
+              as double?,
       price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as double?,
+      canBeMultipleLimit: freezed == canBeMultipleLimit
+          ? _value.canBeMultipleLimit
+          : canBeMultipleLimit // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -2575,7 +2902,11 @@ class __$$SubOptionImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
   _$SubOptionImpl(
-      {required this.name, required this.canBeMultiple, this.price});
+      {required this.name,
+      required this.canBeMultiple,
+      this.calories,
+      this.price,
+      this.canBeMultipleLimit});
 
   factory _$SubOptionImpl.fromJson(Map<String, dynamic> json) =>
       _$$SubOptionImplFromJson(json);
@@ -2585,11 +2916,15 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
   @override
   final bool canBeMultiple;
   @override
+  final double? calories;
+  @override
   final double? price;
+  @override
+  final int? canBeMultipleLimit;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SubOption(name: $name, canBeMultiple: $canBeMultiple, price: $price)';
+    return 'SubOption(name: $name, canBeMultiple: $canBeMultiple, calories: $calories, price: $price, canBeMultipleLimit: $canBeMultipleLimit)';
   }
 
   @override
@@ -2599,7 +2934,9 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
       ..add(DiagnosticsProperty('type', 'SubOption'))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('canBeMultiple', canBeMultiple))
-      ..add(DiagnosticsProperty('price', price));
+      ..add(DiagnosticsProperty('calories', calories))
+      ..add(DiagnosticsProperty('price', price))
+      ..add(DiagnosticsProperty('canBeMultipleLimit', canBeMultipleLimit));
   }
 
   @override
@@ -2610,12 +2947,17 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.canBeMultiple, canBeMultiple) ||
                 other.canBeMultiple == canBeMultiple) &&
-            (identical(other.price, price) || other.price == price));
+            (identical(other.calories, calories) ||
+                other.calories == calories) &&
+            (identical(other.price, price) || other.price == price) &&
+            (identical(other.canBeMultipleLimit, canBeMultipleLimit) ||
+                other.canBeMultipleLimit == canBeMultipleLimit));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, name, canBeMultiple, price);
+  int get hashCode => Object.hash(
+      runtimeType, name, canBeMultiple, calories, price, canBeMultipleLimit);
 
   /// Create a copy of SubOption
   /// with the given fields replaced by the non-null parameter values.
@@ -2637,7 +2979,9 @@ abstract class _SubOption implements SubOption {
   factory _SubOption(
       {required final String name,
       required final bool canBeMultiple,
-      final double? price}) = _$SubOptionImpl;
+      final double? calories,
+      final double? price,
+      final int? canBeMultipleLimit}) = _$SubOptionImpl;
 
   factory _SubOption.fromJson(Map<String, dynamic> json) =
       _$SubOptionImpl.fromJson;
@@ -2647,7 +2991,11 @@ abstract class _SubOption implements SubOption {
   @override
   bool get canBeMultiple;
   @override
+  double? get calories;
+  @override
   double? get price;
+  @override
+  int? get canBeMultipleLimit;
 
   /// Create a copy of SubOption
   /// with the given fields replaced by the non-null parameter values.

@@ -1,16 +1,13 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:country_flags/country_flags.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_udid/flutter_udid.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -203,41 +200,56 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       return;
                     }
 
-                    // final result = await ref
-                    //     .read(signInProvider.notifier)
-                    //     .verifyPhoneNumber(
-                    //         '${_selectedCountry!.dialCode}${_phoneNumberController.text.trim()}');
-                    // if (result.response == Result.success) {
-                    //   navigatorKey.currentState!.push(MaterialPageRoute(
-                    //     builder: (context) => const VerifyPhoneNumber(),
-                    //   ));
-                    // }
-                    // if (mounted && result.response == Result.failure) {
-                    //   showInfoToast(result.payload.toString(), context: context);
-                    // }
                     setState(() {
                       _isLoading = true;
                     });
                     await FirebaseAuth.instance.verifyPhoneNumber(
-                      phoneNumber:
-                          '${_selectedCountry!.dialCode}${_phoneNumberController.text.trim()}',
+                      phoneNumber: _phoneNumberController.text.startsWith('0')
+                          ? '${_selectedCountry?.dialCode}${_phoneNumberController.text.substring(1)}'
+                          : '${_selectedCountry?.dialCode}${_phoneNumberController.text}',
                       verificationCompleted:
                           (PhoneAuthCredential credential) async {
                         await FirebaseAuth.instance
                             .signInWithCredential(credential);
+                        final userCredential =
+                            FirebaseAuth.instance.currentUser!;
                         final snapshot = await FirebaseFirestore.instance
                             .collection(FirestoreCollections.users)
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .doc(userCredential.uid)
                             .get();
 
                         if (snapshot.exists &&
                             snapshot.data() != null &&
                             snapshot.data()!['onboarded'] == true) {
-                          navigatorKey.currentState!.push(MaterialPageRoute(
+                          String udid = await FlutterUdid.consistentUdid;
+                          var deviceRef = FirebaseFirestore.instance
+                              .collection(FirestoreCollections.devices)
+                              .doc(udid);
+                          var deviceSnapshot = await deviceRef.get();
+                          final info = <String, dynamic>{
+                            userCredential.uid: {
+                              'name': userCredential.displayName,
+                              'profilePic': userCredential.photoURL,
+                              "email": userCredential.email,
+                              "phoneNumber": userCredential.phoneNumber
+                            }
+                          };
+                          if (!deviceSnapshot.exists) {
+                            await deviceRef.set(info);
+                          } else {
+                            if (deviceSnapshot[userCredential.uid] == null) {
+                              await deviceRef.update(info);
+                            }
+                          }
+                          await Hive.box(AppBoxes.appState)
+                              .put(BoxKeys.authenticated, true);
+                          await navigatorKey.currentState!
+                              .push(MaterialPageRoute(
                             builder: (context) => const MainScreen(),
                           ));
                         } else {
-                          navigatorKey.currentState!.push(MaterialPageRoute(
+                          await navigatorKey.currentState!
+                              .push(MaterialPageRoute(
                             builder: (context) => const EmailAddressScreen(),
                           ));
                         }
@@ -248,22 +260,24 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           context,
                           description: '${e.code}${e.message}',
                         );
-                        setState(() {
-                          _isLoading = false;
-                        });
                       },
                       codeSent: (String verificationId, int? resendToken) {
                         navigatorKey.currentState!.push(MaterialPageRoute(
-                          builder: (context) => VerifyPhoneNumber(
+                          builder: (context) => VerifyPhoneNumberScreen(
                             verificationId: verificationId,
-                            phoneNumber:
-                                '${_selectedCountry?.dialCode}${_phoneNumberController.text}',
+                            phoneNumber: _phoneNumberController.text
+                                    .startsWith('0')
+                                ? '${_selectedCountry?.dialCode}${_phoneNumberController.text.substring(1)}'
+                                : '${_selectedCountry?.dialCode}${_phoneNumberController.text}',
                           ),
                         ));
                       },
                       timeout: const Duration(minutes: 2),
                       codeAutoRetrievalTimeout: (String verificationId) {},
                     );
+                    setState(() {
+                      _isLoading = false;
+                    });
                   }
                 },
               ),
@@ -296,26 +310,57 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   switch (providerState.status) {
                     case AuthStatus.success:
                       try {
+                        final userCredential =
+                            FirebaseAuth.instance.currentUser!;
                         final snapshot = await FirebaseFirestore.instance
                             .collection(FirestoreCollections.users)
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .doc(userCredential.uid)
                             .get();
 
                         if (snapshot.exists &&
                             snapshot.data() != null &&
                             snapshot.data()!['onboarded'] == true) {
-                          navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => const MainScreen()));
+                          String udid = await FlutterUdid.consistentUdid;
+                          var deviceRef = FirebaseFirestore.instance
+                              .collection(FirestoreCollections.devices)
+                              .doc(udid);
+                          var deviceSnapshot = await deviceRef.get();
+                          final info = <String, dynamic>{
+                            userCredential.uid: {
+                              'name': userCredential.displayName,
+                              'profilePic': userCredential.photoURL,
+                              "email": userCredential.email,
+                              "phoneNumber": userCredential.phoneNumber
+                            }
+                          };
+                          //true if a user signs in with a foreign phone
+                          if (!deviceSnapshot.exists) {
+                            await deviceRef.set(info);
+                          } else {
+                            if (deviceSnapshot[userCredential.uid] == null) {
+                              await deviceRef.update(info);
+                            }
+                          }
+                          await Hive.box(AppBoxes.appState)
+                              .put(BoxKeys.authenticated, true);
+                          await navigatorKey.currentState!.push(
+                              MaterialPageRoute(
+                                  builder: (context) => const MainScreen()));
                         } else {
-                          navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => const PhoneNumberScreen()));
+                          await navigatorKey.currentState!.push(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PhoneNumberScreen()));
                         }
                       } catch (e) {
-                        showAppInfoDialog(context, description: e.toString());
+                        if (context.mounted) {
+                          await showAppInfoDialog(context,
+                              description: e.toString());
+                        }
                       }
                       break;
                     case AuthStatus.failure:
-                      if (mounted) {
+                      if (context.mounted) {
                         await showAppInfoDialog(
                             description: providerState.payload, context);
                       }
@@ -341,6 +386,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   // final providerState = ref.read(signInProvider);
                   // switch (providerState.status) {
                   //   case AuthStatus.success:
+                  // final userCredential = FirebaseAuth.instance.currentUser!;
                   // final snapshot = await FirebaseFirestore.instance
                   //         .collection(FirestoreCollections.users)
                   //         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -349,6 +395,29 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   //     if (snapshot.exists &&
                   //         snapshot.data() != null &&
                   //         snapshot.data()!['onboarded'] == true) {
+                  // String udid = await FlutterUdid.consistentUdid;
+                  // var deviceRef = FirebaseFirestore.instance
+                  //     .collection(FirestoreCollections.devices)
+                  //     .doc(udid);
+                  // var deviceSnapshot = await deviceRef.get();
+                  // final info = <String, dynamic>{
+                  //   userCredential.uid: {
+                  //     'name': userCredential.displayName,
+                  //     'profilePic': userCredential.photoURL,
+                  //     "email": userCredential.email,
+                  //     "phoneNumber": userCredential.phoneNumber
+                  //   }
+                  // };
+                  // //true if a user signs in with a foreign phone
+                  // if (!deviceSnapshot.exists) {
+                  //   await deviceRef.set(info);
+                  // } else {
+                  //   if (deviceSnapshot[userCredential.uid] == null) {
+                  //     await deviceRef.update(info);
+                  //   }
+                  // }
+                  // await Hive.box(AppBoxes.appState)
+                  //     .put(BoxKeys.authenticated, true);
                   //       navigatorKey.currentState!.push(MaterialPageRoute(
                   //         builder: (context) => const MainScreen(),
                   //       ));
@@ -360,7 +429,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
                   //     break;
                   //   case AuthStatus.failure:
-                  //     if (mounted) {
+                  //     if (context.mounted) {
                   //       showAppInfoDialog(
                   //           description: providerState.payload, context);
                   //     }
@@ -377,7 +446,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               const Gap(10),
               AppButton(
                 callback: () async {
-                  navigatorKey.currentState!.push(MaterialPageRoute(
+                  await navigatorKey.currentState!.push(MaterialPageRoute(
                     builder: (context) => const WhatsYourEmailScreen(),
                   ));
                 },
@@ -416,225 +485,246 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 text: 'Find my account',
                 //Not tested
                 callback: () async {
-                  late String deviceId;
-                  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-
-                  if (Platform.isAndroid) {
-                    AndroidDeviceInfo androidInfo =
-                        await deviceInfo.androidInfo;
-                    deviceId = androidInfo.id;
-                    // Unique ID on Android (may not persist across factory resets)
-                    // Other potentially useful properties on AndroidDeviceInfo:
-                    // androidInfo.androidId; // More likely to persist, but not guaranteed
-                    // androidInfo.imei;       // International Mobile Equipment Identity (if available) - requires permissions
-                    // androidInfo.meid;       // Mobile Equipment Identifier (if available) - requires permissions
-                  } else if (Platform.isIOS) {
-                    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-                    deviceId = iosInfo
-                        .identifierForVendor!; // A unique ID for the *vendor* (your app developer), persists across app reinstalls, but changes if all apps by the vendor are uninstalled.
-                    // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
-                  }
-
+                  String udid = await FlutterUdid.consistentUdid;
+                  logger.d(udid);
                   final info = await FirebaseFirestore.instance
                       .collection(FirestoreCollections.devices)
-                      .doc(deviceId)
+                      .doc(udid)
                       .get();
                   if (info.exists && info.data() != null) {
-                    await showModalBottomSheet(
-                        shape: const RoundedRectangleBorder(),
-                        backgroundColor: Colors.white,
-                        context: context,
-                        builder: (context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(top: 8.0),
-                                child: AppText(
-                                  text: 'Continue with account',
-                                  size: AppSizes.heading6,
-                                ),
-                              ),
-                              const Divider(),
-                              ListView.separated(
-                                // padding: const EdgeInsets.symmetric(
-                                //     horizontal:
-                                //         AppSizes.horizontalPaddingSmall),
-                                itemBuilder: (context, index) {
-                                  final item = info.data()!;
-                                  return ListTile(
-                                    dense: true,
-                                    onTap: () async {
-                                      if (info['phoneNumber'] != null) {
-                                        await FirebaseAuth.instance
-                                            .verifyPhoneNumber(
-                                          phoneNumber: item['phoneNumber'],
-                                          verificationCompleted:
-                                              (PhoneAuthCredential
-                                                  credential) async {
-                                            await navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const MainScreen(),
-                                            ));
-                                          },
-                                          // autoRetrievedSmsCodeForTesting: '',
-                                          verificationFailed:
-                                              (FirebaseAuthException e) {
-                                            showAppInfoDialog(
-                                              context,
-                                              description:
-                                                  '${e.code}${e.message}',
-                                            );
+                    if (context.mounted) {
+                      await showModalBottomSheet(
+                          shape: const RoundedRectangleBorder(),
+                          backgroundColor: Colors.white,
+                          context: context,
+                          builder: (context) {
+                            var isLoggingInValues = List.generate(
+                              info.data()!.length,
+                              (index) => false,
+                            );
+                            return StatefulBuilder(
+                                builder: (context, setState) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 8.0),
+                                    child: AppText(
+                                      text: 'Continue with account',
+                                      size: AppSizes.heading6,
+                                    ),
+                                  ),
+                                  const Divider(),
+                                  ListView.separated(
+                                    // padding: const EdgeInsets.symmetric(
+                                    //     horizontal:
+                                    //         AppSizes.horizontalPaddingSmall),
+                                    itemBuilder: (context, index) {
+                                      final item =
+                                          info.data()!.values.elementAt(index);
+                                      return ListTile(
+                                        dense: true,
+                                        onTap: () async {
+                                          if (item['phoneNumber'] != null) {
                                             setState(() {
-                                              _isLoading = false;
+                                              isLoggingInValues[index] = true;
                                             });
-                                          },
-                                          codeSent: (String verificationId,
-                                              int? resendToken) {
-                                            navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) =>
-                                                  VerifyPhoneNumber(
-                                                verificationId: verificationId,
-                                                phoneNumber:
-                                                    item['phoneNumber'],
-                                              ),
-                                            ));
-                                          },
-                                          timeout: const Duration(minutes: 2),
-                                          codeAutoRetrievalTimeout:
-                                              (String verificationId) {},
-                                        );
-                                      } else if (item['email'] != null) {
-                                        await FirebaseAuth.instance
-                                            .sendSignInLinkToEmail(
-                                                email: item['email'],
-                                                actionCodeSettings:
-                                                    ActionCodeSettings(
-                                                        // URL you want to redirect back to. The domain (www.example.com) for this
-                                                        // URL must be whitelisted in the Firebase Console.
-                                                        url:
-                                                            'https://ubereatsclone.page.link/email-link-login',
-                                                        // This must be true
-                                                        handleCodeInApp: true,
-                                                        iOSBundleId:
-                                                            'com.example.uberEatsClone',
-                                                        androidPackageName:
-                                                            'com.example.uber_eats_clone',
-                                                        // installIfNotAvailable
-                                                        androidInstallApp: true,
-                                                        // minimumVersion
-                                                        androidMinimumVersion:
-                                                            '12'))
-                                            .then((value) async {
-                                          await Hive.box(AppBoxes.appState)
-                                              .put('email', info['email']);
 
-                                          await navigatorKey.currentState!
-                                              .push(MaterialPageRoute(
-                                            builder: (context) =>
-                                                EmailSentScreen(
-                                              email: item['email'],
-                                            ),
-                                          ));
+                                            await FirebaseAuth.instance
+                                                .verifyPhoneNumber(
+                                              phoneNumber: item['phoneNumber'],
+                                              verificationCompleted:
+                                                  (PhoneAuthCredential
+                                                      credential) async {
+                                                await Hive.box(
+                                                        AppBoxes.appState)
+                                                    .put(BoxKeys.authenticated,
+                                                        true);
+                                                await navigatorKey.currentState!
+                                                    .push(MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const MainScreen(),
+                                                ));
+                                              },
+                                              // autoRetrievedSmsCodeForTesting: '',
+                                              verificationFailed:
+                                                  (FirebaseAuthException e) {
+                                                showAppInfoDialog(
+                                                  context,
+                                                  description:
+                                                      '${e.code}${e.message}',
+                                                );
+                                              },
+                                              codeSent: (String verificationId,
+                                                  int? resendToken) {
+                                                navigatorKey.currentState!
+                                                    .push(MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      VerifyPhoneNumberScreen(
+                                                    verificationId:
+                                                        verificationId,
+                                                    phoneNumber:
+                                                        item['phoneNumber'],
+                                                  ),
+                                                ));
+                                              },
+                                              timeout:
+                                                  const Duration(minutes: 2),
+                                              codeAutoRetrievalTimeout:
+                                                  (String verificationId) {},
+                                            );
+                                          } else if (item['email'] != null) {
+                                            await FirebaseAuth.instance
+                                                .sendSignInLinkToEmail(
+                                                    email: item['email'],
+                                                    actionCodeSettings:
+                                                        ActionCodeSettings(
+                                                            // URL you want to redirect back to. The domain (www.example.com) for this
+                                                            // URL must be whitelisted in the Firebase Console.
+                                                            url:
+                                                                'https://ubereatsclone.page.link/email-link-login',
+                                                            // This must be true
+                                                            handleCodeInApp:
+                                                                true,
+                                                            iOSBundleId:
+                                                                'com.example.uberEatsClone',
+                                                            androidPackageName:
+                                                                'com.example.uber_eats_clone',
+                                                            // installIfNotAvailable
+                                                            androidInstallApp:
+                                                                true,
+                                                            // minimumVersion
+                                                            androidMinimumVersion:
+                                                                '12'))
+                                                .then((value) async {
+                                              await Hive.box(AppBoxes.appState)
+                                                  .put('email', item['email']);
+                                              setState(() {
+                                                isLoggingInValues[index] =
+                                                    false;
+                                              });
+                                              await navigatorKey.currentState!
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EmailSentScreen(
+                                                  email: item['email'],
+                                                ),
+                                              ));
+                                            }, onError: (onError) {
+                                              setState(() {
+                                                isLoggingInValues[index] =
+                                                    false;
+                                              });
+                                              return showAppInfoDialog(
+                                                  description:
+                                                      'Error sending email verification $onError',
+                                                  navigatorKey.currentContext!);
+                                            });
+                                          }
                                         },
-                                                onError: (onError) =>
-                                                    showAppInfoDialog(
-                                                        description:
-                                                            'Error sending email verification $onError',
-                                                        context));
-                                      }
+                                        trailing: isLoggingInValues[index]
+                                            ? const SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child: CircularProgressIndicator
+                                                    .adaptive(),
+                                              )
+                                            : null,
+                                        leading: CircleAvatar(
+                                          radius: 15,
+                                          child: item['profilePic'] == null
+                                              ? Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      height: 45,
+                                                      width: 45,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        gradient:
+                                                            const RadialGradient(
+                                                                stops: [
+                                                              0.6,
+                                                              1.0
+                                                            ],
+                                                                colors: [
+                                                              Colors.white,
+                                                              AppColors
+                                                                  .neutral200,
+                                                            ]),
+                                                      ),
+                                                    ),
+                                                    Transform.translate(
+                                                      offset:
+                                                          const Offset(0, -4),
+                                                      child: Image.asset(
+                                                        AssetNames.noProfilePic,
+                                                        width: 25,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(50),
+                                                  child: CachedNetworkImage(
+                                                      width: 45,
+                                                      height: 45,
+                                                      fit: BoxFit.cover,
+                                                      imageUrl:
+                                                          item['profilePic']),
+                                                ),
+                                        ),
+                                        title: item['name'] == null
+                                            ? null
+                                            : AppText(
+                                                text: item['name'],
+                                                size: AppSizes.body,
+                                              ),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (item['phoneNumber'] != null)
+                                              AppText(
+                                                  text: item['phoneNumber']),
+                                            if (item['email'] != null)
+                                              AppText(text: item['email']),
+                                          ],
+                                        ),
+                                      );
                                     },
-                                    leading: CircleAvatar(
-                                      radius: 15,
-                                      child: item['profilePic'] == null
-                                          ? Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                Container(
-                                                  height: 45,
-                                                  width: 45,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            50),
-                                                    gradient:
-                                                        const RadialGradient(
-                                                            stops: [
-                                                          0.6,
-                                                          1.0
-                                                        ],
-                                                            colors: [
-                                                          Colors.white,
-                                                          AppColors.neutral200,
-                                                        ]),
-                                                  ),
-                                                ),
-                                                Transform.translate(
-                                                  offset: const Offset(0, -4),
-                                                  child: Image.asset(
-                                                    AssetNames.noProfilePic,
-                                                    width: 25,
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          : ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              child: CachedNetworkImage(
-                                                  width: 45,
-                                                  height: 45,
-                                                  fit: BoxFit.cover,
-                                                  imageUrl: item['profilePic']),
-                                            ),
+                                    itemCount: info.data()!.length,
+                                    shrinkWrap: true,
+                                    separatorBuilder: (context, index) =>
+                                        const Divider(
+                                      indent: 50,
                                     ),
-                                    title: item['name'] == null
-                                        ? null
-                                        : AppText(
-                                            text: item['name'],
-                                            size: AppSizes.body,
-                                          ),
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (item['phoneNumber'] != null)
-                                          AppText(text: info['phoneNumber']),
-                                        if (item['email'] != null)
-                                          AppText(text: item['email']),
-                                      ],
+                                  ),
+                                  const Divider(
+                                    indent: 50,
+                                  ),
+                                  ListTile(
+                                    dense: true,
+                                    leading: const Icon(Icons.person),
+                                    title: const AppText(
+                                      text: 'Use another account',
+                                      size: AppSizes.body,
                                     ),
-                                  );
-                                },
-                                itemCount: info.data()!.length,
-                                shrinkWrap: true,
-                                separatorBuilder: (context, index) =>
-                                    const Divider(
-                                  indent: 50,
-                                ),
-                              ),
-                              const Divider(
-                                indent: 50,
-                              ),
-                              ListTile(
-                                dense: true,
-                                leading: const Icon(Icons.person),
-                                title: const AppText(
-                                  text: 'Use another account',
-                                  size: AppSizes.body,
-                                ),
-                                onTap: navigatorKey.currentState!.pop,
-                              )
-                            ],
-                          );
-                        },
-                        isScrollControlled: true);
+                                    onTap: navigatorKey.currentState!.pop,
+                                  )
+                                ],
+                              );
+                            });
+                          },
+                          isScrollControlled: true);
+                    }
                   } else {
                     showInfoToast(
-                        'You don\'t seem to have a contact with us yet.',
-                        context: context);
+                        'Seems this device does not have an account with us yet.',
+                        context: navigatorKey.currentContext!);
                   }
                 },
               ),

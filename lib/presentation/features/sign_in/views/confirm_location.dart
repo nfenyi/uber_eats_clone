@@ -12,6 +12,7 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/services/google_maps_services.dart';
 import 'package:latlong2/latlong.dart' as lt;
 
+import '../../../../app_functions.dart';
 import '../../../constants/asset_names.dart';
 import '../../../services/place_detail_model.dart';
 
@@ -113,18 +114,9 @@ class _ConfirmLocationState extends ConsumerState<ConfirmLocationScreen>
                             if (_resultName == null) {
                               _locationName = ' ■ ';
                             } else {
-                              var strings = _resultName!.split(',');
-
-                              if (strings.length > 2) {
-                                if (strings.length == 3) {
-                                  _locationName = '${strings[0]},${strings[1]}';
-                                } else {
-                                  _locationName =
-                                      '${strings[0]},${strings[1]},${strings[2]}';
-                                }
-                              } else {
-                                _locationName = '${strings[0]},${strings[1]}';
-                              }
+                              _locationName =
+                                  AppFunctions.formatPlaceDescription(
+                                      _resultName!);
                               _labelColor = Colors.black;
                             }
                           } else {

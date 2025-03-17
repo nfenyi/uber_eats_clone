@@ -1,16 +1,12 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_udid/flutter_udid.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:uuid/uuid.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
@@ -63,53 +59,51 @@ class UberOneScreen extends StatelessWidget {
                             'hasUberOne': false,
                             'type': "Personal",
                             "onboarded": true,
-                            "redeemedPromos": []
+                            "redeemedPromos": <String>[],
+                            "groupOrders": <String>[],
+                            'displayName': userCredential.displayName
                           });
 
-                          late String deviceId;
-                          DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                          String udid = await FlutterUdid.consistentUdid;
 
-                          if (Platform.isAndroid) {
-                            AndroidDeviceInfo androidInfo =
-                                await deviceInfo.androidInfo;
-                            deviceId = androidInfo.id;
-                            // Unique ID on Android (may not persist across factory resets)
-                            // Other potentially useful properties on AndroidDeviceInfo:
-                            // androidInfo.androidId; // More likely to persist, but not guaranteed
-                            // androidInfo.imei;       // International Mobile Equipment Identity (if available) - requires permissions
-                            // androidInfo.meid;       // Mobile Equipment Identifier (if available) - requires permissions
-                          } else if (Platform.isIOS) {
-                            IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-                            deviceId = iosInfo
-                                .identifierForVendor!; // A unique ID for the *vendor* (your app developer), persists across app reinstalls, but changes if all apps by the vendor are uninstalled.
-                            // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
-                          }
-                          await Hive.box(AppBoxes.appState)
-                              .put('authenticated', true);
+                          var deviceRef = FirebaseFirestore.instance
+                              .collection(FirestoreCollections.devices)
+                              .doc(udid);
+                          var deviceSnapshot = await deviceRef.get();
                           final info = <String, dynamic>{
-                            const Uuid().v4(): {
+                            userCredential.uid: {
                               'name': userCredential.displayName,
                               'profilePic': userCredential.photoURL,
                               "email": userCredential.email,
                               "phoneNumber": userCredential.phoneNumber
                             }
                           };
-                          await FirebaseFirestore.instance
-                              .collection(FirestoreCollections.devices)
-                              .doc(deviceId)
-                              .set(info, SetOptions(merge: true));
+                          if (!deviceSnapshot.exists) {
+                            await deviceRef.set(info);
+                          } else {
+                            if (deviceSnapshot[userCredential.uid] == null) {
+                              await deviceRef.update(info);
+                            }
+                          }
+                          //creating favorite stores field
                           await FirebaseFirestore.instance
                               .collection(FirestoreCollections.favoriteStores)
                               .doc(userCredential.uid)
                               .set({});
+                          await Hive.box(AppBoxes.appState)
+                              .put(BoxKeys.authenticated, true);
+                          await Hive.box(AppBoxes.appState)
+                              .delete(BoxKeys.signedInWithEmail);
+                          await Hive.box(AppBoxes.appState)
+                              .delete(BoxKeys.addedEmailToPhoneNumber);
+                          await Hive.box(AppBoxes.appState)
+                              .delete(BoxKeys.addressDetailsSaved);
                           await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                 builder: (context) => const MainScreen(),
                               ), (r) {
                             return false;
                           });
-                          await Hive.box(AppBoxes.appState)
-                              .put(BoxKeys.authenticated, true);
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -219,52 +213,51 @@ class UberOneScreen extends StatelessWidget {
                   'hasUberOne': false,
                   'type': "Personal",
                   "onboarded": true,
-                  "redeemedPromos": []
+                  "redeemedPromos": <String>[],
+                  "groupOrders": <String>[],
+                  'displayName': userCredential.displayName
                 });
 
-                late String deviceId;
-                DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                String udid = await FlutterUdid.consistentUdid;
 
-                if (Platform.isAndroid) {
-                  AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-                  deviceId = androidInfo.id;
-                  // Unique ID on Android (may not persist across factory resets)
-                  // Other potentially useful properties on AndroidDeviceInfo:
-                  // androidInfo.androidId; // More likely to persist, but not guaranteed
-                  // androidInfo.imei;       // International Mobile Equipment Identity (if available) - requires permissions
-                  // androidInfo.meid;       // Mobile Equipment Identifier (if available) - requires permissions
-                } else if (Platform.isIOS) {
-                  IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-                  deviceId = iosInfo
-                      .identifierForVendor!; // A unique ID for the *vendor* (your app developer), persists across app reinstalls, but changes if all apps by the vendor are uninstalled.
-                  // iosInfo.utsname.machine; // This could be used, but it's not a unique identifier.
-                }
-                await Hive.box(AppBoxes.appState).put('authenticated', true);
+                var deviceRef = FirebaseFirestore.instance
+                    .collection(FirestoreCollections.devices)
+                    .doc(udid);
+                var deviceSnapshot = await deviceRef.get();
                 final info = <String, dynamic>{
-                  const Uuid().v4(): {
+                  userCredential.uid: {
                     'name': userCredential.displayName,
                     'profilePic': userCredential.photoURL,
                     "email": userCredential.email,
                     "phoneNumber": userCredential.phoneNumber
                   }
                 };
-                await FirebaseFirestore.instance
-                    .collection(FirestoreCollections.devices)
-                    .doc(deviceId)
-                    .set(info, SetOptions(merge: true));
-
+                if (!deviceSnapshot.exists) {
+                  await deviceRef.set(info);
+                } else {
+                  if (deviceSnapshot[userCredential.uid] == null) {
+                    await deviceRef.update(info);
+                  }
+                }
+                //creating favorite stores field
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.favoriteStores)
                     .doc(userCredential.uid)
                     .set({});
-                navigatorKey.currentState!.pushAndRemoveUntil(
+                await Hive.box(AppBoxes.appState)
+                    .put(BoxKeys.authenticated, true);
+                await Hive.box(AppBoxes.appState)
+                    .delete(BoxKeys.signedInWithEmail);
+                await Hive.box(AppBoxes.appState)
+                    .delete(BoxKeys.addedEmailToPhoneNumber);
+                await Hive.box(AppBoxes.appState)
+                    .delete(BoxKeys.addressDetailsSaved);
+                await navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const MainScreen(),
                     ), (r) {
                   return false;
                 });
-                await Hive.box(AppBoxes.appState)
-                    .put(BoxKeys.authenticated, true);
               },
             ),
           )

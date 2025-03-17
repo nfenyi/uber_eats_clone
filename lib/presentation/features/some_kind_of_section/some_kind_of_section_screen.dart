@@ -54,7 +54,7 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
                         builder: (context) => StoreScreen(
                           widget.store,
                           userLocation: Hive.box(AppBoxes.appState)
-                              .get(BoxKeys.userInfo)['latlng'],
+                              .get(BoxKeys.userInfo)['addresses']['latlng'],
                         ),
                       )),
                   leading: Container(

@@ -6,10 +6,19 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
+
+import '../../../app_functions.dart';
+import '../../../main.dart';
 
 class OrderDeadlineScreen extends ConsumerStatefulWidget {
-  const OrderDeadlineScreen({super.key});
+  final DateTime? setDeadline;
+  final String orderPlacementSetting;
+  final DateTime? firstOrderSchedule;
+  const OrderDeadlineScreen(
+      {super.key,
+      required this.setDeadline,
+      required this.firstOrderSchedule,
+      required this.orderPlacementSetting});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -18,11 +27,21 @@ class OrderDeadlineScreen extends ConsumerStatefulWidget {
 
 class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
   final _controller = TextEditingController();
+  DateTime? _setDeadline;
+
+  late String _orderPlacementSetting;
 
   @override
   void initState() {
     super.initState();
-    _controller.text = 'No deadline';
+    _setDeadline = widget.setDeadline;
+
+    _controller.text = widget.firstOrderSchedule == null
+        ? _setDeadline == null
+            ? 'No deadline'
+            : AppFunctions.formatDate(_setDeadline.toString(),
+                format: 'l, M j, g:i A')
+        : '1 hour before';
   }
 
   @override
@@ -44,98 +63,142 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                //TODO: implement important/loud notification for group orders
                 const AppText(
                   text: 'Set an order deadline',
-                  size: AppSizes.heading6,
+                  size: AppSizes.heading5,
                   weight: FontWeight.w600,
                 ),
                 const Gap(20),
                 const AppText(text: 'When should everyone order by?'),
                 const Gap(20),
-                InkWell(
-                  onTap: () => BottomPicker.dateTime(
-                    onSubmit: (value) {
-                      // value as DateTime;
-                      setState(() {
-                        _controller.text = value.toString();
-                      });
-                    },
-                    titlePadding: const EdgeInsets.symmetric(vertical: 15),
-                    displayCloseIcon: false,
-                    buttonPadding: 15,
-                    buttonWidth: Adaptive.w(90),
-                    buttonSingleColor: Colors.black,
-                    buttonContent: const Align(
-                        alignment: Alignment.center,
-                        child: AppText(
-                          text: 'Save',
-                          color: Colors.white,
-                        )),
-                    dismissable: true,
-                    titleAlignment: Alignment.center,
-                    pickerTitle: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AppText(
-                          text: 'Pick a time',
-                          size: AppSizes.bodySmall,
-                          weight: FontWeight.w600,
-                        ),
-                      ],
-                    ),
-                  ).show(context),
-                  child: Ink(
-                    child: AppTextFormField(
-                      hintStyleColor: Colors.black,
-                      controller: _controller,
-                      enabled: false,
-                      suffixIcon: const Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.black,
-                      ),
-                    ),
+                AppTextFormField(
+                  readOnly: true,
+                  controller: _controller,
+                  onTap: widget.firstOrderSchedule == null
+                      ? () => BottomPicker.dateTime(
+                            onSubmit: (value) {
+                              setState(() {
+                                _setDeadline = value;
+                                _controller.text = AppFunctions.formatDate(
+                                    value.toString(),
+                                    format: 'l, M j, g:i A');
+                              });
+                            },
+                            titlePadding:
+                                const EdgeInsets.symmetric(vertical: 15),
+                            displayCloseIcon: false,
+                            buttonPadding: 15,
+                            buttonWidth: Adaptive.w(90),
+                            buttonSingleColor: Colors.black,
+                            buttonContent: const Align(
+                                alignment: Alignment.center,
+                                child: AppText(
+                                  text: 'Save',
+                                  color: Colors.white,
+                                )),
+                            dismissable: true,
+                            titleAlignment: Alignment.center,
+                            pickerTitle: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AppText(
+                                  text: 'Pick a time',
+                                  size: AppSizes.body,
+                                  weight: FontWeight.w600,
+                                ),
+                              ],
+                            ),
+                          ).show(context)
+                      : null,
+                  suffixIcon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.black,
                   ),
                 ),
                 const Gap(20),
                 if (_controller.text != 'No deadline')
                   Column(
                     children: [
-                      const AppRadioListTile(
-                        padding: EdgeInsets.zero,
-                        subtitle: "We'll remind you to place the order",
-                        groupValue: 'value',
+                      RadioListTile(
+                        title: const AppText(
+                          text: 'Remind me to place the order',
+                          weight: FontWeight.bold,
+                          size: AppSizes.body,
+                        ),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _orderPlacementSetting = value;
+                            });
+                          }
+                        },
+                        contentPadding: EdgeInsets.zero,
+                        subtitle: const AppText(
+                            text: "We'll remind you to place the order"),
+                        groupValue: _orderPlacementSetting,
                         value: 'Remind me to place the order',
                         controlAffinity: ListTileControlAffinity.trailing,
                       ),
                       const Divider(),
-                      const AppRadioListTile(
-                        groupValue: 'value',
-                        padding: EdgeInsets.zero,
-                        subtitle:
-                            "Add your items and check out. We'll place the order at the deadline.",
+                      RadioListTile(
+                        title: const AppText(
+                          text: 'Automatically place the order',
+                          weight: FontWeight.bold,
+                          size: AppSizes.body,
+                        ),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _orderPlacementSetting = value;
+                            });
+                          }
+                        },
+                        groupValue: _orderPlacementSetting,
+                        contentPadding: EdgeInsets.zero,
+                        subtitle: const AppText(
+                            text:
+                                "Add your items and check out. We'll place the order at the deadline."),
                         value: 'Automatically place the order',
                         controlAffinity: ListTileControlAffinity.trailing,
                       ),
-                      Center(
-                          child: AppTextButton(
-                        text: 'Remove Deadline',
-                        size: AppSizes.bodySmall,
-                        color: Colors.grey.shade600,
-                        callback: () {
-                          setState(() {
-                            _controller.text = "No deadline";
-                          });
-                        },
-                        isUnderlined: true,
-                      ))
+                      const Gap(30),
+                      if (widget.firstOrderSchedule == null)
+                        Center(
+                            child: AppTextButton(
+                          text: 'Remove Deadline',
+                          size: AppSizes.bodySmall,
+                          color: Colors.grey.shade600,
+                          callback: () {
+                            setState(() {
+                              _controller.text = "No deadline";
+                              _setDeadline = null;
+                            });
+                          },
+                          isUnderlined: true,
+                        ))
                     ],
                   ),
               ],
             ),
-            const Column(
+            Column(
               children: [
-                AppButton(text: 'Save'),
-                Gap(10),
+                AppButton(
+                  text: 'Save',
+                  callback:
+                      widget.firstOrderSchedule != null || _setDeadline != null
+                          ? () {
+                              navigatorKey.currentState!.pop({
+                                'setDeadline': widget.firstOrderSchedule != null
+                                    ? widget.firstOrderSchedule!
+                                        .add(const Duration(hours: 1))
+                                    : _setDeadline,
+                                'orderPlacementSetting': _orderPlacementSetting
+                              });
+                            }
+                          : null,
+                ),
+                const Gap(10),
               ],
             )
           ],

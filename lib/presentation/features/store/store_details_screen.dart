@@ -1,10 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
+import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/uber_one/join_uber_one_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
@@ -40,20 +46,69 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               //TODO: implement map
-              SliverAppBar(
+              SliverAppBar.medium(
+                automaticallyImplyLeading: false,
                 expandedHeight: 200,
-                flexibleSpace: Column(
-                  children: [
-                    Expanded(
-                      child: Container(
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    alignment: Alignment.topLeft,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: double.infinity,
                         color: Colors.grey,
                       ),
-                    ),
-                  ],
+                      // SizedBox(
+                      //    width: double.infinity,
+                      //   height: double.infinity,
+                      //   child: GoogleMap(
+                      //         zoomControlsEnabled: false,
+                      //         zoomGesturesEnabled: false,
+                      //         tiltGesturesEnabled: false,
+                      //         markers: {
+                      //           Marker(
+                      //               markerId: const MarkerId('set_location'),
+                      //               icon: widget.markerIcon,
+                      //               position: _setLocation)
+                      //         },
+                      //         initialCameraPosition:
+                      //             CameraPosition(target: _setLocation, zoom: 15),
+                      //       ),
+                      // ),
+                      SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.all(
+                              AppSizes.horizontalPaddingSmall),
+                          child: InkWell(
+                              onTap: navigatorKey.currentState!.pop,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(50)),
+                                child: const Icon(Icons.arrow_back),
+                              )),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 pinned: true,
                 floating: true,
-                title: AppText(text: widget.store.name),
+                title: Row(
+                  children: [
+                    InkWell(
+                        onTap: () {
+                          navigatorKey.currentState!.pop();
+                        },
+                        child: Ink(child: const Icon(Icons.arrow_back))),
+                    const Gap(10),
+                    AppText(
+                      text: widget.store.name,
+                      size: AppSizes.heading6,
+                    ),
+                  ],
+                ),
               )
             ];
           },
@@ -85,9 +140,17 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
                   Icons.pin_drop_outlined,
                 ),
                 title: AppText(text: widget.store.location.streetAddress),
-                trailing: const Icon(
-                  Icons.copy,
-                  size: 20,
+                trailing: InkWell(
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(
+                        text: widget.store.location.streetAddress));
+                  },
+                  child: Ink(
+                    child: const Icon(
+                      Icons.copy,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ),
               const Divider(

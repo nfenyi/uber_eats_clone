@@ -114,7 +114,7 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
                         navigatorKey.currentState!.push(MaterialPageRoute(
                       builder: (context) => SearchScreen(
                         userLocation: Hive.box(AppBoxes.appState)
-                            .get(BoxKeys.userInfo)['latlng'],
+                            .get(BoxKeys.userInfo)['addresses']['latlng'],
                         stores: stores,
                       ),
                     )),

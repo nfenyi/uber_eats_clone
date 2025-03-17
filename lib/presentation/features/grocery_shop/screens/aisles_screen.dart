@@ -124,7 +124,16 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                       //                             ]),
                       //                         AppButton2(
                       //                             text: 'Try free for 4 weeks',
-                      //                             callback: () {}),
+                      //                             callback: () {
+                      // navigatorKey
+                      //     .currentState!
+                      //     .push(
+                      //         MaterialPageRoute(
+                      //   builder:
+                      //       (context) =>
+                      //           const JoinUberOneScreen(),
+                      // ));
+                      // }),
                       //                       ],
                       //                     ),
                       //                   ),

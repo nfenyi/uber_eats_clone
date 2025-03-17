@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
+import 'package:flutter_udid/flutter_udid.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -33,58 +34,73 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
   void initState() {
     super.initState();
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await user.reload();
-        if (user.emailVerified) {
-          await navigatorKey.currentState!.push(
-              MaterialPageRoute(builder: (context) => const NameScreen()));
-        } else {
-          await showAppInfoDialog(navigatorKey.currentContext!,
-              description:
-                  'Seems you used the wrong link to verify your email. Try again.');
-        }
-      } else {
-        if (FirebaseAuth.instance
-            .isSignInWithEmailLink(dynamicLinkData.link.toString())) {
-          // The client SDK will parse the code from the link for you.
-          await FirebaseAuth.instance
-              .signInWithEmailLink(
-                  email: widget.email,
-                  emailLink: dynamicLinkData.link.toString())
-              .then((credential) async {
-            try {
-              await Hive.box(AppBoxes.appState).delete(BoxKeys.email);
-
-              final snapshot = await FirebaseFirestore.instance
-                  .collection(FirestoreCollections.users)
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .get();
-              if (snapshot.exists &&
-                  snapshot.data() != null &&
-                  snapshot.data()!['onboarded'] == true) {
-                await navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) => const MainScreen()));
+      if (FirebaseAuth.instance
+          .isSignInWithEmailLink(dynamicLinkData.link.toString())) {
+        // The client SDK will parse the code from the link for you.
+        await FirebaseAuth.instance
+            .signInWithEmailLink(
+                email: widget.email, emailLink: dynamicLinkData.link.toString())
+            .then((credential) async {
+          try {
+            await Hive.box(AppBoxes.appState).delete(BoxKeys.email);
+            final userCredential = FirebaseAuth.instance.currentUser!;
+            final snapshot = await FirebaseFirestore.instance
+                .collection(FirestoreCollections.users)
+                .doc(userCredential.uid)
+                .get();
+            if (snapshot.exists &&
+                snapshot.data() != null &&
+                snapshot.data()!['onboarded'] == true) {
+              String udid = await FlutterUdid.consistentUdid;
+              var deviceRef = FirebaseFirestore.instance
+                  .collection(FirestoreCollections.devices)
+                  .doc(udid);
+              var deviceSnapshot = await deviceRef.get();
+              final info = <String, dynamic>{
+                userCredential.uid: {
+                  'name': userCredential.displayName,
+                  'profilePic': userCredential.photoURL,
+                  "email": userCredential.email,
+                  "phoneNumber": userCredential.phoneNumber
+                }
+              };
+              if (!deviceSnapshot.exists) {
+                await deviceRef.set(info);
               } else {
-                await navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) => const PhoneNumberScreen()));
+                if (deviceSnapshot[userCredential.uid] == null) {
+                  await deviceRef.update(info);
+                }
               }
-            } catch (e) {
-              if (mounted) {
-                await showAppInfoDialog(navigatorKey.currentContext!,
-                    description: e.toString());
-              }
+              await Hive.box(AppBoxes.appState)
+                  .put(BoxKeys.authenticated, true);
+              await navigatorKey.currentState!.push(
+                  MaterialPageRoute(builder: (context) => const MainScreen()));
+            } else {
+              await navigatorKey.currentState!.push(MaterialPageRoute(
+                  builder: (context) => const PhoneNumberScreen()));
             }
-          }, onError: (error) {
-            if (mounted) {
-              showAppInfoDialog(navigatorKey.currentContext!,
-                  description: error.toString());
-            }
-          });
-        } else {
-          await showAppInfoDialog(navigatorKey.currentContext!,
-              description:
-                  'Seems the link in the email has not been acknowledged.');
+          } catch (e) {
+            await showAppInfoDialog(navigatorKey.currentContext!,
+                description: e.toString());
+          }
+        }, onError: (error) {
+          showAppInfoDialog(navigatorKey.currentContext!,
+              description: error.toString());
+        });
+      } else {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await user.reload();
+          if (user.emailVerified) {
+            await Hive.box(AppBoxes.appState)
+                .put(BoxKeys.addedEmailToPhoneNumber, true);
+            await navigatorKey.currentState!.push(
+                MaterialPageRoute(builder: (context) => const NameScreen()));
+          } else {
+            await showAppInfoDialog(navigatorKey.currentContext!,
+                description:
+                    'Seems you used the wrong link to verify your email. Try again.');
+          }
         }
       }
     });

@@ -1,7 +1,11 @@
 part of 'widgets.dart';
 
 void showInfoToast(String message,
-    {int seconds = 3, context, Color color = Colors.black, Widget? icon}) {
+    {int seconds = 3,
+    required context,
+    ToastGravity gravity = ToastGravity.TOP,
+    Color color = Colors.black,
+    Widget? icon}) {
   FToast fToast = FToast();
   fToast.init(context);
   Widget toast = Container(
@@ -13,8 +17,13 @@ void showInfoToast(String message,
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (icon != null) icon,
-        const SizedBox(width: 10),
+        if (icon != null)
+          Row(
+            children: [
+              icon,
+              const SizedBox(width: 10),
+            ],
+          ),
         Expanded(
           child: AppText(
             text: message,
@@ -30,6 +39,6 @@ void showInfoToast(String message,
   fToast.showToast(
     child: toast,
     toastDuration: Duration(seconds: seconds),
-    gravity: ToastGravity.TOP,
+    gravity: gravity,
   );
 }

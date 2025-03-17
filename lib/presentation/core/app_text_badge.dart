@@ -2,8 +2,10 @@ part of 'widgets.dart';
 
 class AppTextBadge extends StatelessWidget {
   final String text;
+  final Color? color;
   const AppTextBadge({
     required this.text,
+    this.color = AppColors.primary2,
     super.key,
   });
 
@@ -16,11 +18,7 @@ class AppTextBadge extends StatelessWidget {
       ),
       // constraints: const BoxConstraints.tightForFinite(),
       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
-      child: AppText(
-        text: text,
-        size: 9,
-        color: AppColors.primary2,
-      ),
+      child: AppText(text: text, size: 9, color: color),
     );
   }
 }

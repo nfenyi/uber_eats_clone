@@ -7,6 +7,7 @@ import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
@@ -220,20 +221,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Future<void> _getAccountStatus() async {
     Map<dynamic, dynamic>? userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    if (userInfo == null) {
-      final userInfoSnapshot = await FirebaseFirestore.instance
-          .collection(FirestoreCollections.users)
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get();
-      userInfo = userInfoSnapshot.data();
-      var userInfoForHiveBox = userInfo!;
-      userInfoForHiveBox['latlng'] = HiveGeoPoint(
-          latitude: userInfo['latlng'].latitude,
-          longitude: userInfo['latlng'].longitude);
+    userInfo ??= await AppFunctions.getUserInfo();
 
-      await Hive.box(AppBoxes.appState)
-          .put(BoxKeys.userInfo, userInfoForHiveBox);
-    }
     _hasUberOne = userInfo['hasUberOne'];
     _accountType = userInfo['type'];
   }

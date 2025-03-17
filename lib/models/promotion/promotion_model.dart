@@ -7,6 +7,7 @@ part 'promotion_model.g.dart';
 @freezed
 class Promotion with _$Promotion {
   const factory Promotion({
+    required String id,
     required double discount,
     required String description,
     required DateTime expirationDate,

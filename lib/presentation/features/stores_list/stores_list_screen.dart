@@ -52,7 +52,7 @@ class _StoresListScreenState extends State<StoresListScreen> {
                     return StoreScreen(
                       store,
                       userLocation: Hive.box(AppBoxes.appState)
-                          .get(BoxKeys.userInfo)['latlng'],
+                          .get(BoxKeys.userInfo)['addresses']['latlng'],
                     );
                   }
                 },
