@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
@@ -6,17 +7,20 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../../main.dart';
+import '../../../../state/delivery_schedule_provider.dart';
 import '../../../core/app_colors.dart';
 import 'addresses_screen.dart';
 
-class ScheduleDeliveryScreen extends StatefulWidget {
+class ScheduleDeliveryScreen extends ConsumerStatefulWidget {
   const ScheduleDeliveryScreen({super.key});
 
   @override
-  State<ScheduleDeliveryScreen> createState() => _ScheduleDeliveryScreenState();
+  ConsumerState<ScheduleDeliveryScreen> createState() =>
+      _ScheduleDeliveryScreenState();
 }
 
-class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
+class _ScheduleDeliveryScreenState
+    extends ConsumerState<ScheduleDeliveryScreen> {
   late final List<DateTime> _days = [];
   late final List<DateTime> _times = [];
 
@@ -59,8 +63,14 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
                 if (_selectedTime.difference(DateTime.now()) >
                         const Duration(hours: 1) ||
                     _selectedDay.isAfter(DateTime.now())) {
-                  navigatorKey.currentState!.pop(_selectedDay.copyWith(
-                      hour: _selectedTime.hour, minute: _selectedTime.minute));
+                  // navigatorKey.currentState!.pop(_selectedDay.copyWith(
+                  //     hour: _selectedTime.hour, minute: _selectedTime.minute));
+                  // Hive.box(AppBoxes.appState).put(BoxKeys.activatedPromoPath, value)
+                  ref.read(deliveryScheduleProvider.notifier).state =
+                      _selectedDay.copyWith(
+                          hour: _selectedTime.hour,
+                          minute: _selectedTime.minute);
+                  navigatorKey.currentState!.pop();
                 } else {
                   showInfoToast(
                       'The time schedule time selected must be at least an hour ahead of now',
@@ -72,9 +82,8 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
             Row(
               children: [
                 Expanded(
-                  child: AppButton2(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                  child: AppButton(
+                    isSecondary: true,
                     text: 'Cancel',
                     callback: () => navigatorKey.currentState!.pop(),
                   ),
@@ -85,115 +94,120 @@ class _ScheduleDeliveryScreenState extends State<ScheduleDeliveryScreen> {
         )
       ],
       appBar: AppBar(
-        leading: InkWell(
-          onTap: () {
-            if (_selectedTime.difference(DateTime.now()) >
-                    const Duration(hours: 1) ||
-                _selectedDay.isAfter(DateTime.now())) {
-              navigatorKey.currentState!.pop(_selectedDay.copyWith(
-                  hour: _selectedTime.hour, minute: _selectedTime.minute));
-            } else {
-              showInfoToast(
-                  'The time schedule time selected must be at least an hour ahead of now',
-                  context: context);
-            }
-          },
-          child: Ink(
-            child: const Icon(Icons.arrow_back),
+          // leading: InkWell(
+          //   onTap: () {
+          //     if (_selectedTime.difference(DateTime.now()) >
+          //             const Duration(hours: 1) ||
+          //         _selectedDay.isAfter(DateTime.now())) {
+          //       // navigatorKey.currentState!.pop(_selectedDay.copyWith(
+          //       //     hour: _selectedTime.hour, minute: _selectedTime.minute));
+          //       ref.read(deliveryScheduleProvider.notifier).state =
+          //           _selectedDay.copyWith(
+          //               hour: _selectedTime.hour, minute: _selectedTime.minute);
+          //       navigatorKey.currentState!.pop();
+          //     } else {
+          //       showInfoToast(
+          //           'The time schedule time selected must be at least an hour ahead of now',
+          //           context: context);
+          //     }
+          //   },
+          //   child: Ink(
+          //     child: const Icon(Icons.arrow_back),
+          //   ),
+          // ),
           ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.horizontalPaddingSmall),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const AppText(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: AppSizes.horizontalPaddingSmall),
+            child: AppText(
               text: 'Schedule delivery',
               weight: FontWeight.w600,
               size: AppSizes.heading6,
             ),
-            const Gap(10),
-            SizedBox(
-              height: 70,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _days.length,
-                itemBuilder: (context, index) {
-                  final day = _days[index];
+          ),
+          const Gap(10),
+          SizedBox(
+            height: 70,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmall),
+              scrollDirection: Axis.horizontal,
+              itemCount: _days.length,
+              itemBuilder: (context, index) {
+                final day = _days[index];
 
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedDay = day;
-                      });
-                    },
-                    child: Container(
-                      width: 110,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                            width: _selectedDay == day ? 2 : 1,
-                            color: _selectedDay == day
-                                ? Colors.black
-                                : AppColors.neutral300,
-                          ),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText(
-                              text: index == 0
-                                  ? 'Today'
-                                  : index == 1
-                                      ? 'Tomorrow'
-                                      : AppFunctions.formatDate(day.toString(),
-                                          format: 'l')),
-                          const Gap(10),
-                          AppText(
-                              color: AppColors.neutral500,
-                              text: AppFunctions.formatDate(day.toString(),
-                                  format: 'M j'))
-                        ],
-                      ),
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedDay = day;
+                    });
+                  },
+                  child: Container(
+                    width: 110,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          width: _selectedDay == day ? 2 : 1,
+                          color: _selectedDay == day
+                              ? Colors.black
+                              : AppColors.neutral300,
+                        ),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(
+                            text: index == 0
+                                ? 'Today'
+                                : index == 1
+                                    ? 'Tomorrow'
+                                    : AppFunctions.formatDate(day.toString(),
+                                        format: 'l')),
+                        const Gap(10),
+                        AppText(
+                            color: AppColors.neutral500,
+                            text: AppFunctions.formatDate(day.toString(),
+                                format: 'M j'))
+                      ],
                     ),
-                  );
-                },
-                separatorBuilder: (context, index) => const Gap(10),
-              ),
+                  ),
+                );
+              },
+              separatorBuilder: (context, index) => const Gap(10),
             ),
-            const Gap(10),
-            Expanded(
-              child: ListView.separated(
-                separatorBuilder: (context, index) => const Divider(
-                  color: AppColors.neutral100,
-                ),
-                itemCount: _times.length,
-                itemBuilder: (context, index) {
-                  final time = _times[index];
-                  return RadioListTile(
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _selectedTime = value;
-                        });
-                      }
-                    },
-                    controlAffinity: ListTileControlAffinity.trailing,
-                    groupValue: _selectedTime,
-                    value: _times[index],
-                    contentPadding: EdgeInsets.zero,
-                    title: AppText(
-                        size: AppSizes.bodySmall,
-                        text:
-                            '${AppFunctions.formatDate(time.toString(), format: 'G:i A')} - ${AppFunctions.formatDate(time.add(const Duration(minutes: 30)).toString(), format: 'G:i A')}'),
-                  );
-                },
+          ),
+          const Gap(10),
+          Expanded(
+            child: ListView.separated(
+              separatorBuilder: (context, index) => const Divider(
+                color: AppColors.neutral100,
               ),
-            )
-          ],
-        ),
+              itemCount: _times.length,
+              itemBuilder: (context, index) {
+                final time = _times[index];
+                return RadioListTile(
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedTime = value;
+                      });
+                    }
+                  },
+                  controlAffinity: ListTileControlAffinity.trailing,
+                  groupValue: _selectedTime,
+                  value: _times[index],
+                  title: AppText(
+                      size: AppSizes.bodySmall,
+                      text:
+                          '${AppFunctions.formatDate(time.toString(), format: 'G:i A')} - ${AppFunctions.formatDate(time.add(const Duration(minutes: 30)).toString(), format: 'G:i A')}'),
+                );
+              },
+            ),
+          )
+        ],
       ),
     );
   }

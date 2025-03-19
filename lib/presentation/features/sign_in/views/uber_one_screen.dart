@@ -6,10 +6,12 @@ import 'package:flutter_udid/flutter_udid.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
+import '../../../../models/uber_cash/uber_cash_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
@@ -61,7 +63,8 @@ class UberOneScreen extends StatelessWidget {
                             "onboarded": true,
                             "redeemedPromos": <String>[],
                             "groupOrders": <String>[],
-                            'displayName': userCredential.displayName
+                            'displayName': userCredential.displayName,
+                            'uberCash': const UberCash().toJson(),
                           });
 
                           String udid = await FlutterUdid.consistentUdid;
@@ -100,7 +103,10 @@ class UberOneScreen extends StatelessWidget {
                               .delete(BoxKeys.addressDetailsSaved);
                           await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
-                                builder: (context) => const MainScreen(),
+                                builder: (context) =>
+                                    ShowCaseWidget(builder: (context) {
+                                  return const MainScreen();
+                                }),
                               ), (r) {
                             return false;
                           });
@@ -215,7 +221,8 @@ class UberOneScreen extends StatelessWidget {
                   "onboarded": true,
                   "redeemedPromos": <String>[],
                   "groupOrders": <String>[],
-                  'displayName': userCredential.displayName
+                  'displayName': userCredential.displayName,
+                  'uberCash': const UberCash().toJson(),
                 });
 
                 String udid = await FlutterUdid.consistentUdid;
@@ -235,7 +242,7 @@ class UberOneScreen extends StatelessWidget {
                 if (!deviceSnapshot.exists) {
                   await deviceRef.set(info);
                 } else {
-                  if (deviceSnapshot[userCredential.uid] == null) {
+                  if (deviceSnapshot.data()![userCredential.uid] == null) {
                     await deviceRef.update(info);
                   }
                 }
@@ -254,7 +261,9 @@ class UberOneScreen extends StatelessWidget {
                     .delete(BoxKeys.addressDetailsSaved);
                 await navigatorKey.currentState!.pushAndRemoveUntil(
                     MaterialPageRoute(
-                      builder: (context) => const MainScreen(),
+                      builder: (context) => ShowCaseWidget(builder: (context) {
+                        return const MainScreen();
+                      }),
                     ), (r) {
                   return false;
                 });

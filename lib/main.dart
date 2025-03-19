@@ -250,11 +250,10 @@ class UberEatsClone extends StatelessWidget {
           // colorSchemeSeed: Colors.black,
           useMaterial3: true,
         ),
-        home: ShowCaseWidget(builder: (context) {
-          return ResponsiveSizer(builder: (BuildContext context,
-              Orientation orientation, ScreenType screenType) {
-            return const Wrapper();
-          });
+        initialRoute: '/',
+        home: ResponsiveSizer(builder: (BuildContext context,
+            Orientation orientation, ScreenType screenType) {
+          return const Wrapper();
         }),
       ),
     );
@@ -298,7 +297,9 @@ class Wrapper extends ConsumerWidget {
           if (!authenticated) {
             return const SignInScreen();
           } else {
-            return const MainScreen();
+            return ShowCaseWidget(builder: (context) {
+              return const MainScreen();
+            });
           }
         });
   }

@@ -128,8 +128,8 @@ class _WhatsYourEmailScreenState extends ConsumerState<WhatsYourEmailScreen> {
                                             // minimumVersion
                                             androidMinimumVersion: '12'))
                                     .then((value) async {
-                                  await Hive.box(AppBoxes.appState)
-                                      .put('email', _emailController.text);
+                                  await Hive.box(AppBoxes.appState).put(
+                                      'email', _emailController.text.trim());
 
                                   navigatorKey.currentState!
                                       .push(MaterialPageRoute(

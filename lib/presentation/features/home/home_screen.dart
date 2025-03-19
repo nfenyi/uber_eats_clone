@@ -22,6 +22,7 @@ import 'package:uber_eats_clone/presentation/features/grocery_store/screens/groc
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
+import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
@@ -350,13 +351,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   int? _currentFoodCategoryIndex;
 
-  String? _userPlaceDescription;
+  // String? _userPlaceDescription;
 
   LocationData? _currentLocation;
 
   final _locationFarAway = GlobalKey();
-
-  bool? _addressShouldReload;
 
   @override
   void initState() {
@@ -389,7 +388,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Hive.box(AppBoxes.appState).put(BoxKeys.userInfo, null);
     // var addressDetails = const AddressDetails(
     //     instruction: "bring your own tip",
     //     apartment: "A1",
@@ -570,7 +568,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar(
-            automaticallyImplyLeading: false,
+            // automaticallyImplyLeading: false,
             expandedHeight: 115,
             floating: true,
             pinned: true,
@@ -662,209 +660,77 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                 ),
               ),
-              background: _storedUserLocation == null ||
-                      _currentLocation == null ||
-                      _addressShouldReload == true
-                  ? FutureBuilder(
-                      future: _getLocation(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Padding(
-                            padding:
-                                EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-                            child: Skeletonizer(
-                              enabled: true,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  AppText(
-                                    text: 'bnbnmbkbkbj',
-                                    color: AppColors.neutral500,
-                                  ),
-                                  AppText(
-                                      text:
-                                          'vjvjbhhnklnlklsljkslkjajlkaslkaasklf')
-                                ],
-                              ),
-                            ),
-                          );
-                        } else if (snapshot.hasError) {
-                          logger.d(snapshot.error.toString());
-                          return Padding(
-                            padding: const EdgeInsets.all(
-                                AppSizes.horizontalPaddingSmall),
-                            child: InkWell(
-                              onTap: () {
-                                setState(() {});
-                              },
-                              child: Ink(
-                                child: const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    AppText(
-                                      text: 'Error',
-                                      color: AppColors.neutral500,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-// if(snapshot.hasData)
-                        {
-                          return Padding(
-                            padding: const EdgeInsets.all(
-                                AppSizes.horizontalPaddingSmall),
-                            child: GestureDetector(
-                              onTap: () async {
-                                _addressShouldReload = await navigatorKey
-                                    .currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) => const AddressesScreen(),
-                                ));
-
-                                if (_addressShouldReload == true) {
-                                  setState(() {});
-                                  // _addressShouldReload = false;
-                                }
-                              },
-                              child: Ink(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const AppText(
-                                      text: 'Deliver now',
-                                      color: AppColors.neutral500,
-                                    ),
-                                    Row(
+              //TODO: change to valuelistenablebuilder
+              background: ValueListenableBuilder(
+                  valueListenable: Hive.box(AppBoxes.appState)
+                      .listenable(keys: [BoxKeys.userInfo]),
+                  builder: (context, appStateBox, child) {
+                    var timePreference = ref.watch(deliveryScheduleProvider);
+                    return appStateBox.get(BoxKeys.userInfo) == null ||
+                            _currentLocation == null
+                        ? FutureBuilder(
+                            future: _getLocation(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Padding(
+                                  padding: EdgeInsets.all(
+                                      AppSizes.horizontalPaddingSmall),
+                                  child: Skeletonizer(
+                                    enabled: true,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Builder(builder: (context) {
-                                          const distance =
-                                              Distance(roundResult: true);
-                                          final distanceResult = distance.as(
-                                              LengthUnit.Meter,
-                                              LatLng(
-                                                  _currentLocation!.latitude!,
-                                                  _currentLocation!.longitude!),
-                                              LatLng(
-                                                  _storedUserLocation!.latitude,
-                                                  _storedUserLocation!
-                                                      .longitude));
-
-                                          if (distanceResult > 400) {
-                                            WidgetsBinding.instance
-                                                .addPostFrameCallback((_) =>
-                                                    ShowCaseWidget.of(context)
-                                                        .startShowCase([
-                                                      _locationFarAway
-                                                    ]));
-                                          }
-
-                                          return Showcase(
-                                            overlayOpacity: 0,
-                                            disableMovingAnimation: true,
-                                            textColor: Colors.white,
-                                            tooltipBackgroundColor:
-                                                Colors.black87,
-                                            tooltipBorderRadius:
-                                                BorderRadius.circular(5),
-                                            description:
-                                                'You seem quite far away',
-                                            key: _locationFarAway,
-                                            child: AppText(
-                                                text: AppFunctions
-                                                        .formatPlaceDescription(
-                                                            _userPlaceDescription!)
-                                                    .split(', ')
-                                                    .first),
-                                          );
-                                        }),
-                                        const Icon(Icons.keyboard_arrow_down)
+                                        AppText(
+                                          text: 'bnbnmbkbkbj',
+                                          color: AppColors.neutral500,
+                                        ),
+                                        AppText(
+                                            text:
+                                                'vjvjbhhnklnlklsljkslkjajlkaslkaasklf')
                                       ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
+                                    ),
+                                  ),
+                                );
+                              } else if (snapshot.hasError) {
+                                logger.d(snapshot.error.toString());
+                                return Padding(
+                                  padding: const EdgeInsets.all(
+                                      AppSizes.horizontalPaddingSmall),
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {});
+                                    },
+                                    child: Ink(
+                                      child: const Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          AppText(
+                                            text: 'Error',
+                                            color: AppColors.neutral500,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return LocationWidget(
+                                appStateBox: appStateBox,
+                                timePreference: timePreference,
+                                currentLocation: _currentLocation,
+                              );
+                            })
+                        : LocationWidget(
+                            appStateBox: appStateBox,
+                            timePreference: timePreference,
+                            currentLocation: _currentLocation,
                           );
-                        }
-                      })
-                  : Padding(
-                      padding:
-                          const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-                      child: InkWell(
-                        onTap: () async {
-                          _addressShouldReload = await navigatorKey
-                              .currentState!
-                              .push(MaterialPageRoute(
-                            builder: (context) => const AddressesScreen(),
-                          ));
-
-                          if (_addressShouldReload == true) {
-                            setState(() {});
-                            // _addressShouldReload = false;
-                          }
-                        },
-                        child: Ink(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const AppText(
-                                text: 'Deliver now',
-                                color: AppColors.neutral500,
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Builder(builder: (context) {
-                                    const distance =
-                                        Distance(roundResult: true);
-                                    final distanceResult = distance.as(
-                                        LengthUnit.Meter,
-                                        LatLng(_currentLocation!.latitude!,
-                                            _currentLocation!.longitude!),
-                                        LatLng(_storedUserLocation!.latitude,
-                                            _storedUserLocation!.longitude));
-
-                                    if (distanceResult > 400) {
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((_) =>
-                                              ShowCaseWidget.of(context)
-                                                  .startShowCase(
-                                                      [_locationFarAway]));
-                                    }
-                                    return Showcase(
-                                      overlayOpacity: 0,
-                                      disableMovingAnimation: true,
-                                      textColor: Colors.white,
-                                      tooltipBackgroundColor: Colors.black87,
-                                      tooltipBorderRadius:
-                                          BorderRadius.circular(5),
-                                      description: 'You seem quite far away',
-                                      key: _locationFarAway,
-                                      child: AppText(
-                                          text: AppFunctions
-                                                  .formatPlaceDescription(
-                                                      _userPlaceDescription!)
-                                              .split(', ')
-                                              .first),
-                                    );
-                                  }),
-                                  const Icon(Icons.keyboard_arrow_down)
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                  }),
             ),
           )
         ],
@@ -3817,13 +3683,95 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     Map<dynamic, dynamic>? userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
     userInfo ??= await AppFunctions.getUserInfo();
-    _storedUserLocation = GeoPoint(
-        userInfo['selectedAddress']['latlng'].latitude,
-        userInfo['selectedAddress']['latlng'].longitude);
-    _userPlaceDescription = userInfo['selectedAddress']['placeDescription'];
+
     final location = Location();
     _currentLocation = await location.getLocation();
-    // logger.d(_currentLocation);
+  }
+}
+
+class LocationWidget extends StatelessWidget {
+  const LocationWidget(
+      {super.key,
+      required this.timePreference,
+      required this.appStateBox,
+      required LocationData? currentLocation})
+      : _currentLocation = currentLocation;
+
+  final DateTime? timePreference;
+  final LocationData? _currentLocation;
+  final Box<dynamic> appStateBox;
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (context) {
+      final locationFarAway = GlobalKey();
+      Map userInfo = appStateBox.get(BoxKeys.userInfo);
+      String? userPlaceDescription =
+          userInfo['selectedAddress']['placeDescription'];
+
+      var storedUserLocation = GeoPoint(
+          userInfo['selectedAddress']['latlng'].latitude,
+          userInfo['selectedAddress']['latlng'].longitude);
+      return Padding(
+        padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+        child: InkWell(
+          onTap: () async {
+            await navigatorKey.currentState!.push(MaterialPageRoute(
+              builder: (context) => const AddressesScreen(),
+            ));
+          },
+          child: Ink(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppText(
+                  text: timePreference == null
+                      ? 'Deliver now'
+                      : '${AppFunctions.formatDate(timePreference.toString(), format: 'D, G:i A')} - ${AppFunctions.formatDate(timePreference!.add(const Duration(minutes: 30)).toString(), format: 'G:i A')}',
+                  color: AppColors.neutral500,
+                ),
+                Row(
+                  // mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Builder(builder: (context) {
+                      const distance = Distance(roundResult: true);
+                      final distanceResult = distance.as(
+                          LengthUnit.Meter,
+                          LatLng(_currentLocation!.latitude!,
+                              _currentLocation!.longitude!),
+                          LatLng(storedUserLocation.latitude,
+                              storedUserLocation.longitude));
+
+                      if (distanceResult > 400) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) =>
+                            ShowCaseWidget.of(context)
+                                .startShowCase([locationFarAway]));
+                      }
+                      return Showcase(
+                        overlayOpacity: 0,
+                        disableMovingAnimation: true,
+                        textColor: Colors.white,
+                        tooltipBackgroundColor: Colors.black87,
+                        tooltipBorderRadius: BorderRadius.circular(5),
+                        description: 'You seem quite far away',
+                        key: locationFarAway,
+                        child: AppText(
+                            text: AppFunctions.formatPlaceDescription(
+                                    userPlaceDescription!)
+                                .split(', ')
+                                .first),
+                      );
+                    }),
+                    const Icon(Icons.keyboard_arrow_down)
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 

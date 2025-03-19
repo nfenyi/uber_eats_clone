@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -8,7 +6,6 @@ import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
-import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -18,8 +15,6 @@ import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_category_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery/screens/grocery_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
-import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
-import 'package:uber_eats_clone/state/account_state_provider.dart';
 
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';

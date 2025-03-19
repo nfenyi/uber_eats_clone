@@ -377,7 +377,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                         });
                       }
                       await AppFunctions.getUserInfo();
-                      navigatorKey.currentState!.pop(true);
+                      navigatorKey.currentState!.pop();
                     } else {
                       await FirebaseFirestore.instance
                           .collection(FirestoreCollections.users)

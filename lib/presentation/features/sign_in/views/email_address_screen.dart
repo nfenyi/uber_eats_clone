@@ -114,14 +114,14 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
                           ? null
                           : () async {
                               if (_formKey.currentState!.validate()) {
-                                await FirebaseAuth.instance.currentUser!
-                                    .verifyBeforeUpdateEmail(
-                                        _emailController.text.trim(),
-                                        ActionCodeSettings(
+                                await FirebaseAuth.instance
+                                    .sendSignInLinkToEmail(
+                                        email: _emailController.text,
+                                        actionCodeSettings: ActionCodeSettings(
                                             // URL you want to redirect back to. The domain (www.example.com) for this
                                             // URL must be whitelisted in the Firebase Console.
                                             url:
-                                                'https://ubereatsclone.page.link/email-verification-link',
+                                                'https://ubereatsclone.page.link/email-link-login',
                                             // This must be true
                                             handleCodeInApp: true,
                                             iOSBundleId:

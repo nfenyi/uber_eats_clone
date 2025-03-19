@@ -40,6 +40,7 @@ dependencies:
   country_ip: ^3.0.0
   cupertino_icons: ^1.0.8
   date_time_format: ^2.0.1
+  deepcopy: ^1.1.2
   dio: ^5.8.0+1
   dropdown_button2: ^2.3.9
   firebase_auth: ^5.3.4

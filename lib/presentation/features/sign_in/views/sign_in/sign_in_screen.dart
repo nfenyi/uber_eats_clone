@@ -598,7 +598,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                                                 '12'))
                                                 .then((value) async {
                                               await Hive.box(AppBoxes.appState)
-                                                  .put('email', item['email']);
+                                                  .put(BoxKeys.email,
+                                                      item['email']);
                                               setState(() {
                                                 isLoggingInValues[index] =
                                                     false;

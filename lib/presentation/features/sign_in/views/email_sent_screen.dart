@@ -34,74 +34,107 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
   void initState() {
     super.initState();
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
-      if (FirebaseAuth.instance
-          .isSignInWithEmailLink(dynamicLinkData.link.toString())) {
-        // The client SDK will parse the code from the link for you.
-        await FirebaseAuth.instance
-            .signInWithEmailLink(
-                email: widget.email, emailLink: dynamicLinkData.link.toString())
-            .then((credential) async {
-          try {
-            await Hive.box(AppBoxes.appState).delete(BoxKeys.email);
-            final userCredential = FirebaseAuth.instance.currentUser!;
-            final snapshot = await FirebaseFirestore.instance
-                .collection(FirestoreCollections.users)
-                .doc(userCredential.uid)
-                .get();
-            if (snapshot.exists &&
-                snapshot.data() != null &&
-                snapshot.data()!['onboarded'] == true) {
-              String udid = await FlutterUdid.consistentUdid;
-              var deviceRef = FirebaseFirestore.instance
-                  .collection(FirestoreCollections.devices)
-                  .doc(udid);
-              var deviceSnapshot = await deviceRef.get();
-              final info = <String, dynamic>{
-                userCredential.uid: {
-                  'name': userCredential.displayName,
-                  'profilePic': userCredential.photoURL,
-                  "email": userCredential.email,
-                  "phoneNumber": userCredential.phoneNumber
-                }
-              };
-              if (!deviceSnapshot.exists) {
-                await deviceRef.set(info);
-              } else {
-                if (deviceSnapshot[userCredential.uid] == null) {
-                  await deviceRef.update(info);
-                }
-              }
-              await Hive.box(AppBoxes.appState)
-                  .put(BoxKeys.authenticated, true);
-              await navigatorKey.currentState!.push(
-                  MaterialPageRoute(builder: (context) => const MainScreen()));
-            } else {
-              await navigatorKey.currentState!.push(MaterialPageRoute(
-                  builder: (context) => const PhoneNumberScreen()));
-            }
-          } catch (e) {
-            await showAppInfoDialog(navigatorKey.currentContext!,
-                description: e.toString());
-          }
-        }, onError: (error) {
-          showAppInfoDialog(navigatorKey.currentContext!,
-              description: error.toString());
-        });
-      } else {
-        final user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          await user.reload();
-          if (user.emailVerified) {
+      //TODO: to test the phone number then add email flow
+      try {
+        if (FirebaseAuth.instance
+            .isSignInWithEmailLink(dynamicLinkData.link.toString())) {
+          final user = FirebaseAuth.instance.currentUser;
+          logger.d(user.toString());
+          if (user != null) {
+            final credential = EmailAuthProvider.credentialWithLink(
+                email: widget.email,
+                emailLink: dynamicLinkData.link.toString());
+            logger.d(credential);
+            await user.linkWithCredential(credential);
+            await user.reload();
+
+            // if (user.emailVerified) {
             await Hive.box(AppBoxes.appState)
                 .put(BoxKeys.addedEmailToPhoneNumber, true);
             await navigatorKey.currentState!.push(
                 MaterialPageRoute(builder: (context) => const NameScreen()));
+            // }
+            //  else {
+            //   await showAppInfoDialog(navigatorKey.currentContext!,
+            //       description:
+            //           'Seems you used the wrong link to verify your email. Try again.');
+            // }
           } else {
-            await showAppInfoDialog(navigatorKey.currentContext!,
-                description:
-                    'Seems you used the wrong link to verify your email. Try again.');
+            await FirebaseAuth.instance
+                .signInWithEmailLink(
+                    email: widget.email,
+                    emailLink: dynamicLinkData.link.toString())
+                .then(
+              (credential) async {
+                await Hive.box(AppBoxes.appState).delete(BoxKeys.email);
+                final userCredential = FirebaseAuth.instance.currentUser!;
+                final snapshot = await FirebaseFirestore.instance
+                    .collection(FirestoreCollections.users)
+                    .doc(userCredential.uid)
+                    .get();
+                if (snapshot.exists &&
+                    snapshot.data() != null &&
+                    snapshot.data()!['onboarded'] == true) {
+                  String udid = await FlutterUdid.consistentUdid;
+                  var deviceRef = FirebaseFirestore.instance
+                      .collection(FirestoreCollections.devices)
+                      .doc(udid);
+                  var deviceSnapshot = await deviceRef.get();
+                  final info = <String, dynamic>{
+                    userCredential.uid: {
+                      'name': userCredential.displayName,
+                      'profilePic': userCredential.photoURL,
+                      "email": userCredential.email,
+                      "phoneNumber": userCredential.phoneNumber
+                    }
+                  };
+                  if (!deviceSnapshot.exists) {
+                    await deviceRef.set(info);
+                  } else {
+                    if (deviceSnapshot[userCredential.uid] == null) {
+                      await deviceRef.update(info);
+                    }
+                  }
+                  await Hive.box(AppBoxes.appState)
+                      .put(BoxKeys.authenticated, true);
+                  await navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => const MainScreen()));
+                } else {
+                  await navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => const PhoneNumberScreen()));
+                }
+              },
+              //  onError: (error) {
+              //   showAppInfoDialog(navigatorKey.currentContext!,
+              //       description: error.toString());
+              // }
+            );
           }
         }
+        // else {
+        // final user = FirebaseAuth.instance.currentUser;
+        // if (user != null) {
+        //   final credential = EmailAuthProvider.credentialWithLink(
+        //       email: widget.email,
+        //       emailLink: dynamicLinkData.link.toString());
+        //   await user.linkWithCredential(credential);
+        //   await user.reload();
+
+        //   if (user.emailVerified) {
+        //     await Hive.box(AppBoxes.appState)
+        //         .put(BoxKeys.addedEmailToPhoneNumber, true);
+        //     await navigatorKey.currentState!.push(
+        //         MaterialPageRoute(builder: (context) => const NameScreen()));
+        //   } else {
+        //     await showAppInfoDialog(navigatorKey.currentContext!,
+        //         description:
+        //             'Seems you used the wrong link to verify your email. Try again.');
+        //   }
+        // }
+        // }
+      } on FirebaseAuthException catch (e) {
+        await showAppInfoDialog(navigatorKey.currentContext!,
+            description: e.toString());
       }
     });
   }
@@ -259,13 +292,14 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                             color: AppColors.neutral200,
                             borderRadius: BorderRadius.all(Radius.circular(20)),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(
-                                FontAwesomeIcons.arrowLeft,
-                                size: 15,
-                              ),
-                              AppText(text: '  Wrong email ?')
+                              if (navigatorKey.currentState!.canPop())
+                                const Icon(
+                                  FontAwesomeIcons.arrowLeft,
+                                  size: 15,
+                                ),
+                              const AppText(text: '  Wrong email ?')
                             ],
                           ),
                         ),

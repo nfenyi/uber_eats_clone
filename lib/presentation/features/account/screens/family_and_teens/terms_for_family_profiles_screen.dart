@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
@@ -209,10 +210,12 @@ class _TermsForFamilyProfilesScreenState
                               'Invite sent to ${widget.familyMemberName} ',
                               context: context);
 
-                          navigatorKey.currentState!.pushAndRemoveUntil(
+                          await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (context) => const MainScreen()),
-                              (r) {
+                                  builder: (context) =>
+                                      ShowCaseWidget(builder: (context) {
+                                        return const MainScreen();
+                                      })), (r) {
                             return false;
                           });
                         }

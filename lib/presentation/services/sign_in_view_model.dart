@@ -109,7 +109,7 @@ class AuthenticatoViewModel {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn().signOut();
       // await FacebookAuth.instance.logOut();
-      await Hive.box(AppBoxes.appState).put('authenticated', false);
+      await Hive.box(AppBoxes.appState).put(BoxKeys.authenticated, false);
       return ServiceResponse(response: Result.success, payload: {});
     } on Exception catch (e) {
       return ServiceResponse(response: Result.failure, payload: e.toString());

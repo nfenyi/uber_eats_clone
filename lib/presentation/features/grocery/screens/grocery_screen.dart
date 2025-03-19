@@ -86,8 +86,6 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
   final List<Store> _retailStores = [];
   late final GeoPoint storedUserLocation;
 
-  bool _showFilters = true;
-
   late final List<Color> _featuredStoresColors = [];
 
   @override
@@ -97,8 +95,9 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarColor: Colors.white,
     ));
-    storedUserLocation =
-        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo)['latlng'];
+    var temp = Hive.box(AppBoxes.appState)
+        .get(BoxKeys.userInfo)['selectedAddress']['latlng'];
+    storedUserLocation = GeoPoint(temp.latitude, temp.longitude);
 
     _hottestDeals = List.from(stores);
     _hottestDeals.sort(
@@ -180,10 +179,49 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
   Widget build(BuildContext context) {
     TimeOfDay timeOfDayNow = TimeOfDay.now();
     return SafeArea(
-        child: Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        Visibility(
+      child: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            expandedHeight: 90,
+            floating: true,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              expandedTitleScale: 1,
+              titlePadding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmallest),
+              background: const Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.horizontalPaddingSmall),
+                child: AppText(
+                  text: 'Grocery',
+                  weight: FontWeight.w600,
+                  size: AppSizes.heading4,
+                ),
+              ),
+              title: InkWell(
+                onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
+                  builder: (context) => SearchScreen(
+                    userLocation: storedUserLocation,
+                    stores: _groceryScreenStores,
+                  ),
+                )),
+                child: Ink(
+                  child: const AppTextFormField(
+                    enabled: false,
+                    constraintWidth: 40,
+                    hintText: 'Search grocery, drinks, stores',
+                    radius: 50,
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Icon(Icons.search),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+        body: Visibility(
           visible: !_onFilterScreen,
           replacement: SingleChildScrollView(
             child: Padding(
@@ -191,7 +229,6 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   horizontal: AppSizes.horizontalPaddingSmall),
               child: Column(
                 children: [
-                  const Gap(157),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -377,22 +414,62 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
           ),
           child: NotificationListener<UserScrollNotification>(
             onNotification: (UserScrollNotification userScrollNotification) {
-              if (userScrollNotification.direction == ScrollDirection.reverse) {
-                setState(() {
-                  _showFilters = false;
-                });
-              } else if (userScrollNotification.direction ==
-                  ScrollDirection.forward) {
-                setState(() {
-                  _showFilters = true;
-                });
-              }
               return true;
             },
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const Gap(160),
+                  const Gap(10),
+
+                  SizedBox(
+                    height: 65,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      separatorBuilder: (context, index) => const Gap(15),
+                      itemCount: _foodCategories.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        final foodCategory = _foodCategories[index];
+                        return InkWell(
+                          onTap: () {
+                            if (index == 0) {
+                              navigatorKey.currentState!.push(MaterialPageRoute(
+                                builder: (context) => GroceryGroceryScreen(
+                                    stores: _groceryGroceryStores),
+                              ));
+                            } else if (index == 2) {
+                              navigatorKey.currentState!.push(MaterialPageRoute(
+                                builder: (context) => AlcoholScreen(
+                                    alcoholStores: _alcoholStores),
+                              ));
+                            } else if (index == 4) {
+                              navigatorKey.currentState!.push(MaterialPageRoute(
+                                builder: (context) => PharmacyScreen(
+                                    pharmacyStores: _pharmacyStores),
+                              ));
+                            }
+                          },
+                          child: SizedBox(
+                            width: 60,
+                            child: Column(
+                              children: [
+                                Image.asset(
+                                  foodCategory.image,
+                                  height: 45,
+                                ),
+                                AppText(
+                                  text: foodCategory.name,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
                   const Padding(
                     padding: EdgeInsets.all(AppSizes.horizontalPaddingSmall),
                     child: Row(
@@ -1271,106 +1348,108 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
             ),
           ),
         ),
-        Container(
-          color: Colors.white.withOpacity(0.96),
-          // height: _onFilterScreen ? 180 : 275,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (!_onFilterScreen)
-                const Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: 5,
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        AppText(
-                          text: 'Grocery',
-                          weight: FontWeight.w600,
-                          size: AppSizes.heading4,
-                        ),
-                      ],
-                    )),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: AppSizes.horizontalPaddingSmall),
-                child: InkWell(
-                  onTap: () =>
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) => SearchScreen(
-                      userLocation: storedUserLocation,
-                      stores: _groceryScreenStores,
-                    ),
-                  )),
-                  child: Ink(
-                    child: const AppTextFormField(
-                      enabled: false,
-                      constraintWidth: 40,
-                      hintText: 'Search grocery, drinks, stores',
-                      radius: 50,
-                      prefixIcon: Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Icon(Icons.search),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const Gap(10),
-              if (_onFilterScreen || _showFilters)
-                SizedBox(
-                  height: 65,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    separatorBuilder: (context, index) => const Gap(15),
-                    itemCount: _foodCategories.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      final foodCategory = _foodCategories[index];
-                      return InkWell(
-                        onTap: () {
-                          if (index == 0) {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => GroceryGroceryScreen(
-                                  stores: _groceryGroceryStores),
-                            ));
-                          } else if (index == 2) {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) =>
-                                  AlcoholScreen(alcoholStores: _alcoholStores),
-                            ));
-                          } else if (index == 4) {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => PharmacyScreen(
-                                  pharmacyStores: _pharmacyStores),
-                            ));
-                          }
-                        },
-                        child: SizedBox(
-                          width: 60,
-                          child: Column(
-                            children: [
-                              Image.asset(
-                                foodCategory.image,
-                                height: 45,
-                              ),
-                              AppText(
-                                text: foodCategory.name,
-                                overflow: TextOverflow.ellipsis,
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    ));
+      ),
+      //      Stack(
+
+      //   alignment: Alignment.topCenter,
+      //   children: [
+      //     Container(
+      //       color: Colors.white.withOpacity(0.96),
+      //       // height: _onFilterScreen ? 180 : 275,
+      //       child: Column(
+      //         mainAxisSize: MainAxisSize.min,
+      //         children: [
+      //           if (!_onFilterScreen)
+      //             const Padding(
+      //                 padding: EdgeInsets.symmetric(
+      //                     vertical: 5,
+      //                     horizontal: AppSizes.horizontalPaddingSmall),
+      //                 child: Row(
+      //                   mainAxisAlignment: MainAxisAlignment.start,
+      //                   children: [
+
+      //                   ],
+      //                 )),
+      //           Padding(
+      //             padding: const EdgeInsets.symmetric(
+      //                 horizontal: AppSizes.horizontalPaddingSmall),
+      //             child: InkWell(
+      //               onTap: () =>
+      //                   navigatorKey.currentState!.push(MaterialPageRoute(
+      //                 builder: (context) => SearchScreen(
+      //                   userLocation: storedUserLocation,
+      //                   stores: _groceryScreenStores,
+      //                 ),
+      //               )),
+      //               child: Ink(
+      //                 child: const AppTextFormField(
+      //                   enabled: false,
+      //                   constraintWidth: 40,
+      //                   hintText: 'Search grocery, drinks, stores',
+      //                   radius: 50,
+      //                   prefixIcon: Padding(
+      //                     padding: EdgeInsets.only(left: 8.0),
+      //                     child: Icon(Icons.search),
+      //                   ),
+      //                 ),
+      //               ),
+      //             ),
+      //           ),
+      //           const Gap(10),
+      //           if (_onFilterScreen || _showFilters)
+      //             SizedBox(
+      //               height: 65,
+      //               child: ListView.separated(
+      //                 padding: const EdgeInsets.symmetric(
+      //                     horizontal: AppSizes.horizontalPaddingSmall),
+      //                 separatorBuilder: (context, index) => const Gap(15),
+      //                 itemCount: _foodCategories.length,
+      //                 scrollDirection: Axis.horizontal,
+      //                 itemBuilder: (context, index) {
+      //                   final foodCategory = _foodCategories[index];
+      //                   return InkWell(
+      //                     onTap: () {
+      //                       if (index == 0) {
+      //                         navigatorKey.currentState!.push(MaterialPageRoute(
+      //                           builder: (context) => GroceryGroceryScreen(
+      //                               stores: _groceryGroceryStores),
+      //                         ));
+      //                       } else if (index == 2) {
+      //                         navigatorKey.currentState!.push(MaterialPageRoute(
+      //                           builder: (context) =>
+      //                               AlcoholScreen(alcoholStores: _alcoholStores),
+      //                         ));
+      //                       } else if (index == 4) {
+      //                         navigatorKey.currentState!.push(MaterialPageRoute(
+      //                           builder: (context) => PharmacyScreen(
+      //                               pharmacyStores: _pharmacyStores),
+      //                         ));
+      //                       }
+      //                     },
+      //                     child: SizedBox(
+      //                       width: 60,
+      //                       child: Column(
+      //                         children: [
+      //                           Image.asset(
+      //                             foodCategory.image,
+      //                             height: 45,
+      //                           ),
+      //                           AppText(
+      //                             text: foodCategory.name,
+      //                             overflow: TextOverflow.ellipsis,
+      //                           )
+      //                         ],
+      //                       ),
+      //                     ),
+      //                   );
+      //                 },
+      //               ),
+      //             ),
+      //         ],
+      //       ),
+      //     ),
+      //   ],
+      // )
+    );
   }
 }

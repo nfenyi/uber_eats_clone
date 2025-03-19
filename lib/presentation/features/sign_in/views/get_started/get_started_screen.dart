@@ -75,7 +75,7 @@ class _GetStartedScreenState extends ConsumerState<GetStartedScreen> {
                         await Hive.box(AppBoxes.appState)
                             .put(BoxKeys.showGetStarted, false);
                         await Hive.box(AppBoxes.appState).put(
-                            'country',
+                            BoxKeys.country,
                             HiveCountryResponse(
                                 ip: countryResponse?.ip,
                                 code: countryResponse?.countryCode,

@@ -25,7 +25,7 @@ class SignInNotifier extends StateNotifier<AuthState> {
     state = state.copiedWithIsLoading(true);
     await _authenticator.logOut();
     state = const AuthState.unknown();
-    await Hive.box(AppBoxes.appState).put('authenticated', false);
+    await Hive.box(AppBoxes.appState).put(BoxKeys.authenticated, false);
   }
 
   Future<ServiceResponse> verifyPhoneNumber(String phoneNumber) async {
