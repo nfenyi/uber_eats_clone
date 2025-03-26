@@ -9,7 +9,7 @@ import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/order_screen.dart';
-import 'package:uber_eats_clone/presentation/features/grocery_store/screens/grocery_store_screens.dart';
+import 'package:uber_eats_clone/presentation/features/grocery_store/screens/screens/grocery_store_main_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 
@@ -199,8 +199,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                   ? GroceryStoreMainScreen(
                                                       ongoingOrder.store)
                                                   : StoreScreen(
-                                                      userLocation: widget
-                                                          .storedUserLocation,
                                                       ongoingOrder.store);
                                             },
                                           ));
@@ -267,8 +265,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                   ? GroceryStoreMainScreen(
                                                       pastOrder.store)
                                                   : StoreScreen(
-                                                      userLocation: widget
-                                                          .storedUserLocation,
                                                       pastOrder.store);
                                             },
                                           ));

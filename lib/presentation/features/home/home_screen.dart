@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,16 +14,20 @@ import 'package:location/location.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/models/browse_video/browse_video_model.dart';
 import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/grocery_store/screens/grocery_store_screens.dart';
+import 'package:uber_eats_clone/presentation/features/grocery_store/screens/screens/grocery_store_main_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
+import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
@@ -43,6 +48,7 @@ import 'map/map_screen.dart';
 Map<String, Product> products = {};
 List<Store> stores = [];
 
+GeoPoint? storedUserLocation;
 // List<Store> stores = [
 //   Store(
 //     id: const Uuid().v4(),
@@ -308,6 +314,7 @@ List<Store> stores = [];
 //   ),
 // ];
 List<FavouriteStore> favoriteStores = [];
+late List<Advert> adverts;
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -339,23 +346,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   String? _selectedSort;
   final _scrollController = ScrollController();
 
-  FoodCategory? _selectedFoodCategory;
-
   late List<AnimationController> _animationControllers;
   late List<Animation<double>> _rotations;
 
-  int? _previousFoodCategoryIndex;
   late List<Store> _popularNearYou;
-  late List<Advert> _adverts;
-  GeoPoint? _storedUserLocation;
-
-  int? _currentFoodCategoryIndex;
-
-  // String? _userPlaceDescription;
 
   LocationData? _currentLocation;
-
-  final _locationFarAway = GlobalKey();
+  FoodCategory? _selectedFoodCategory;
 
   @override
   void initState() {
@@ -545,14 +542,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     //   ),
     // ];
 
-    // // for (var category in prodcat) {
-    // //   FirebaseFirestore.instance
-    // //       .collection(FirestoreCollections.stores)
-    // //       .doc('n9g1kTpCk6MQjwrngK6V')
-    // //       .update({
-    // //     'productCategories': FieldValue.arrayUnion([category.toJson()])
-    // //   });
-    // // }
+    // List<BrowseVideo> _browseVideos = [
+    //   BrowseVideo(
+    //       id: const Uuid().v4(),
+    //       productRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.products)
+    //           .doc('1240'),
+    //       storeRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.stores)
+    //           .doc('pWxVJ3aWrzkMluIn1x3T'),
+    //       videoUrl:
+    //           'https://firebasestorage.googleapis.com/v0/b/uber-eats-clone-d792a.firebasestorage.app/o/browse%20videos%2F%F0%9F%8D%BA%F0%9F%8D%8B%20coronaextra%20bebidas%20cervejacorona%F0%9F%8D%BB%F0%9F%A4%A4%F0%9F%A4%97%20mexico%F0%9F%87%B2%F0%9F%87%BD%20brasil.mp4?alt=media&token=33bbc44d-bf96-4fc5-b746-e0eae07d22ea'),
+    //   BrowseVideo(
+    //       id: const Uuid().v4(),
+    //       productRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.products)
+    //           .doc('7dc114b6-fa6a-4b4b-b8ac-953dbcea0864'),
+    //       storeRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.stores)
+    //           .doc('n9g1kTpCk6MQjwrngK6V'),
+    //       videoUrl:
+    //           'https://firebasestorage.googleapis.com/v0/b/uber-eats-clone-d792a.firebasestorage.app/o/browse%20videos%2FThis%20how%20we%20make%20a%20bacon%20egg%20and%20cheese%20mcqwidle%20fyp%20viral%20mcdonalds%20fyp%E3%82%B7%20trending%20tiktok%20foryou.mp4?alt=media&token=c185ab55-2fbe-40d8-9f44-63ee847de899'),
+    //   BrowseVideo(
+    //       id: const Uuid().v4(),
+    //       productRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.products)
+    //           .doc('6a036181-4fa8-4eab-949e-e6c4af81aac2'),
+    //       storeRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.stores)
+    //           .doc('wcWtBqW8AnN0AVq4MCaE'),
+    //       videoUrl:
+    //           'https://firebasestorage.googleapis.com/v0/b/uber-eats-clone-d792a.firebasestorage.app/o/browse%20videos%2FMake%20a%20Joe%E2%80%99s%20club%20with%20us%20%F0%9F%A4%B2%F0%9F%8F%BC%20joeandthejuice%20joesclub.mp4?alt=media&token=c732bdc6-59cc-42c8-bdcc-59b89c72ed3a'),
+    //   BrowseVideo(
+    //       id: const Uuid().v4(),
+    //       productRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.products)
+    //           .doc('f6c6a80e-86ce-4840-820c-ac4ab16332e3'),
+    //       storeRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.stores)
+    //           .doc('n9g1kTpCk6MQjwrngK6V'),
+    //       videoUrl:
+    //           'https://firebasestorage.googleapis.com/v0/b/uber-eats-clone-d792a.firebasestorage.app/o/browse%20videos%2FThailand%20Frozen%20Coca%20Cola%20%F0%9F%A5%A4%F0%9F%A7%8A%20bangkok%20thailand%20tiktokeats%20foodietok%20foodreview%20streetfood%20tiktokthailand.mp4?alt=media&token=fa7a4670-837f-4e1a-915f-7cd6f0c7b532'),
+    //   BrowseVideo(
+    //       id: const Uuid().v4(),
+    //       productRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.products)
+    //           .doc('17df74ac-bb54-4ac7-afd4-150aca00e349'),
+    //       storeRef: FirebaseFirestore.instance
+    //           .collection(FirestoreCollections.stores)
+    //           .doc('wcWtBqW8AnN0AVq4MCaE'),
+    //       videoUrl:
+    //           'https://firebasestorage.googleapis.com/v0/b/uber-eats-clone-d792a.firebasestorage.app/o/browse%20videos%2F%D8%A7%D8%B3%D8%A7%D9%8A%20%D8%AC%D9%88_%D8%A7%D9%86%D8%AF_%D8%AC%D9%88%D8%B3%20fyp%20foryou%20a%C3%A7ai%20a%C3%A7a%C3%AD%20explore%20joeandthejuiceksa%20explore%20riyadh%20khobar%20joeandthejuice%20summer.mp4?alt=media&token=c95476c9-12f9-49ae-ba35-a6c8eef3e8b5'),
+    // ];
+
+    // for (var vid in _browseVideos) {
+    //   FirebaseFirestore.instance
+    //       .collection(FirestoreCollections.browseVideos)
+    //       .doc(vid.id)
+    //       .set(vid.toJson());
+    // }
 
     // for (var product in newProducts) {
     //   FirebaseFirestore.instance
@@ -640,7 +688,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               title: InkWell(
                 onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
                   builder: (context) => SearchScreen(
-                    userLocation: _storedUserLocation!,
                     stores: stores,
                   ),
                 )),
@@ -739,84 +786,91 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             children: [
               const Gap(15),
               _foodCategories.isNotEmpty
-                  ? SizedBox(
-                      height: 75,
-                      child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        separatorBuilder: (context, index) => const Gap(15),
-                        itemCount: _foodCategories.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          final category = _foodCategories[index];
-                          return InkWell(
-                            // radius: 50,
-                            onTap: () {
-                              if (_selectedFoodCategory != category) {
-                                _previousFoodCategoryIndex =
-                                    _currentFoodCategoryIndex;
-                                _currentFoodCategoryIndex = index;
-                                _selectedFoodCategory = category;
-                                _animationControllers[index].forward();
-                                if (_previousFoodCategoryIndex != null) {
-                                  _animationControllers[
-                                          _previousFoodCategoryIndex!]
-                                      .reverse();
+                  ? Builder(builder: (context) {
+                      int? previousFoodCategoryIndex;
+                      int? currentFoodCategoryIndex;
+
+                      return SizedBox(
+                        height: 75,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
+                          separatorBuilder: (context, index) => const Gap(15),
+                          itemCount: _foodCategories.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            final category = _foodCategories[index];
+                            return InkWell(
+                              // radius: 50,
+                              onTap: () {
+                                if (_selectedFoodCategory != category) {
+                                  previousFoodCategoryIndex =
+                                      currentFoodCategoryIndex;
+                                  currentFoodCategoryIndex = index;
+                                  _selectedFoodCategory = category;
+                                  _animationControllers[index].forward();
+                                  if (previousFoodCategoryIndex != null) {
+                                    _animationControllers[
+                                            previousFoodCategoryIndex!]
+                                        .reverse();
+                                  }
+
+                                  setState(() {
+                                    _selectedFilters = [];
+
+                                    _onFilterScreen = true;
+                                  });
+                                } else if (_selectedFoodCategory == category) {
+                                  previousFoodCategoryIndex = null;
+                                  currentFoodCategoryIndex = null;
+                                  _selectedFoodCategory = null;
+                                  _animationControllers[index].reverse();
+                                  setState(() {
+                                    _selectedFilters = [];
+
+                                    _onFilterScreen = false;
+                                  });
                                 }
-
-                                setState(() {
-                                  _selectedFilters = [];
-
-                                  _onFilterScreen = true;
-                                });
-                              } else if (_selectedFoodCategory == category) {
-                                _previousFoodCategoryIndex = null;
-                                _currentFoodCategoryIndex = null;
-                                _selectedFoodCategory = null;
-                                _animationControllers[index].reverse();
-                                setState(() {
-                                  _selectedFilters = [];
-
-                                  _onFilterScreen = false;
-                                });
-                              }
-                            },
-                            child: SizedBox(
-                              height: 55,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: _selectedFoodCategory == category
-                                            ? Colors.amber.shade100
-                                            : null),
-                                    height: 50,
-                                    width: 50,
-                                    child: AnimatedBuilder(
-                                      animation: _rotations[index],
-                                      builder: (context, child) {
-                                        return Transform.rotate(
-                                            angle: _rotations[index].value,
-                                            child: child);
-                                      },
-                                      child: CachedNetworkImage(
-                                        imageUrl: category.image,
-                                        height: 40,
-                                        width: 40,
+                              },
+                              child: SizedBox(
+                                height: 55,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          color:
+                                              _selectedFoodCategory == category
+                                                  ? Colors.amber.shade100
+                                                  : null),
+                                      height: 50,
+                                      width: 50,
+                                      child: AnimatedBuilder(
+                                        animation: _rotations[index],
+                                        builder: (context, child) {
+                                          return Transform.rotate(
+                                              angle: _rotations[index].value,
+                                              child: child);
+                                        },
+                                        child: CachedNetworkImage(
+                                          imageUrl: category.image,
+                                          height: 40,
+                                          width: 40,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  AppText(
-                                    text: category.name,
-                                  )
-                                ],
+                                    AppText(
+                                      text: category.name,
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    )
+                            );
+                          },
+                        ),
+                      );
+                    })
                   : FutureBuilder(
                       future: _getFoodCategories(),
                       builder: (context, snapshot) {
@@ -830,7 +884,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: 75,
+                                    height: 65,
                                     child: ListView.separated(
                                         itemCount: 5,
                                         padding: const EdgeInsets.symmetric(
@@ -846,13 +900,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                 borderRadius:
                                                     BorderRadius.circular(50),
                                                 child: Container(
-                                                  color: Colors.blue,
-                                                  width: 45,
-                                                  height: 45,
+                                                  color: AppColors.neutral100,
+                                                  width: 60,
+                                                  height: 60,
                                                 ),
                                               ),
-                                              const Gap(5),
-                                              const AppText(text: 'helloworld'),
                                             ],
                                           );
                                         }),
@@ -865,107 +917,105 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: AppSizes.horizontalPaddingSmall),
-                            child: Skeletonizer(
-                              enabled: true,
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 90,
-                                    child: ListView.separated(
-                                        itemCount: 5,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: AppSizes
-                                                .horizontalPaddingSmall),
-                                        separatorBuilder: (context, index) =>
-                                            const Gap(15),
-                                        scrollDirection: Axis.horizontal,
-                                        itemBuilder: (context, index) {
-                                          return Column(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                                child: Container(
-                                                    color: Colors.blue,
-                                                    width: 60,
-                                                    height: 60,
-                                                    child: const AppText(
-                                                      text: '!',
-                                                      size: AppSizes.body,
-                                                    )),
-                                              ),
-                                              const Gap(5),
-                                              const AppText(text: 'helloworld'),
-                                            ],
-                                          );
-                                        }),
-                                  ),
-                                ],
-                              ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 90,
+                                  child: ListView.separated(
+                                      itemCount: 5,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal:
+                                              AppSizes.horizontalPaddingSmall),
+                                      separatorBuilder: (context, index) =>
+                                          const Gap(15),
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (context, index) {
+                                        return Column(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              child: Container(
+                                                  color: AppColors.neutral100,
+                                                  width: 60,
+                                                  height: 60,
+                                                  child: const AppText(
+                                                    text: '!',
+                                                    size: AppSizes.body,
+                                                  )),
+                                            ),
+                                          ],
+                                        );
+                                      }),
+                                ),
+                              ],
                             ),
                           );
                         }
 
-                        return SizedBox(
-                          height: 75,
-                          child: ListView.separated(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            separatorBuilder: (context, index) => const Gap(15),
-                            itemCount: _foodCategories.length,
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) {
-                              final category = _foodCategories[index];
-                              return InkWell(
-                                // radius: 50,
-                                onTap: () {
-                                  if (_selectedFoodCategory != category) {
-                                    _previousFoodCategoryIndex =
-                                        _currentFoodCategoryIndex;
-                                    _currentFoodCategoryIndex = index;
-                                    _selectedFoodCategory = category;
-                                    _animationControllers[index].forward();
-                                    if (_previousFoodCategoryIndex != null) {
-                                      _animationControllers[
-                                              _previousFoodCategoryIndex!]
-                                          .reverse();
+                        return Builder(builder: (context) {
+                          int? previousFoodCategoryIndex0;
+                          int? currentFoodCategoryIndex0;
+
+                          return SizedBox(
+                            height: 75,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSizes.horizontalPaddingSmall),
+                              separatorBuilder: (context, index) =>
+                                  const Gap(15),
+                              itemCount: _foodCategories.length,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) {
+                                final category = _foodCategories[index];
+                                return InkWell(
+                                  // radius: 50,
+                                  onTap: () {
+                                    if (_selectedFoodCategory != category) {
+                                      previousFoodCategoryIndex0 =
+                                          currentFoodCategoryIndex0;
+                                      currentFoodCategoryIndex0 = index;
+                                      _selectedFoodCategory = category;
+                                      _animationControllers[index].forward();
+                                      if (previousFoodCategoryIndex0 != null) {
+                                        _animationControllers[
+                                                previousFoodCategoryIndex0!]
+                                            .reverse();
+                                      }
+
+                                      setState(() {
+                                        _selectedFilters = [];
+
+                                        _onFilterScreen = true;
+                                      });
+                                    } else if (_selectedFoodCategory ==
+                                        category) {
+                                      previousFoodCategoryIndex0 = null;
+                                      currentFoodCategoryIndex0 = null;
+                                      _selectedFoodCategory = null;
+                                      _animationControllers[index].reverse();
+                                      setState(() {
+                                        _selectedFilters = [];
+
+                                        _onFilterScreen = false;
+                                      });
                                     }
-
-                                    setState(() {
-                                      _selectedFilters = [];
-
-                                      _onFilterScreen = true;
-                                    });
-                                  } else if (_selectedFoodCategory ==
-                                      category) {
-                                    _previousFoodCategoryIndex = null;
-                                    _currentFoodCategoryIndex = null;
-                                    _selectedFoodCategory = null;
-                                    _animationControllers[index].reverse();
-                                    setState(() {
-                                      _selectedFilters = [];
-
-                                      _onFilterScreen = false;
-                                    });
-                                  }
-                                },
-                                child: SizedBox(
-                                  height: 55,
-                                  child: Column(
-                                    children: [
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          if (_selectedFoodCategory == category)
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  color: Colors.amber.shade100),
-                                              height: 55,
-                                              width: 55,
-                                            ),
-                                          AnimatedBuilder(
+                                  },
+                                  child: SizedBox(
+                                    height: 55,
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              color: _selectedFoodCategory ==
+                                                      category
+                                                  ? Colors.amber.shade100
+                                                  : null),
+                                          height: 50,
+                                          width: 50,
+                                          child: AnimatedBuilder(
                                             animation: _rotations[index],
                                             builder: (context, child) {
                                               return Transform.rotate(
@@ -975,22 +1025,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                             },
                                             child: CachedNetworkImage(
                                               imageUrl: category.image,
-                                              height: 45,
-                                              width: 45,
+                                              height: 40,
+                                              width: 40,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                      AppText(
-                                        text: category.name,
-                                      )
-                                    ],
+                                        ),
+                                        AppText(
+                                          text: category.name,
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
+                                );
+                              },
+                            ),
+                          );
+                        });
                       }),
               ChipsChoice<String>.multiple(
                 choiceLabelBuilder: (item, i) {
@@ -1691,23 +1741,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 ),
                               );
                             } else if (snapshot.hasError) {
-                              return Column(
-                                // mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Gap(100),
-                                  Image.asset(
-                                    AssetNames.fallenIceCream,
-                                    width: 180,
-                                  ),
-                                  const Gap(10),
-                                  const AppText(
-                                    text: 'Sorry, something went wrong.',
-                                    weight: FontWeight.bold,
-                                    size: AppSizes.body,
-                                  ),
-                                  // TODO: UNCOMMENT
-                                  AppText(text: snapshot.error.toString())
-                                ],
+                              logger.d(snapshot.error);
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal:
+                                        AppSizes.horizontalPaddingSmall),
+                                child: Column(
+                                  // mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Gap(100),
+                                    Image.asset(
+                                      AssetNames.fallenIceCream,
+                                      width: 180,
+                                    ),
+                                    const Gap(10),
+                                    const AppText(
+                                      text: 'Sorry, something went wrong.',
+                                      weight: FontWeight.bold,
+                                      size: AppSizes.body,
+                                    ),
+                                    AppText(text: snapshot.error.toString())
+                                  ],
+                                ),
                               );
                             }
                             return SingleChildScrollView(
@@ -1757,7 +1812,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                     builder: (context) =>
                                                         MapScreen(
                                                       userLocation:
-                                                          _storedUserLocation!,
+                                                          storedUserLocation!,
                                                       filteredStores: stores,
                                                       selectedFilters:
                                                           _selectedFilters,
@@ -1826,8 +1881,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                   store);
                                                             } else {
                                                               return StoreScreen(
-                                                                  userLocation:
-                                                                      _storedUserLocation!,
                                                                   store);
                                                             }
                                                           },
@@ -2080,29 +2133,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 ),
                               );
                             } else if (snapshot.hasError) {
-                              return Column(
-                                // mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Gap(100),
-                                  Image.asset(
-                                    AssetNames.fallenIceCream,
-                                    width: 180,
-                                  ),
-                                  const Gap(10),
-                                  const AppText(
-                                    text: 'Sorry, something went wrong.',
-                                    weight: FontWeight.bold,
-                                    size: AppSizes.body,
-                                  ),
-                                  // TODO: UNCOMMENT
-                                  AppText(text: snapshot.error.toString())
-                                ],
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal:
+                                        AppSizes.horizontalPaddingSmall),
+                                child: Column(
+                                  // mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Gap(100),
+                                    Image.asset(
+                                      AssetNames.fallenIceCream,
+                                      width: 180,
+                                    ),
+                                    const Gap(10),
+                                    const AppText(
+                                      text: 'Sorry, something went wrong.',
+                                      weight: FontWeight.bold,
+                                      size: AppSizes.body,
+                                    ),
+                                    // TODO: UNCOMMENT
+                                    AppText(text: snapshot.error.toString())
+                                  ],
+                                ),
                               );
                             }
                             return SingleChildScrollView(
                               child: Column(
                                 children: [
-                                  HomeScreenTopic(
+                                  MainScreenTopic(
                                     title: 'Top 10 hottest this week',
                                     callback: () => navigatorKey.currentState!
                                         .push(MaterialPageRoute(
@@ -2146,8 +2204,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                 } else {
                                                   return StoreScreen(
                                                     store,
-                                                    userLocation:
-                                                        _storedUserLocation!,
                                                   );
                                                 }
                                               },
@@ -2356,7 +2412,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       },
                                     ),
                                   ),
-                                  HomeScreenTopic(
+                                  MainScreenTopic(
                                       callback: () => navigatorKey.currentState!
                                               .push(MaterialPageRoute(
                                             builder: (context) =>
@@ -2383,11 +2439,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           onTap: () {
                                             navigatorKey.currentState!
                                                 .push(MaterialPageRoute(
-                                              builder: (context) => StoreScreen(
-                                                store,
-                                                userLocation:
-                                                    _storedUserLocation!,
-                                              ),
+                                              builder: (context) {
+                                                if (store.type
+                                                    .toLowerCase()
+                                                    .contains('grocery')) {
+                                                  return GroceryStoreMainScreen(
+                                                      store);
+                                                } else {
+                                                  return StoreScreen(
+                                                    store,
+                                                  );
+                                                }
+                                              },
                                             ));
                                           },
                                           child: Ink(
@@ -2430,7 +2493,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       },
                                     ),
                                   ),
-                                  HomeScreenTopic(
+                                  MainScreenTopic(
                                       callback: () {
                                         navigatorKey.currentState!
                                             .push(MaterialPageRoute(
@@ -2660,169 +2723,187 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   const Gap(10),
                                   SizedBox(
                                     height: 140,
-                                    child: ListView(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal:
-                                              AppSizes.horizontalPaddingSmall),
-                                      scrollDirection: Axis.horizontal,
-                                      children: [
-                                        Container(
-                                            width: 350,
-                                            height: 140,
-                                            decoration: BoxDecoration(
-                                              color: Colors.brown,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 15.0,
-                                                        vertical: 10),
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              AppText(
-                                                                color: Colors
-                                                                    .white,
-                                                                text:
-                                                                    '\$0 Delivery Fee + up to 10% off with Uber One',
-                                                                size: AppSizes
-                                                                    .bodySmall,
-                                                              ),
-                                                            ]),
-                                                        AppButton2(
-                                                            text:
-                                                                'Try free for 4 weeks',
-                                                            callback: () {
-                                                              navigatorKey
-                                                                  .currentState!
-                                                                  .push(
-                                                                      MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        const JoinUberOneScreen(),
-                                                              ));
-                                                            }),
-                                                      ],
+                                    child: CarouselSlider(
+                                      options: CarouselOptions(
+                                          autoPlay: true,
+
+                                          // padEnds: true,
+                                          height: 150,
+                                          enableInfiniteScroll: false,
+                                          scrollDirection: Axis.horizontal),
+                                      items: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Container(
+                                              width: 350,
+                                              // height: 140,
+                                              decoration: BoxDecoration(
+                                                color: Colors.brown,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 15.0,
+                                                          vertical: 10),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          const Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                AppText(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  text:
+                                                                      '\$0 Delivery Fee + up to 10% off with Uber One',
+                                                                  size: AppSizes
+                                                                      .bodySmall,
+                                                                ),
+                                                              ]),
+                                                          AppButton2(
+                                                              text:
+                                                                  'Try free for 4 weeks',
+                                                              callback: () {
+                                                                navigatorKey
+                                                                    .currentState!
+                                                                    .push(
+                                                                        MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          const JoinUberOneScreen(),
+                                                                ));
+                                                              }),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                Expanded(
-                                                    flex: 1,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                              .only(
-                                                              topRight: Radius
-                                                                  .circular(10),
-                                                              bottomRight:
-                                                                  Radius
-                                                                      .circular(
-                                                                          10)),
-                                                      child: Image.asset(
-                                                        height: double.infinity,
-                                                        AssetNames.hamburger,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ))
-                                              ],
-                                            )),
+                                                  Expanded(
+                                                      flex: 1,
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .only(
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomRight: Radius
+                                                                    .circular(
+                                                                        10)),
+                                                        child: Image.asset(
+                                                          height:
+                                                              double.infinity,
+                                                          AssetNames.hamburger,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ))
+                                                ],
+                                              )),
+                                        ),
                                         const Gap(10),
-                                        Container(
-                                            width: 350,
-                                            height: 140,
-                                            decoration: BoxDecoration(
-                                              color: Colors.black38,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 15.0,
-                                                        vertical: 10),
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              AppText(
-                                                                color: Colors
-                                                                    .white,
-                                                                text:
-                                                                    'Use your promo and get there for less',
-                                                                size: AppSizes
-                                                                    .bodySmall,
-                                                              ),
-                                                              Gap(3),
-                                                              AppText(
-                                                                color: Colors
-                                                                    .white,
-                                                                text:
-                                                                    'Save on your next ride',
-                                                                size: AppSizes
-                                                                    .bodySmallest,
-                                                              ),
-                                                            ]),
-                                                        AppButton2(
-                                                            text:
-                                                                'Request ride',
-                                                            callback: () {}),
-                                                      ],
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Container(
+                                              width: 350,
+                                              // height: 140,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black38,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 15.0,
+                                                          vertical: 10),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          const Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                AppText(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  text:
+                                                                      'Use your promo and get there for less',
+                                                                  size: AppSizes
+                                                                      .bodySmall,
+                                                                ),
+                                                                Gap(3),
+                                                                AppText(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  text:
+                                                                      'Save on your next ride',
+                                                                  size: AppSizes
+                                                                      .bodySmallest,
+                                                                ),
+                                                              ]),
+                                                          AppButton2(
+                                                              text:
+                                                                  'Request ride',
+                                                              callback:
+                                                                  () async {
+                                                                await launchUrl(
+                                                                    Uri.parse(
+                                                                        'https://play.google.com/store/apps/details?id=com.ubercab'));
+                                                              }),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                Expanded(
-                                                    flex: 1,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                              .only(
-                                                              topRight: Radius
-                                                                  .circular(10),
-                                                              bottomRight:
-                                                                  Radius
-                                                                      .circular(
-                                                                          10)),
-                                                      child: Image.asset(
-                                                        height: double.infinity,
-                                                        AssetNames.whiteCar,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ))
-                                              ],
-                                            )),
+                                                  Expanded(
+                                                      flex: 1,
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .only(
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomRight: Radius
+                                                                    .circular(
+                                                                        10)),
+                                                        child: Image.asset(
+                                                          height:
+                                                              double.infinity,
+                                                          AssetNames.whiteCar,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ))
+                                                ],
+                                              )),
+                                        ),
                                       ],
                                     ),
                                   ),
-                                  HomeScreenTopic(
+                                  MainScreenTopic(
                                       callback: () => navigatorKey.currentState!
                                               .push(MaterialPageRoute(
                                             builder: (context) =>
@@ -2859,8 +2940,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               } else {
                                                 return StoreScreen(
                                                   popularStore,
-                                                  userLocation:
-                                                      _storedUserLocation!,
                                                 );
                                               }
                                             },
@@ -3075,9 +3154,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       physics:
                                           const NeverScrollableScrollPhysics(),
                                       shrinkWrap: true,
-                                      itemCount: _adverts.length,
+                                      itemCount: adverts.length,
                                       itemBuilder: (context, index) {
-                                        final advert = _adverts[index];
+                                        final advert = adverts[index];
                                         final store = stores.firstWhere(
                                           (element) =>
                                               element.id == advert.shopId,
@@ -3085,23 +3164,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
                                         return Column(
                                           children: [
-                                            HomeScreenTopic(
+                                            MainScreenTopic(
                                                 callback: () => navigatorKey
                                                         .currentState!
                                                         .push(MaterialPageRoute(
                                                       builder: (context) {
-                                                        if (store.type
-                                                            .toLowerCase()
-                                                            .contains(
-                                                                'grocery')) {
-                                                          return GroceryStoreMainScreen(
-                                                              store);
-                                                        } else {
-                                                          return StoreScreen(
-                                                              userLocation:
-                                                                  _storedUserLocation!,
-                                                              store);
-                                                        }
+                                                        return AdvertScreen(
+                                                            store: store,
+                                                            productRefs: advert
+                                                                .products);
                                                       },
                                                     )),
                                                 title: advert.title,
@@ -3112,9 +3183,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               child: ListView.separated(
                                                   scrollDirection:
                                                       Axis.horizontal,
-                                                  // TODO: find a way to do lazy loading and remove shrinkWrap
-                                                  // shrinkWrap: true,
-
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: AppSizes
+                                                          .horizontalPaddingSmall),
                                                   itemCount:
                                                       advert.products.length,
                                                   separatorBuilder:
@@ -3182,7 +3254,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           ],
                                         );
                                       }),
-                                  HomeScreenTopic(
+                                  MainScreenTopic(
                                       callback: () => navigatorKey.currentState!
                                               .push(MaterialPageRoute(
                                             builder: (context) =>
@@ -3537,7 +3609,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         .collection(FirestoreCollections.adverts)
         .get();
 
-    _adverts = advertsSnapshot.docs.map(
+    adverts = advertsSnapshot.docs.map(
       (snapshot) {
         // logger.d(snapshot.data());
         return Advert.fromJson(snapshot.data());
@@ -3709,7 +3781,7 @@ class LocationWidget extends StatelessWidget {
       String? userPlaceDescription =
           userInfo['selectedAddress']['placeDescription'];
 
-      var storedUserLocation = GeoPoint(
+      storedUserLocation = GeoPoint(
           userInfo['selectedAddress']['latlng'].latitude,
           userInfo['selectedAddress']['latlng'].longitude);
       return Padding(
@@ -3731,40 +3803,52 @@ class LocationWidget extends StatelessWidget {
                       : '${AppFunctions.formatDate(timePreference.toString(), format: 'D, G:i A')} - ${AppFunctions.formatDate(timePreference!.add(const Duration(minutes: 30)).toString(), format: 'G:i A')}',
                   color: AppColors.neutral500,
                 ),
-                Row(
-                  // mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Builder(builder: (context) {
-                      const distance = Distance(roundResult: true);
-                      final distanceResult = distance.as(
-                          LengthUnit.Meter,
-                          LatLng(_currentLocation!.latitude!,
-                              _currentLocation!.longitude!),
-                          LatLng(storedUserLocation.latitude,
-                              storedUserLocation.longitude));
+                Showcase(
+                  overlayOpacity: 0.05,
+                  // disableMovingAnimation: true,
+                  textColor: Colors.white,
+                  tooltipBackgroundColor: Colors.black87,
+                  tooltipBorderRadius: BorderRadius.circular(5),
+                  description:
+                      'Is this the right address? You seem quite far away',
+                  key: locationFarAway,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Builder(builder: (context) {
+                        const distance = Distance(roundResult: true);
+                        final distanceResult = distance.as(
+                            LengthUnit.Meter,
+                            LatLng(_currentLocation!.latitude!,
+                                _currentLocation!.longitude!),
+                            LatLng(storedUserLocation!.latitude,
+                                storedUserLocation!.longitude));
 
-                      if (distanceResult > 400) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) =>
-                            ShowCaseWidget.of(context)
-                                .startShowCase([locationFarAway]));
-                      }
-                      return Showcase(
-                        overlayOpacity: 0,
-                        disableMovingAnimation: true,
-                        textColor: Colors.white,
-                        tooltipBackgroundColor: Colors.black87,
-                        tooltipBorderRadius: BorderRadius.circular(5),
-                        description: 'You seem quite far away',
-                        key: locationFarAway,
-                        child: AppText(
+                        if (distanceResult > 400) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (context.mounted) {
+                              ShowCaseWidget.of(context)
+                                  .startShowCase([locationFarAway]);
+                            }
+                          });
+                          Future.delayed(
+                            const Duration(seconds: 30),
+                            () {
+                              if (context.mounted) {
+                                ShowCaseWidget.of(context).dismiss();
+                              }
+                            },
+                          );
+                        }
+                        return AppText(
                             text: AppFunctions.formatPlaceDescription(
                                     userPlaceDescription!)
                                 .split(', ')
-                                .first),
-                      );
-                    }),
-                    const Icon(Icons.keyboard_arrow_down)
-                  ],
+                                .first);
+                      }),
+                      const Icon(Icons.keyboard_arrow_down)
+                    ],
+                  ),
                 )
               ],
             ),
@@ -3780,10 +3864,12 @@ class FavouriteButton extends StatefulWidget {
     super.key,
     required this.store,
     this.color = Colors.white,
+    this.size,
   });
 
   final Store store;
   final Color color;
+  final double? size;
 
   @override
   State<FavouriteButton> createState() => _FavouriteButtonState();
@@ -3825,6 +3911,7 @@ class _FavouriteButtonState extends State<FavouriteButton> {
         child: Icon(
           isFavourite ? Icons.favorite : Icons.favorite_outline,
           color: widget.color,
+          size: widget.size,
         ),
       ),
     );
@@ -3942,13 +4029,10 @@ class AllStoresResultDisplay extends StatelessWidget {
     super.key,
     required this.timeOfDayNow,
     required this.storesWithNameOrProduct,
-    required this.storedUserLocation,
   });
 
   final List<Store> storesWithNameOrProduct;
   final TimeOfDay timeOfDayNow;
-
-  final GeoPoint storedUserLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -3987,7 +4071,6 @@ class AllStoresResultDisplay extends StatelessWidget {
                         } else {
                           return StoreScreen(
                             store,
-                            userLocation: storedUserLocation,
                           );
                         }
                       },
@@ -4112,13 +4195,11 @@ class SearchResultDisplay extends StatelessWidget {
     required this.storesWithProduct,
     required this.showProducts,
     required this.query,
-    required this.storedUserLocation,
   });
 
   final List<Store> storesWithProduct;
   final String query;
   final bool showProducts;
-  final GeoPoint storedUserLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -4186,7 +4267,6 @@ class SearchResultDisplay extends StatelessWidget {
                       } else {
                         return StoreScreen(
                           store,
-                          userLocation: storedUserLocation,
                         );
                       }
                     },
@@ -4273,7 +4353,6 @@ class SearchResultDisplay extends StatelessWidget {
                                         } else {
                                           return StoreScreen(
                                             store,
-                                            userLocation: storedUserLocation,
                                           );
                                         }
                                       },
@@ -4396,8 +4475,11 @@ class SearchResultDisplay extends StatelessWidget {
                                             return (offers.any(
                                               (element) {
                                                 matchingOffer = element;
-                                                return element.product.id ==
-                                                        product.id &&
+                                                final castedProduct =
+                                                    element.product
+                                                        as DocumentReference;
+                                                return castedProduct.path
+                                                        .contains(product.id) &&
                                                     element.store.id ==
                                                         store.id;
                                               },
@@ -4430,12 +4512,10 @@ class SearchResultDisplay extends StatelessWidget {
 }
 
 class NoSearchResult extends StatelessWidget {
-  const NoSearchResult(
-    TabController tabController, {
-    super.key,
-  }) : _tabController = tabController;
+  const NoSearchResult({super.key, TabController? tabController})
+      : _tabController = tabController;
 
-  final TabController _tabController;
+  final TabController? _tabController;
 
   @override
   Widget build(BuildContext context) {
@@ -4460,7 +4540,7 @@ class NoSearchResult extends StatelessWidget {
               size: AppSizes.bodySmall,
             ),
             const Gap(10),
-            if (_tabController.index != 0)
+            if (_tabController != null && _tabController.index != 0)
               AppButton(
                 text: 'Search in all',
                 callback: () => _tabController.animateTo(0),
@@ -4651,12 +4731,12 @@ class InitialSearchPage2 extends StatelessWidget {
   }
 }
 
-class HomeScreenTopic extends StatelessWidget {
+class MainScreenTopic extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback callback;
   final String? imageUrl;
-  const HomeScreenTopic({
+  const MainScreenTopic({
     super.key,
     this.imageUrl,
     this.subtitle,

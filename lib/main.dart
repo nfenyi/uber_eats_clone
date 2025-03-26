@@ -325,6 +325,7 @@ class BoxKeys {
   static const String country = 'country';
   static const String userInfo = 'userInfo';
   static const String activatedPromoPath = 'activatedPromoPath';
+  static const String recentlyViewed = 'recentlyViewed';
 
   const BoxKeys._();
 }

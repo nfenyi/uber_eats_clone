@@ -540,12 +540,12 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                     }
                                     //Use address.copyWith instead?
                                     temp['selectedAddress'] = address.toJson();
-
+                                    final storelatLng =
+                                        address.latlng as GeoPoint;
                                     temp['selectedAddress']['latlng'] =
                                         HiveGeoPoint(
-                                            latitude: address.latlng.latitude,
-                                            longitude:
-                                                address.latlng.longitude);
+                                            latitude: storelatLng.latitude,
+                                            longitude: storelatLng.longitude);
                                     await Hive.box(AppBoxes.appState)
                                         .put(BoxKeys.userInfo, temp);
                                     // setState(() {
@@ -583,25 +583,25 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                     );
                                     await navigatorKey.currentState!
                                         .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddressDetailsScreen(
-                                              addressLabel:
-                                                  address.addressLabel,
-                                              apartment: address.apartment,
-                                              building: address.building,
-                                              dropOffOption:
-                                                  address.dropoffOption,
-                                              instruction: address.instruction,
-                                              navigatedWithAddressListTile:
-                                                  true,
-                                              addressesAlreadyExist: true,
-                                              location: PlaceLocation(
-                                                  lat: address.latlng.latitude,
-                                                  lng:
-                                                      address.latlng.longitude),
-                                              placeDescription:
-                                                  address.placeDescription,
-                                              markerIcon: bitmapDescriptor),
+                                      builder: (context) {
+                                        final storelatLng =
+                                            address.latlng as GeoPoint;
+                                        return AddressDetailsScreen(
+                                            addressLabel: address.addressLabel,
+                                            apartment: address.apartment,
+                                            building: address.building,
+                                            dropOffOption:
+                                                address.dropoffOption,
+                                            instruction: address.instruction,
+                                            navigatedWithAddressListTile: true,
+                                            addressesAlreadyExist: true,
+                                            location: PlaceLocation(
+                                                lat: storelatLng.latitude,
+                                                lng: storelatLng.longitude),
+                                            placeDescription:
+                                                address.placeDescription,
+                                            markerIcon: bitmapDescriptor);
+                                      },
                                     ));
                                   },
                                   child: Ink(

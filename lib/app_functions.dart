@@ -1,12 +1,18 @@
 import 'dart:convert';
+import 'dart:typed_data' show Uint8List;
 
+import 'package:cached_network_image/cached_network_image.dart'
+    show CachedNetworkImage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_format/date_time_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/models/promotion/promotion_model.dart';
+import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
+import 'package:uber_eats_clone/presentation/core/app_text.dart';
 // import 'package:flutter/material.dart';
 
 import 'hive_adapters/geopoint/geopoint_adapter.dart';
@@ -39,11 +45,102 @@ class AppFunctions {
     return snapshot.data() as Map<String, dynamic>;
   }
 
+  static Future<List<Product>> fetchDeals(String storeId) async {
+    final productsWithDeals = <Product>[];
+    final discountedProducts = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.products)
+        .where('stores', arrayContains: storeId)
+        .where('promoPrice', isNotEqualTo: null)
+        .get();
+
+    final promoProducts = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.deals)
+        .where('stores', arrayContains: storeId)
+        .where('offer', isNotEqualTo: null)
+        .get();
+    for (var element in discountedProducts.docs) {
+      productsWithDeals.add(Product.fromJson(element.data()));
+    }
+
+    for (var element in promoProducts.docs) {
+      productsWithDeals.add(Product.fromJson(element.data()));
+    }
+    return productsWithDeals;
+  }
+
   static Future<Product> loadProductReference(
       DocumentReference reference) async {
     final productJson = await loadDocReference(reference);
 
     return Product.fromJson(productJson);
+  }
+
+  static Future<Store> loadStoreReference(DocumentReference reference) async {
+    final storeJson = await loadDocReference(reference);
+
+    return Store.fromJson(storeJson);
+  }
+
+  static Widget displayNetworkImage(String image,
+      {required double width,
+      required double height,
+      BoxFit? fit,
+      String placeholderAssetImage = AssetNames.aisleImage}) {
+    if (image.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: image,
+        errorWidget: (context, url, error) {
+          logger.d(error.toString());
+          return Image.asset(
+            placeholderAssetImage,
+            width: width,
+            height: height,
+            fit: fit,
+          );
+        },
+        width: width,
+        placeholder: (context, url) => Image.asset(
+          placeholderAssetImage,
+          width: width,
+          height: height,
+          fit: fit,
+        ),
+        height: height,
+        fit: fit,
+      );
+    } else if (image.startsWith('data:image')) {
+      // It's a base64 string
+      try {
+        String base64String = image.split(',').last;
+        Uint8List bytes = base64Decode(base64String);
+        return Image.memory(
+          width: width,
+          height: height,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              placeholderAssetImage,
+              width: width,
+              height: height,
+              fit: fit,
+            );
+          },
+          fit: fit,
+          bytes,
+        );
+      } catch (e) {
+        logger.d('Error decoding base64 image: $e');
+        return const AppText(text: 'Error loading image');
+      }
+    } else {
+      logger.d('Invalid image source');
+      return Image.asset(
+        placeholderAssetImage,
+        width: width,
+        height: height,
+        fit: fit,
+      );
+      // // Handle invalid image source (neither URL nor base64)
+    }
   }
 
   static Future<Promotion> loadPromotionReference(

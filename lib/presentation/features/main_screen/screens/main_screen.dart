@@ -18,7 +18,9 @@ import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
+import '../../alcohol/alcohol_screen.dart';
 import '../../gifts/screens/gift_screen.dart';
+import '../../pharmacy/screens/pharmacy_screen.dart';
 import '../state/bottom_nav_index_provider.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -59,7 +61,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           ? _screens[_currentScreen]
           : bottomNavIndex == 6
               ? const GiftScreen()
-              : const GiftCategoryScreen(),
+              : bottomNavIndex == 7
+                  ? const GiftCategoryScreen()
+                  : bottomNavIndex == 7
+                      ? const AlcoholScreen()
+                      : const PharmacyScreen(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentScreen,
         onTap: (value) {

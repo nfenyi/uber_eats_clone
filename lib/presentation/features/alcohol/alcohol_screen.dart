@@ -1,196 +1,232 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
+import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../app_functions.dart';
 
+import '../../../main.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
+import '../../constants/weblinks.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../../core/widgets.dart';
+import '../../services/sign_in_view_model.dart';
+import '../address/screens/payment_options_screen.dart';
 import '../home/home_screen.dart';
+import '../home/map/map_screen.dart';
+import '../home/screens/search_screen.dart';
+import '../some_kind_of_section/advert_screen.dart';
+import '../store/store_screen.dart';
+import '../stores_list/stores_list_screen.dart';
+import '../webview/webview_screen.dart';
 
-class AlcoholScreen extends StatefulWidget {
-  final List<Store> alcoholStores;
-  const AlcoholScreen({super.key, required this.alcoholStores});
+class AlcoholScreen extends ConsumerStatefulWidget {
+  const AlcoholScreen({super.key});
 
   @override
-  State<AlcoholScreen> createState() => _AlcoholScreenState();
+  ConsumerState<AlcoholScreen> createState() => _AlcoholScreenState();
 }
 
-class _AlcoholScreenState extends State<AlcoholScreen> {
+class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
   late final List<Color> _featuredStoresColors = [];
+  final webViewcontroller = WebViewControllerPlus();
+
+  List<Store> _alcoholStores = [];
+
+  bool _onFilterScreen = false;
+  List<Store> _filteredStores = [];
+  Future<List<DocumentReference>> _getFeaturedStoreRefs() async {
+    final featuredGroceryStoresSnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.featuredStores)
+        .get();
+    final documentSnapshots = featuredGroceryStoresSnapshot.docs;
+    List<DocumentReference> storeRefs = [];
+    for (var docSnapshot in documentSnapshots) {
+      storeRefs.add(docSnapshot.data().values.first);
+    }
+
+    return storeRefs;
+  }
+
+  int? _selectedDeliveryFeeIndex;
+  int? _selectedRatingIndex;
+  String? _selectedPrice;
+  List<String> _selectedDietaryOptions = [];
+  String? _selectedSort;
+  List<String> _selectedFilters = [];
 
   @override
   void initState() {
     super.initState();
-    for (var i = 0; i < widget.alcoholStores.length; i++) {
-      _featuredStoresColors.add(Color.fromARGB(50, Random().nextInt(256),
-          Random().nextInt(256), Random().nextInt(256)));
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final timeOfDayNow = TimeOfDay.now();
-    return Scaffold(
-        body: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                SliverAppBar(
-                  pinned: true,
-                  floating: true,
-                  expandedHeight: 120,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: const SafeArea(
-                      child: Padding(
-                        padding:
-                            EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AppText(
-                              text: 'Alcohol',
-                              weight: FontWeight.w600,
-                              size: AppSizes.heading4,
-                            ),
-                          ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        ref.read(bottomNavIndexProvider.notifier).updateIndex(1);
+      },
+      child: SafeArea(
+          child: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            expandedHeight: 100,
+            floating: true,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              expandedTitleScale: 1,
+              titlePadding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmallest),
+              background: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.horizontalPaddingSmallest),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                            onTap: () {
+                              ref
+                                  .read(bottomNavIndexProvider.notifier)
+                                  .updateIndex(1);
+                            },
+                            child: const Icon(Icons.arrow_back)),
+                        const Gap(5),
+                        const AppText(
+                          text: 'Alcohol',
+                          weight: FontWeight.w600,
+                          size: AppSizes.heading4,
                         ),
-                      ),
+                      ],
                     ),
-                    centerTitle: true,
-                    titlePadding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    // expandedTitleScale: 2,
-                    title: InkWell(
-                      // onTap: () =>
-                      //     navigatorKey.currentState!.push(MaterialPageRoute(
-                      //   builder: (context) => SearchScreen(
-                      //     stores: _groceryScreenStores,
-                      //   ),
-                      // ))
-
-                      child: Ink(
-                        child: const AppTextFormField(
-                          enabled: false,
-                          hintText: 'Search alcohol',
-                          radius: 50,
-                          prefixIcon: Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Icon(Icons.search),
-                          ),
-                        ),
-                      ),
-                    ),
-                    expandedTitleScale: 1,
+                  ],
+                ),
+              ),
+              title: InkWell(
+                onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
+                  builder: (context) => SearchScreen(
+                    stores: _alcoholStores,
                   ),
-                )
-              ];
-            },
-            body: Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-                  child: Row(
+                )),
+                child: Ink(
+                  child: const AppTextFormField(
+                    enabled: false,
+                    constraintWidth: 40,
+                    hintText: 'Search alcohol',
+                    radius: 50,
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Icon(Icons.search),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+        body: Visibility(
+          visible: !_onFilterScreen,
+          replacement: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.horizontalPaddingSmall),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      AppText(
-                        text: 'Featured stores',
-                        size: AppSizes.heading6,
+                      const AppText(
+                        size: AppSizes.bodySmall,
+                        text: '80 results',
                         weight: FontWeight.w600,
+                      ),
+                      AppButton2(
+                        text: 'Reset',
+                        callback: () {
+                          setState(() {
+                            _selectedFilters = [];
+                            _onFilterScreen = false;
+                            _selectedDeliveryFeeIndex = null;
+                            _selectedRatingIndex = null;
+                            _selectedPrice = null;
+                            _selectedDietaryOptions = [];
+                            _selectedSort = null;
+                          });
+                        },
                       ),
                     ],
                   ),
-                ),
-                SizedBox(
-                  height: 150,
-                  child: ListView.separated(
-                    cacheExtent: 300,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    separatorBuilder: (context, index) => const Gap(10),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: widget.alcoholStores.length,
-                    itemBuilder: (context, index) {
-                      final store = widget.alcoholStores[index];
-                      final bool isClosed = timeOfDayNow.hour <
-                              store.openingTime.hour ||
-                          (timeOfDayNow.hour >= store.closingTime.hour &&
-                              timeOfDayNow.minute >= store.closingTime.minute);
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            // navigatorKey.currentState!.push(MaterialPageRoute(
-                            //   builder: (context) => StoreScreen(store),
-                            // ));
-                          },
-                          child: Ink(
-                            // decoration: BoxDecoration(
-                            //   borderRadius: BorderRadius.circular(12),
-                            // ),
-
-                            child: Stack(
+                  const Gap(10),
+                  InkWell(
+                    onTap: () async {
+                      await navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => MapScreen(
+                          userLocation: storedUserLocation!,
+                          filteredStores: const [],
+                        ),
+                      ));
+                    },
+                    child: Ink(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(AssetNames.map, width: double.infinity),
+                          Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: const AppText(text: 'View map'))
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Gap(20),
+                  ListView.separated(
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final store = stores[index];
+                        final bool isClosed =
+                            timeOfDayNow.hour < store.openingTime.hour ||
+                                (timeOfDayNow.hour >= store.closingTime.hour &&
+                                    timeOfDayNow.minute >=
+                                        store.closingTime.minute);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Stack(
+                              alignment: Alignment.topRight,
                               children: [
-                                Container(
-                                  width: 150,
-                                  height: 150,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 5, vertical: 20),
-                                  color: _featuredStoresColors[index],
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CachedNetworkImage(
-                                        imageUrl: store.logo,
-                                        width: 200,
-                                        height: 50,
-                                        // fit: BoxFit.fitWidth,
-                                      ),
-                                      Column(
-                                        children: [
-                                          AppText(
-                                            text: store.name,
-                                            weight: FontWeight.w600,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Visibility(
-                                                  visible:
-                                                      store.delivery.fee < 1,
-                                                  child: Image.asset(
-                                                    AssetNames.uberOneSmall,
-                                                    height: 10,
-                                                  )),
-                                              Visibility(
-                                                  visible:
-                                                      store.delivery.fee < 1,
-                                                  child: const AppText(
-                                                      text: ' •')),
-                                              AppText(
-                                                  text:
-                                                      " ${store.delivery.estimatedDeliveryTime} min")
-                                            ],
-                                          ),
-                                          //TODO: offers available text
-                                        ],
-                                      )
-                                    ],
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: CachedNetworkImage(
+                                    imageUrl: store.cardImage,
+                                    width: double.infinity,
+                                    height: 170,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
                                 isClosed
                                     ? Container(
                                         color: Colors.black.withOpacity(0.5),
-                                        width: 150,
-                                        height: 150,
+                                        width: double.infinity,
+                                        height: 170,
                                         child: const Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -208,7 +244,8 @@ class _AlcoholScreenState extends State<AlcoholScreen> {
                                         ? Container(
                                             color:
                                                 Colors.black.withOpacity(0.5),
-                                            width: 150,
+                                            width: double.infinity,
+                                            height: 170,
                                             child: const Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -223,63 +260,402 @@ class _AlcoholScreenState extends State<AlcoholScreen> {
                                             ),
                                           )
                                         : const SizedBox.shrink(),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 8.0, top: 8.0),
+                                  child: FavouriteButton(store: store),
+                                )
+                              ],
+                            ),
+                            const Gap(5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AppText(
+                                  text: store.name,
+                                  weight: FontWeight.w600,
+                                ),
+                                Container(
+                                    decoration: BoxDecoration(
+                                        color: AppColors.neutral200,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 2),
+                                    child: AppText(
+                                        text: store.rating.averageRating
+                                            .toString()))
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Visibility(
+                                    visible: store.delivery.fee < 1,
+                                    child: Image.asset(
+                                      AssetNames.uberOneSmall,
+                                      height: 10,
+                                    )),
+                                AppText(
+                                    text: isClosed
+                                        ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                        : '\$${store.delivery.fee} Delivery Fee',
+                                    color: store.delivery.fee < 1
+                                        ? const Color.fromARGB(
+                                            255, 163, 133, 42)
+                                        : null),
+                                AppText(
+                                    text:
+                                        ' • ${store.delivery.estimatedDeliveryTime} min'),
+                              ],
+                            )
+                          ],
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Gap(10),
+                      itemCount: stores.length),
+                ],
+              ),
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const Gap(10),
+                FutureBuilder<List<DocumentReference>>(
+                    //TODO: change to featured alcohol stores
+                    future: _getFeaturedStoreRefs(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox.shrink();
+                      } else if (snapshot.hasError) {
+                        logger.d(snapshot.error.toString());
+                        return const SizedBox.shrink();
+                      } else if (!snapshot.hasData) {
+                        const SizedBox.shrink();
+                      }
+                      final storeRefs = snapshot.data!;
+                      final List<Color> featuredStoresColors = [];
+                      for (var i = 0; i < storeRefs.length; i++) {
+                        featuredStoresColors.add(Color.fromARGB(
+                            50,
+                            Random().nextInt(256),
+                            Random().nextInt(256),
+                            Random().nextInt(256)));
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding:
+                                EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+                            child: Row(
+                              children: [
+                                AppText(
+                                  text: 'Featured stores',
+                                  size: AppSizes.heading6,
+                                  weight: FontWeight.w600,
+                                ),
                               ],
                             ),
                           ),
-                        ),
+                          SizedBox(
+                            height: 150,
+                            child: ListView.separated(
+                              cacheExtent: 300,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSizes.horizontalPaddingSmall),
+                              separatorBuilder: (context, index) =>
+                                  const Gap(10),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: storeRefs.length,
+                              itemBuilder: (context, index) {
+                                final reference = storeRefs[index];
+
+                                // logger.d(store.id);
+
+                                return FutureBuilder<Store>(
+                                    future: AppFunctions.loadStoreReference(
+                                        reference),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Skeletonizer(
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Container(
+                                              width: 150,
+                                              height: 150,
+                                              color: Colors.amber,
+                                            ),
+                                          ),
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: SizedBox(
+                                            width: 150,
+                                            height: 150,
+                                            child: AppText(
+                                                text:
+                                                    snapshot.error.toString()),
+                                          ),
+                                        );
+                                      }
+
+                                      final store = snapshot.data!;
+
+                                      final bool isClosed = timeOfDayNow.hour <
+                                              store.openingTime.hour ||
+                                          (timeOfDayNow.hour >=
+                                                  store.closingTime.hour &&
+                                              timeOfDayNow.minute >=
+                                                  store.closingTime.minute);
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: InkWell(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          onTap: () async {
+                                            // final location = Location();
+                                            // final userLocation = await location.getLocation();
+                                            await navigatorKey.currentState!
+                                                .push(MaterialPageRoute(
+                                              builder: (context) {
+                                                return StoreScreen(
+                                                  store,
+                                                );
+                                              },
+                                            ));
+                                          },
+                                          child: Ink(
+                                            // decoration: BoxDecoration(
+                                            //   borderRadius: BorderRadius.circular(12),
+                                            // ),
+
+                                            child: Stack(
+                                              children: [
+                                                Container(
+                                                  width: 150,
+                                                  height: 150,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 5,
+                                                      vertical: 20),
+                                                  color: featuredStoresColors[
+                                                      index],
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      CachedNetworkImage(
+                                                        imageUrl: store.logo,
+                                                        width: 200,
+                                                        height: 50,
+                                                        // fit: BoxFit.fitWidth,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          AppText(
+                                                            text: store.name,
+                                                            weight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Visibility(
+                                                                  visible: store
+                                                                          .delivery
+                                                                          .fee <
+                                                                      1,
+                                                                  child: Image
+                                                                      .asset(
+                                                                    AssetNames
+                                                                        .uberOneSmall,
+                                                                    height: 10,
+                                                                  )),
+                                                              Visibility(
+                                                                  visible: store
+                                                                          .delivery
+                                                                          .fee <
+                                                                      1,
+                                                                  child: const AppText(
+                                                                      text:
+                                                                          ' •')),
+                                                              AppText(
+                                                                  text:
+                                                                      " ${store.delivery.estimatedDeliveryTime} min")
+                                                            ],
+                                                          ),
+                                                          if (store.offers !=
+                                                                  null &&
+                                                              store.offers!
+                                                                  .isNotEmpty)
+                                                            AppText(
+                                                                color: Colors
+                                                                    .green,
+                                                                size: AppSizes
+                                                                    .bodySmallest,
+                                                                text:
+                                                                    '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                isClosed
+                                                    ? Container(
+                                                        color: Colors.black
+                                                            .withOpacity(0.5),
+                                                        width: 150,
+                                                        height: 150,
+                                                        child: const Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            AppText(
+                                                              text: 'Closed',
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    : !store.delivery.canDeliver
+                                                        ? Container(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            width: 150,
+                                                            child: const Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                AppText(
+                                                                  text:
+                                                                      'Pick up',
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        : const SizedBox
+                                                            .shrink(),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              },
+                            ),
+                          ),
+                        ],
                       );
-                    },
-                  ),
-                ),
-                const Divider(),
-                HomeScreenTopic(
-                    callback: () {},
-                    title: 'Prep brunch for Mum',
-                    subtitle: 'From ${stores[2].name}',
-                    imageUrl: stores[2].logo),
-                // SizedBox(
-                //   height: 200,
-                //   child: CustomScrollView(
-                //     scrollDirection: Axis.horizontal,
-                //     slivers: stores[2]
-                //         .productCategories
-                //         .map((productCategory) => SliverPadding(
-                //               padding:
-                //                   const EdgeInsets.symmetric(horizontal: 10),
-                //               sliver: SliverList.separated(
-                //                 separatorBuilder: (context, index) =>
-                //                     const Gap(10),
-                //                 itemBuilder: (context, index) =>
-                //                     ListView.separated(
-                //                         scrollDirection: Axis.horizontal,
-                //                         // TODO: find a way to do lazy loading and remove shrinkWrap
-                //                         shrinkWrap: true,
-                //                         itemCount:
-                //                             productCategory.productsAndQuantities.length,
-                //                         separatorBuilder: (context, index) =>
-                //                             const Gap(15),
-                //                         itemBuilder: (context, index) {
-                //                           final product =
-                //                               productCategory.productsAndQuantities.entries.elementAt(index);
-                //                           return ProductGridTile(
-                //                             product: product,
-                //                             store: stores[2],
-                //                           );
-                //                         }),
-                //                 itemCount: 1,
-                //               ),
-                //             ))
-                //         .toList(),
-                //   ),
-                // ),
-                HomeScreenTopic(callback: () {}, title: 'All Stores'),
+                    }),
+                ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: adverts.length,
+                    itemBuilder: (context, index) {
+                      final advert = adverts[index];
+                      final store = stores.firstWhere(
+                        (element) => element.id == advert.shopId,
+                      );
+
+                      return Column(
+                        children: [
+                          MainScreenTopic(
+                              callback: () => navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) {
+                                      return AdvertScreen(
+                                          store: store,
+                                          productRefs: advert.products);
+                                    },
+                                  )),
+                              title: advert.title,
+                              subtitle: 'From ${store.name}',
+                              imageUrl: store.logo),
+                          SizedBox(
+                            height: 200,
+                            child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal:
+                                        AppSizes.horizontalPaddingSmall),
+                                itemCount: advert.products.length,
+                                separatorBuilder: (context, index) =>
+                                    const Gap(15),
+                                itemBuilder: (context, index) {
+                                  final productReference =
+                                      advert.products[index];
+                                  return FutureBuilder<Product>(
+                                      future: AppFunctions.loadProductReference(
+                                          productReference
+                                              as DocumentReference),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Skeletonizer(
+                                            child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                child: Container(
+                                                  color: Colors.blue,
+                                                  width: 110,
+                                                  height: 200,
+                                                )),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: Container(
+                                                color: AppColors.neutral100,
+                                                width: 110,
+                                                height: 200,
+                                                child: AppText(
+                                                  text:
+                                                      snapshot.error.toString(),
+                                                  size: AppSizes.bodySmallest,
+                                                ),
+                                              ));
+                                        }
+
+                                        return ProductGridTile(
+                                            product: snapshot.data!,
+                                            store: store);
+                                      });
+                                }),
+                          ),
+                        ],
+                      );
+                    }),
+                //TODO: Add alcohol store to firestore
+                MainScreenTopic(callback: () {}, title: 'All Stores'),
                 ListView.separated(
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppSizes.horizontalPaddingSmall),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      final store = widget.alcoholStores[index];
+                      final store = _alcoholStores[index];
                       final bool isClosed = timeOfDayNow.hour <
                               store.openingTime.hour ||
                           (timeOfDayNow.hour >= store.closingTime.hour &&
@@ -303,12 +679,9 @@ class _AlcoholScreenState extends State<AlcoholScreen> {
                           ),
                           title: AppText(text: store.name),
                           contentPadding: EdgeInsets.zero,
-                          trailing: Icon(
-                            favoriteStores
-                                    .any((element) => element.id == store.id)
-                                ? Icons.favorite
-                                : Icons.favorite_outline,
-                            color: AppColors.neutral300,
+                          trailing: FavouriteButton(
+                            store: store,
+                            color: AppColors.neutral500,
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,8 +721,47 @@ class _AlcoholScreenState extends State<AlcoholScreen> {
                     separatorBuilder: (context, index) => const Divider(
                           indent: 30,
                         ),
-                    itemCount: widget.alcoholStores.length),
+                    itemCount: _alcoholStores.length),
+                const Gap(20),
+                const Divider(),
+                const Gap(3),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.horizontalPaddingSmall),
+                  child: RichText(
+                    text: TextSpan(
+                        text:
+                            "Uber is paid by merchants for marketing and promotion, which influences the personalized recommendations you see. ",
+                        style: const TextStyle(
+                          fontSize: AppSizes.bodySmallest,
+                          color: Colors.black,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Learn more or change settings',
+                            style: const TextStyle(
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                navigatorKey.currentState!
+                                    .push(MaterialPageRoute(
+                                  builder: (context) => WebViewScreen(
+                                    controller: webViewcontroller,
+                                    link: Weblinks.uberOneTerms,
+                                  ),
+                                ));
+                              },
+                          ),
+                        ]),
+                  ),
+                ),
+                const Gap(10)
               ],
-            )));
+            ),
+          ),
+        ),
+      )),
+    );
   }
 }

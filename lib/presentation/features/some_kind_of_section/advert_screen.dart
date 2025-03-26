@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
-import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 
 import '../../../app_functions.dart';
@@ -13,16 +14,17 @@ import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../home/home_screen.dart';
 
-class SomeKindOfSectionScreen extends StatefulWidget {
+class AdvertScreen extends StatefulWidget {
   final Store store;
-  const SomeKindOfSectionScreen({super.key, required this.store});
+  final List<Object> productRefs;
+  const AdvertScreen(
+      {super.key, required this.store, required this.productRefs});
 
   @override
-  State<SomeKindOfSectionScreen> createState() =>
-      _SomeKindOfSectionScreenState();
+  State<AdvertScreen> createState() => _AdvertScreenState();
 }
 
-class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
+class _AdvertScreenState extends State<AdvertScreen> {
   @override
   Widget build(BuildContext context) {
     TimeOfDay timeOfDayNow = TimeOfDay.now();
@@ -32,17 +34,14 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
     return Scaffold(
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                const SliverAppBar(
+                const SliverAppBar.medium(
                   pinned: true,
                   floating: true,
-                  expandedHeight: 80,
-                  flexibleSpace: FlexibleSpaceBar(
-                    // expandedTitleScale: 2,
-                    title: AppText(
-                      text: 'Prep brunch for Mom',
-                      weight: FontWeight.w600,
-                      size: AppSizes.bodySmall,
-                    ),
+                  expandedHeight: 100,
+                  title: AppText(
+                    text: 'Prep brunch for Mom',
+                    weight: FontWeight.w600,
+                    size: AppSizes.heading6,
                   ),
                 )
               ],
@@ -53,8 +52,6 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
                           .pushReplacement(MaterialPageRoute(
                         builder: (context) => StoreScreen(
                           widget.store,
-                          userLocation: Hive.box(AppBoxes.appState)
-                              .get(BoxKeys.userInfo)['addresses']['latlng'],
                         ),
                       )),
                   leading: Container(
@@ -105,43 +102,87 @@ class _SomeKindOfSectionScreenState extends State<SomeKindOfSectionScreen> {
                                   ' • ${widget.store.delivery.estimatedDeliveryTime} min'),
                         ],
                       ),
-                      const AppText(
-                        text: 'Offers available',
-                        color: Colors.green,
-                      )
+                      if (widget.store.offers != null &&
+                          widget.store.offers!.isNotEmpty)
+                        OfferText(store: widget.store)
                     ],
                   )),
               const Divider(
                 indent: 60,
               ),
-              // Expanded(
-              //     child: GridView.builder(
-              //   padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-              //   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              //       maxCrossAxisExtent: 120,
-              //       mainAxisExtent: 220,
-              //       mainAxisSpacing: 10,
-              //       crossAxisSpacing: 10),
-              //   itemBuilder: (context, index) {
-              //     final product =
-              //         widget.store.productCategories[1].products[index];
-              //     return Column(
-              //       children: [
-              //         ProductGridTile(
-              //           product: product,
-              //           store: widget.store,
-              //         ),
-              //         if (product.promoPrice != null)
-              //           AppTextBadge(
-              //               text:
-              //                   '${(((product.initialPrice - product.promoPrice!) / product.initialPrice) * 100).toStringAsFixed(0)}% off')
-              //       ],
-              //     );
-              //   },
-              //   itemCount: widget.store.productCategories[1].products.length,
-              // )),
+              Expanded(
+                  child: GridView.builder(
+                padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 120,
+                    mainAxisExtent: 220,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10),
+                itemBuilder: (context, index) {
+                  return FutureBuilder(
+                      future: AppFunctions.loadProductReference(
+                          widget.productRefs[index] as DocumentReference),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Skeletonizer(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                width: 150,
+                                height: 150,
+                                color: Colors.amber,
+                              ),
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return AppText(
+                            text: snapshot.error.toString(),
+                          );
+                        }
+                        final product = snapshot.data!;
+                        return Column(
+                          children: [
+                            ProductGridTile(
+                              product: product,
+                              store: widget.store,
+                            ),
+                            if (product.promoPrice != null)
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(50)),
+                                padding: const EdgeInsets.all(5),
+                                child: AppText(
+                                    color: Colors.white,
+                                    text:
+                                        '${(((product.initialPrice - product.promoPrice!) / product.initialPrice) * 100).toStringAsFixed(0)}% off'),
+                              )
+                          ],
+                        );
+                      });
+                },
+                itemCount: widget.productRefs.length,
+              )),
             ],
           )),
+    );
+  }
+}
+
+class OfferText extends StatelessWidget {
+  const OfferText(
+      {super.key, required this.store, this.textColor = Colors.green});
+
+  final Store store;
+  final Color? textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppText(
+      text:
+          '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}',
+      color: Colors.green,
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 
 import '../../../app_functions.dart';
 import '../../../models/store/store_model.dart';
@@ -8,6 +10,7 @@ import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../home/home_screen.dart';
+import '../store/store_screen.dart';
 
 class GroceryGroceryScreen extends StatefulWidget {
   final List<Store> stores;
@@ -24,21 +27,16 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
-              const SliverAppBar(
+              const SliverAppBar.medium(
                 pinned: true,
                 floating: true,
-                expandedHeight: 80,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: EdgeInsets.symmetric(
-                      horizontal: AppSizes.horizontalPaddingSmall),
-                  // expandedTitleScale: 2,
-                  title: AppText(
-                    text: 'Grocery',
-                    weight: FontWeight.w600,
-                    size: AppSizes.bodySmall,
-                  ),
+                expandedHeight: 90,
+                title: AppText(
+                  text: 'Grocery',
+                  weight: FontWeight.w600,
+                  size: AppSizes.heading5,
                 ),
-              )
+              ),
             ];
           },
           body: ListView.builder(
@@ -51,12 +49,11 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                   (timeOfDayNow.hour >= groceryStore.closingTime.hour &&
                       timeOfDayNow.minute >= groceryStore.closingTime.minute);
               return ListTile(
-                  // onTap: () => navigatorKey.currentState!
-                  //         .pushReplacement(MaterialPageRoute(
-                  //       builder: (context) => StoreScreen(groceryStore),
-                  //     )),
+                  onTap: () => navigatorKey.currentState!
+                          .pushReplacement(MaterialPageRoute(
+                        builder: (context) => StoreScreen(groceryStore),
+                      )),
                   leading: Container(
-                    padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
                         border: Border.all(color: AppColors.neutral200)),
@@ -64,27 +61,22 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                       borderRadius: BorderRadius.circular(50),
                       child: CachedNetworkImage(
                         imageUrl: groceryStore.logo,
-                        width: 30,
-                        height: 30,
+                        width: 40,
+                        height: 40,
                         fit: BoxFit.fill,
                       ),
                     ),
                   ),
-                  title: AppText(text: groceryStore.name),
+                  title: AppText(
+                    text: groceryStore.name,
+                    size: AppSizes.bodySmall,
+                    weight: FontWeight.bold,
+                  ),
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSizes.horizontalPaddingSmall),
-                  trailing: InkWell(
-                    onTap: () {},
-                    child: Ink(
-                      child: Icon(
-                        favoriteStores.any(
-                          (element) => element.id == groceryStore.id,
-                        )
-                            ? Icons.favorite
-                            : Icons.favorite_outline,
-                        color: AppColors.neutral500,
-                      ),
-                    ),
+                  trailing: FavouriteButton(
+                    store: groceryStore,
+                    color: AppColors.neutral500,
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,10 +105,9 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                                   ' • ${groceryStore.delivery.estimatedDeliveryTime} min'),
                         ],
                       ),
-                      const AppText(
-                        text: 'Offers available',
-                        color: Colors.green,
-                      )
+                      if (groceryStore.offers != null &&
+                          groceryStore.offers!.isNotEmpty)
+                        OfferText(store: groceryStore)
                     ],
                   ));
             },

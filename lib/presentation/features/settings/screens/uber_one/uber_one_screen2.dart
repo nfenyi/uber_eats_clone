@@ -26,10 +26,12 @@ class UberOneScreen2 extends StatefulWidget {
 class _UberOneScreen2State extends State<UberOneScreen2> {
   final List<Offer> _offers = [
     Offer(
+        id: '456343432',
         product: products.entries.first.value,
         store: stores[2],
         title: "Buy 1 get 1 free"),
     Offer(
+        id: '764534',
         product: products.entries.first.value,
         store: stores[2],
         title: "Buy 1 get 1 free"),
@@ -146,25 +148,27 @@ class _UberOneScreen2State extends State<UberOneScreen2> {
                   final offer = _offers[index];
                   return Row(
                     children: [
-                      CachedNetworkImage(
-                        imageUrl: offer.product.imageUrls.first,
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                      ),
+                      // CachedNetworkImage(
+                      //   imageUrl: offer.product.imageUrls.first,
+                      //   width: 80,
+                      //   height: 80,
+                      //   fit: BoxFit.cover,
+                      // ),
+
                       const Gap(10),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            width: 250,
-                            child: AppText(
-                              text: offer.product.name,
-                              weight: FontWeight.bold,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                          // SizedBox(
+                          //   width: 250,
+                          //   child:
+                          //   AppText(
+                          //     text: offer.product.name,
+                          //     weight: FontWeight.bold,
+                          //     overflow: TextOverflow.ellipsis,
+                          //   ),
+                          // ),
                           Row(
                             children: [
                               Image.asset(

@@ -152,10 +152,14 @@ class FirestoreCollections {
   static String stores = 'stores';
   static String products = 'products';
   static String foodCategories = 'food categories';
+  static String groceryCategories = 'grocery categories';
   static String favoriteStores = 'favorite stores';
   static String adverts = 'adverts';
   static String groupOrders = 'group orders';
   static String promotions = 'promotions';
+  static String deals = 'deals';
+  static String browseVideos = 'browse videos';
+  static String featuredStores = 'featured stores';
 
   FirestoreCollections._();
 }

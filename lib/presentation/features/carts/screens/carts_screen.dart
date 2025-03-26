@@ -15,7 +15,7 @@ import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/orders_screen.dart';
-import 'package:uber_eats_clone/presentation/features/grocery_store/screens/grocery_store_screens.dart';
+import 'package:uber_eats_clone/presentation/features/grocery_store/screens/screens/grocery_store_main_screen.dart';
 import 'package:uber_eats_clone/presentation/features/group_order/group_order_screen.dart';
 import 'package:uber_eats_clone/presentation/features/promotion/promo_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';

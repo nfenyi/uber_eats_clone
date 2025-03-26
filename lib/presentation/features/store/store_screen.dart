@@ -36,8 +36,7 @@ import '../uber_one/join_uber_one_screen.dart';
 class StoreScreen extends StatefulWidget {
   final Store store;
 
-  final GeoPoint userLocation;
-  const StoreScreen(this.store, {super.key, required this.userLocation});
+  const StoreScreen(this.store, {super.key});
 
   @override
   State<StoreScreen> createState() => _StoreScreenState();
@@ -46,6 +45,7 @@ class StoreScreen extends StatefulWidget {
 class _StoreScreenState extends State<StoreScreen> {
   late final Store _store;
   late final List<GlobalKey> _categoryKeys;
+  late final _storeLatLng;
   // final _scrollController = ScrollController();
   // late final ScrollNotification _scrollNotification;
   late Distance _distance;
@@ -106,6 +106,7 @@ class _StoreScreenState extends State<StoreScreen> {
       statusBarColor: null,
     ));
     _store = widget.store;
+    _storeLatLng = _store.location.latlng as GeoPoint;
     if (_store.productCategories != null) {
       _categoryKeys = _store.productCategories!
           .map(
@@ -1282,7 +1283,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                           ),
                                         AppText(
                                             text:
-                                                ' • ${_distance.as(LengthUnit.Kilometer, LatLng(_store.location.latlng.latitude, _store.location.latlng.longitude), LatLng(widget.userLocation.latitude, widget.userLocation.longitude))} km '),
+                                                ' • ${_distance.as(LengthUnit.Kilometer, LatLng(_storeLatLng.latitude, _storeLatLng.longitude), LatLng(storedUserLocation!.latitude, storedUserLocation!.longitude))} km '),
                                         const Icon(Icons.keyboard_arrow_right)
                                       ],
                                     ),

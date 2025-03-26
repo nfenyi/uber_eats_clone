@@ -109,7 +109,7 @@ _$StoreLocationImpl _$$StoreLocationImplFromJson(Map<String, dynamic> json) =>
     _$StoreLocationImpl(
       countryOfOrigin: json['countryOfOrigin'] as String,
       streetAddress: json['streetAddress'] as String,
-      latlng: json['latlng'],
+      latlng: json['latlng'] as Object,
     );
 
 Map<String, dynamic> _$$StoreLocationImplToJson(_$StoreLocationImpl instance) =>
@@ -175,7 +175,9 @@ _$ProductImpl _$$ProductImplFromJson(Map<String, dynamic> json) =>
       calories: (json['calories'] as num?)?.toDouble(),
       isSoldOut: json['isSoldOut'] as bool?,
       isSponsored: json['isSponsored'] as bool?,
-      noInStock: (json['noInStock'] as num?)?.toInt(),
+      offer: json['offer'],
+      stores:
+          (json['stores'] as List<dynamic>?)?.map((e) => e as Object).toList(),
       similarProducts: (json['similarProducts'] as List<dynamic>?)
           ?.map((e) => Product.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -199,7 +201,8 @@ Map<String, dynamic> _$$ProductImplToJson(_$ProductImpl instance) =>
       'calories': instance.calories,
       'isSoldOut': instance.isSoldOut,
       'isSponsored': instance.isSponsored,
-      'noInStock': instance.noInStock,
+      'offer': instance.offer,
+      'stores': instance.stores,
       'similarProducts':
           instance.similarProducts?.map((e) => e.toJson()).toList(),
     };

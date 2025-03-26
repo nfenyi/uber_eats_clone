@@ -71,8 +71,8 @@ class StoreLocation with _$StoreLocation {
   factory StoreLocation({
     required String countryOfOrigin,
     required String streetAddress,
-    @GeoPointConverter() required GeoPoint latlng,
-    // required GeoPoint latlng,
+    // @GeoPointConverter() required GeoPoint latlng,
+    required Object latlng,
   }) = _StoreLocation;
 
   factory StoreLocation.fromJson(Map<String, Object?> json) =>
@@ -136,7 +136,8 @@ class Product with _$Product {
     double? calories,
     bool? isSoldOut,
     bool? isSponsored,
-    int? noInStock,
+    Object? offer,
+    List<Object>? stores,
     List<Product>? similarProducts,
   }) = _Product;
 

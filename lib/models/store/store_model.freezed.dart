@@ -1259,9 +1259,9 @@ StoreLocation _$StoreLocationFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$StoreLocation {
   String get countryOfOrigin => throw _privateConstructorUsedError;
-  String get streetAddress => throw _privateConstructorUsedError;
-  @GeoPointConverter()
-  GeoPoint get latlng => throw _privateConstructorUsedError;
+  String get streetAddress =>
+      throw _privateConstructorUsedError; // @GeoPointConverter() required GeoPoint latlng,
+  Object get latlng => throw _privateConstructorUsedError;
 
   /// Serializes this StoreLocation to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1279,10 +1279,7 @@ abstract class $StoreLocationCopyWith<$Res> {
           StoreLocation value, $Res Function(StoreLocation) then) =
       _$StoreLocationCopyWithImpl<$Res, StoreLocation>;
   @useResult
-  $Res call(
-      {String countryOfOrigin,
-      String streetAddress,
-      @GeoPointConverter() GeoPoint latlng});
+  $Res call({String countryOfOrigin, String streetAddress, Object latlng});
 }
 
 /// @nodoc
@@ -1313,10 +1310,7 @@ class _$StoreLocationCopyWithImpl<$Res, $Val extends StoreLocation>
           ? _value.streetAddress
           : streetAddress // ignore: cast_nullable_to_non_nullable
               as String,
-      latlng: null == latlng
-          ? _value.latlng
-          : latlng // ignore: cast_nullable_to_non_nullable
-              as GeoPoint,
+      latlng: null == latlng ? _value.latlng : latlng,
     ) as $Val);
   }
 }
@@ -1329,10 +1323,7 @@ abstract class _$$StoreLocationImplCopyWith<$Res>
       __$$StoreLocationImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String countryOfOrigin,
-      String streetAddress,
-      @GeoPointConverter() GeoPoint latlng});
+  $Res call({String countryOfOrigin, String streetAddress, Object latlng});
 }
 
 /// @nodoc
@@ -1361,10 +1352,7 @@ class __$$StoreLocationImplCopyWithImpl<$Res>
           ? _value.streetAddress
           : streetAddress // ignore: cast_nullable_to_non_nullable
               as String,
-      latlng: null == latlng
-          ? _value.latlng
-          : latlng // ignore: cast_nullable_to_non_nullable
-              as GeoPoint,
+      latlng: null == latlng ? _value.latlng : latlng,
     ));
   }
 }
@@ -1377,7 +1365,7 @@ class _$StoreLocationImpl
   _$StoreLocationImpl(
       {required this.countryOfOrigin,
       required this.streetAddress,
-      @GeoPointConverter() required this.latlng});
+      required this.latlng});
 
   factory _$StoreLocationImpl.fromJson(Map<String, dynamic> json) =>
       _$$StoreLocationImplFromJson(json);
@@ -1386,9 +1374,9 @@ class _$StoreLocationImpl
   final String countryOfOrigin;
   @override
   final String streetAddress;
+// @GeoPointConverter() required GeoPoint latlng,
   @override
-  @GeoPointConverter()
-  final GeoPoint latlng;
+  final Object latlng;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -1414,13 +1402,13 @@ class _$StoreLocationImpl
                 other.countryOfOrigin == countryOfOrigin) &&
             (identical(other.streetAddress, streetAddress) ||
                 other.streetAddress == streetAddress) &&
-            (identical(other.latlng, latlng) || other.latlng == latlng));
+            const DeepCollectionEquality().equals(other.latlng, latlng));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, countryOfOrigin, streetAddress, latlng);
+  int get hashCode => Object.hash(runtimeType, countryOfOrigin, streetAddress,
+      const DeepCollectionEquality().hash(latlng));
 
   /// Create a copy of StoreLocation
   /// with the given fields replaced by the non-null parameter values.
@@ -1440,10 +1428,9 @@ class _$StoreLocationImpl
 
 abstract class _StoreLocation implements StoreLocation {
   factory _StoreLocation(
-          {required final String countryOfOrigin,
-          required final String streetAddress,
-          @GeoPointConverter() required final GeoPoint latlng}) =
-      _$StoreLocationImpl;
+      {required final String countryOfOrigin,
+      required final String streetAddress,
+      required final Object latlng}) = _$StoreLocationImpl;
 
   factory _StoreLocation.fromJson(Map<String, dynamic> json) =
       _$StoreLocationImpl.fromJson;
@@ -1451,10 +1438,9 @@ abstract class _StoreLocation implements StoreLocation {
   @override
   String get countryOfOrigin;
   @override
-  String get streetAddress;
+  String get streetAddress; // @GeoPointConverter() required GeoPoint latlng,
   @override
-  @GeoPointConverter()
-  GeoPoint get latlng;
+  Object get latlng;
 
   /// Create a copy of StoreLocation
   /// with the given fields replaced by the non-null parameter values.
@@ -1879,7 +1865,8 @@ mixin _$Product {
   double? get calories => throw _privateConstructorUsedError;
   bool? get isSoldOut => throw _privateConstructorUsedError;
   bool? get isSponsored => throw _privateConstructorUsedError;
-  int? get noInStock => throw _privateConstructorUsedError;
+  Object? get offer => throw _privateConstructorUsedError;
+  List<Object>? get stores => throw _privateConstructorUsedError;
   List<Product>? get similarProducts => throw _privateConstructorUsedError;
 
   /// Serializes this Product to a JSON map.
@@ -1913,7 +1900,8 @@ abstract class $ProductCopyWith<$Res> {
       double? calories,
       bool? isSoldOut,
       bool? isSponsored,
-      int? noInStock,
+      Object? offer,
+      List<Object>? stores,
       List<Product>? similarProducts});
 }
 
@@ -1948,7 +1936,8 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
     Object? calories = freezed,
     Object? isSoldOut = freezed,
     Object? isSponsored = freezed,
-    Object? noInStock = freezed,
+    Object? offer = freezed,
+    Object? stores = freezed,
     Object? similarProducts = freezed,
   }) {
     return _then(_value.copyWith(
@@ -2016,10 +2005,11 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
           ? _value.isSponsored
           : isSponsored // ignore: cast_nullable_to_non_nullable
               as bool?,
-      noInStock: freezed == noInStock
-          ? _value.noInStock
-          : noInStock // ignore: cast_nullable_to_non_nullable
-              as int?,
+      offer: freezed == offer ? _value.offer : offer,
+      stores: freezed == stores
+          ? _value.stores
+          : stores // ignore: cast_nullable_to_non_nullable
+              as List<Object>?,
       similarProducts: freezed == similarProducts
           ? _value.similarProducts
           : similarProducts // ignore: cast_nullable_to_non_nullable
@@ -2052,7 +2042,8 @@ abstract class _$$ProductImplCopyWith<$Res> implements $ProductCopyWith<$Res> {
       double? calories,
       bool? isSoldOut,
       bool? isSponsored,
-      int? noInStock,
+      Object? offer,
+      List<Object>? stores,
       List<Product>? similarProducts});
 }
 
@@ -2085,7 +2076,8 @@ class __$$ProductImplCopyWithImpl<$Res>
     Object? calories = freezed,
     Object? isSoldOut = freezed,
     Object? isSponsored = freezed,
-    Object? noInStock = freezed,
+    Object? offer = freezed,
+    Object? stores = freezed,
     Object? similarProducts = freezed,
   }) {
     return _then(_$ProductImpl(
@@ -2153,10 +2145,11 @@ class __$$ProductImplCopyWithImpl<$Res>
           ? _value.isSponsored
           : isSponsored // ignore: cast_nullable_to_non_nullable
               as bool?,
-      noInStock: freezed == noInStock
-          ? _value.noInStock
-          : noInStock // ignore: cast_nullable_to_non_nullable
-              as int?,
+      offer: freezed == offer ? _value.offer : offer,
+      stores: freezed == stores
+          ? _value._stores
+          : stores // ignore: cast_nullable_to_non_nullable
+              as List<Object>?,
       similarProducts: freezed == similarProducts
           ? _value._similarProducts
           : similarProducts // ignore: cast_nullable_to_non_nullable
@@ -2185,12 +2178,14 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
       this.calories,
       this.isSoldOut,
       this.isSponsored,
-      this.noInStock,
+      this.offer,
+      final List<Object>? stores,
       final List<Product>? similarProducts})
       : _imageUrls = imageUrls,
         _frequentlyBoughtTogether = frequentlyBoughtTogether,
         _nutritionFacts = nutritionFacts,
         _options = options,
+        _stores = stores,
         _similarProducts = similarProducts;
 
   factory _$ProductImpl.fromJson(Map<String, dynamic> json) =>
@@ -2261,7 +2256,17 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
   @override
   final bool? isSponsored;
   @override
-  final int? noInStock;
+  final Object? offer;
+  final List<Object>? _stores;
+  @override
+  List<Object>? get stores {
+    final value = _stores;
+    if (value == null) return null;
+    if (_stores is EqualUnmodifiableListView) return _stores;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   final List<Product>? _similarProducts;
   @override
   List<Product>? get similarProducts {
@@ -2274,7 +2279,7 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Product(name: $name, id: $id, initialPrice: $initialPrice, promoPrice: $promoPrice, imageUrls: $imageUrls, frequentlyBoughtTogether: $frequentlyBoughtTogether, nutritionFacts: $nutritionFacts, ingredients: $ingredients, directions: $directions, quantity: $quantity, description: $description, options: $options, selectOptionRequired: $selectOptionRequired, calories: $calories, isSoldOut: $isSoldOut, isSponsored: $isSponsored, noInStock: $noInStock, similarProducts: $similarProducts)';
+    return 'Product(name: $name, id: $id, initialPrice: $initialPrice, promoPrice: $promoPrice, imageUrls: $imageUrls, frequentlyBoughtTogether: $frequentlyBoughtTogether, nutritionFacts: $nutritionFacts, ingredients: $ingredients, directions: $directions, quantity: $quantity, description: $description, options: $options, selectOptionRequired: $selectOptionRequired, calories: $calories, isSoldOut: $isSoldOut, isSponsored: $isSponsored, offer: $offer, stores: $stores, similarProducts: $similarProducts)';
   }
 
   @override
@@ -2299,7 +2304,8 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
       ..add(DiagnosticsProperty('calories', calories))
       ..add(DiagnosticsProperty('isSoldOut', isSoldOut))
       ..add(DiagnosticsProperty('isSponsored', isSponsored))
-      ..add(DiagnosticsProperty('noInStock', noInStock))
+      ..add(DiagnosticsProperty('offer', offer))
+      ..add(DiagnosticsProperty('stores', stores))
       ..add(DiagnosticsProperty('similarProducts', similarProducts));
   }
 
@@ -2337,34 +2343,36 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
                 other.isSoldOut == isSoldOut) &&
             (identical(other.isSponsored, isSponsored) ||
                 other.isSponsored == isSponsored) &&
-            (identical(other.noInStock, noInStock) ||
-                other.noInStock == noInStock) &&
+            const DeepCollectionEquality().equals(other.offer, offer) &&
+            const DeepCollectionEquality().equals(other._stores, _stores) &&
             const DeepCollectionEquality()
                 .equals(other._similarProducts, _similarProducts));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      id,
-      initialPrice,
-      promoPrice,
-      const DeepCollectionEquality().hash(_imageUrls),
-      const DeepCollectionEquality().hash(_frequentlyBoughtTogether),
-      const DeepCollectionEquality().hash(_nutritionFacts),
-      ingredients,
-      directions,
-      quantity,
-      description,
-      const DeepCollectionEquality().hash(_options),
-      selectOptionRequired,
-      calories,
-      isSoldOut,
-      isSponsored,
-      noInStock,
-      const DeepCollectionEquality().hash(_similarProducts));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        name,
+        id,
+        initialPrice,
+        promoPrice,
+        const DeepCollectionEquality().hash(_imageUrls),
+        const DeepCollectionEquality().hash(_frequentlyBoughtTogether),
+        const DeepCollectionEquality().hash(_nutritionFacts),
+        ingredients,
+        directions,
+        quantity,
+        description,
+        const DeepCollectionEquality().hash(_options),
+        selectOptionRequired,
+        calories,
+        isSoldOut,
+        isSponsored,
+        const DeepCollectionEquality().hash(offer),
+        const DeepCollectionEquality().hash(_stores),
+        const DeepCollectionEquality().hash(_similarProducts)
+      ]);
 
   /// Create a copy of Product
   /// with the given fields replaced by the non-null parameter values.
@@ -2400,7 +2408,8 @@ abstract class _Product implements Product {
       final double? calories,
       final bool? isSoldOut,
       final bool? isSponsored,
-      final int? noInStock,
+      final Object? offer,
+      final List<Object>? stores,
       final List<Product>? similarProducts}) = _$ProductImpl;
 
   factory _Product.fromJson(Map<String, dynamic> json) = _$ProductImpl.fromJson;
@@ -2438,7 +2447,9 @@ abstract class _Product implements Product {
   @override
   bool? get isSponsored;
   @override
-  int? get noInStock;
+  Object? get offer;
+  @override
+  List<Object>? get stores;
   @override
   List<Product>? get similarProducts;
 

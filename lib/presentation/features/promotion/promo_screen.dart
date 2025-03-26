@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../main.dart';
 import '../../../models/promotion/promotion_model.dart';
@@ -543,142 +545,159 @@ class _PromoScreenState extends State<PromoScreen> {
                             //TODO: Switch to autoplay carousel with short duration
                             SizedBox(
                               height: 142,
-                              child: ListView(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal:
-                                        AppSizes.horizontalPaddingSmall),
-                                scrollDirection: Axis.horizontal,
-                                children: [
-                                  Container(
-                                      width: Adaptive.w(80),
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        color: Colors.brown,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 2,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(15.0),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        AppText(
-                                                          color: Colors.white,
-                                                          text:
-                                                              '\$0 Delivery Fee + up to 10% off with Uber One',
-                                                        ),
-                                                        Gap(10),
-                                                        AppText(
-                                                          color: Colors.white,
-                                                          text:
-                                                              'Save on your next ride',
-                                                        ),
-                                                      ]),
-                                                  AppButton2(
-                                                      text:
-                                                          'Try free for 4 weeks',
-                                                      callback: () {
-                                                        navigatorKey
-                                                            .currentState!
-                                                            .push(
-                                                                MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const JoinUberOneScreen(),
-                                                        ));
-                                                      }),
-                                                ],
+                              child: CarouselSlider(
+                                options: CarouselOptions(
+                                    autoPlay: true,
+
+                                    // padEnds: true,
+                                    height: 150,
+                                    enableInfiniteScroll: false,
+                                    scrollDirection: Axis.horizontal),
+                                items: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Container(
+                                        width: Adaptive.w(80),
+                                        // height: 150,
+                                        decoration: BoxDecoration(
+                                          color: Colors.brown,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(15.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          AppText(
+                                                            color: Colors.white,
+                                                            text:
+                                                                '\$0 Delivery Fee + up to 10% off with Uber One',
+                                                          ),
+                                                          Gap(10),
+                                                          AppText(
+                                                            color: Colors.white,
+                                                            text:
+                                                                'Save on your next ride',
+                                                          ),
+                                                        ]),
+                                                    AppButton2(
+                                                        text:
+                                                            'Try free for 4 weeks',
+                                                        callback: () {
+                                                          navigatorKey
+                                                              .currentState!
+                                                              .push(
+                                                                  MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const JoinUberOneScreen(),
+                                                          ));
+                                                        }),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Expanded(
-                                              flex: 1,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    const BorderRadius.only(
-                                                        topRight:
-                                                            Radius.circular(10),
-                                                        bottomRight:
-                                                            Radius.circular(
-                                                                10)),
-                                                child: Image.asset(
-                                                  height: double.infinity,
-                                                  AssetNames.hamburger,
-                                                  fit: BoxFit.cover,
+                                            Expanded(
+                                                flex: 1,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  10),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  10)),
+                                                  child: Image.asset(
+                                                    height: double.infinity,
+                                                    AssetNames.hamburger,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ))
+                                          ],
+                                        )),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Container(
+                                        width: Adaptive.w(80),
+                                        // height: 150,
+                                        decoration: BoxDecoration(
+                                          color: Colors.black45,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(15.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          AppText(
+                                                            color: Colors.white,
+                                                            text:
+                                                                '\$0 Delivery Fee + up to 10% off with Uber One',
+                                                          ),
+                                                        ]),
+                                                    AppButton2(
+                                                        text: 'Request ride',
+                                                        callback: () async {
+                                                          await launchUrl(Uri.parse(
+                                                              'https://play.google.com/store/apps/details?id=com.ubercab'));
+                                                        }),
+                                                  ],
                                                 ),
-                                              ))
-                                        ],
-                                      )),
-                                  const Gap(10),
-                                  Container(
-                                      width: Adaptive.w(80),
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        color: Colors.black45,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 2,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(15.0),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        AppText(
-                                                          color: Colors.white,
-                                                          text:
-                                                              '\$0 Delivery Fee + up to 10% off with Uber One',
-                                                        ),
-                                                      ]),
-                                                  AppButton2(
-                                                      text: 'Request ride',
-                                                      callback: () {}),
-                                                ],
                                               ),
                                             ),
-                                          ),
-                                          Expanded(
-                                              flex: 1,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    const BorderRadius.only(
-                                                        topRight:
-                                                            Radius.circular(10),
-                                                        bottomRight:
-                                                            Radius.circular(
-                                                                10)),
-                                                child: Image.asset(
-                                                  height: double.infinity,
-                                                  AssetNames.whiteCar,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ))
-                                        ],
-                                      )),
+                                            Expanded(
+                                                flex: 1,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  10),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  10)),
+                                                  child: Image.asset(
+                                                    height: double.infinity,
+                                                    AssetNames.whiteCar,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ))
+                                          ],
+                                        )),
+                                  ),
                                 ],
                               ),
                             ),

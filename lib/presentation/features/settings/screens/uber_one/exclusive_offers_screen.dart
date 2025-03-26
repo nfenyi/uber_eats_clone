@@ -19,10 +19,12 @@ class ExclusiveOffersScreen extends StatefulWidget {
 class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
   final List<Offer> _offers = [
     Offer(
+        id: '456465',
         product: products.entries.first.value,
         store: stores[2],
         title: "Buy 1 get 1 free"),
     Offer(
+        id: '4453543',
         product: products.entries.first.value,
         store: stores[2],
         title: "Buy 1 get 1 free"),

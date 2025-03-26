@@ -19,12 +19,11 @@ import '../home_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   final List<Store> stores;
-  final GeoPoint userLocation;
+
   // final List<Product> products;
   const SearchScreen({
     super.key,
     required this.stores,
-    required this.userLocation,
 
     // required this.products
   });
@@ -501,10 +500,9 @@ class _SearchScreenState extends State<SearchScreen>
                               _searchStoresWithOtherListTile,
                           foodCategories: _foodCategories)
                       : _stores.isEmpty
-                          ? NoSearchResult(_tabController)
+                          ? NoSearchResult(tabController: _tabController)
                           //all stores
                           : AllStoresResultDisplay(
-                              storedUserLocation: widget.userLocation,
                               timeOfDayNow: timeOfDayNow,
                               storesWithNameOrProduct: _stores),
                   _searchController.text.isEmpty
@@ -513,10 +511,9 @@ class _SearchScreenState extends State<SearchScreen>
                           searchHistory: _searchHistory,
                           topSearches: _topSearches)
                       : _restaurantsWithProduct.isEmpty && _restaurants.isEmpty
-                          ? NoSearchResult(_tabController)
+                          ? NoSearchResult(tabController: _tabController)
                           //restaurants
                           : SearchResultDisplay(
-                              storedUserLocation: widget.userLocation,
                               query: _searchController.text,
                               showProducts: _restaurantsWithProduct.isNotEmpty,
                               storesWithProduct: _restaurantsWithProduct.isEmpty
@@ -529,10 +526,9 @@ class _SearchScreenState extends State<SearchScreen>
                           topSearches: _topSearches)
                       : _groceryStoresWithProduct.isEmpty &&
                               _groceryStores.isEmpty
-                          ? NoSearchResult(_tabController)
+                          ? NoSearchResult(tabController: _tabController)
                           //groceries
                           : SearchResultDisplay(
-                              storedUserLocation: widget.userLocation,
                               showProducts:
                                   _groceryStoresWithProduct.isNotEmpty,
                               query: _searchController.text,
@@ -547,10 +543,9 @@ class _SearchScreenState extends State<SearchScreen>
                           topSearches: _topSearches)
                       : _alcoholStoresWithProduct.isEmpty &&
                               _alcoholStores.isEmpty
-                          ? NoSearchResult(_tabController)
+                          ? NoSearchResult(tabController: _tabController)
                           //alcohol
                           : SearchResultDisplay(
-                              storedUserLocation: widget.userLocation,
                               showProducts:
                                   _alcoholStoresWithProduct.isNotEmpty,
                               query: _searchController.text,

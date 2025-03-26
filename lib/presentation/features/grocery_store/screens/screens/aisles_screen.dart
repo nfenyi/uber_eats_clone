@@ -4,19 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/features/grocery_store/screens/screens/grocery_shop_search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery_store/state/grocery_store_bottom_nav_index_provider.dart';
 
-import '../../../../models/store/store_model.dart';
-import '../../../constants/app_sizes.dart';
-import '../../../constants/asset_names.dart';
-import '../../../core/app_colors.dart';
-import '../../../core/widgets.dart';
-import '../../product/product_screen.dart';
-import 'grocery_shop_search_screen.dart';
+import '../../../../../models/store/store_model.dart';
+import '../../../../constants/app_sizes.dart';
+import '../../../../core/app_colors.dart';
+import '../../../../core/widgets.dart';
+import '../../../address/screens/addresses_screen.dart';
+import '../../../product/product_screen.dart';
+import '../../../uber_one/join_uber_one_screen.dart';
 
 class AislesScreen extends ConsumerStatefulWidget {
   final Store groceryStore;
@@ -27,7 +30,7 @@ class AislesScreen extends ConsumerStatefulWidget {
 }
 
 class _AislesScreenState extends ConsumerState<AislesScreen> {
-  bool _showAisleScreen = false;
+  bool _showProdcuctCat = false;
   List<GlobalKey> _categoryKeys = [];
   final _scrollController = ScrollController();
   late Aisle _aisle;
@@ -70,7 +73,7 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: _showAisleScreen
+        child: _showProdcuctCat
             ? DefaultTabController(
                 length: _aisle.productCategories.length,
                 child: NestedScrollView(
@@ -78,144 +81,141 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                     // controller: _scrollController,
                     slivers: [
                       const SliverGap(10),
-                      // SliverList(
-                      //     delegate: SliverChildListDelegate([
-                      //   SizedBox(
-                      //     height: 145,
-                      //     child: ListView(
-                      //       padding: const EdgeInsets.symmetric(
-                      //           horizontal: AppSizes.horizontalPaddingSmall),
-                      //       scrollDirection: Axis.horizontal,
-                      //       children: [
-                      //         Container(
-                      //             width: Adaptive.w(80),
-                      //             height: 150,
-                      //             decoration: BoxDecoration(
-                      //               color: Colors.brown,
-                      //               borderRadius: BorderRadius.circular(10),
-                      //             ),
-                      //             child: Row(
-                      //               children: [
-                      //                 Expanded(
-                      //                   flex: 2,
-                      //                   child: Padding(
-                      //                     padding: const EdgeInsets.all(15.0),
-                      //                     child: Column(
-                      //                       mainAxisAlignment:
-                      //                           MainAxisAlignment.spaceBetween,
-                      //                       crossAxisAlignment:
-                      //                           CrossAxisAlignment.start,
-                      //                       children: [
-                      //                         const Column(
-                      //                             crossAxisAlignment:
-                      //                                 CrossAxisAlignment.start,
-                      //                             children: [
-                      //                               AppText(
-                      //                                 color: Colors.white,
-                      //                                 text:
-                      //                                     '\$0 Delivery Fee + up to 10% off with Uber One',
-                      //                               ),
-                      //                               Gap(10),
-                      //                               AppText(
-                      //                                 color: Colors.white,
-                      //                                 text:
-                      //                                     'Save on your next ride',
-                      //                               ),
-                      //                             ]),
-                      //                         AppButton2(
-                      //                             text: 'Try free for 4 weeks',
-                      //                             callback: () {
-                      // navigatorKey
-                      //     .currentState!
-                      //     .push(
-                      //         MaterialPageRoute(
-                      //   builder:
-                      //       (context) =>
-                      //           const JoinUberOneScreen(),
-                      // ));
-                      // }),
-                      //                       ],
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //                 Expanded(
-                      //                     flex: 1,
-                      //                     child: ClipRRect(
-                      //                       borderRadius:
-                      //                           const BorderRadius.only(
-                      //                               topRight:
-                      //                                   Radius.circular(10),
-                      //                               bottomRight:
-                      //                                   Radius.circular(10)),
-                      //                       child: Image.asset(
-                      //                         height: double.infinity,
-                      //                         AssetNames.hamburger,
-                      //                         fit: BoxFit.cover,
-                      //                       ),
-                      //                     ))
-                      //               ],
-                      //             )),
-                      //         const Gap(10),
-                      //         Container(
-                      //             width: Adaptive.w(80),
-                      //             height: 100,
-                      //             decoration: BoxDecoration(
-                      //               color: const Color.fromARGB(
-                      //                   255, 201, 176, 102),
-                      //               borderRadius: BorderRadius.circular(10),
-                      //             ),
-                      //             child: Row(
-                      //               children: [
-                      //                 const Expanded(
-                      //                   flex: 2,
-                      //                   child: Padding(
-                      //                     padding: EdgeInsets.all(15.0),
-                      //                     child: Column(
-                      //                       mainAxisAlignment:
-                      //                           MainAxisAlignment.spaceBetween,
-                      //                       crossAxisAlignment:
-                      //                           CrossAxisAlignment.start,
-                      //                       children: [
-                      //                         Column(
-                      //                             crossAxisAlignment:
-                      //                                 CrossAxisAlignment.start,
-                      //                             children: [
-                      //                               AppText(
-                      //                                 text:
-                      //                                     'Save 20% when you order \$25 or more',
-                      //                               ),
-                      //                               Gap(10),
-                      //                               AppText(
-                      //                                 text:
-                      //                                     'Use by May 31, 2025 11 PM',
-                      //                               ),
-                      //                             ]),
-                      //                       ],
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //                 Expanded(
-                      //                     flex: 1,
-                      //                     child: ClipRRect(
-                      //                       borderRadius:
-                      //                           const BorderRadius.only(
-                      //                               topRight:
-                      //                                   Radius.circular(10),
-                      //                               bottomRight:
-                      //                                   Radius.circular(10)),
-                      //                       child: Image.asset(
-                      //                         height: double.infinity,
-                      //                         AssetNames.greenTag,
-                      //                         fit: BoxFit.cover,
-                      //                       ),
-                      //                     ))
-                      //               ],
-                      //             )),
-                      //       ],
-                      //     ),
-                      //   ),
-                      //   const Gap(10),
-                      // ])),
+                      SliverList(
+                          delegate: SliverChildListDelegate([
+                        SizedBox(
+                          height: 145,
+                          child: ListView(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AppSizes.horizontalPaddingSmall),
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              Container(
+                                  width: Adaptive.w(80),
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    color: Colors.brown,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(15.0),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    AppText(
+                                                      color: Colors.white,
+                                                      text:
+                                                          '\$0 Delivery Fee + up to 10% off with Uber One',
+                                                    ),
+                                                    Gap(10),
+                                                    AppText(
+                                                      color: Colors.white,
+                                                      text:
+                                                          'Save on your next ride',
+                                                    ),
+                                                  ]),
+                                              AppButton2(
+                                                  text: 'Try free for 4 weeks',
+                                                  callback: () {
+                                                    navigatorKey.currentState!
+                                                        .push(MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const JoinUberOneScreen(),
+                                                    ));
+                                                  }),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                          flex: 1,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(10),
+                                                    bottomRight:
+                                                        Radius.circular(10)),
+                                            child: Image.asset(
+                                              height: double.infinity,
+                                              AssetNames.hamburger,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ))
+                                    ],
+                                  )),
+                              const Gap(10),
+                              Container(
+                                  width: Adaptive.w(80),
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(
+                                        255, 201, 176, 102),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Expanded(
+                                        flex: 2,
+                                        child: Padding(
+                                          padding: EdgeInsets.all(15.0),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    AppText(
+                                                      text:
+                                                          'Save 20% when you order \$25 or more',
+                                                    ),
+                                                    Gap(10),
+                                                    AppText(
+                                                      text:
+                                                          'Use by May 31, 2025 11 PM',
+                                                    ),
+                                                  ]),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                          flex: 1,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(10),
+                                                    bottomRight:
+                                                        Radius.circular(10)),
+                                            child: Image.asset(
+                                              height: double.infinity,
+                                              AssetNames.greenTag,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ))
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ),
+                        const Gap(10),
+                      ])),
                       (_aisle.productCategories.isNotEmpty)
                           ? SliverList.separated(
                               separatorBuilder: (context, index) =>
@@ -452,20 +452,19 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                   ),
                   headerSliverBuilder: (context, innerBoxIsScrolled) => [
                     SliverAppBar(
-                      collapsedHeight: 50,
-                      pinned: true, toolbarHeight: 50,
+                      pinned: true,
                       snap: true,
                       floating: true,
                       title: InkWell(
-                        // onTap: () =>
-                        //     navigatorKey.currentState!.push(MaterialPageRoute(
-                        //   builder: (context) => GroceryShopSearchScreen(
-                        //     store: widget.groceryStore,
-                        //   ),
-                        // )),
                         child: Ink(
                           child: AppTextFormField(
-                            enabled: false,
+                            readOnly: true,
+                            onTap: () => navigatorKey.currentState!
+                                .push(MaterialPageRoute(
+                              builder: (context) => GroceryShopSearchScreen(
+                                store: widget.groceryStore,
+                              ),
+                            )),
                             hintText: 'Search ${widget.groceryStore.name}',
                             radius: 50,
                             prefixIcon: const Padding(
@@ -475,11 +474,12 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                           ),
                         ),
                       ),
+
                       automaticallyImplyLeading: false,
                       leading: InkWell(
                         onTap: () {
                           setState(() {
-                            _showAisleScreen = false;
+                            _showProdcuctCat = false;
                           });
                         },
                         child: Ink(
@@ -512,92 +512,103 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                     ),
                   ],
                 ))
-            : Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: AppSizes.horizontalPaddingSmall),
-                child: Column(
-                  children: [
-                    AppBar(
-                      leading: GestureDetector(
-                          onTap: () => ref
-                              .read(groceryStoreBottomNavIndexProvider.notifier)
-                              .updateIndex(0),
-                          child: const Icon(
-                            FontAwesomeIcons.arrowLeft,
-                            size: 20,
-                          )),
-                      title: InkWell(
-                        // onTap: () =>
-                        //     navigatorKey.currentState!.push(MaterialPageRoute(
-                        //   builder: (context) => GroceryShopSearchScreen(
-                        //     store: widget.groceryStore,
-                        //   ),
-                        // )),
-                        child: Ink(
-                          child: AppTextFormField(
-                            enabled: false,
-                            hintText: 'Search ${widget.groceryStore.name}',
-                            radius: 50,
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.only(left: 8.0),
-                              child: Icon(Icons.search),
-                            ),
-                          ),
+            : Column(
+                children: [
+                  AppBar(
+                    title: AppTextFormField(
+                      onTap: () =>
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => GroceryShopSearchScreen(
+                          store: widget.groceryStore,
                         ),
-                      ),
+                      )),
+                      readOnly: true,
+                      hintText: 'Search ${widget.groceryStore.name}',
+                      radius: 50,
+                      constraintWidth: 40,
+                      prefixIcon: const Icon(Icons.search),
                     ),
-                    const Gap(20),
-                    // Expanded(
-                    //   child: ListView.separated(
-                    //       padding: EdgeInsets.zero,
-                    //       itemBuilder: (context, index) {
-                    //         final aisle = widget.groceryStore.aisles![index];
-                    //         return ListTile(
-                    //           onTap: () {
-                    //             _aisle = aisle;
-                    //             _categoryKeys = List.generate(
-                    //               _aisle.productCategories.length,
-                    //               (index) => GlobalKey(),
-                    //             );
-                    //             setState(() {
-                    //               _showAisleScreen = true;
-                    //             });
-                    //           },
-                    //           leading: CachedNetworkImage(
-                    //               width: 50,
-                    //               height: 100,
-                    //               errorWidget: (context, url, error) =>
-                    //                   Image.asset(
-                    //                     AssetNames.aisleImage,
-                    //                     height: 100,
-                    //                     width: 50,
-                    //                   ),
-                    //               fit: BoxFit.cover,
-                    //               placeholder: (context, url) => Image.asset(
-                    //                     AssetNames.aisleImage,
-                    //                     height: 100,
-                    //                     width: 50,
-                    //                   ),
-                    //               imageUrl: aisle.productCategories.isEmpty
-                    //                   ? 'njanokjns'
-                    //                   : aisle.productCategories.first.products
-                    //                       .first.imageUrls.first),
-                    //           title: AppText(
-                    //             text: aisle.name,
-                    //             color: Colors.black,
-                    //           ),
-                    //         );
-                    //       },
-                    //       separatorBuilder: (context, index) {
-                    //         return const Divider(
-                    //           indent: 80,
-                    //         );
-                    //       },
-                    //       itemCount:
-                    //           widget.groceryStore.productCategories.length),
-                    // )
-                  ],
-                ),
+                  ),
+                  const Gap(20),
+                  Expanded(
+                    child: ListView.separated(
+                        itemBuilder: (context, index) {
+                          final aisle = widget.groceryStore.aisles![index];
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 5,
+                                horizontal: AppSizes.horizontalPaddingSmall),
+                            onTap: () {
+                              _aisle = aisle;
+                              _categoryKeys = List.generate(
+                                _aisle.productCategories.length,
+                                (index) => GlobalKey(),
+                              );
+                              setState(() {
+                                _showProdcuctCat = true;
+                              });
+                            },
+                            leading: Builder(builder: (context) {
+                              final firstProductCats = aisle.productCategories;
+                              if (firstProductCats.isEmpty) {
+                                return Image.asset(
+                                  AssetNames.aisleImage,
+                                  width: 50,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                );
+                              } else {
+                                final firstProduct = firstProductCats.first
+                                    .productsAndQuantities.first['product'];
+
+                                return FutureBuilder(
+                                    future: AppFunctions.loadProductReference(
+                                        firstProduct),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Image.asset(
+                                          AssetNames.aisleImage,
+                                          width: 50,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        return SizedBox(
+                                          width: 50,
+                                          height: 100,
+                                          child: AppText(
+                                              text: snapshot.error.toString()),
+                                        );
+                                      }
+
+                                      final imageUrl =
+                                          snapshot.data!.imageUrls.first;
+                                      return AppFunctions.displayNetworkImage(
+                                        imageUrl,
+                                        width: 50,
+                                        height: 100,
+                                        placeholderAssetImage:
+                                            AssetNames.aisleImage,
+                                        fit: BoxFit.cover,
+                                      );
+                                    });
+                              }
+                            }),
+                            title: AppText(
+                              text: aisle.name,
+                              color: Colors.black,
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return const Divider(
+                            indent: 80,
+                          );
+                        },
+                        itemCount: widget.groceryStore.aisles!.length),
+                  )
+                ],
               ));
   }
 }

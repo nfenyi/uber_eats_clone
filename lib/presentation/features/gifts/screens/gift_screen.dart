@@ -45,7 +45,22 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
           floatHeaderSlivers: true,
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
-              SliverAppBar(
+              SliverAppBar.medium(
+                title: Row(
+                  children: [
+                    const AppText(
+                      text: 'Gifts',
+                      weight: FontWeight.w600,
+                      size: AppSizes.heading4,
+                    ),
+                    Image.asset(
+                      AssetNames.sendGifts2,
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ],
+                ),
                 // surfaceTintColor: const Color.fromARGB(255, 254, 243, 240),
                 floating: true,
                 backgroundColor: const Color.fromARGB(255, 254, 243, 240),
@@ -75,6 +90,12 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const AppText(
+                                  text: 'Gifts',
+                                  weight: FontWeight.w600,
+                                  size: AppSizes.heading4,
+                                ),
+                                const Gap(15),
+                                const AppText(
                                   text: 'Recipient address',
                                   color: AppColors.neutral600,
                                 ),
@@ -98,11 +119,6 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
                           Image.asset(AssetNames.sendGifts2),
                         ],
                       )),
-                  title: const AppText(
-                    text: 'Gifts',
-                    weight: FontWeight.w600,
-                    size: AppSizes.heading4,
-                  ),
                 ),
               ),
               SliverPadding(
@@ -113,8 +129,6 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
                     onTap: () =>
                         navigatorKey.currentState!.push(MaterialPageRoute(
                       builder: (context) => SearchScreen(
-                        userLocation: Hive.box(AppBoxes.appState)
-                            .get(BoxKeys.userInfo)['addresses']['latlng'],
                         stores: stores,
                       ),
                     )),

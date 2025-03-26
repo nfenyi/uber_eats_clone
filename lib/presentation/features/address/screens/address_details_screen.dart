@@ -387,9 +387,10 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                         'addresses': [addressDetails.toJson()]
                       }, SetOptions(merge: true));
                       var addressDetailsForHive = addressDetails.toJson();
+                      var storelatLng = addressDetails.latlng as GeoPoint;
                       addressDetailsForHive['latlng'] = HiveGeoPoint(
-                          latitude: addressDetails.latlng.latitude,
-                          longitude: addressDetails.latlng.longitude);
+                          latitude: storelatLng.latitude,
+                          longitude: storelatLng.longitude);
 
                       await Hive.box(AppBoxes.appState)
                           .put('addressDetailsSaved', true);

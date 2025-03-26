@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,22 +11,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:location/location.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery_grocery/grocery_grocery_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:uber_eats_clone/presentation/features/some_kind_of_section/some_kind_of_section_screen.dart';
+import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
+import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../../app_functions.dart';
+import '../../../../models/advert/advert_model.dart';
 import '../../../../models/store/store_model.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
+import '../../../services/sign_in_view_model.dart';
 import '../../alcohol/alcohol_screen.dart';
-import '../../grocery_store/screens/grocery_store_screens.dart';
+import '../../grocery_store/screens/screens/grocery_store_main_screen.dart';
 import '../../home/home_screen.dart';
 import '../../home/map/map_screen.dart';
 import '../../stores_list/stores_list_screen.dart';
@@ -43,22 +49,9 @@ class GroceryScreen extends ConsumerStatefulWidget {
 class _GroceryScreenState extends ConsumerState<GroceryScreen> {
   final webViewcontroller = WebViewControllerPlus();
 
-  final List<FoodCategory> _foodCategories = [
-    FoodCategory('Grocery', AssetNames.grocery2),
-    FoodCategory('Convenience', AssetNames.convenience),
-    FoodCategory('Alcohol', AssetNames.alcohol),
-    FoodCategory('Gifts', AssetNames.gift),
-    FoodCategory('Pharmacy', AssetNames.pharmacy),
-    FoodCategory('Baby', AssetNames.babyBottle),
-    FoodCategory('Specialty Foods', AssetNames.specialtyFoods),
-    FoodCategory('Pet Supplies', AssetNames.petSupplies),
-    FoodCategory('Flowers', AssetNames.flowers),
-    FoodCategory('Retail', AssetNames.retail),
-  ];
+  List<FoodCategory> _groceryCategories = [];
 
   List<String> _selectedFilters = [];
-
-  late List<Store> _hottestDeals;
 
   // bool _onSearchScreen = false;
   bool _onFilterScreen = false;
@@ -84,26 +77,15 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
   final List<Store> _petSuppliesStores = [];
   final List<Store> _flowerStores = [];
   final List<Store> _retailStores = [];
-  late final GeoPoint storedUserLocation;
-
-  late final List<Color> _featuredStoresColors = [];
 
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarIconBrightness: Brightness.dark,
-      statusBarColor: Colors.white,
-    ));
-    var temp = Hive.box(AppBoxes.appState)
-        .get(BoxKeys.userInfo)['selectedAddress']['latlng'];
-    storedUserLocation = GeoPoint(temp.latitude, temp.longitude);
+    // SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    //   statusBarIconBrightness: Brightness.dark,
+    //   statusBarColor: Colors.white,
+    // ));
 
-    _hottestDeals = List.from(stores);
-    _hottestDeals.sort(
-      (a, b) => a.rating.averageRating.compareTo(b.rating.averageRating),
-    );
-    _hottestDeals = _hottestDeals.reversed.toList();
     //TODO: store in global lists so this filteration does not occur on every screen
     //that needs this sorting
     //or better still let firebase take care of sorting
@@ -153,10 +135,6 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
       ..._retailStores
     ]).toSet().toList();
 
-    for (var i = 0; i < _groceryScreenStores.length; i++) {
-      _featuredStoresColors.add(Color.fromARGB(50, Random().nextInt(256),
-          Random().nextInt(256), Random().nextInt(256)));
-    }
     //   _scrollController.addListener(() {
     //   setState(() {
     //     if (_scrollController. == 1) {
@@ -177,12 +155,36 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // FirebaseFirestore.instance
+    //     .collection(FirestoreCollections.featuredStores)
+    //     .doc()
+    //     .set({
+    //   'store': FirebaseFirestore.instance
+    //       .collection(FirestoreCollections.stores)
+    //       .doc('NazJMIA9yaUsLRjLxBGa')
+    // });
+    // FirebaseFirestore.instance
+    //     .collection(FirestoreCollections.featuredStores)
+    //     .doc()
+    //     .set({
+    //   'store': FirebaseFirestore.instance
+    //       .collection(FirestoreCollections.stores)
+    //       .doc('pWxVJ3aWrzkMluIn1x3T')
+    // });
+
+    // for (var category in _groceryCategories) {
+    //   FirebaseFirestore.instance
+    //       .collection(FirestoreCollections.groceryCategories)
+    //       .doc()
+    //       .set(category.toJson());
+    // }
+
     TimeOfDay timeOfDayNow = TimeOfDay.now();
     return SafeArea(
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar(
-            expandedHeight: 90,
+            expandedHeight: 100,
             floating: true,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -201,7 +203,6 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
               title: InkWell(
                 onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
                   builder: (context) => SearchScreen(
-                    userLocation: storedUserLocation,
                     stores: _groceryScreenStores,
                   ),
                 )),
@@ -256,10 +257,10 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   const Gap(10),
                   InkWell(
                     onTap: () async {
-                      navigatorKey.currentState!.push(MaterialPageRoute(
+                      await navigatorKey.currentState!.push(MaterialPageRoute(
                         builder: (context) => MapScreen(
-                          userLocation: storedUserLocation,
-                          filteredStores: [],
+                          userLocation: storedUserLocation!,
+                          filteredStores: const [],
                         ),
                       ));
                     },
@@ -346,19 +347,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       right: 8.0, top: 8.0),
-                                  child: InkWell(
-                                    onTap: () {},
-                                    child: Ink(
-                                      child: Icon(
-                                        favoriteStores.any(
-                                          (element) => element.id == store.id,
-                                        )
-                                            ? Icons.favorite
-                                            : Icons.favorite_outline,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
+                                  child: FavouriteButton(store: store),
                                 )
                               ],
                             ),
@@ -412,192 +401,361 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
               ),
             ),
           ),
-          child: NotificationListener<UserScrollNotification>(
-            onNotification: (UserScrollNotification userScrollNotification) {
-              return true;
-            },
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const Gap(10),
-
-                  SizedBox(
-                    height: 65,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      separatorBuilder: (context, index) => const Gap(15),
-                      itemCount: _foodCategories.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        final foodCategory = _foodCategories[index];
-                        return InkWell(
-                          onTap: () {
-                            if (index == 0) {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) => GroceryGroceryScreen(
-                                    stores: _groceryGroceryStores),
-                              ));
-                            } else if (index == 2) {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) => AlcoholScreen(
-                                    alcoholStores: _alcoholStores),
-                              ));
-                            } else if (index == 4) {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) => PharmacyScreen(
-                                    pharmacyStores: _pharmacyStores),
-                              ));
-                            }
-                          },
-                          child: SizedBox(
-                            width: 60,
-                            child: Column(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                FutureBuilder(
+                    future: _getGroceryCategories(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox.shrink();
+                      } else if (snapshot.hasError) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
+                          child: AppText(text: snapshot.error.toString()),
+                        );
+                      }
+                      return CategoriesListView(
+                          groceryCategories: _groceryCategories,
+                          groceryGroceryStores: _groceryGroceryStores,
+                          alcoholStores: _alcoholStores,
+                          pharmacyStores: _pharmacyStores);
+                    }),
+                FutureBuilder<List<DocumentReference>>(
+                    future: _getFeaturedStoreRefs(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox.shrink();
+                      } else if (snapshot.hasError) {
+                        logger.d(snapshot.error.toString());
+                        return const SizedBox.shrink();
+                      }
+                      final List<Color> featuredStoresColors = [];
+                      for (var i = 0; i < _groceryScreenStores.length; i++) {
+                        featuredStoresColors.add(Color.fromARGB(
+                            50,
+                            Random().nextInt(256),
+                            Random().nextInt(256),
+                            Random().nextInt(256)));
+                      }
+                      final storeRefs = snapshot.data!;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Gap(10),
+                          const Padding(
+                            padding:
+                                EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+                            child: Row(
                               children: [
-                                Image.asset(
-                                  foodCategory.image,
-                                  height: 45,
-                                ),
                                 AppText(
-                                  text: foodCategory.name,
-                                  overflow: TextOverflow.ellipsis,
-                                )
+                                  text: 'Featured stores',
+                                  size: AppSizes.heading6,
+                                  weight: FontWeight.w600,
+                                ),
                               ],
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
+                          SizedBox(
+                            height: 150,
+                            child: ListView.separated(
+                              cacheExtent: 300,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSizes.horizontalPaddingSmall),
+                              separatorBuilder: (context, index) =>
+                                  const Gap(10),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: storeRefs.length,
+                              itemBuilder: (context, index) {
+                                final reference = storeRefs[index];
 
-                  const Padding(
-                    padding: EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-                    child: Row(
-                      children: [
-                        AppText(
-                          text: 'Featured stores',
-                          size: AppSizes.heading6,
-                          weight: FontWeight.w600,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 150,
-                    child: ListView.separated(
-                      cacheExtent: 300,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      separatorBuilder: (context, index) => const Gap(10),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _groceryScreenStores.length,
-                      itemBuilder: (context, index) {
-                        final store = _groceryScreenStores[index];
-                        final bool isClosed =
-                            timeOfDayNow.hour < store.openingTime.hour ||
-                                (timeOfDayNow.hour >= store.closingTime.hour &&
-                                    timeOfDayNow.minute >=
-                                        store.closingTime.minute);
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: () async {
-                              final location = Location();
-                              final userLocation = await location.getLocation();
-                              await navigatorKey.currentState!
-                                  .push(MaterialPageRoute(
-                                builder: (context) {
-                                  if (store.type.contains('Grocery')) {
-                                    return GroceryStoreMainScreen(store);
-                                  } else {
-                                    return StoreScreen(
-                                      store,
-                                      userLocation: storedUserLocation,
-                                    );
-                                  }
-                                },
-                              ));
-                            },
-                            child: Ink(
-                              // decoration: BoxDecoration(
-                              //   borderRadius: BorderRadius.circular(12),
-                              // ),
+                                // logger.d(store.id);
 
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    width: 150,
-                                    height: 150,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 20),
-                                    color: _featuredStoresColors[index],
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CachedNetworkImage(
-                                          imageUrl: store.logo,
-                                          width: 200,
-                                          height: 50,
-                                          // fit: BoxFit.fitWidth,
-                                        ),
-                                        Column(
-                                          children: [
-                                            AppText(
-                                              text: store.name,
-                                              weight: FontWeight.w600,
+                                return FutureBuilder<Store>(
+                                    future: AppFunctions.loadStoreReference(
+                                        reference),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Skeletonizer(
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Container(
+                                              width: 150,
+                                              height: 150,
+                                              color: Colors.amber,
                                             ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                          ),
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: SizedBox(
+                                            width: 150,
+                                            height: 150,
+                                            child: AppText(
+                                                text:
+                                                    snapshot.error.toString()),
+                                          ),
+                                        );
+                                      }
+
+                                      final store = snapshot.data!;
+                                      final bool isClosed = timeOfDayNow.hour <
+                                              store.openingTime.hour ||
+                                          (timeOfDayNow.hour >=
+                                                  store.closingTime.hour &&
+                                              timeOfDayNow.minute >=
+                                                  store.closingTime.minute);
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: InkWell(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          onTap: () async {
+                                            // final location = Location();
+                                            // final userLocation = await location.getLocation();
+                                            await navigatorKey.currentState!
+                                                .push(MaterialPageRoute(
+                                              builder: (context) {
+                                                if (store.type
+                                                    .contains('Grocery')) {
+                                                  return GroceryStoreMainScreen(
+                                                      store);
+                                                } else {
+                                                  return StoreScreen(
+                                                    store,
+                                                  );
+                                                }
+                                              },
+                                            ));
+                                          },
+                                          child: Ink(
+                                            // decoration: BoxDecoration(
+                                            //   borderRadius: BorderRadius.circular(12),
+                                            // ),
+
+                                            child: Stack(
                                               children: [
-                                                Visibility(
-                                                    visible:
-                                                        store.delivery.fee < 1,
-                                                    child: Image.asset(
-                                                      AssetNames.uberOneSmall,
-                                                      height: 10,
-                                                    )),
-                                                Visibility(
-                                                    visible:
-                                                        store.delivery.fee < 1,
-                                                    child: const AppText(
-                                                        text: ' •')),
-                                                AppText(
-                                                    text:
-                                                        " ${store.delivery.estimatedDeliveryTime} min")
+                                                Container(
+                                                  width: 150,
+                                                  height: 150,
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 5,
+                                                      vertical: 20),
+                                                  color: featuredStoresColors[
+                                                      index],
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      CachedNetworkImage(
+                                                        imageUrl: store.logo,
+                                                        width: 200,
+                                                        height: 50,
+                                                        // fit: BoxFit.fitWidth,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          AppText(
+                                                            text: store.name,
+                                                            weight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Visibility(
+                                                                  visible: store
+                                                                          .delivery
+                                                                          .fee <
+                                                                      1,
+                                                                  child: Image
+                                                                      .asset(
+                                                                    AssetNames
+                                                                        .uberOneSmall,
+                                                                    height: 10,
+                                                                  )),
+                                                              Visibility(
+                                                                  visible: store
+                                                                          .delivery
+                                                                          .fee <
+                                                                      1,
+                                                                  child: const AppText(
+                                                                      text:
+                                                                          ' •')),
+                                                              AppText(
+                                                                  text:
+                                                                      " ${store.delivery.estimatedDeliveryTime} min")
+                                                            ],
+                                                          ),
+                                                          if (store.offers !=
+                                                                  null &&
+                                                              store.offers!
+                                                                  .isNotEmpty)
+                                                            AppText(
+                                                                color: Colors
+                                                                    .green,
+                                                                size: AppSizes
+                                                                    .bodySmallest,
+                                                                text:
+                                                                    '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                isClosed
+                                                    ? Container(
+                                                        color: Colors.black
+                                                            .withOpacity(0.5),
+                                                        width: 150,
+                                                        height: 150,
+                                                        child: const Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            AppText(
+                                                              text: 'Closed',
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    : !store.delivery.canDeliver
+                                                        ? Container(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            width: 150,
+                                                            child: const Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                AppText(
+                                                                  text:
+                                                                      'Pick up',
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        : const SizedBox
+                                                            .shrink(),
                                               ],
                                             ),
-                                            //TODO: offers available text
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  isClosed
-                                      ? Container(
-                                          color: Colors.black.withOpacity(0.5),
-                                          width: 150,
-                                          height: 150,
-                                          child: const Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              AppText(
-                                                text: 'Closed',
-                                                color: Colors.white,
-                                              ),
-                                            ],
                                           ),
-                                        )
-                                      : !store.delivery.canDeliver
+                                        ),
+                                      );
+                                    });
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                MainScreenTopic(
+                  callback: () {
+                    navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => StoresListScreen(
+                        stores: _groceryScreenStores,
+                        screenTitle: 'Grocery Stores',
+                      ),
+                    ));
+                  },
+                  title: 'Stock up on groceries',
+                  subtitle: 'Fresh groceries delivered to your door',
+                ),
+                SizedBox(
+                  height: 185,
+                  child: ListView.separated(
+                    cacheExtent: 300,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSizes.horizontalPaddingSmall),
+                    separatorBuilder: (context, index) => const Gap(10),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _groceryScreenStores.length,
+                    itemBuilder: (context, index) {
+                      final groceryScreenStore = _groceryScreenStores[index];
+                      return SizedBox(
+                        width: 200,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  Stack(
+                                    alignment: Alignment.topLeft,
+                                    children: [
+                                      CachedNetworkImage(
+                                        imageUrl: groceryScreenStore.cardImage,
+                                        width: 200,
+                                        height: 120,
+                                        fit: BoxFit.fill,
+                                      ),
+                                      if (groceryScreenStore.offers != null &&
+                                          groceryScreenStore.offers!.isNotEmpty)
+                                        Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, top: 8.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                color: Colors.green.shade900,
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5,
+                                                      vertical: 2),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  AppText(
+                                                      color: Colors.white,
+                                                      size:
+                                                          AppSizes.bodySmallest,
+                                                      text:
+                                                          '${groceryScreenStore.offers?.length == 1 ? groceryScreenStore.offers?.first.title : '${groceryScreenStore.offers?.length} Offers available'}'),
+                                                ],
+                                              ),
+                                            )),
+                                      (timeOfDayNow.hour <
+                                                  groceryScreenStore
+                                                      .openingTime.hour ||
+                                              (timeOfDayNow.hour >=
+                                                      groceryScreenStore
+                                                          .closingTime.hour &&
+                                                  timeOfDayNow.minute >=
+                                                      groceryScreenStore
+                                                          .closingTime.minute))
                                           ? Container(
                                               color:
                                                   Colors.black.withOpacity(0.5),
-                                              width: 150,
+                                              width: 200,
+                                              height: 120,
                                               child: const Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
@@ -605,851 +763,588 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                     CrossAxisAlignment.center,
                                                 children: [
                                                   AppText(
-                                                    text: 'Pick up',
+                                                    text: 'Closed',
                                                     color: Colors.white,
                                                   ),
                                                 ],
                                               ),
                                             )
-                                          : const SizedBox.shrink(),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  HomeScreenTopic(
-                    callback: () {
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => StoresListScreen(
-                          stores: _groceryScreenStores,
-                          screenTitle: 'Grocery Stores',
-                        ),
-                      ));
-                    },
-                    title: 'Stock up on groceries',
-                    subtitle: 'Fresh groceries delivered to your door',
-                  ),
-                  SizedBox(
-                    height: 185,
-                    child: ListView.separated(
-                      cacheExtent: 300,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      separatorBuilder: (context, index) => const Gap(10),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _groceryScreenStores.length,
-                      itemBuilder: (context, index) {
-                        final groceryScreenStore = _groceryScreenStores[index];
-                        return SizedBox(
-                          width: 200,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    CachedNetworkImage(
-                                      imageUrl: groceryScreenStore.cardImage,
-                                      width: 200,
-                                      height: 120,
-                                      fit: BoxFit.fill,
-                                    ),
-                                    (timeOfDayNow.hour <
-                                                groceryScreenStore
-                                                    .openingTime.hour ||
-                                            (timeOfDayNow.hour >=
-                                                    groceryScreenStore
-                                                        .closingTime.hour &&
-                                                timeOfDayNow.minute >=
-                                                    groceryScreenStore
-                                                        .closingTime.minute))
-                                        ? Container(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            width: 200,
-                                            height: 120,
-                                            child: const Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                AppText(
-                                                  text: 'Closed',
-                                                  color: Colors.white,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        : !groceryScreenStore
-                                                .delivery.canDeliver
-                                            ? Container(
-                                                color: Colors.black
-                                                    .withOpacity(0.5),
-                                                width: 200,
-                                                height: 120,
-                                                child: const Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    AppText(
-                                                      text: 'Pick up',
-                                                      color: Colors.white,
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            : const SizedBox.shrink(),
-                                    Padding(
+                                          : !groceryScreenStore
+                                                  .delivery.canDeliver
+                                              ? Container(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  width: 200,
+                                                  height: 120,
+                                                  child: const Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      AppText(
+                                                        text: 'Pick up',
+                                                        color: Colors.white,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : const SizedBox.shrink(),
+                                    ],
+                                  ),
+                                  Padding(
                                       padding: const EdgeInsets.only(
                                           right: 8.0, top: 8.0),
-                                      child: InkWell(
-                                        onTap: () {},
-                                        child: Ink(
-                                          child: Icon(
-                                            favoriteStores.any(
-                                              (element) =>
-                                                  element.id ==
-                                                  groceryScreenStore.id,
-                                            )
-                                                ? Icons.favorite
-                                                : Icons.favorite_outline,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              const Gap(5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  AppText(
-                                    text: groceryScreenStore.name,
-                                    weight: FontWeight.w600,
-                                  ),
-                                  Container(
-                                      decoration: BoxDecoration(
-                                          color: AppColors.neutral200,
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5, vertical: 2),
-                                      child: AppText(
-                                          text: groceryScreenStore
-                                              .rating.averageRating
-                                              .toString()))
+                                      child: FavouriteButton(
+                                          store: groceryScreenStore))
                                 ],
-                              ),
-                              Row(
-                                children: [
-                                  Visibility(
-                                      visible:
-                                          groceryScreenStore.delivery.fee < 1,
-                                      child: Image.asset(
-                                        AssetNames.uberOneSmall,
-                                        height: 10,
-                                      )),
-                                  Visibility(
-                                      visible:
-                                          groceryScreenStore.delivery.fee < 1,
-                                      child: const AppText(
-                                        text: ' • ',
-                                      )),
-                                  AppText(
-                                    text:
-                                        '\$${groceryScreenStore.delivery.fee} Delivery Fee',
-                                  ),
-                                ],
-                              ),
-                              AppText(
-                                  text:
-                                      '${groceryScreenStore.delivery.estimatedDeliveryTime} min')
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  HomeScreenTopic(
-                    callback: () {
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => StoresListScreen(
-                          stores: _groceryScreenStores,
-                          screenTitle: 'Grocery Stores',
-                        ),
-                      ));
-                    },
-                    title: 'Quick essentials',
-                    subtitle: 'Fresh snacks and drinks to daily needs',
-                  ),
-                  SizedBox(
-                    height: 200,
-                    child: ListView.separated(
-                      cacheExtent: 300,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      separatorBuilder: (context, index) => const Gap(10),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _groceryScreenStores.length,
-                      itemBuilder: (context, index) {
-                        final groceryScreenStore = _groceryScreenStores[index];
-                        return SizedBox(
-                          width: 200,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    CachedNetworkImage(
-                                      imageUrl: groceryScreenStore.cardImage,
-                                      width: 200,
-                                      height: 120,
-                                      fit: BoxFit.fill,
-                                    ),
-                                    (timeOfDayNow.hour <
-                                                groceryScreenStore
-                                                    .openingTime.hour ||
-                                            (timeOfDayNow.hour >=
-                                                    groceryScreenStore
-                                                        .closingTime.hour &&
-                                                timeOfDayNow.minute >=
-                                                    groceryScreenStore
-                                                        .closingTime.minute))
-                                        ? Container(
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            width: 200,
-                                            height: 120,
-                                            child: const Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                AppText(
-                                                  text: 'Closed',
-                                                  color: Colors.white,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        : !groceryScreenStore
-                                                .delivery.canDeliver
-                                            ? Container(
-                                                color: Colors.black
-                                                    .withOpacity(0.5),
-                                                width: 200,
-                                                height: 120,
-                                                child: const Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    AppText(
-                                                      text: 'Pick up',
-                                                      color: Colors.white,
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                            : const SizedBox.shrink(),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 8.0, top: 8.0),
-                                      child: InkWell(
-                                        onTap: () {},
-                                        child: Ink(
-                                          child: Icon(
-                                            favoriteStores.any(
-                                              (element) =>
-                                                  element.id ==
-                                                  groceryScreenStore.id,
-                                            )
-                                                ? Icons.favorite
-                                                : Icons.favorite_outline,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              const Gap(5),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  AppText(
-                                    text: groceryScreenStore.name,
-                                    weight: FontWeight.w600,
-                                  ),
-                                  Container(
-                                      decoration: BoxDecoration(
-                                          color: AppColors.neutral200,
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5, vertical: 2),
-                                      child: AppText(
-                                          text: groceryScreenStore
-                                              .rating.averageRating
-                                              .toString()))
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Visibility(
-                                      visible:
-                                          groceryScreenStore.delivery.fee < 1,
-                                      child: Image.asset(
-                                        AssetNames.uberOneSmall,
-                                        height: 10,
-                                      )),
-                                  Visibility(
-                                      visible:
-                                          groceryScreenStore.delivery.fee < 1,
-                                      child: const AppText(
-                                        text: ' • ',
-                                      )),
-                                  AppText(
-                                    text:
-                                        '\$${groceryScreenStore.delivery.fee} Delivery Fee',
-                                  ),
-                                ],
-                              ),
-                              AppText(
-                                  text:
-                                      '${groceryScreenStore.delivery.estimatedDeliveryTime} min')
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  HomeScreenTopic(
-                      callback: () {
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                          builder: (context) =>
-                              SomeKindOfSectionScreen(store: stores[2]),
-                        ));
-                      },
-                      title: 'Prep brunch for Mum',
-                      subtitle: 'From ${stores[2].name}',
-                      imageUrl: stores[2].logo),
-                  // SizedBox(
-                  //   height: 200,
-                  //   child: CustomScrollView(
-                  //     scrollDirection: Axis.horizontal,
-                  //     slivers: stores[2]
-                  //         .productCategories
-                  //         .map((productCategory) => SliverPadding(
-                  //               padding:
-                  //                   const EdgeInsets.symmetric(horizontal: 10),
-                  //               sliver: SliverList.separated(
-                  //                 separatorBuilder: (context, index) =>
-                  //                     const Gap(10),
-                  //                 itemBuilder: (context, index) =>
-                  //                     ListView.separated(
-                  //                         scrollDirection: Axis.horizontal,
-                  //                         // TODO: find a way to do lazy loading and remove shrinkWrap
-                  //                         shrinkWrap: true,
-                  //                         itemCount:
-                  //                             productCategory.productsAndQuantities.length,
-                  //                         separatorBuilder: (context, index) =>
-                  //                             const Gap(15),
-                  //                         itemBuilder: (context, index) {
-                  //                           final product =
-                  //                               productCategory.products[index];
-                  //                           return SizedBox(
-                  //                             width: 100,
-                  //                             child: Column(
-                  //                               crossAxisAlignment:
-                  //                                   CrossAxisAlignment.start,
-                  //                               children: [
-                  //                                 Stack(
-                  //                                   alignment:
-                  //                                       Alignment.bottomRight,
-                  //                                   children: [
-                  //                                     ClipRRect(
-                  //                                       borderRadius:
-                  //                                           BorderRadius
-                  //                                               .circular(12),
-                  //                                       child:
-                  //                                           CachedNetworkImage(
-                  //                                         imageUrl: product
-                  //                                             .imageUrls.first,
-                  //                                         width: 100,
-                  //                                         height: 120,
-                  //                                         fit: BoxFit.fill,
-                  //                                       ),
-                  //                                     ),
-                  //                                     Padding(
-                  //                                       padding:
-                  //                                           const EdgeInsets
-                  //                                               .only(
-                  //                                               right: 8.0,
-                  //                                               top: 8.0),
-                  //                                       child: InkWell(
-                  //                                         onTap: () {},
-                  //                                         child: Ink(
-                  //                                           child: Container(
-                  //                                             padding:
-                  //                                                 const EdgeInsets
-                  //                                                     .all(5),
-                  //                                             decoration: BoxDecoration(
-                  //                                                 boxShadow: const [
-                  //                                                   BoxShadow(
-                  //                                                     color: Colors
-                  //                                                         .black12,
-                  //                                                     offset:
-                  //                                                         Offset(
-                  //                                                             2,
-                  //                                                             2),
-                  //                                                   )
-                  //                                                 ],
-                  //                                                 color: Colors
-                  //                                                     .white,
-                  //                                                 borderRadius:
-                  //                                                     BorderRadius
-                  //                                                         .circular(
-                  //                                                             50)),
-                  //                                             child: const Icon(
-                  //                                               Icons.add,
-                  //                                             ),
-                  //                                           ),
-                  //                                         ),
-                  //                                       ),
-                  //                                     )
-                  //                                   ],
-                  //                                 ),
-                  //                                 const Gap(5),
-                  //                                 AppText(
-                  //                                   text: product.name,
-                  //                                   weight: FontWeight.w600,
-                  //                                   maxLines: 3,
-                  //                                   overflow:
-                  //                                       TextOverflow.ellipsis,
-                  //                                 ),
-                  //                                 Row(
-                  //                                   children: [
-                  //                                     Visibility(
-                  //                                       visible: product
-                  //                                               .promoPrice !=
-                  //                                           null,
-                  //                                       child: Row(
-                  //                                         children: [
-                  //                                           AppText(
-                  //                                               text:
-                  //                                                   '\$${product.initialPrice}',
-                  //                                               color: Colors
-                  //                                                   .green),
-                  //                                           const Gap(5),
-                  //                                         ],
-                  //                                       ),
-                  //                                     ),
-                  //                                     AppText(
-                  //                                       text: product
-                  //                                           .initialPrice
-                  //                                           .toString(),
-                  //                                       decoration:
-                  //                                           product.promoPrice !=
-                  //                                                   null
-                  //                                               ? TextDecoration
-                  //                                                   .lineThrough
-                  //                                               : TextDecoration
-                  //                                                   .none,
-                  //                                     )
-                  //                                   ],
-                  //                                 ),
-                  //                               ],
-                  //                             ),
-                  //                           );
-                  //                         }),
-                  //                 itemCount: 1,
-                  //               ),
-                  //             ))
-                  //         .toList(),
-                  //   ),
-                  // ),
-
-                  HomeScreenTopic(
-                      callback: () {},
-                      title: 'Breakfast baked goods',
-                      subtitle: 'From ${stores[2].name}',
-                      imageUrl: stores[2].logo),
-                  // SizedBox(
-                  //   height: 200,
-                  //   child: CustomScrollView(
-                  //     scrollDirection: Axis.horizontal,
-                  //     slivers: stores[2]
-                  //         .productCategories
-                  //         .map((productCategory) => SliverPadding(
-                  //               padding:
-                  //                   const EdgeInsets.symmetric(horizontal: 10),
-                  //               sliver: SliverList.separated(
-                  //                 separatorBuilder: (context, index) =>
-                  //                     const Gap(10),
-                  //                 itemBuilder: (context, index) =>
-                  //                     ListView.separated(
-                  //                         scrollDirection: Axis.horizontal,
-                  //                         // TODO: find a way to do lazy loading and remove shrinkWrap
-                  //                         shrinkWrap: true,
-                  //                         itemCount: productCategory
-                  //                             .productsAndQuantities.length,
-                  //                         separatorBuilder: (context, index) =>
-                  //                             const Gap(15),
-                  //                         itemBuilder: (context, index) {
-                  //                           final product =
-                  //                               productCategory.products[index];
-                  //                           return SizedBox(
-                  //                             width: 100,
-                  //                             child: Column(
-                  //                               crossAxisAlignment:
-                  //                                   CrossAxisAlignment.start,
-                  //                               children: [
-                  //                                 Stack(
-                  //                                   alignment:
-                  //                                       Alignment.bottomRight,
-                  //                                   children: [
-                  //                                     ClipRRect(
-                  //                                       borderRadius:
-                  //                                           BorderRadius
-                  //                                               .circular(12),
-                  //                                       child:
-                  //                                           CachedNetworkImage(
-                  //                                         imageUrl: product
-                  //                                             .imageUrls.first,
-                  //                                         width: 100,
-                  //                                         height: 120,
-                  //                                         fit: BoxFit.fill,
-                  //                                       ),
-                  //                                     ),
-                  //                                     Padding(
-                  //                                       padding:
-                  //                                           const EdgeInsets
-                  //                                               .only(
-                  //                                               right: 8.0,
-                  //                                               top: 8.0),
-                  //                                       child: InkWell(
-                  //                                         onTap: () {},
-                  //                                         child: Ink(
-                  //                                           child: Container(
-                  //                                             padding:
-                  //                                                 const EdgeInsets
-                  //                                                     .all(5),
-                  //                                             decoration: BoxDecoration(
-                  //                                                 boxShadow: const [
-                  //                                                   BoxShadow(
-                  //                                                     color: Colors
-                  //                                                         .black12,
-                  //                                                     offset:
-                  //                                                         Offset(
-                  //                                                             2,
-                  //                                                             2),
-                  //                                                   )
-                  //                                                 ],
-                  //                                                 color: Colors
-                  //                                                     .white,
-                  //                                                 borderRadius:
-                  //                                                     BorderRadius
-                  //                                                         .circular(
-                  //                                                             50)),
-                  //                                             child: const Icon(
-                  //                                               Icons.add,
-                  //                                             ),
-                  //                                           ),
-                  //                                         ),
-                  //                                       ),
-                  //                                     )
-                  //                                   ],
-                  //                                 ),
-                  //                                 const Gap(5),
-                  //                                 AppText(
-                  //                                   text: product.name,
-                  //                                   weight: FontWeight.w600,
-                  //                                   maxLines: 3,
-                  //                                   overflow:
-                  //                                       TextOverflow.ellipsis,
-                  //                                 ),
-                  //                                 Row(
-                  //                                   children: [
-                  //                                     Visibility(
-                  //                                       visible: product
-                  //                                               .promoPrice !=
-                  //                                           null,
-                  //                                       child: Row(
-                  //                                         children: [
-                  //                                           AppText(
-                  //                                               text:
-                  //                                                   '\$${product.initialPrice}',
-                  //                                               color: Colors
-                  //                                                   .green),
-                  //                                           const Gap(5),
-                  //                                         ],
-                  //                                       ),
-                  //                                     ),
-                  //                                     AppText(
-                  //                                       text: product
-                  //                                           .initialPrice
-                  //                                           .toString(),
-                  //                                       decoration:
-                  //                                           product.promoPrice !=
-                  //                                                   null
-                  //                                               ? TextDecoration
-                  //                                                   .lineThrough
-                  //                                               : TextDecoration
-                  //                                                   .none,
-                  //                                     )
-                  //                                   ],
-                  //                                 ),
-                  //                               ],
-                  //                             ),
-                  //                           );
-                  //                         }),
-                  //                 itemCount: 1,
-                  //               ),
-                  //             ))
-                  //         .toList(),
-                  //   ),
-                  // ),
-
-                  HomeScreenTopic(callback: () {}, title: 'All Stores'),
-                  ListView.separated(
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        final store = _groceryScreenStores[index];
-                        final bool isClosed =
-                            timeOfDayNow.hour < store.openingTime.hour ||
-                                (timeOfDayNow.hour >= store.closingTime.hour &&
-                                    timeOfDayNow.minute >=
-                                        store.closingTime.minute);
-                        return ListTile(
-                            leading: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  border:
-                                      Border.all(color: AppColors.neutral200)),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: CachedNetworkImage(
-                                  imageUrl: store.logo,
-                                  width: 30,
-                                  height: 30,
-                                  fit: BoxFit.fill,
-                                ),
                               ),
                             ),
-                            title: AppText(text: store.name),
-                            contentPadding: EdgeInsets.zero,
-                            trailing: Icon(
-                              favoriteStores.any(
-                                (element) => element.id == store.id,
-                              )
-                                  ? Icons.favorite
-                                  : Icons.favorite_outline,
-                              color: Colors.white,
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            const Gap(5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    Visibility(
-                                        visible: store.delivery.fee < 1,
-                                        child: Image.asset(
-                                          AssetNames.uberOneSmall,
-                                          height: 10,
-                                        )),
-                                    AppText(
-                                        text: isClosed
-                                            ? store.openingTime.hour -
-                                                        timeOfDayNow.hour >
-                                                    1
-                                                ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
-                                                : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
-                                            : '\$${store.delivery.fee} Delivery Fee',
-                                        color: store.delivery.fee < 1
-                                            ? const Color.fromARGB(
-                                                255, 163, 133, 42)
-                                            : null),
-                                    AppText(
-                                        text:
-                                            ' • ${store.delivery.estimatedDeliveryTime} min'),
-                                  ],
+                                AppText(
+                                  text: groceryScreenStore.name,
+                                  weight: FontWeight.w600,
                                 ),
-                                const AppText(
-                                  text: 'Offers available',
-                                  color: Colors.green,
-                                )
+                                Container(
+                                    decoration: BoxDecoration(
+                                        color: AppColors.neutral200,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 2),
+                                    child: AppText(
+                                        text: groceryScreenStore
+                                            .rating.averageRating
+                                            .toString()))
                               ],
-                            ));
-                      },
-                      separatorBuilder: (context, index) => const Divider(
-                            indent: 30,
-                          ),
-                      itemCount: _groceryScreenStores.length),
-                  const Gap(20),
-                  const Divider(),
-                  const Gap(3),
-                  Padding(
+                            ),
+                            Row(
+                              children: [
+                                Visibility(
+                                    visible:
+                                        groceryScreenStore.delivery.fee < 1,
+                                    child: Image.asset(
+                                      AssetNames.uberOneSmall,
+                                      height: 10,
+                                    )),
+                                Visibility(
+                                    visible:
+                                        groceryScreenStore.delivery.fee < 1,
+                                    child: const AppText(
+                                      text: ' • ',
+                                    )),
+                                AppText(
+                                  text:
+                                      '\$${groceryScreenStore.delivery.fee} Delivery Fee',
+                                ),
+                              ],
+                            ),
+                            AppText(
+                                text:
+                                    '${groceryScreenStore.delivery.estimatedDeliveryTime} min')
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                MainScreenTopic(
+                  callback: () {
+                    navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => StoresListScreen(
+                        stores: _groceryScreenStores,
+                        screenTitle: 'Grocery Stores',
+                      ),
+                    ));
+                  },
+                  title: 'Quick essentials',
+                  subtitle: 'Fresh snacks and drinks to daily needs',
+                ),
+                SizedBox(
+                  height: 200,
+                  child: ListView.separated(
+                    cacheExtent: 300,
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppSizes.horizontalPaddingSmall),
-                    child: RichText(
-                      text: TextSpan(
-                          text:
-                              "Uber is paid by merchants for marketing and promotion, which influences the personalized recommendations you see. ",
-                          style: const TextStyle(
-                            fontSize: AppSizes.bodySmallest,
-                            color: Colors.black,
-                          ),
+                    separatorBuilder: (context, index) => const Gap(10),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _groceryScreenStores.length,
+                    itemBuilder: (context, index) {
+                      final groceryScreenStore = _groceryScreenStores[index];
+                      return SizedBox(
+                        width: 200,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextSpan(
-                              text: 'Learn more or change settings',
-                              style: const TextStyle(
-                                decoration: TextDecoration.underline,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  Stack(
+                                    alignment: Alignment.topLeft,
+                                    children: [
+                                      CachedNetworkImage(
+                                        imageUrl: groceryScreenStore.cardImage,
+                                        width: 200,
+                                        height: 120,
+                                        fit: BoxFit.fill,
+                                      ),
+                                      if (groceryScreenStore.offers != null &&
+                                          groceryScreenStore.offers!.isNotEmpty)
+                                        Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, top: 8.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                color: Colors.green.shade900,
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5,
+                                                      vertical: 2),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  AppText(
+                                                      color: Colors.white,
+                                                      size:
+                                                          AppSizes.bodySmallest,
+                                                      text:
+                                                          '${groceryScreenStore.offers?.length == 1 ? groceryScreenStore.offers?.first.title : '${groceryScreenStore.offers?.length} Offers available'}'),
+                                                ],
+                                              ),
+                                            )),
+                                      (timeOfDayNow.hour <
+                                                  groceryScreenStore
+                                                      .openingTime.hour ||
+                                              (timeOfDayNow.hour >=
+                                                      groceryScreenStore
+                                                          .closingTime.hour &&
+                                                  timeOfDayNow.minute >=
+                                                      groceryScreenStore
+                                                          .closingTime.minute))
+                                          ? Container(
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                              width: 200,
+                                              height: 120,
+                                              child: const Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  AppText(
+                                                    text: 'Closed',
+                                                    color: Colors.white,
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : !groceryScreenStore
+                                                  .delivery.canDeliver
+                                              ? Container(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  width: 200,
+                                                  height: 120,
+                                                  child: const Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      AppText(
+                                                        text: 'Pick up',
+                                                        color: Colors.white,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : const SizedBox.shrink(),
+                                    ],
+                                  ),
+                                  Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 8.0, top: 8.0),
+                                      child: FavouriteButton(
+                                          store: groceryScreenStore))
+                                ],
                               ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) => WebViewScreen(
-                                      controller: webViewcontroller,
-                                      link: Weblinks.uberOneTerms,
-                                    ),
-                                  ));
-                                },
                             ),
-                          ]),
-                    ),
+                            const Gap(5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AppText(
+                                  text: groceryScreenStore.name,
+                                  weight: FontWeight.w600,
+                                ),
+                                Container(
+                                    decoration: BoxDecoration(
+                                        color: AppColors.neutral100,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 2),
+                                    child: AppText(
+                                        text: groceryScreenStore
+                                            .rating.averageRating
+                                            .toString()))
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Visibility(
+                                    visible:
+                                        groceryScreenStore.delivery.fee < 1,
+                                    child: Image.asset(
+                                      AssetNames.uberOneSmall,
+                                      height: 10,
+                                    )),
+                                Visibility(
+                                    visible:
+                                        groceryScreenStore.delivery.fee < 1,
+                                    child: const AppText(
+                                      text: ' • ',
+                                    )),
+                                AppText(
+                                  text:
+                                      '\$${groceryScreenStore.delivery.fee} Delivery Fee',
+                                ),
+                              ],
+                            ),
+                            AppText(
+                                text:
+                                    '${groceryScreenStore.delivery.estimatedDeliveryTime} min')
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                  const Gap(10)
-                ],
-              ),
+                ),
+                ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: adverts.length,
+                    itemBuilder: (context, index) {
+                      final advert = adverts[index];
+                      final store = stores.firstWhere(
+                        (element) => element.id == advert.shopId,
+                      );
+
+                      return Column(
+                        children: [
+                          MainScreenTopic(
+                              callback: () => navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) {
+                                      return AdvertScreen(
+                                          store: store,
+                                          productRefs: advert.products);
+                                    },
+                                  )),
+                              title: advert.title,
+                              subtitle: 'From ${store.name}',
+                              imageUrl: store.logo),
+                          SizedBox(
+                            height: 200,
+                            child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal:
+                                        AppSizes.horizontalPaddingSmall),
+                                itemCount: advert.products.length,
+                                separatorBuilder: (context, index) =>
+                                    const Gap(15),
+                                itemBuilder: (context, index) {
+                                  final productReference =
+                                      advert.products[index];
+                                  return FutureBuilder<Product>(
+                                      future: AppFunctions.loadProductReference(
+                                          productReference
+                                              as DocumentReference),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Skeletonizer(
+                                            child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                child: Container(
+                                                  color: Colors.blue,
+                                                  width: 110,
+                                                  height: 200,
+                                                )),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              child: Container(
+                                                color: AppColors.neutral100,
+                                                width: 110,
+                                                height: 200,
+                                                child: AppText(
+                                                  text:
+                                                      snapshot.error.toString(),
+                                                  size: AppSizes.bodySmallest,
+                                                ),
+                                              ));
+                                        }
+
+                                        return ProductGridTile(
+                                            product: snapshot.data!,
+                                            store: store);
+                                      });
+                                }),
+                          ),
+                        ],
+                      );
+                    }),
+                MainScreenTopic(callback: () {}, title: 'All Stores'),
+                ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSizes.horizontalPaddingSmall),
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      final store = _groceryScreenStores[index];
+                      final bool isClosed = timeOfDayNow.hour <
+                              store.openingTime.hour ||
+                          (timeOfDayNow.hour >= store.closingTime.hour &&
+                              timeOfDayNow.minute >= store.closingTime.minute);
+                      return ListTile(
+                          leading: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                border:
+                                    Border.all(color: AppColors.neutral200)),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(50),
+                              child: CachedNetworkImage(
+                                imageUrl: store.logo,
+                                width: 30,
+                                height: 30,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ),
+                          title: AppText(text: store.name),
+                          contentPadding: EdgeInsets.zero,
+                          trailing: FavouriteButton(
+                            store: store,
+                            color: AppColors.neutral500,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Visibility(
+                                      visible: store.delivery.fee < 1,
+                                      child: Image.asset(
+                                        AssetNames.uberOneSmall,
+                                        height: 10,
+                                      )),
+                                  AppText(
+                                      text: isClosed
+                                          ? store.openingTime.hour -
+                                                      timeOfDayNow.hour >
+                                                  1
+                                              ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                              : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
+                                          : '\$${store.delivery.fee} Delivery Fee',
+                                      color: store.delivery.fee < 1
+                                          ? const Color.fromARGB(
+                                              255, 163, 133, 42)
+                                          : null),
+                                  AppText(
+                                      text:
+                                          ' • ${store.delivery.estimatedDeliveryTime} min'),
+                                ],
+                              ),
+                              const AppText(
+                                text: 'Offers available',
+                                color: Colors.green,
+                              )
+                            ],
+                          ));
+                    },
+                    separatorBuilder: (context, index) => const Divider(
+                          indent: 30,
+                        ),
+                    itemCount: _groceryScreenStores.length),
+                const Gap(20),
+                const Divider(),
+                const Gap(3),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.horizontalPaddingSmall),
+                  child: RichText(
+                    text: TextSpan(
+                        text:
+                            "Uber is paid by merchants for marketing and promotion, which influences the personalized recommendations you see. ",
+                        style: const TextStyle(
+                          fontSize: AppSizes.bodySmallest,
+                          color: Colors.black,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Learn more or change settings',
+                            style: const TextStyle(
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                navigatorKey.currentState!
+                                    .push(MaterialPageRoute(
+                                  builder: (context) => WebViewScreen(
+                                    controller: webViewcontroller,
+                                    link: Weblinks.uberOneTerms,
+                                  ),
+                                ));
+                              },
+                          ),
+                        ]),
+                  ),
+                ),
+                const Gap(10)
+              ],
             ),
           ),
         ),
       ),
-      //      Stack(
+    );
+  }
 
-      //   alignment: Alignment.topCenter,
-      //   children: [
-      //     Container(
-      //       color: Colors.white.withOpacity(0.96),
-      //       // height: _onFilterScreen ? 180 : 275,
-      //       child: Column(
-      //         mainAxisSize: MainAxisSize.min,
-      //         children: [
-      //           if (!_onFilterScreen)
-      //             const Padding(
-      //                 padding: EdgeInsets.symmetric(
-      //                     vertical: 5,
-      //                     horizontal: AppSizes.horizontalPaddingSmall),
-      //                 child: Row(
-      //                   mainAxisAlignment: MainAxisAlignment.start,
-      //                   children: [
+  Future<void> _getGroceryCategories() async {
+    final groceryCategoriesSnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.groceryCategories)
+        .get();
+    _groceryCategories = groceryCategoriesSnapshot.docs.map(
+      (snapshot) {
+        return FoodCategory.fromJson(snapshot.data());
+      },
+    ).toList();
+    // _animationControllers = List.generate(
+    //     _foodCategories.length,
+    //     (index) => AnimationController(
+    //           vsync: this,
+    //           duration: const Duration(
+    //               milliseconds: 300), // Adjust duration for speed
+    //         ));
 
-      //                   ],
-      //                 )),
-      //           Padding(
-      //             padding: const EdgeInsets.symmetric(
-      //                 horizontal: AppSizes.horizontalPaddingSmall),
-      //             child: InkWell(
-      //               onTap: () =>
-      //                   navigatorKey.currentState!.push(MaterialPageRoute(
-      //                 builder: (context) => SearchScreen(
-      //                   userLocation: storedUserLocation,
-      //                   stores: _groceryScreenStores,
-      //                 ),
-      //               )),
-      //               child: Ink(
-      //                 child: const AppTextFormField(
-      //                   enabled: false,
-      //                   constraintWidth: 40,
-      //                   hintText: 'Search grocery, drinks, stores',
-      //                   radius: 50,
-      //                   prefixIcon: Padding(
-      //                     padding: EdgeInsets.only(left: 8.0),
-      //                     child: Icon(Icons.search),
-      //                   ),
-      //                 ),
-      //               ),
-      //             ),
-      //           ),
-      //           const Gap(10),
-      //           if (_onFilterScreen || _showFilters)
-      //             SizedBox(
-      //               height: 65,
-      //               child: ListView.separated(
-      //                 padding: const EdgeInsets.symmetric(
-      //                     horizontal: AppSizes.horizontalPaddingSmall),
-      //                 separatorBuilder: (context, index) => const Gap(15),
-      //                 itemCount: _foodCategories.length,
-      //                 scrollDirection: Axis.horizontal,
-      //                 itemBuilder: (context, index) {
-      //                   final foodCategory = _foodCategories[index];
-      //                   return InkWell(
-      //                     onTap: () {
-      //                       if (index == 0) {
-      //                         navigatorKey.currentState!.push(MaterialPageRoute(
-      //                           builder: (context) => GroceryGroceryScreen(
-      //                               stores: _groceryGroceryStores),
-      //                         ));
-      //                       } else if (index == 2) {
-      //                         navigatorKey.currentState!.push(MaterialPageRoute(
-      //                           builder: (context) =>
-      //                               AlcoholScreen(alcoholStores: _alcoholStores),
-      //                         ));
-      //                       } else if (index == 4) {
-      //                         navigatorKey.currentState!.push(MaterialPageRoute(
-      //                           builder: (context) => PharmacyScreen(
-      //                               pharmacyStores: _pharmacyStores),
-      //                         ));
-      //                       }
-      //                     },
-      //                     child: SizedBox(
-      //                       width: 60,
-      //                       child: Column(
-      //                         children: [
-      //                           Image.asset(
-      //                             foodCategory.image,
-      //                             height: 45,
-      //                           ),
-      //                           AppText(
-      //                             text: foodCategory.name,
-      //                             overflow: TextOverflow.ellipsis,
-      //                           )
-      //                         ],
-      //                       ),
-      //                     ),
-      //                   );
-      //                 },
-      //               ),
-      //             ),
-      //         ],
-      //       ),
-      //     ),
-      //   ],
-      // )
+    // _rotations = List.generate(
+    //     _foodCategories.length,
+    //     (index) => Tween<double>(begin: 0, end: 0.7).animate(
+    //           // Adjust value for hop height
+    //           CurvedAnimation(
+    //               parent: _animationControllers[index],
+    //               curve: Curves.easeInOut), // Smooth animation
+    //         ));
+  }
+
+  Future<List<DocumentReference>> _getFeaturedStoreRefs() async {
+    final featuredGroceryStoresSnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.featuredStores)
+        .get();
+    final documentSnapshots = featuredGroceryStoresSnapshot.docs;
+    List<DocumentReference> storeRefs = [];
+    for (var docSnapshot in documentSnapshots) {
+      storeRefs.add(docSnapshot.data().values.first);
+    }
+    return storeRefs;
+  }
+}
+
+class CategoriesListView extends ConsumerWidget {
+  const CategoriesListView({
+    super.key,
+    required List<FoodCategory> groceryCategories,
+    required List<Store> groceryGroceryStores,
+    required List<Store> alcoholStores,
+    required List<Store> pharmacyStores,
+  })  : _groceryCategories = groceryCategories,
+        _groceryGroceryStores = groceryGroceryStores,
+        _alcoholStores = alcoholStores,
+        _pharmacyStores = pharmacyStores;
+
+  final List<FoodCategory> _groceryCategories;
+  final List<Store> _groceryGroceryStores;
+  final List<Store> _alcoholStores;
+  final List<Store> _pharmacyStores;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      height: 65,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.horizontalPaddingSmall),
+        separatorBuilder: (context, index) => const Gap(15),
+        itemCount: _groceryCategories.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          final category = _groceryCategories[index];
+          return InkWell(
+            onTap: () {
+              switch (category.name) {
+                case 'Grocery':
+                  navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) =>
+                        GroceryGroceryScreen(stores: _groceryGroceryStores),
+                  ));
+                  break;
+                case 'Alcohol':
+                  ref.read(bottomNavIndexProvider.notifier).showAlcoholScreen();
+                  break;
+                case 'Pharmacy':
+                  ref
+                      .read(bottomNavIndexProvider.notifier)
+                      .showPharmacyScreen();
+                  break;
+                // case 'Gifts':
+                //   navigatorKey.currentState!.push(MaterialPageRoute(
+                //     builder: (context) => Material(child: const GiftScreen()),
+                //   ));
+                //   break;
+                default:
+                  break;
+              }
+            },
+            child: SizedBox(
+              width: 55,
+              child: Column(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: category.image,
+                    height: 45,
+                    width: 45,
+                  ),
+                  AppText(
+                    text: category.name,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

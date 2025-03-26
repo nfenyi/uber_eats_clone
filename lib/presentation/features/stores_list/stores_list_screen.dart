@@ -11,7 +11,7 @@ import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
-import '../grocery_store/screens/grocery_store_screens.dart';
+import '../grocery_store/screens/screens/grocery_store_main_screen.dart';
 import '../home/home_screen.dart';
 
 class StoresListScreen extends StatefulWidget {
@@ -51,8 +51,6 @@ class _StoresListScreenState extends State<StoresListScreen> {
                   } else {
                     return StoreScreen(
                       store,
-                      userLocation: Hive.box(AppBoxes.appState)
-                          .get(BoxKeys.userInfo)['addresses']['latlng'],
                     );
                   }
                 },

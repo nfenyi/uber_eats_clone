@@ -86,21 +86,22 @@ class _MapScreenState extends State<MapScreen> {
     );
     _stores = widget.filteredStores;
     for (var i = 0; i < _stores.length; i++) {
+      final storeLatlng = _stores[i].location.latlng as GeoPoint;
       _markers.add(
         Marker(
             onTap: () async {
               final controller = await _mapController.future;
+
               await controller.moveCamera(CameraUpdate.newCameraPosition(
                   CameraPosition(
-                      target: LatLng(_stores[i].location.latlng.latitude,
-                          _stores[i].location.latlng.longitude),
+                      target:
+                          LatLng(storeLatlng.latitude, storeLatlng.longitude),
                       zoom: 15)));
               await _carouselController.animateToPage(i);
               // _carouselController.jumpTo(e.)
             },
             markerId: MarkerId(_stores[i].name),
-            position: LatLng(_stores[i].location.latlng.latitude,
-                _stores[i].location.latlng.longitude)),
+            position: LatLng(storeLatlng.latitude, storeLatlng.longitude)),
       );
     }
   }
@@ -116,19 +117,21 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          GoogleMap(
-            markers: _markers,
-            zoomControlsEnabled: false,
-            myLocationButtonEnabled: true,
-            minMaxZoomPreference: const MinMaxZoomPreference(10, 30),
-            onMapCreated: (controller) {
-              _mapController.complete(controller);
-            },
-            initialCameraPosition: CameraPosition(
-                target: LatLng(_stores.first.location.latlng.latitude,
-                    _stores.first.location.latlng.longitude),
-                zoom: 15),
-          ),
+          Builder(builder: (context) {
+            final storeLatlng = _stores.first.location.latlng as GeoPoint;
+            return GoogleMap(
+              markers: _markers,
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: true,
+              minMaxZoomPreference: const MinMaxZoomPreference(10, 30),
+              onMapCreated: (controller) {
+                _mapController.complete(controller);
+              },
+              initialCameraPosition: CameraPosition(
+                  target: LatLng(storeLatlng.latitude, storeLatlng.longitude),
+                  zoom: 15),
+            );
+          }),
           SafeArea(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -173,6 +176,9 @@ class _MapScreenState extends State<MapScreen> {
                                         .toList();
                                     _markers.clear();
                                     for (var i = 0; i < _stores.length; i++) {
+                                      final storelatLng = _stores[i]
+                                          .location
+                                          .latlng as GeoPoint;
                                       _markers.add(
                                         Marker(
                                             onTap: () async {
@@ -182,13 +188,9 @@ class _MapScreenState extends State<MapScreen> {
                                                   CameraUpdate.newCameraPosition(
                                                       CameraPosition(
                                                           target: LatLng(
-                                                              _stores[i]
-                                                                  .location
-                                                                  .latlng
+                                                              storelatLng
                                                                   .latitude,
-                                                              _stores[i]
-                                                                  .location
-                                                                  .latlng
+                                                              storelatLng
                                                                   .longitude),
                                                           zoom: 15)));
                                               await _carouselController
@@ -197,14 +199,8 @@ class _MapScreenState extends State<MapScreen> {
                                             },
                                             markerId: MarkerId(_stores[i].name),
                                             position: LatLng(
-                                                _stores[i]
-                                                    .location
-                                                    .latlng
-                                                    .latitude,
-                                                _stores[i]
-                                                    .location
-                                                    .latlng
-                                                    .longitude)),
+                                                storelatLng.latitude,
+                                                storelatLng.longitude)),
                                       );
                                     }
                                   });
@@ -921,6 +917,7 @@ class _MapScreenState extends State<MapScreen> {
                     itemCount: _stores.length,
                     itemBuilder: (context, index, realIndex) {
                       final store = _stores[index];
+                      final storelatLng = store.location.latlng as GeoPoint;
 
                       return Card(
                         color: Colors.white,
@@ -969,7 +966,7 @@ class _MapScreenState extends State<MapScreen> {
                                     ),
                                   AppText(
                                       text:
-                                          '${store.delivery.estimatedDeliveryTime} min • ${_distance.as(lt.LengthUnit.Kilometer, lt.LatLng(store.location.latlng.latitude, store.location.latlng.longitude), lt.LatLng(widget.userLocation.latitude!, widget.userLocation.longitude!))} km'),
+                                          '${store.delivery.estimatedDeliveryTime} min • ${_distance.as(lt.LengthUnit.Kilometer, lt.LatLng(storelatLng.latitude, storelatLng.longitude), lt.LatLng(widget.userLocation.latitude, widget.userLocation.longitude))} km'),
                                 ],
                               ),
                             ),
@@ -993,11 +990,12 @@ class _MapScreenState extends State<MapScreen> {
                         enableInfiniteScroll: false,
                         onPageChanged: (index, reason) async {
                           final controller = await _mapController.future;
+                          final storelatLng =
+                              _stores[index].location.latlng as GeoPoint;
                           await controller.moveCamera(
                               CameraUpdate.newCameraPosition(CameraPosition(
-                                  target: LatLng(
-                                      _stores[index].location.latlng.latitude,
-                                      _stores[index].location.latlng.longitude),
+                                  target: LatLng(storelatLng.latitude,
+                                      storelatLng.longitude),
                                   zoom: 15)));
                         },
                         viewportFraction: 0.85),

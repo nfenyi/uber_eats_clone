@@ -8,7 +8,8 @@ part 'offer_model.g.dart';
 @freezed
 class Offer with _$Offer {
   const factory Offer({
-    required Product product,
+    required String id,
+    required Object product,
     required Store store,
     required String title,
   }) = _Offer;

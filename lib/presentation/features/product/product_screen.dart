@@ -15,8 +15,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../app_functions.dart';
@@ -25,7 +23,6 @@ import '../../constants/app_sizes.dart';
 import '../../constants/weblinks.dart';
 import '../../core/app_colors.dart';
 import '../webview/webview_screen.dart';
-import 'back_up_option_screen.dart';
 import 'product_image_screen.dart';
 import 'sub_option_selection_screen.dart';
 
@@ -96,6 +93,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                   pinned: true,
                   floating: true,
                   flexibleSpace: FlexibleSpaceBar(
+                    // titlePadding: EdgeInsets.only(left: 50),
                     expandedTitleScale: 1.1,
                     title: AppText(
                       text: _product.name,
@@ -1031,42 +1029,13 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                       borderRadius: BorderRadius.circular(12),
                                       child: Builder(
                                         builder: (context) {
-                                          if (similarProduct.imageUrls.first
-                                              .startsWith('http')) {
-                                            return CachedNetworkImage(
-                                              imageUrl: similarProduct
-                                                  .imageUrls.first,
-                                              width: 100,
-                                              height: 100,
-                                              fit: BoxFit.fill,
-                                            );
-                                          } else if (similarProduct
-                                              .imageUrls.first
-                                              .startsWith('data:image')) {
-                                            // It's a base64 string
-                                            try {
-                                              String base64String =
-                                                  similarProduct.imageUrls.first
-                                                      .split(',')
-                                                      .last;
-                                              Uint8List bytes =
-                                                  base64Decode(base64String);
-                                              return Image.memory(
-                                                  width: 100,
-                                                  height: 100,
+                                          return AppFunctions
+                                              .displayNetworkImage(
+                                                  similarProduct
+                                                      .imageUrls.first,
                                                   fit: BoxFit.fill,
-                                                  bytes);
-                                            } catch (e) {
-                                              // logger.d(
-                                              //     'Error decoding base64 image: $e');
-                                              return const AppText(
-                                                  text: 'Error loading image');
-                                            }
-                                          } else {
-                                            // Handle invalid image source (neither URL nor base64)
-                                            return const AppText(
-                                                text: 'Invalid image source');
-                                          }
+                                                  height: 100,
+                                                  width: 100);
                                         },
                                       ),
                                     ),

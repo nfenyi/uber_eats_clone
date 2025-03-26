@@ -20,7 +20,8 @@ Offer _$OfferFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Offer {
-  Product get product => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError;
+  Object get product => throw _privateConstructorUsedError;
   Store get store => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
 
@@ -38,9 +39,8 @@ abstract class $OfferCopyWith<$Res> {
   factory $OfferCopyWith(Offer value, $Res Function(Offer) then) =
       _$OfferCopyWithImpl<$Res, Offer>;
   @useResult
-  $Res call({Product product, Store store, String title});
+  $Res call({String id, Object product, Store store, String title});
 
-  $ProductCopyWith<$Res> get product;
   $StoreCopyWith<$Res> get store;
 }
 
@@ -59,15 +59,17 @@ class _$OfferCopyWithImpl<$Res, $Val extends Offer>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? product = null,
     Object? store = null,
     Object? title = null,
   }) {
     return _then(_value.copyWith(
-      product: null == product
-          ? _value.product
-          : product // ignore: cast_nullable_to_non_nullable
-              as Product,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      product: null == product ? _value.product : product,
       store: null == store
           ? _value.store
           : store // ignore: cast_nullable_to_non_nullable
@@ -77,16 +79,6 @@ class _$OfferCopyWithImpl<$Res, $Val extends Offer>
           : title // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
-  }
-
-  /// Create a copy of Offer
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $ProductCopyWith<$Res> get product {
-    return $ProductCopyWith<$Res>(_value.product, (value) {
-      return _then(_value.copyWith(product: value) as $Val);
-    });
   }
 
   /// Create a copy of Offer
@@ -107,10 +99,8 @@ abstract class _$$OfferImplCopyWith<$Res> implements $OfferCopyWith<$Res> {
       __$$OfferImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({Product product, Store store, String title});
+  $Res call({String id, Object product, Store store, String title});
 
-  @override
-  $ProductCopyWith<$Res> get product;
   @override
   $StoreCopyWith<$Res> get store;
 }
@@ -128,15 +118,17 @@ class __$$OfferImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? product = null,
     Object? store = null,
     Object? title = null,
   }) {
     return _then(_$OfferImpl(
-      product: null == product
-          ? _value.product
-          : product // ignore: cast_nullable_to_non_nullable
-              as Product,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      product: null == product ? _value.product : product,
       store: null == store
           ? _value.store
           : store // ignore: cast_nullable_to_non_nullable
@@ -153,13 +145,18 @@ class __$$OfferImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$OfferImpl implements _Offer {
   const _$OfferImpl(
-      {required this.product, required this.store, required this.title});
+      {required this.id,
+      required this.product,
+      required this.store,
+      required this.title});
 
   factory _$OfferImpl.fromJson(Map<String, dynamic> json) =>
       _$$OfferImplFromJson(json);
 
   @override
-  final Product product;
+  final String id;
+  @override
+  final Object product;
   @override
   final Store store;
   @override
@@ -167,7 +164,7 @@ class _$OfferImpl implements _Offer {
 
   @override
   String toString() {
-    return 'Offer(product: $product, store: $store, title: $title)';
+    return 'Offer(id: $id, product: $product, store: $store, title: $title)';
   }
 
   @override
@@ -175,14 +172,16 @@ class _$OfferImpl implements _Offer {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$OfferImpl &&
-            (identical(other.product, product) || other.product == product) &&
+            (identical(other.id, id) || other.id == id) &&
+            const DeepCollectionEquality().equals(other.product, product) &&
             (identical(other.store, store) || other.store == store) &&
             (identical(other.title, title) || other.title == title));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, product, store, title);
+  int get hashCode => Object.hash(runtimeType, id,
+      const DeepCollectionEquality().hash(product), store, title);
 
   /// Create a copy of Offer
   /// with the given fields replaced by the non-null parameter values.
@@ -202,14 +201,17 @@ class _$OfferImpl implements _Offer {
 
 abstract class _Offer implements Offer {
   const factory _Offer(
-      {required final Product product,
+      {required final String id,
+      required final Object product,
       required final Store store,
       required final String title}) = _$OfferImpl;
 
   factory _Offer.fromJson(Map<String, dynamic> json) = _$OfferImpl.fromJson;
 
   @override
-  Product get product;
+  String get id;
+  @override
+  Object get product;
   @override
   Store get store;
   @override
