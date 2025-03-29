@@ -11,7 +11,7 @@ import 'package:iconify_flutter/icons/simple_line_icons.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/communication/communication_screen.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/voice_command_screen.dart';
-import 'package:uber_eats_clone/presentation/features/gifts/screens/send_gifts_screen.dart';
+import 'package:uber_eats_clone/presentation/features/gifts/screens/send_gifts_intro_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/about/about_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/business_preferences/turn_on_business_preferences_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/favorites_screen.dart';
@@ -362,7 +362,7 @@ class _AccountScreenState extends State<AccountScreen> {
           ListTile(
             onTap: () {
               navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => const SendGiftsScreen(),
+                builder: (context) => const SendGiftsIntroScreen(),
               ));
             },
             leading: const Iconify(Ph.gift),

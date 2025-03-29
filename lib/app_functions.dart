@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
+import 'package:uber_eats_clone/models/offer/offer_model.dart';
 import 'package:uber_eats_clone/models/promotion/promotion_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -75,6 +76,12 @@ class AppFunctions {
     return Product.fromJson(productJson);
   }
 
+  static Future<Offer> loadOfferReference(DocumentReference reference) async {
+    final offerJson = await loadDocReference(reference);
+
+    return Offer.fromJson(offerJson);
+  }
+
   static Future<Store> loadStoreReference(DocumentReference reference) async {
     final storeJson = await loadDocReference(reference);
 
@@ -82,8 +89,8 @@ class AppFunctions {
   }
 
   static Widget displayNetworkImage(String image,
-      {required double width,
-      required double height,
+      {double? width,
+      double? height,
       BoxFit? fit,
       String placeholderAssetImage = AssetNames.aisleImage}) {
     if (image.startsWith('http')) {

@@ -12,14 +12,14 @@ import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_n
 
 import '../../../core/app_colors.dart';
 
-class SendGiftsScreen extends ConsumerStatefulWidget {
-  const SendGiftsScreen({super.key});
+class SendGiftsIntroScreen extends ConsumerStatefulWidget {
+  const SendGiftsIntroScreen({super.key});
 
   @override
-  ConsumerState<SendGiftsScreen> createState() => _SendGiftsState();
+  ConsumerState<SendGiftsIntroScreen> createState() => _SendGiftsIntroState();
 }
 
-class _SendGiftsState extends ConsumerState<SendGiftsScreen> {
+class _SendGiftsIntroState extends ConsumerState<SendGiftsIntroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
