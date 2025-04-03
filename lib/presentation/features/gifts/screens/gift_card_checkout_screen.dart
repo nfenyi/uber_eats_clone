@@ -11,9 +11,6 @@ import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_card_screen.dart';
-import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen.dart';
-import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
@@ -33,14 +30,21 @@ class GiftCardCheckoutScreen extends ConsumerStatefulWidget {
 
 class _GiftCardCheckoutScreenState
     extends ConsumerState<GiftCardCheckoutScreen> {
-  String? _selectedSendMethod;
+  late String _selectedSendMethod;
 
-  final List<String> _giftAmounts = ['Send Now', 'Schedule'];
-  String? _selectedSendTime;
+  final List<String> _giftSchedules = ['Send Now', 'Schedule'];
+  late String _selectedSendSchedule;
   final List<String> _sendMethods = ['Message', 'Email'];
   final _webViewcontroller = WebViewControllerPlus();
 
   final _emailController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedSendSchedule = _giftSchedules.first;
+    _selectedSendMethod = _sendMethods.first;
+  }
 
   @override
   void dispose() {
@@ -75,17 +79,17 @@ class _GiftCardCheckoutScreenState
                   ),
                   ChipsChoice<String>.single(
                     padding: EdgeInsets.zero,
-                    value: _selectedSendTime,
+                    value: _selectedSendSchedule,
                     onChanged: (value) {
                       setState(() {
-                        _selectedSendTime = value;
+                        _selectedSendSchedule = value;
                         if (value == 'Schedule') {
                           _selectedSendMethod == 'Email';
                         }
                       });
                     },
                     choiceItems: C2Choice.listFrom<String, String>(
-                      source: _giftAmounts,
+                      source: _giftSchedules,
                       value: (i, v) => v,
                       label: (i, v) => v,
                     ),
@@ -102,7 +106,7 @@ class _GiftCardCheckoutScreenState
                       color: AppColors.neutral200,
                     ),
                   ),
-                  if (_selectedSendTime == 'Schedule')
+                  if (_selectedSendSchedule == 'Schedule')
                     ListTile(
                       leading: const Icon(Icons.calendar_month_outlined),
                       title: const AppText(
@@ -128,7 +132,7 @@ class _GiftCardCheckoutScreenState
                       setState(() {
                         _selectedSendMethod = value;
                         if (value == 'Message') {
-                          _selectedSendTime = 'Send Now';
+                          _selectedSendSchedule = 'Send Now';
                         }
                       });
 

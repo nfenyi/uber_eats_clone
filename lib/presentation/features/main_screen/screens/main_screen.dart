@@ -4,9 +4,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
+import 'package:uber_eats_clone/models/store/store_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/account_screen.dart';
@@ -15,6 +16,7 @@ import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_category_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery/screens/grocery_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
+import 'package:uber_eats_clone/state/shops_state_stream_provider.dart';
 
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
@@ -22,6 +24,9 @@ import '../../alcohol/alcohol_screen.dart';
 import '../../gifts/screens/gift_screen.dart';
 import '../../pharmacy/screens/pharmacy_screen.dart';
 import '../state/bottom_nav_index_provider.dart';
+
+late List<Store> allStores;
+late List<FavouriteStore> favoriteStores;
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -47,12 +52,15 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   void initState() {
     super.initState();
+    _getAccountStatus();
     _currentScreen = ref.read(bottomNavIndexProvider);
   }
 
   @override
   Widget build(BuildContext context) {
     final int bottomNavIndex = ref.watch(bottomNavIndexProvider);
+    allStores = ref.watch(storesProvider).value ?? [];
+    favoriteStores = ref.watch(favoriteStoresProvider).value ?? [];
     if (bottomNavIndex < 6) {
       _currentScreen = bottomNavIndex;
     }
@@ -70,9 +78,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 ? const GiftScreen()
                 : bottomNavIndex == 7
                     ? const GiftCategoryScreen()
-                    : bottomNavIndex == 7
-                        ? const AlcoholScreen()
-                        : const PharmacyScreen(),
+                    : const PharmacyScreen(),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentScreen,
           onTap: (value) {
@@ -149,53 +155,47 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               // 'Budgets',
             ),
             BottomNavigationBarItem(
-              activeIcon: Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  _accountType == 'Personal'
-                      ? const Icon(
-                          Icons.person,
-                          // color: AppColors.primary,
-                          size: 27,
-                        )
-                      : const Iconify(
-                          Mdi.briefcase,
-                          size: 26,
-                        ),
-                  if (_hasUberOne == true)
-                    Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(50)),
-                      child: Image.asset(
-                        AssetNames.uberOneSmall,
-                        width: 17,
-                      ),
-                    ),
-                ],
-              ),
-
-              icon: FutureBuilder(
-                  future: _getAccountStatus(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Skeletonizer(
-                          child: Container(
-                        height: 35,
-                        width: 35,
-                        color: Colors.blue,
-                      ));
-                    } else if (snapshot.hasError) {
-                      logger.d(snapshot.error.toString());
-                      return const AppText(text: 'Error');
-                    }
-
-                    final isPersonal = _accountType == 'Personal';
+              activeIcon: ValueListenableBuilder(
+                  valueListenable: Hive.box(AppBoxes.appState)
+                      .listenable(keys: [BoxKeys.userInfo]),
+                  builder: (context, box, child) {
+                    // if(box.get(BoxKeys.userInfo) == nul)
 
                     return Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        isPersonal
+                        _accountType == 'Personal'
+                            ? const Icon(
+                                Icons.person,
+                                // color: AppColors.primary,
+                                size: 27,
+                              )
+                            : const Iconify(
+                                Mdi.briefcase,
+                                size: 26,
+                              ),
+                        if (_hasUberOne == true)
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(50)),
+                            child: Image.asset(
+                              AssetNames.uberOneSmall,
+                              width: 17,
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
+
+              icon: ValueListenableBuilder(
+                  valueListenable: Hive.box(AppBoxes.appState)
+                      .listenable(keys: [BoxKeys.userInfo]),
+                  builder: (context, box, child) {
+                    return Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        _accountType == 'Personal'
                             ? const Icon(
                                 Icons.person,
                                 size: 27,

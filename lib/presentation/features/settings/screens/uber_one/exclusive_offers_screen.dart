@@ -8,6 +8,7 @@ import '../../../../constants/app_sizes.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_text.dart';
 import '../../../home/home_screen.dart';
+import '../../../main_screen/screens/main_screen.dart';
 
 class ExclusiveOffersScreen extends StatefulWidget {
   const ExclusiveOffersScreen({super.key});
@@ -21,12 +22,12 @@ class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
     Offer(
         id: '456465',
         product: products.entries.first.value,
-        store: stores[2],
+        store: allStores[2],
         title: "Buy 1 get 1 free"),
     Offer(
         id: '4453543',
         product: products.entries.first.value,
-        store: stores[2],
+        store: allStores[2],
         title: "Buy 1 get 1 free"),
   ];
   @override

@@ -151,6 +151,10 @@ class UberEatsClone extends StatelessWidget {
         navigatorKey: navigatorKey,
         title: 'Uber Eats Clone',
         theme: ThemeData(
+          progressIndicatorTheme: const ProgressIndicatorThemeData(
+            color: Colors.black,
+            linearTrackColor: AppColors.neutral100,
+          ),
           dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
           sliderTheme:
               const SliderThemeData(inactiveTrackColor: AppColors.neutral100),
@@ -327,6 +331,7 @@ class BoxKeys {
   static const String activatedPromoPath = 'activatedPromoPath';
   static const String recentlyViewed = 'recentlyViewed';
   static const String firstTimeSendingGift = 'firstTimeSendingGift';
+  static const String isOnboardedToUberGifts = 'isOnboardedToUberGifts';
 
   const BoxKeys._();
 }

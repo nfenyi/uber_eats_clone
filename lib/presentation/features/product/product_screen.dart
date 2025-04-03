@@ -15,6 +15,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/product/back_up_option_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../app_functions.dart';
@@ -22,6 +23,7 @@ import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/weblinks.dart';
 import '../../core/app_colors.dart';
+import '../address/screens/addresses_screen.dart';
 import '../webview/webview_screen.dart';
 import 'product_image_screen.dart';
 import 'sub_option_selection_screen.dart';
@@ -49,7 +51,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   bool _footerButtonTapped = false;
   late final List<int> _optionQuantities;
 
-  final String _backupInstruction = 'Best match';
+  String? _backupInstruction = 'Best match';
 
   final _noteController = TextEditingController();
 
@@ -567,134 +569,167 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                           ),
                         ),
                       ),
-                      //Add note
-                      // const Gap(10),
-                      // ListTile(
-                      //     onTap: () {
-                      //       showModalBottomSheet(
-                      //         isScrollControlled: true,
-                      //         useSafeArea: true,
-                      //         context: context,
-                      //         builder: (context) {
-                      //           return Container(
-                      //             height: double.infinity,
-                      //             decoration: const BoxDecoration(
-                      //                 color: Colors.white,
-                      //                 borderRadius: BorderRadius.only(
-                      //                     topLeft: Radius.circular(10),
-                      //                     topRight: Radius.circular(10))),
-                      //             child: Column(
-                      //               mainAxisAlignment:
-                      //                   MainAxisAlignment.spaceBetween,
-                      //               children: [
-                      //                 Column(
-                      //                   crossAxisAlignment:
-                      //                       CrossAxisAlignment.start,
-                      //                   children: [
-                      //                     AppBar(
-                      //                       title: const AppText(
-                      //                         text: 'Add replacement or note',
-                      //                         size: AppSizes.heading6,
-                      //                       ),
-                      //                       leading: GestureDetector(
-                      //                           onTap: () => navigatorKey
-                      //                               .currentState!
-                      //                               .pop(),
-                      //                           child: const Icon(Icons.clear)),
-                      //                     ),
-                      //                     Padding(
-                      //                       padding: const EdgeInsets.symmetric(
-                      //                           horizontal: AppSizes
-                      //                               .horizontalPaddingSmall),
-                      //                       child: Column(
-                      //                         crossAxisAlignment:
-                      //                             CrossAxisAlignment.start,
-                      //                         children: [
-                      //                           const AppText(
-                      //                             text: 'Add note',
-                      //                             size: AppSizes.bodySmall,
-                      //                           ),
-                      //                           const Gap(10),
-                      //                           AppTextFormField(
-                      //                             controller: _noteController,
-                      //                             hintText:
-                      //                                 'e.g. Green bananas please',
-                      //                           ),
-                      //                           const Gap(10),
-                      //                           const AppText(
-                      //                             text: 'Backup instructions',
-                      //                             size: AppSizes.bodySmall,
-                      //                           ),
-                      //                         ],
-                      //                       ),
-                      //                     ),
-                      //                     AppRadioListTile(
-                      //                       controlAffinity:
-                      //                           ListTileControlAffinity.leading,
-                      //                       value: 'Best match',
-                      //                       subtitle:
-                      //                           'Your shopper will select an item similar price and quality',
-                      //                       groupValue: _backupInstruction,
-                      //                     ),
-                      //                     AppRadioListTile(
-                      //                       secondary: AppButton2(
-                      //                           text: 'Select',
-                      //                           callback: () {
-                      //                             navigatorKey.currentState!
-                      //                                 .push(MaterialPageRoute(
-                      //                               builder: (context) {
-                      //                                 return BackUpOptionScreen(
-                      //                                     product:
-                      //                                         widget.product,
-                      //                                     store: widget.store);
-                      //                               },
-                      //                             ));
-                      //                           }),
-                      //                       controlAffinity:
-                      //                           ListTileControlAffinity.leading,
-                      //                       value: 'Specific item',
-                      //                       subtitle:
-                      //                           'Select a specific replacement item if your selection is unavailable, your shopper will use Best Match to select a similar replacement.',
-                      //                       groupValue: _backupInstruction,
-                      //                     ),
-                      //                     AppRadioListTile(
-                      //                       controlAffinity:
-                      //                           ListTileControlAffinity.leading,
-                      //                       value: 'Refund item',
-                      //                       subtitle:
-                      //                           'Refund item if unavailable',
-                      //                       groupValue: _backupInstruction,
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //                 const Padding(
-                      //                   padding: EdgeInsets.symmetric(
-                      //                       horizontal: AppSizes
-                      //                           .horizontalPaddingSmall),
-                      //                   child: Column(
-                      //                     children: [
-                      //                       AppButton(text: 'Update'),
-                      //                       Gap(10),
-                      //                     ],
-                      //                   ),
-                      //                 )
-                      //               ],
-                      //             ),
-                      //           );
-                      //         },
-                      //       );
-                      //     },
-                      //     contentPadding: EdgeInsets.zero,
-                      //     leading: const Icon(Icons.repeat),
-                      //     title: AppText(
-                      //       text: _note.isEmpty
-                      //           ? 'Add note or edit replacement'
-                      //           : _note,
-                      //       weight: FontWeight.w600,
-                      //     ),
-                      //     trailing: const Icon(Icons.keyboard_arrow_right),
-                      //     subtitle: AppText(text: _backupInstruction))
-                      // Gap(10),
+                      // Add note
+                      if (widget.store.type.toLowerCase().contains('grocery'))
+                        Column(children: [
+                          const Gap(10),
+                          ListTile(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  useSafeArea: true,
+                                  context: context,
+                                  builder: (context) {
+                                    return Container(
+                                      height: double.infinity,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10))),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              AppBar(
+                                                title: const AppText(
+                                                  text:
+                                                      'Add replacement or note',
+                                                  size: AppSizes.heading6,
+                                                ),
+                                                leading: GestureDetector(
+                                                    onTap: () => navigatorKey
+                                                        .currentState!
+                                                        .pop(),
+                                                    child: const Icon(
+                                                        Icons.clear)),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets
+                                                    .symmetric(
+                                                    horizontal: AppSizes
+                                                        .horizontalPaddingSmall),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const AppText(
+                                                      text: 'Add note',
+                                                      size: AppSizes.bodySmall,
+                                                    ),
+                                                    const Gap(10),
+                                                    AppTextFormField(
+                                                      controller:
+                                                          _noteController,
+                                                      hintText:
+                                                          'e.g. Green bananas please',
+                                                    ),
+                                                    const Gap(10),
+                                                    const AppText(
+                                                      text:
+                                                          'Backup instructions',
+                                                      size: AppSizes.bodySmall,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              RadioListTile(
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    _backupInstruction = value;
+                                                  });
+                                                },
+                                                controlAffinity:
+                                                    ListTileControlAffinity
+                                                        .leading,
+                                                value: 'Best match',
+                                                subtitle: const AppText(
+                                                    text:
+                                                        'Your shopper will select an item similar price and quality'),
+                                                groupValue: _backupInstruction,
+                                              ),
+                                              RadioListTile(
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    _backupInstruction = value;
+                                                  });
+                                                },
+                                                secondary: AppButton2(
+                                                    text: 'Select',
+                                                    callback: () {
+                                                      navigatorKey.currentState!
+                                                          .push(
+                                                              MaterialPageRoute(
+                                                        builder: (context) {
+                                                          return BackUpOptionScreen(
+                                                              product: widget
+                                                                  .product,
+                                                              store:
+                                                                  widget.store);
+                                                        },
+                                                      ));
+                                                    }),
+                                                controlAffinity:
+                                                    ListTileControlAffinity
+                                                        .leading,
+                                                value: 'Specific item',
+                                                subtitle: const AppText(
+                                                    text:
+                                                        'Select a specific replacement item if your selection is unavailable, your shopper will use Best Match to select a similar replacement.'),
+                                                groupValue: _backupInstruction,
+                                              ),
+                                              RadioListTile(
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    _backupInstruction = value;
+                                                  });
+                                                },
+                                                controlAffinity:
+                                                    ListTileControlAffinity
+                                                        .leading,
+                                                value: 'Refund item',
+                                                subtitle: const AppText(
+                                                  text:
+                                                      'Refund item if unavailable',
+                                                ),
+                                                groupValue: _backupInstruction,
+                                              ),
+                                            ],
+                                          ),
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: AppSizes
+                                                    .horizontalPaddingSmall),
+                                            child: Column(
+                                              children: [
+                                                AppButton(text: 'Update'),
+                                                Gap(10),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(Icons.repeat),
+                              title: AppText(
+                                text: _note.isEmpty
+                                    ? 'Add note or edit replacement'
+                                    : _note,
+                                weight: FontWeight.w600,
+                              ),
+                              trailing: const Icon(Icons.keyboard_arrow_right),
+                              subtitle:
+                                  AppText(text: _backupInstruction.toString())),
+                          const Gap(10),
+                        ])
                     ],
                   ),
                 ),
@@ -763,7 +798,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           child: Container(
-                                            color: Colors.blue,
+                                            color: AppColors.neutral100,
                                             width: 100,
                                             height: 100,
                                           ),
@@ -952,123 +987,156 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         separatorBuilder: (context, index) => const Divider(),
                         itemCount: _product.similarProducts!.length,
                         itemBuilder: (context, index) {
-                          final similarProduct =
-                              _product.similarProducts![index];
-                          return InkWell(
-                            onTap: () {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) => ProductScreen(
-                                  product: similarProduct,
-                                  store: widget.store,
-                                ),
-                              ));
-                            },
-                            child: Row(
-                              // crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      AppText(
-                                        text: similarProduct.name,
-                                        weight: FontWeight.w600,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Visibility(
-                                            visible:
-                                                similarProduct.promoPrice !=
-                                                    null,
-                                            child: Row(
-                                              children: [
-                                                AppText(
+                          return FutureBuilder<Product>(
+                              future: AppFunctions.loadProductReference(_product
+                                  .similarProducts[index] as DocumentReference),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final similarProduct = snapshot.data!;
+                                  return InkWell(
+                                    onTap: () {
+                                      navigatorKey.currentState!
+                                          .push(MaterialPageRoute(
+                                        builder: (context) => ProductScreen(
+                                          product: similarProduct,
+                                          store: widget.store,
+                                        ),
+                                      ));
+                                    },
+                                    child: Row(
+                                      // crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              AppText(
+                                                text: similarProduct.name,
+                                                weight: FontWeight.w600,
+                                                maxLines: 3,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Visibility(
+                                                    visible: similarProduct
+                                                            .promoPrice !=
+                                                        null,
+                                                    child: Row(
+                                                      children: [
+                                                        AppText(
+                                                            text:
+                                                                '\$${similarProduct.promoPrice}',
+                                                            color:
+                                                                Colors.green),
+                                                        const Gap(5),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  AppText(
                                                     text:
-                                                        '\$${similarProduct.promoPrice}',
-                                                    color: Colors.green),
-                                                const Gap(5),
-                                              ],
-                                            ),
-                                          ),
-                                          AppText(
-                                            text:
-                                                '\$${similarProduct.initialPrice}',
-                                            decoration:
-                                                similarProduct.promoPrice !=
-                                                        null
-                                                    ? TextDecoration.lineThrough
-                                                    : TextDecoration.none,
-                                          ),
-                                          if (similarProduct.calories != null)
-                                            AppText(
-                                              text:
-                                                  ' • ${similarProduct.calories!.toInt()} Cal.',
-                                              color: AppColors.neutral500,
-                                              overflow: TextOverflow.ellipsis,
-                                            )
-                                        ],
-                                      ),
-                                      if (similarProduct.description != null)
-                                        AppText(
-                                          text: similarProduct.description!,
-                                          maxLines: 2,
-                                          color: AppColors.neutral500,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                const Gap(20),
-                                Stack(
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Builder(
-                                        builder: (context) {
-                                          return AppFunctions
-                                              .displayNetworkImage(
-                                                  similarProduct
-                                                      .imageUrls.first,
-                                                  fit: BoxFit.fill,
-                                                  height: 100,
-                                                  width: 100);
-                                        },
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 8.0, top: 8.0),
-                                      child: InkWell(
-                                        onTap: () {},
-                                        child: Ink(
-                                          child: Container(
-                                            padding: const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                                boxShadow: const [
-                                                  BoxShadow(
-                                                    color: Colors.black12,
-                                                    offset: Offset(2, 2),
-                                                  )
+                                                        '\$${similarProduct.initialPrice}',
+                                                    decoration: similarProduct
+                                                                .promoPrice !=
+                                                            null
+                                                        ? TextDecoration
+                                                            .lineThrough
+                                                        : TextDecoration.none,
+                                                  ),
+                                                  if (similarProduct.calories !=
+                                                      null)
+                                                    AppText(
+                                                      text:
+                                                          ' • ${similarProduct.calories!.toInt()} Cal.',
+                                                      color:
+                                                          AppColors.neutral500,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    )
                                                 ],
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(50)),
-                                            child: const Icon(
-                                              Icons.add,
-                                            ),
+                                              ),
+                                              if (similarProduct.description !=
+                                                  null)
+                                                AppText(
+                                                  text: similarProduct
+                                                      .description!,
+                                                  maxLines: 2,
+                                                  color: AppColors.neutral500,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                            ],
                                           ),
                                         ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
+                                        const Gap(20),
+                                        Stack(
+                                          alignment: Alignment.bottomRight,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: Builder(
+                                                builder: (context) {
+                                                  return AppFunctions
+                                                      .displayNetworkImage(
+                                                          similarProduct
+                                                              .imageUrls.first,
+                                                          fit: BoxFit.fill,
+                                                          height: 100,
+                                                          width: 100);
+                                                },
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 8.0, top: 8.0),
+                                              child: InkWell(
+                                                onTap: () {},
+                                                child: Ink(
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(5),
+                                                    decoration: BoxDecoration(
+                                                        boxShadow: const [
+                                                          BoxShadow(
+                                                            color:
+                                                                Colors.black12,
+                                                            offset:
+                                                                Offset(2, 2),
+                                                          )
+                                                        ],
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50)),
+                                                    child: const Icon(
+                                                      Icons.add,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return AppText(
+                                    text: snapshot.error.toString(),
+                                    maxLines: null,
+                                  );
+                                } else {
+                                  return ClipRRect(
+                                      borderRadius: BorderRadius.circular(15),
+                                      child: Container(
+                                        color: Colors.blue,
+                                        width: 110,
+                                        height: 200,
+                                      ));
+                                }
+                              });
                         },
                       ),
                     ]),
@@ -1176,7 +1244,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         size: AppSizes.bodySmallest,
                         color: AppColors.neutral500,
                         text:
-                            'The prices in this catalog are set by the merchant and may be higher than in store. Some in-store promotions may not apply.'),
+                            'The information shown here may not be current, complete or accurate. Always check the item\'s packaging for product information and warnings.\n\nThe prices in this catalog are set by the merchant and may be higher than in store. Some in-store promotions may not apply.'),
                   ),
                 ])),
               if (widget.store.type.contains('Fast Food') ||

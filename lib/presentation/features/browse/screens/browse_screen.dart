@@ -28,6 +28,7 @@ import '../../box_catering/screens/box_catering_screens.dart';
 import '../../grocery_grocery/grocery_grocery_screen.dart';
 import '../../home/home_screen.dart';
 import '../../home/screens/search_screen.dart';
+import '../../main_screen/screens/main_screen.dart';
 
 class BrowseScreen extends ConsumerStatefulWidget {
   const BrowseScreen({super.key});
@@ -84,7 +85,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
   @override
   void initState() {
     super.initState();
-    for (var store in stores) {
+    for (var store in allStores) {
       if (store.type.contains('Grocery')) {
         _groceryGroceryStores.add(store);
       }
@@ -151,7 +152,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                         onTap: () =>
                             navigatorKey.currentState!.push(MaterialPageRoute(
                           builder: (context) => SearchScreen(
-                            stores: stores,
+                            stores: allStores,
                           ),
                         )),
                         child: Ink(
@@ -533,10 +534,13 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
                                   });
                                 } else if (visiblePercentage <= 50 &&
                                     _isVideoVisible) {
-                                  setState(() {
+                                  //this bit seems to run also when i navigate to the gifts screen hence the change of code
+                                  //TODO: clean up
+                                  if (context.mounted) {
                                     _isVideoVisible = false;
-                                    _videoController!.pause();
-                                  });
+                                    await _videoController!.pause();
+                                    setState(() {});
+                                  }
                                 }
                               },
                               child: VideoPlayer(

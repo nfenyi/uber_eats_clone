@@ -14,4 +14,6 @@ class Weblinks {
 
   static const String copyrightInfringement =
       'https://www.uber.com/legal/en/document/?country=united-states&lang=en&name=report-copyright-infringement';
+  static const String uberGiftCardTerms =
+      'https://www.uber.com/legal/en/document/?country=great-britain&lang=en-gb&name=uber-gift-cards-terms-of-use';
 }

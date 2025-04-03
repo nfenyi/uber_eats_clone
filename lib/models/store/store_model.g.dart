@@ -179,8 +179,9 @@ _$ProductImpl _$$ProductImplFromJson(Map<String, dynamic> json) =>
       stores:
           (json['stores'] as List<dynamic>?)?.map((e) => e as Object).toList(),
       similarProducts: (json['similarProducts'] as List<dynamic>?)
-          ?.map((e) => Product.fromJson(e as Map<String, dynamic>))
-          .toList(),
+              ?.map((e) => e as Object)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$ProductImplToJson(_$ProductImpl instance) =>
@@ -203,8 +204,7 @@ Map<String, dynamic> _$$ProductImplToJson(_$ProductImpl instance) =>
       'isSponsored': instance.isSponsored,
       'offer': instance.offer,
       'stores': instance.stores,
-      'similarProducts':
-          instance.similarProducts?.map((e) => e.toJson()).toList(),
+      'similarProducts': instance.similarProducts,
     };
 
 _$OptionImpl _$$OptionImplFromJson(Map<String, dynamic> json) => _$OptionImpl(

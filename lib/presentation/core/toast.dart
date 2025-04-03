@@ -28,6 +28,7 @@ void showInfoToast(String message,
           child: AppText(
             text: message,
             size: 13.0,
+            maxLines: null,
             color: Colors.white,
             weight: FontWeight.w500,
             softWrap: true,

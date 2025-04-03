@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
+import 'package:uber_eats_clone/models/gift_card_category_model.dart';
 import 'package:uber_eats_clone/models/offer/offer_model.dart';
 import 'package:uber_eats_clone/models/promotion/promotion_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
@@ -18,6 +19,7 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 
 import 'hive_adapters/geopoint/geopoint_adapter.dart';
 import 'main.dart';
+import 'models/advert/advert_model.dart';
 import 'models/store/store_model.dart';
 import 'presentation/constants/other_constants.dart';
 import 'presentation/services/sign_in_view_model.dart';
@@ -44,6 +46,71 @@ class AppFunctions {
     final snapshot = await reference.get();
 
     return snapshot.data() as Map<String, dynamic>;
+  }
+
+  static Future<List<Advert>> getGiftAdverts() async {
+    final advertsSnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.adverts)
+        .get();
+    final allAdverts = advertsSnapshot.docs.map(
+      (snapshot) {
+        return Advert.fromJson(snapshot.data());
+      },
+    );
+    final giftAdverts = allAdverts
+        .where(
+          (element) => element.type.toLowerCase().contains('gift'),
+        )
+        .toList();
+    giftAdverts.shuffle();
+
+    return giftAdverts;
+  }
+
+  static Future<List<GiftCardCategory>> getGiftCardCategories() async {
+    final categoriesSnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.giftCardCategories)
+        .get();
+    final giftCategories = categoriesSnapshot.docs.map(
+      (snapshot) {
+        return GiftCardCategory.fromJson(snapshot.data());
+      },
+    ).toList();
+
+    return giftCategories;
+  }
+
+  static Future<GiftCardImage> getGiftCardImage(
+      DocumentReference giftCardRef) async {
+    final giftCardJson = await loadDocReference(giftCardRef);
+
+    return GiftCardImage.fromJson(giftCardJson);
+  }
+
+  static Future<List<Advert>> getGiftCategoryAdverts(String type) async {
+    final advertsSnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.adverts)
+        .get();
+    final allAdverts = advertsSnapshot.docs.map(
+      (snapshot) {
+        return Advert.fromJson(snapshot.data());
+      },
+    );
+    final giftAdverts = allAdverts
+        .where(
+          (element) => element.type.toLowerCase().contains(type.toLowerCase()),
+        )
+        .toList();
+    giftAdverts.shuffle();
+    // final allStoresSnapshot = await FirebaseFirestore.instance
+    //     .collection(FirestoreCollections.stores)
+    //     .get();
+    // _allStores = allStoresSnapshot.docs.map(
+    //   (snapshot) {
+    //     return Store.fromJson(snapshot.data());
+    //   },
+    // ).toList();
+    return giftAdverts;
   }
 
   static Future<List<Product>> fetchDeals(String storeId) async {
@@ -245,4 +312,8 @@ class AppFunctions {
     }
     return storedCreditCards;
   }
+
+  // static Future<List<Store>> getStores()async {
+  //   if(ref.rea)
+  // }
 }

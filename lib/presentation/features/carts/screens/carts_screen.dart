@@ -17,6 +17,7 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/orders_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery_store/screens/screens/grocery_store_main_screen.dart';
 import 'package:uber_eats_clone/presentation/features/group_order/group_order_screen.dart';
+import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen.dart';
 import 'package:uber_eats_clone/presentation/features/promotion/promo_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
@@ -123,7 +124,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
   void initState() {
     super.initState();
     HiveGeoPoint temp = Hive.box(AppBoxes.appState)
-        .get(BoxKeys.userInfo)['addresses']['latlng'];
+        .get(BoxKeys.userInfo)['selectedAddress']['latlng'];
     _storedUserLocation = GeoPoint(temp.latitude, temp.longitude);
   }
 
@@ -186,7 +187,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                   SliverList.separated(
                     itemCount: 2,
                     itemBuilder: (context, index) {
-                      final store = stores[index];
+                      final store = allStores[index];
                       return Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(

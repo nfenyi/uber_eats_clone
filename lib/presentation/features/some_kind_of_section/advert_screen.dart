@@ -6,8 +6,10 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
+import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../app_functions.dart';
+import '../../../models/advert/advert_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
@@ -16,9 +18,13 @@ import '../home/home_screen.dart';
 
 class AdvertScreen extends StatefulWidget {
   final Store store;
-  final List<Object> productRefs;
+  final Advert advert;
+  // final List<Object> productRefs;
   const AdvertScreen(
-      {super.key, required this.store, required this.productRefs});
+      {super.key,
+      required this.store,
+      // required this.productRefs,
+      required this.advert});
 
   @override
   State<AdvertScreen> createState() => _AdvertScreenState();
@@ -34,26 +40,32 @@ class _AdvertScreenState extends State<AdvertScreen> {
     return Scaffold(
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                const SliverAppBar.medium(
+                SliverAppBar.medium(
                   pinned: true,
                   floating: true,
                   expandedHeight: 100,
                   title: AppText(
-                    text: 'Prep brunch for Mom',
+                    text: widget.advert.title,
                     weight: FontWeight.w600,
-                    size: AppSizes.heading6,
+                    size: AppSizes.heading5,
                   ),
                 )
               ],
           body: Column(
             children: [
               ListTile(
-                  onTap: () => navigatorKey.currentState!
-                          .pushReplacement(MaterialPageRoute(
-                        builder: (context) => StoreScreen(
-                          widget.store,
-                        ),
-                      )),
+                  onTap: () async {
+                    await FirebaseFirestore.instance
+                        .collection(FirestoreCollections.stores)
+                        .doc(widget.store.id)
+                        .update({'visits': FieldValue.increment(1)});
+                    await navigatorKey.currentState!
+                        .pushReplacement(MaterialPageRoute(
+                      builder: (context) => StoreScreen(
+                        widget.store,
+                      ),
+                    ));
+                  },
                   leading: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
@@ -115,13 +127,13 @@ class _AdvertScreenState extends State<AdvertScreen> {
                 padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 120,
-                    mainAxisExtent: 220,
+                    mainAxisExtent: 230,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10),
                 itemBuilder: (context, index) {
                   return FutureBuilder(
                       future: AppFunctions.loadProductReference(
-                          widget.productRefs[index] as DocumentReference),
+                          widget.advert.products[index] as DocumentReference),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -141,28 +153,13 @@ class _AdvertScreenState extends State<AdvertScreen> {
                           );
                         }
                         final product = snapshot.data!;
-                        return Column(
-                          children: [
-                            ProductGridTile(
-                              product: product,
-                              store: widget.store,
-                            ),
-                            if (product.promoPrice != null)
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius: BorderRadius.circular(50)),
-                                padding: const EdgeInsets.all(5),
-                                child: AppText(
-                                    color: Colors.white,
-                                    text:
-                                        '${(((product.initialPrice - product.promoPrice!) / product.initialPrice) * 100).toStringAsFixed(0)}% off'),
-                              )
-                          ],
+                        return ProductGridTilePriceFirst(
+                          product: product,
+                          store: widget.store,
                         );
                       });
                 },
-                itemCount: widget.productRefs.length,
+                itemCount: widget.advert.products.length,
               )),
             ],
           )),

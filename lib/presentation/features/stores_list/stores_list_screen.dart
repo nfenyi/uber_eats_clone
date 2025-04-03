@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
+import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../main.dart';
 import '../../../models/store/store_model.dart';
@@ -43,8 +45,12 @@ class _StoresListScreenState extends State<StoresListScreen> {
           final store = widget.stores[index];
 
           return InkWell(
-            onTap: () {
-              navigatorKey.currentState!.push(MaterialPageRoute(
+            onTap: () async {
+              await FirebaseFirestore.instance
+                  .collection(FirestoreCollections.stores)
+                  .doc(store.id)
+                  .update({'visits': FieldValue.increment(1)});
+              await navigatorKey.currentState!.push(MaterialPageRoute(
                 builder: (context) {
                   if (store.type.toLowerCase().contains('grocery')) {
                     return GroceryStoreMainScreen(store);

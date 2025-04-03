@@ -27,15 +27,17 @@ import 'package:uber_eats_clone/presentation/services/google_maps_services.dart'
 import 'package:uber_eats_clone/presentation/services/place_detail_model.dart';
 
 import '../../../../app_functions.dart';
-import '../../../../state/delivery_schedule_provider.dart'
-    show deliveryScheduleProvider;
+import '../../../../state/delivery_schedule_provider.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 import 'address_details_screen.dart';
 
 class AddressesScreen extends ConsumerStatefulWidget {
-  const AddressesScreen({super.key});
+  final bool isFromGiftScreen;
+  final String? recipientAddressLabel;
+  const AddressesScreen(
+      {super.key, this.isFromGiftScreen = false, this.recipientAddressLabel});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -82,7 +84,12 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (widget.isFromGiftScreen) {
+        showInfoToast('Select an address for your recipient',
+            context: navigatorKey.currentContext);
+      }
       await _getCurrentLocation();
     });
   }
@@ -96,7 +103,12 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime? schedule = ref.watch(deliveryScheduleProvider);
+    DateTime? schedule;
+    if (widget.isFromGiftScreen) {
+      schedule = ref.watch(deliveryScheduleProviderForRecipient);
+    } else {
+      schedule = ref.watch(deliveryScheduleProvider);
+    }
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
@@ -120,8 +132,8 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                 hiveJsonAddress['latlng'] = GeoPoint(
                     hiveJsonAddress['latlng'].latitude,
                     hiveJsonAddress['latlng'].longitude);
-                hiveJsonAddress as Map<dynamic, dynamic>;
-                //🙄
+                //🙄 The following statement because i was getting type '_Map<dynamic, dynamic>' is not a subtype of type 'Map<String, dynamic>'
+                hiveJsonAddress as Map<dynamic, dynamic>; //
                 Map<String, dynamic> stringedKeyMap =
                     hiveJsonAddress.map((key, value) {
                   return MapEntry(key.toString(), value);
@@ -129,9 +141,13 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                 recentAddresses.add(AddressDetails.fromJson(stringedKeyMap));
               }
 
-              _selectedAddressLabel =
-                  storedUserInfo['selectedAddress']['addressLabel'];
-              _accountType = storedUserInfo['type'];
+              if (widget.isFromGiftScreen) {
+                _selectedAddressLabel = widget.recipientAddressLabel;
+              } else {
+                _selectedAddressLabel =
+                    storedUserInfo['selectedAddress']['addressLabel'];
+                _accountType = storedUserInfo['type'];
+              }
             }
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,31 +547,39 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                 onTap: () async {
                                   if (_selectedAddressLabel !=
                                       address.addressLabel) {
-                                    var temp = storedUserInfo!.deepcopy();
-                                    for (var address in temp['addresses']) {
-                                      address['latlng'] = HiveGeoPoint(
-                                          latitude: address['latlng'].latitude,
-                                          longitude:
-                                              address['latlng'].longitude);
+                                    if (widget.isFromGiftScreen) {
+                                      ref
+                                          .read(
+                                              tempAddressForRecipient.notifier)
+                                          .state = address;
+                                    } else {
+                                      var temp = storedUserInfo!.deepcopy();
+                                      for (var address in temp['addresses']) {
+                                        address['latlng'] = HiveGeoPoint(
+                                            latitude:
+                                                address['latlng'].latitude,
+                                            longitude:
+                                                address['latlng'].longitude);
+                                      }
+
+                                      temp['selectedAddress'] =
+                                          address.toJson();
+                                      final storelatLng =
+                                          address.latlng as GeoPoint;
+                                      temp['selectedAddress']['latlng'] =
+                                          HiveGeoPoint(
+                                              latitude: storelatLng.latitude,
+                                              longitude: storelatLng.longitude);
+                                      await Hive.box(AppBoxes.appState)
+                                          .put(BoxKeys.userInfo, temp);
                                     }
-                                    //Use address.copyWith instead?
-                                    temp['selectedAddress'] = address.toJson();
-                                    final storelatLng =
-                                        address.latlng as GeoPoint;
-                                    temp['selectedAddress']['latlng'] =
-                                        HiveGeoPoint(
-                                            latitude: storelatLng.latitude,
-                                            longitude: storelatLng.longitude);
-                                    await Hive.box(AppBoxes.appState)
-                                        .put(BoxKeys.userInfo, temp);
-                                    // setState(() {
-                                    //   _selectedAddressLabel = address.addressLabel;
-                                    // });
-                                    navigatorKey.currentState!.pop(true);
+
+                                    navigatorKey.currentState!.pop();
                                   }
                                 },
                                 onLongPress: () async {
                                   await showAppInfoDialog(context,
+                                      dismissible: true,
                                       title: 'Delete?',
                                       description:
                                           'Are you sure you want to delete \'${address.addressLabel}\' address?');
@@ -635,8 +659,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                             onTap: () async {
                               await navigatorKey.currentState!
                                   .push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const ScheduleDeliveryScreen(),
+                                builder: (context) => ScheduleDeliveryScreen(
+                                  isFromGiftScreen: widget.isFromGiftScreen,
+                                ),
                               ));
                             },
                             leading: const Icon(
@@ -657,9 +682,12 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                   await navigatorKey.currentState!
                                       .push(MaterialPageRoute(
                                     builder: (context) =>
-                                        const ScheduleDeliveryScreen(),
+                                        ScheduleDeliveryScreen(
+                                      isFromGiftScreen: widget.isFromGiftScreen,
+                                    ),
                                   ));
                                 } else {
+                                  if (widget.isFromGiftScreen) {}
                                   ref
                                       .read(deliveryScheduleProvider.notifier)
                                       .state = null;
@@ -667,64 +695,75 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                               },
                             ),
                           ),
-                          const Gap(10),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            child: AppText(
-                              size: AppSizes.heading6,
-                              text: 'Profile',
-                              weight: FontWeight.w600,
+                          if (!widget.isFromGiftScreen)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Gap(10),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          AppSizes.horizontalPaddingSmall),
+                                  child: AppText(
+                                    size: AppSizes.heading6,
+                                    text: 'Profile',
+                                    weight: FontWeight.w600,
+                                  ),
+                                ),
+                                const Gap(10),
+                                ListTile(
+                                  onTap: () {
+                                    navigatorKey.currentState!
+                                        .push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PaymentOptionsScreen(),
+                                    ));
+                                  },
+                                  leading:
+                                      CupertinoSlidingSegmentedControl<int>(
+                                    backgroundColor: AppColors.neutral200,
+                                    padding: EdgeInsets.zero,
+                                    thumbColor: _accountType == 'Personal'
+                                        ? Colors.black
+                                        : Colors.green,
+                                    children: _accountType == 'Personal'
+                                        ? const {
+                                            0: Icon(
+                                              Icons.person,
+                                              color: Colors.white,
+                                            ),
+                                            1: Icon(
+                                              FontAwesomeIcons.briefcase,
+                                              size: 12,
+                                            )
+                                          }
+                                        : const {
+                                            0: Icon(
+                                              Icons.person,
+                                              size: 12,
+                                            ),
+                                            1: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 3),
+                                                child: Icon(
+                                                  FontAwesomeIcons.briefcase,
+                                                  color: Colors.white,
+                                                  size: 20,
+                                                ))
+                                          },
+                                    groupValue:
+                                        _accountType == 'Personal' ? 0 : 1,
+                                    onValueChanged: (value) {},
+                                  ),
+                                  trailing:
+                                      const Icon(Icons.keyboard_arrow_right),
+                                  title: AppText(
+                                    text: _accountType,
+                                    size: AppSizes.bodySmall,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          const Gap(10),
-                          ListTile(
-                            onTap: () {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const PaymentOptionsScreen(),
-                              ));
-                            },
-                            leading: CupertinoSlidingSegmentedControl<int>(
-                              backgroundColor: AppColors.neutral200,
-                              padding: EdgeInsets.zero,
-                              thumbColor: _accountType == 'Personal'
-                                  ? Colors.black
-                                  : Colors.green,
-                              children: _accountType == 'Personal'
-                                  ? const {
-                                      0: Icon(
-                                        Icons.person,
-                                        color: Colors.white,
-                                      ),
-                                      1: Icon(
-                                        FontAwesomeIcons.briefcase,
-                                        size: 12,
-                                      )
-                                    }
-                                  : const {
-                                      0: Icon(
-                                        Icons.person,
-                                        size: 12,
-                                      ),
-                                      1: Padding(
-                                          padding:
-                                              EdgeInsets.symmetric(vertical: 3),
-                                          child: Icon(
-                                            FontAwesomeIcons.briefcase,
-                                            color: Colors.white,
-                                            size: 20,
-                                          ))
-                                    },
-                              groupValue: _accountType == 'Personal' ? 0 : 1,
-                              onValueChanged: (value) {},
-                            ),
-                            trailing: const Icon(Icons.keyboard_arrow_right),
-                            title: AppText(
-                              text: _accountType,
-                              size: AppSizes.bodySmall,
-                            ),
-                          ),
                         ]),
                   ),
               ],

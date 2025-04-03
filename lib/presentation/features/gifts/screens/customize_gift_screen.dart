@@ -1,7 +1,14 @@
+import 'dart:io';
+
+import 'package:camera/camera.dart';
 import 'package:chips_choice/chips_choice.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 // import 'package:image_picker/image_picker.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -9,10 +16,13 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_card_checkout_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
+import '../../../../app_functions.dart';
 import '../../../../main.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/weblinks.dart';
 import '../../webview/webview_screen.dart';
+import 'record_message_screen.dart';
+import 'recorded_message_player_screen.dart';
 
 class CustomizeGiftScreen extends StatefulWidget {
   final String initiallySelectedCard;
@@ -30,23 +40,43 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
   final _fromTextEditingController = TextEditingController();
   final _toTextEditingController = TextEditingController();
   final _textMessageController = TextEditingController();
+  final _progress = ValueNotifier<double>(0);
 
   String? _selectedMessageOption;
 
   final _webViewcontroller = WebViewControllerPlus();
+  late final String _userDisplayName;
 
   bool? _agreedToTerms = false;
+
+  String _videoLength = '';
+
+  XFile? _videoFile;
+
+  UploadTask? _uploadTask;
+
+  String? _downloadUrl;
 
   @override
   void initState() {
     super.initState();
     _selectedCard = widget.initiallySelectedCard;
     _selectedGiftAmount = _giftAmounts.first;
-    _fromTextEditingController.text = 'Nana';
+    _userDisplayName =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo)['displayName'];
+    _fromTextEditingController.text = _userDisplayName;
   }
 
   @override
   void dispose() {
+    try {
+      if (_downloadUrl != null) {
+        final ref = FirebaseStorage.instance.refFromURL(_downloadUrl!);
+        ref.delete();
+      }
+    } catch (e) {
+      showInfoToast(e.toString(), context: navigatorKey.currentContext);
+    }
     _fromTextEditingController.dispose();
     _toTextEditingController.dispose();
     _textMessageController.dispose();
@@ -59,8 +89,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
       appBar: AppBar(
         title: const AppText(
           text: 'Customize your gift',
-          weight: FontWeight.w600,
-          size: AppSizes.heading6,
+          size: AppSizes.body,
         ),
       ),
       body: SingleChildScrollView(
@@ -75,31 +104,34 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Image.asset(
+                    AppFunctions.displayNetworkImage(
                       _selectedCard,
                       width: double.infinity,
                       height: 200,
                       fit: BoxFit.cover,
                     ),
-                    Container(
-                      color: Colors.black45,
-                      width: double.infinity,
-                      height: 200,
-                    ),
-                    AppButton(
-                      callback: () {},
-                      borderRadius: 50,
-                      text: 'Change',
-                      buttonColor: Colors.white70,
-                      textColor: Colors.black,
-                      iconFirst: true,
-                      width: 100,
-                      height: 35,
-                      icon: const Icon(
-                        Icons.edit,
-                        size: 15,
-                      ),
-                    )
+                    // Container(
+                    //   color: Colors.black45,
+                    //   width: double.infinity,
+                    //   height: 200,
+                    // ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     // navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => ,))
+                    //   },
+                    //   style: TextButton.styleFrom(
+                    //       backgroundColor: Colors.white70,
+                    //       shape: RoundedRectangleBorder(
+                    //           borderRadius: BorderRadius.circular(50))),
+                    //   child: const Row(
+                    //     mainAxisSize: MainAxisSize.min,
+                    //     children: [
+                    //       Icon(Icons.edit, size: 15),
+                    //       Gap(15),
+                    //       AppText(text: 'Change')
+                    //     ],
+                    //   ),
+                    // )
                   ],
                 ),
               ),
@@ -171,7 +203,16 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                 controller: _toTextEditingController,
                 suffixIcon: GestureDetector(
                     onTap: _toTextEditingController.clear,
-                    child: const Icon(Icons.cancel)),
+                    child: Visibility(
+                      visible: _toTextEditingController.text.isNotEmpty,
+                      child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _toTextEditingController.clear();
+                            });
+                          },
+                          child: const Icon(Icons.cancel)),
+                    )),
               ),
               const Gap(5),
               Visibility(
@@ -183,19 +224,100 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
               ),
               const Gap(20),
               const AppText(text: 'Add a message (optional)'),
+
+              Visibility(
+                visible: _selectedMessageOption == null &&
+                    (_uploadTask == null ||
+                        _textMessageController.text.trim().isEmpty),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Gap(5),
+                    AppText(
+                      text: 'You can add either a video or a text message',
+                      size: AppSizes.bodySmallest,
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(10),
               ChipsChoice<String>.single(
                 wrapped: false,
                 padding: EdgeInsets.zero,
                 value: _selectedMessageOption,
                 onChanged: (value) async {
-                  setState(() {
-                    _selectedMessageOption = value;
-                  });
-                  // logger.d(value);
-                  if (value == 'Record video') {
-                    // await ImagePicker().pickVideo(
-                    //   source: ImageSource.camera,
-                    // );
+                  if (_selectedMessageOption == value) {
+                    setState(() {
+                      _selectedMessageOption = null;
+                    });
+                    return;
+                  } else {
+                    setState(() {
+                      _selectedMessageOption = value;
+                    });
+
+                    if (value == 'Record video' && _uploadTask == null) {
+                      List<CameraDescription> cameras =
+                          await availableCameras();
+
+                      // logger.d(cameras);
+                      final cameraController =
+                          CameraController(cameras.first, ResolutionPreset.max);
+                      await cameraController.initialize().then((_) async {
+                        await cameraController.lockCaptureOrientation(
+                            DeviceOrientation.portraitUp);
+                        //the following is needed for iOS
+                        await cameraController.prepareForVideoRecording();
+                        //TODO: complete camera capture
+                        if (context.mounted) {
+                          final listResult = await showModalBottomSheet(
+                            barrierColor: Colors.transparent,
+                            context: context,
+                            isDismissible: false,
+                            isScrollControlled: true,
+                            useSafeArea: true,
+                            builder: (context) => RecordMessageScreen(
+                              availableCameras: cameras,
+                              cameraController: cameraController,
+                            ),
+                          );
+                          logger.d(listResult);
+                          if (listResult != null) {
+                            _videoFile = listResult[0];
+                            final storageRef = FirebaseStorage.instance.ref().child(
+                                'user media/${FirebaseAuth.instance.currentUser!.uid}/recorded messages/${DateTime.now().millisecondsSinceEpoch}.mp4');
+                            setState(() {
+                              _uploadTask =
+                                  storageRef.putFile(File(_videoFile!.path));
+                              _videoLength = listResult[1];
+                            });
+                            _uploadTask!.snapshotEvents.listen(
+                              (snapshot) {
+                                // if(snapshot.state != TaskState.canceled && snapshot.state != TaskState.error) {
+                                _progress.value = snapshot.bytesTransferred /
+                                    snapshot.totalBytes;
+                                if (snapshot.state == TaskState.success) {
+                                  setState(() {});
+                                }
+                                // }else{
+
+                                // }
+                              },
+                            );
+                            final snapshot = await _uploadTask;
+                            _downloadUrl = await snapshot!.ref.getDownloadURL();
+                          } else {
+                            setState(() {
+                              if (_videoLength.isEmpty) {
+                                _selectedMessageOption = null;
+                              }
+                            });
+                          }
+                        } else {
+                          await cameraController.dispose();
+                        }
+                      });
+                    }
                   }
                 },
                 choiceLeadingBuilder: (item, i) {
@@ -228,90 +350,127 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                     controller: _textMessageController,
                     hintText: 'Congratulations! You must be Uber the moon!',
                   )),
-              const Gap(15),
-              Visibility(
-                visible: _selectedMessageOption == null,
-                child: const AppText(
-                  text: 'You can add either a video or a text message',
-                  size: AppSizes.bodySmallest,
-                ),
-              ),
-              Visibility(
-                visible: false,
-                replacement: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: AppColors.neutral300)),
-                  child: ListTile(
-                    leading: const Icon(Icons.videocam_rounded),
-                    subtitle: const AppText(
-                      text: 'Upload successful',
-                      color: Colors.green,
-                    ),
-                    title: const AppText(
-                      text: '0:09 seconds',
-                      // size: AppSizes.bodySmaller,
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        InkWell(
-                          child: Ink(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: AppColors.neutral100,
-                                borderRadius: BorderRadius.circular(50)),
-                            child: const Icon(
-                              Icons.delete,
-                              size: 15,
+              // const Gap(15),
+
+              if (_uploadTask != null &&
+                  _selectedMessageOption == 'Record video')
+                Visibility(
+                  visible: _progress.value != 1.toDouble(),
+                  replacement: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: AppColors.neutral300)),
+                    child: ListTile(
+                      leading: const Icon(Icons.videocam_rounded),
+                      subtitle: const AppText(
+                        text: 'Upload successful',
+                        color: Colors.green,
+                      ),
+                      title: AppText(
+                        text: _videoLength,
+                        // size: AppSizes.bodySmaller,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            onTap: () async {
+                              try {
+                                if (_downloadUrl != null) {
+                                  final ref = FirebaseStorage.instance
+                                      .refFromURL(_downloadUrl!);
+
+                                  await ref.delete().then(
+                                        (value) => showInfoToast(
+                                            'Video deleted',
+                                            context:
+                                                navigatorKey.currentContext),
+                                      );
+                                }
+                              } catch (e) {
+                                showInfoToast(e.toString(),
+                                    context: navigatorKey.currentContext);
+                              }
+                            },
+                            child: Ink(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: AppColors.neutral100,
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: const Icon(
+                                Icons.delete,
+                                size: 20,
+                              ),
                             ),
                           ),
-                        ),
-                        const Gap(5),
-                        InkWell(
-                          child: Ink(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: AppColors.neutral100,
-                                borderRadius: BorderRadius.circular(50)),
-                            child: const Icon(
-                              Icons.play_arrow,
-                              size: 15,
+                          const Gap(5),
+                          InkWell(
+                            onTap: () async {
+                              if (context.mounted) {
+                                await showModalBottomSheet(
+                                  useSafeArea: true,
+                                  isScrollControlled: true,
+                                  context: context,
+                                  builder: (context) =>
+                                      RecordedMessagePlayerScreen(
+                                    videoFile: _videoFile!,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Ink(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: AppColors.neutral100,
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: const Icon(
+                                Icons.play_arrow,
+                                size: 20,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: AppColors.neutral300)),
-                  child: ListTile(
-                    leading: const Icon(Icons.videocam_rounded),
-                    subtitle: const LinearProgressIndicator(
-                      value: 0.1,
-                    ),
-                    title: const AppText(
-                      text: 'Uploading video',
-                      // size: AppSizes.bodySmaller,
-                    ),
-                    trailing: InkWell(
-                      child: Ink(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: AppColors.neutral100,
-                            borderRadius: BorderRadius.circular(50)),
-                        child: const Icon(
-                          Icons.delete,
-                          size: 15,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: AppColors.neutral300)),
+                    child: ListTile(
+                      leading: const Icon(Icons.videocam_rounded),
+                      subtitle: ValueListenableBuilder<double>(
+                          valueListenable: _progress,
+                          builder: (context, value, child) {
+                            return LinearProgressIndicator(
+                              value: value,
+                            );
+                          }),
+                      title: const AppText(
+                        text: 'Uploading video',
+                        // size: AppSizes.bodySmaller,
+                      ),
+                      trailing: InkWell(
+                        onTap: () async {
+                          await _uploadTask!.cancel();
+                          _selectedMessageOption == null;
+                          _uploadTask == null;
+                          _videoLength = '';
+                        },
+                        child: Ink(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: AppColors.neutral100,
+                              borderRadius: BorderRadius.circular(50)),
+                          child: const Icon(
+                            Icons.delete,
+                            size: 15,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
               const Gap(20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -382,12 +541,13 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
             AppButton(
               callback: _toTextEditingController.text.isEmpty
                   ? null
-                  : () {
-                      showModalBottomSheet(
+                  : () async {
+                      await showModalBottomSheet(
                         isScrollControlled: true,
                         useSafeArea: true,
                         context: context,
                         builder: (context) {
+                          final webViewcontroller = WebViewControllerPlus();
                           return Container(
                             height: double.infinity,
                             decoration: const BoxDecoration(
@@ -457,7 +617,8 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(15),
-                                                        child: Image.asset(
+                                                        child: AppFunctions
+                                                            .displayNetworkImage(
                                                           _selectedCard,
                                                           width:
                                                               double.infinity,
@@ -486,7 +647,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                                     text:
                                                         '\$$_selectedGiftAmount USD',
                                                     weight: FontWeight.w600,
-                                                    size: AppSizes.heading2,
+                                                    size: AppSizes.heading4,
                                                   ),
                                                   const Gap(30),
                                                   AppText(
@@ -495,32 +656,66 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                                       text:
                                                           "${_toTextEditingController.text}, here's an Uber gift from Nana!"),
                                                   const Gap(10),
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 15,
-                                                        vertical: 20),
-                                                    decoration: BoxDecoration(
+                                                  if (_selectedMessageOption ==
+                                                          'Record video' &&
+                                                      _downloadUrl != null)
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 15,
+                                                          vertical: 20),
+                                                      decoration: BoxDecoration(
+                                                        color: AppColors
+                                                            .neutral100,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          const Icon(Icons
+                                                              .videocam_sharp),
+                                                          const Gap(10),
+                                                          AppText(
+                                                              text:
+                                                                  'You got a video from ${_fromTextEditingController.text}!')
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  if (_selectedMessageOption ==
+                                                      'Write text')
+                                                    AppText(
+                                                      text: _textMessageController
+                                                              .text
+                                                              .trim()
+                                                              .isEmpty
+                                                          ? 'Optional message not added yet!'
+                                                          : _textMessageController
+                                                              .text,
                                                       color:
-                                                          AppColors.neutral100,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15),
+                                                          _textMessageController
+                                                                  .text
+                                                                  .trim()
+                                                                  .isEmpty
+                                                              ? AppColors
+                                                                  .neutral500
+                                                              : null,
                                                     ),
-                                                    child: const Row(
-                                                      children: [
-                                                        Icon(Icons
-                                                            .videocam_sharp),
-                                                        Gap(10),
-                                                        AppText(
-                                                            text:
-                                                                'You got a video from Joshua!')
-                                                      ],
-                                                    ),
-                                                  ),
                                                   const Gap(15),
                                                   GestureDetector(
-                                                    onTap: () {},
+                                                    onTap: () {
+                                                      navigatorKey.currentState!
+                                                          .push(
+                                                              MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            WebViewScreen(
+                                                          controller:
+                                                              webViewcontroller,
+                                                          link: Weblinks
+                                                              .uberGiftCardTerms,
+                                                        ),
+                                                      ));
+                                                    },
                                                     child: const AppText(
                                                       text: 'Terms apply',
                                                       decoration: TextDecoration
@@ -560,6 +755,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                     },
               text: 'Go to checkout',
             ),
+            const Gap(5),
           ],
         ),
       ],

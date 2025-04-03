@@ -2,22 +2,16 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:location/location.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery_grocery/grocery_grocery_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
@@ -30,13 +24,11 @@ import '../../../../models/store/store_model.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../alcohol/alcohol_screen.dart';
 import '../../grocery_store/screens/screens/grocery_store_main_screen.dart';
 import '../../home/home_screen.dart';
 import '../../home/map/map_screen.dart';
+import '../../main_screen/screens/main_screen.dart';
 import '../../stores_list/stores_list_screen.dart';
-import '../../pharmacy/screens/pharmacy_screen.dart';
-import '../../store/store_screen.dart';
 import '../../webview/webview_screen.dart';
 
 class GroceryScreen extends ConsumerStatefulWidget {
@@ -78,6 +70,21 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
   final List<Store> _flowerStores = [];
   final List<Store> _retailStores = [];
 
+  Future<List<Advert>> _getGroceryAdverts() async {
+    final advertsSnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.adverts)
+        .where('type', isEqualTo: 'grocery')
+        .get();
+
+    final groceryAdverts = advertsSnapshot.docs.map(
+      (snapshot) {
+        // logger.d(snapshot.data());
+        return Advert.fromJson(snapshot.data());
+      },
+    ).toList();
+    return groceryAdverts;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -89,7 +96,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
     //TODO: store in global lists so this filteration does not occur on every screen
     //that needs this sorting
     //or better still let firebase take care of sorting
-    for (var store in stores) {
+    for (var store in allStores) {
       if (store.type.contains('Grocery')) {
         _groceryGroceryStores.add(store);
       }
@@ -285,7 +292,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final store = stores[index];
+                        final store = allStores[index];
                         final bool isClosed =
                             timeOfDayNow.hour < store.openingTime.hour ||
                                 (timeOfDayNow.hour >= store.closingTime.hour &&
@@ -396,7 +403,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                         );
                       },
                       separatorBuilder: (context, index) => const Gap(10),
-                      itemCount: stores.length),
+                      itemCount: allStores.length),
                 ],
               ),
             ),
@@ -516,20 +523,25 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           onTap: () async {
-                                            // final location = Location();
-                                            // final userLocation = await location.getLocation();
+                                            await FirebaseFirestore.instance
+                                                .collection(
+                                                    FirestoreCollections.stores)
+                                                .doc(store.id)
+                                                .update({
+                                              'visits': FieldValue.increment(1)
+                                            });
                                             await navigatorKey.currentState!
                                                 .push(MaterialPageRoute(
                                               builder: (context) {
-                                                if (store.type
-                                                    .contains('Grocery')) {
-                                                  return GroceryStoreMainScreen(
-                                                      store);
-                                                } else {
-                                                  return StoreScreen(
-                                                    store,
-                                                  );
-                                                }
+                                                // if (store.type
+                                                //     .contains('Grocery')) {
+                                                return GroceryStoreMainScreen(
+                                                    store);
+                                                // } else {
+                                                //   return StoreScreen(
+                                                //     store,
+                                                //   );
+                                                // }
                                               },
                                             ));
                                           },
@@ -1035,159 +1047,110 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                     },
                   ),
                 ),
-                ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: adverts.length,
-                    itemBuilder: (context, index) {
-                      final advert = adverts[index];
-                      final store = stores.firstWhere(
-                        (element) => element.id == advert.shopId,
-                      );
+                FutureBuilder<List<Advert>>(
+                    future: _getGroceryAdverts(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final groceryAdverts = snapshot.data!;
+                        return ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: groceryAdverts.length,
+                            itemBuilder: (context, index) {
+                              final advert = groceryAdverts[index];
+                              final store = allStores.firstWhere(
+                                (element) => element.id == advert.shopId,
+                              );
 
-                      return Column(
-                        children: [
-                          MainScreenTopic(
-                              callback: () => navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) {
-                                      return AdvertScreen(
-                                          store: store,
-                                          productRefs: advert.products);
-                                    },
-                                  )),
-                              title: advert.title,
-                              subtitle: 'From ${store.name}',
-                              imageUrl: store.logo),
-                          SizedBox(
-                            height: 200,
-                            child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal:
-                                        AppSizes.horizontalPaddingSmall),
-                                itemCount: advert.products.length,
-                                separatorBuilder: (context, index) =>
-                                    const Gap(15),
-                                itemBuilder: (context, index) {
-                                  final productReference =
-                                      advert.products[index];
-                                  return FutureBuilder<Product>(
-                                      future: AppFunctions.loadProductReference(
-                                          productReference
-                                              as DocumentReference),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Skeletonizer(
-                                            child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                                child: Container(
-                                                  color: Colors.blue,
-                                                  width: 110,
-                                                  height: 200,
-                                                )),
-                                          );
-                                        } else if (snapshot.hasError) {
-                                          return ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              child: Container(
-                                                color: AppColors.neutral100,
-                                                width: 110,
-                                                height: 200,
-                                                child: AppText(
-                                                  text:
-                                                      snapshot.error.toString(),
-                                                  size: AppSizes.bodySmallest,
-                                                ),
-                                              ));
-                                        }
-
-                                        return ProductGridTile(
-                                            product: snapshot.data!,
-                                            store: store);
-                                      });
-                                }),
-                          ),
-                        ],
-                      );
-                    }),
-                MainScreenTopic(callback: () {}, title: 'All Stores'),
-                ListView.separated(
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      final store = _groceryScreenStores[index];
-                      final bool isClosed = timeOfDayNow.hour <
-                              store.openingTime.hour ||
-                          (timeOfDayNow.hour >= store.closingTime.hour &&
-                              timeOfDayNow.minute >= store.closingTime.minute);
-                      return ListTile(
-                          leading: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                border:
-                                    Border.all(color: AppColors.neutral200)),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: CachedNetworkImage(
-                                imageUrl: store.logo,
-                                width: 30,
-                                height: 30,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
-                          title: AppText(text: store.name),
-                          contentPadding: EdgeInsets.zero,
-                          trailing: FavouriteButton(
-                            store: store,
-                            color: AppColors.neutral500,
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                              return Column(
                                 children: [
-                                  Visibility(
-                                      visible: store.delivery.fee < 1,
-                                      child: Image.asset(
-                                        AssetNames.uberOneSmall,
-                                        height: 10,
-                                      )),
-                                  AppText(
-                                      text: isClosed
-                                          ? store.openingTime.hour -
-                                                      timeOfDayNow.hour >
-                                                  1
-                                              ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
-                                              : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
-                                          : '\$${store.delivery.fee} Delivery Fee',
-                                      color: store.delivery.fee < 1
-                                          ? const Color.fromARGB(
-                                              255, 163, 133, 42)
-                                          : null),
-                                  AppText(
-                                      text:
-                                          ' • ${store.delivery.estimatedDeliveryTime} min'),
+                                  MainScreenTopic(
+                                      callback: () => navigatorKey.currentState!
+                                              .push(MaterialPageRoute(
+                                            builder: (context) {
+                                              return AdvertScreen(
+                                                store: store,
+                                                advert: advert,
+                                              );
+                                            },
+                                          )),
+                                      title: advert.title,
+                                      subtitle: 'From ${store.name}',
+                                      imageUrl: store.logo),
+                                  SizedBox(
+                                    height: 200,
+                                    child: ListView.separated(
+                                        scrollDirection: Axis.horizontal,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: AppSizes
+                                                .horizontalPaddingSmall),
+                                        itemCount: advert.products.length,
+                                        separatorBuilder: (context, index) =>
+                                            const Gap(15),
+                                        itemBuilder: (context, index) {
+                                          final productReference =
+                                              advert.products[index];
+                                          return FutureBuilder<Product>(
+                                              future: AppFunctions
+                                                  .loadProductReference(
+                                                      productReference
+                                                          as DocumentReference),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return Skeletonizer(
+                                                    child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        child: Container(
+                                                          color: Colors.blue,
+                                                          width: 110,
+                                                          height: 200,
+                                                        )),
+                                                  );
+                                                } else if (snapshot.hasError) {
+                                                  return ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                      child: Container(
+                                                        color: AppColors
+                                                            .neutral100,
+                                                        width: 110,
+                                                        height: 200,
+                                                        child: AppText(
+                                                          text: snapshot.error
+                                                              .toString(),
+                                                          size: AppSizes
+                                                              .bodySmallest,
+                                                        ),
+                                                      ));
+                                                }
+
+                                                return ProductGridTile(
+                                                    product: snapshot.data!,
+                                                    store: store);
+                                              });
+                                        }),
+                                  ),
                                 ],
-                              ),
-                              const AppText(
-                                text: 'Offers available',
-                                color: Colors.green,
-                              )
-                            ],
-                          ));
-                    },
-                    separatorBuilder: (context, index) => const Divider(
-                          indent: 30,
-                        ),
-                    itemCount: _groceryScreenStores.length),
+                              );
+                            });
+                      } else if (snapshot.hasError) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
+                          child: AppText(
+                            text: snapshot.error.toString(),
+                            maxLines: null,
+                          ),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    }),
+                AllStoresListView(stores: _groceryScreenStores),
                 const Gap(20),
                 const Divider(),
                 const Gap(3),
@@ -1268,6 +1231,95 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
       storeRefs.add(docSnapshot.data().values.first);
     }
     return storeRefs;
+  }
+}
+
+class AllStoresListView extends StatelessWidget {
+  const AllStoresListView({
+    super.key,
+    required List<Store> stores,
+  }) : _groceryScreenStores = stores;
+
+  final List<Store> _groceryScreenStores;
+
+  @override
+  Widget build(BuildContext context) {
+    TimeOfDay timeOfDayNow = TimeOfDay.now();
+    return Column(
+      children: [
+        MainScreenTopic(callback: () {}, title: 'All Stores'),
+        ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.horizontalPaddingSmall),
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              final store = _groceryScreenStores[index];
+              final bool isClosed =
+                  timeOfDayNow.hour < store.openingTime.hour ||
+                      (timeOfDayNow.hour >= store.closingTime.hour &&
+                          timeOfDayNow.minute >= store.closingTime.minute);
+              return ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(color: AppColors.neutral200)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: CachedNetworkImage(
+                        imageUrl: store.logo,
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  ),
+                  title: AppText(text: store.name),
+                  contentPadding: EdgeInsets.zero,
+                  trailing: FavouriteButton(
+                    store: store,
+                    color: AppColors.neutral500,
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Visibility(
+                              visible: store.delivery.fee < 1,
+                              child: Image.asset(
+                                AssetNames.uberOneSmall,
+                                height: 10,
+                              )),
+                          AppText(
+                              text: isClosed
+                                  ? store.openingTime.hour - timeOfDayNow.hour >
+                                          1
+                                      ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                      : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
+                                  : '\$${store.delivery.fee} Delivery Fee',
+                              color: store.delivery.fee < 1
+                                  ? const Color.fromARGB(255, 163, 133, 42)
+                                  : null),
+                          AppText(
+                              text:
+                                  ' • ${store.delivery.estimatedDeliveryTime} min'),
+                        ],
+                      ),
+                      const AppText(
+                        text: 'Offers available',
+                        color: Colors.green,
+                      )
+                    ],
+                  ));
+            },
+            separatorBuilder: (context, index) => const Divider(
+                  indent: 30,
+                ),
+            itemCount: _groceryScreenStores.length),
+      ],
+    );
   }
 }
 

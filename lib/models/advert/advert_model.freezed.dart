@@ -23,6 +23,7 @@ mixin _$Advert {
   String get title => throw _privateConstructorUsedError;
   String get shopId => throw _privateConstructorUsedError;
   List<Object> get products => throw _privateConstructorUsedError;
+  String get type => throw _privateConstructorUsedError;
 
   /// Serializes this Advert to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -38,7 +39,7 @@ abstract class $AdvertCopyWith<$Res> {
   factory $AdvertCopyWith(Advert value, $Res Function(Advert) then) =
       _$AdvertCopyWithImpl<$Res, Advert>;
   @useResult
-  $Res call({String title, String shopId, List<Object> products});
+  $Res call({String title, String shopId, List<Object> products, String type});
 }
 
 /// @nodoc
@@ -59,6 +60,7 @@ class _$AdvertCopyWithImpl<$Res, $Val extends Advert>
     Object? title = null,
     Object? shopId = null,
     Object? products = null,
+    Object? type = null,
   }) {
     return _then(_value.copyWith(
       title: null == title
@@ -73,6 +75,10 @@ class _$AdvertCopyWithImpl<$Res, $Val extends Advert>
           ? _value.products
           : products // ignore: cast_nullable_to_non_nullable
               as List<Object>,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -84,7 +90,7 @@ abstract class _$$AdvertImplCopyWith<$Res> implements $AdvertCopyWith<$Res> {
       __$$AdvertImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, String shopId, List<Object> products});
+  $Res call({String title, String shopId, List<Object> products, String type});
 }
 
 /// @nodoc
@@ -103,6 +109,7 @@ class __$$AdvertImplCopyWithImpl<$Res>
     Object? title = null,
     Object? shopId = null,
     Object? products = null,
+    Object? type = null,
   }) {
     return _then(_$AdvertImpl(
       title: null == title
@@ -117,6 +124,10 @@ class __$$AdvertImplCopyWithImpl<$Res>
           ? _value._products
           : products // ignore: cast_nullable_to_non_nullable
               as List<Object>,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -127,7 +138,8 @@ class _$AdvertImpl with DiagnosticableTreeMixin implements _Advert {
   const _$AdvertImpl(
       {required this.title,
       required this.shopId,
-      required final List<Object> products})
+      required final List<Object> products,
+      required this.type})
       : _products = products;
 
   factory _$AdvertImpl.fromJson(Map<String, dynamic> json) =>
@@ -146,8 +158,11 @@ class _$AdvertImpl with DiagnosticableTreeMixin implements _Advert {
   }
 
   @override
+  final String type;
+
+  @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Advert(title: $title, shopId: $shopId, products: $products)';
+    return 'Advert(title: $title, shopId: $shopId, products: $products, type: $type)';
   }
 
   @override
@@ -157,7 +172,8 @@ class _$AdvertImpl with DiagnosticableTreeMixin implements _Advert {
       ..add(DiagnosticsProperty('type', 'Advert'))
       ..add(DiagnosticsProperty('title', title))
       ..add(DiagnosticsProperty('shopId', shopId))
-      ..add(DiagnosticsProperty('products', products));
+      ..add(DiagnosticsProperty('products', products))
+      ..add(DiagnosticsProperty('type', type));
   }
 
   @override
@@ -167,13 +183,14 @@ class _$AdvertImpl with DiagnosticableTreeMixin implements _Advert {
             other is _$AdvertImpl &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.shopId, shopId) || other.shopId == shopId) &&
-            const DeepCollectionEquality().equals(other._products, _products));
+            const DeepCollectionEquality().equals(other._products, _products) &&
+            (identical(other.type, type) || other.type == type));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, title, shopId,
-      const DeepCollectionEquality().hash(_products));
+      const DeepCollectionEquality().hash(_products), type);
 
   /// Create a copy of Advert
   /// with the given fields replaced by the non-null parameter values.
@@ -195,7 +212,8 @@ abstract class _Advert implements Advert {
   const factory _Advert(
       {required final String title,
       required final String shopId,
-      required final List<Object> products}) = _$AdvertImpl;
+      required final List<Object> products,
+      required final String type}) = _$AdvertImpl;
 
   factory _Advert.fromJson(Map<String, dynamic> json) = _$AdvertImpl.fromJson;
 
@@ -205,6 +223,8 @@ abstract class _Advert implements Advert {
   String get shopId;
   @override
   List<Object> get products;
+  @override
+  String get type;
 
   /// Create a copy of Advert
   /// with the given fields replaced by the non-null parameter values.

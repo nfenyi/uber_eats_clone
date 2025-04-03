@@ -11,6 +11,7 @@ _$AdvertImpl _$$AdvertImplFromJson(Map<String, dynamic> json) => _$AdvertImpl(
       shopId: json['shopId'] as String,
       products:
           (json['products'] as List<dynamic>).map((e) => e as Object).toList(),
+      type: json['type'] as String,
     );
 
 Map<String, dynamic> _$$AdvertImplToJson(_$AdvertImpl instance) =>
@@ -18,4 +19,5 @@ Map<String, dynamic> _$$AdvertImplToJson(_$AdvertImpl instance) =>
       'title': instance.title,
       'shopId': instance.shopId,
       'products': instance.products,
+      'type': instance.type,
     };

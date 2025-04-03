@@ -1867,7 +1867,7 @@ mixin _$Product {
   bool? get isSponsored => throw _privateConstructorUsedError;
   Object? get offer => throw _privateConstructorUsedError;
   List<Object>? get stores => throw _privateConstructorUsedError;
-  List<Product>? get similarProducts => throw _privateConstructorUsedError;
+  List<Object> get similarProducts => throw _privateConstructorUsedError;
 
   /// Serializes this Product to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1902,7 +1902,7 @@ abstract class $ProductCopyWith<$Res> {
       bool? isSponsored,
       Object? offer,
       List<Object>? stores,
-      List<Product>? similarProducts});
+      List<Object> similarProducts});
 }
 
 /// @nodoc
@@ -1938,7 +1938,7 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
     Object? isSponsored = freezed,
     Object? offer = freezed,
     Object? stores = freezed,
-    Object? similarProducts = freezed,
+    Object? similarProducts = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -2010,10 +2010,10 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
           ? _value.stores
           : stores // ignore: cast_nullable_to_non_nullable
               as List<Object>?,
-      similarProducts: freezed == similarProducts
+      similarProducts: null == similarProducts
           ? _value.similarProducts
           : similarProducts // ignore: cast_nullable_to_non_nullable
-              as List<Product>?,
+              as List<Object>,
     ) as $Val);
   }
 }
@@ -2044,7 +2044,7 @@ abstract class _$$ProductImplCopyWith<$Res> implements $ProductCopyWith<$Res> {
       bool? isSponsored,
       Object? offer,
       List<Object>? stores,
-      List<Product>? similarProducts});
+      List<Object> similarProducts});
 }
 
 /// @nodoc
@@ -2078,7 +2078,7 @@ class __$$ProductImplCopyWithImpl<$Res>
     Object? isSponsored = freezed,
     Object? offer = freezed,
     Object? stores = freezed,
-    Object? similarProducts = freezed,
+    Object? similarProducts = null,
   }) {
     return _then(_$ProductImpl(
       name: null == name
@@ -2150,10 +2150,10 @@ class __$$ProductImplCopyWithImpl<$Res>
           ? _value._stores
           : stores // ignore: cast_nullable_to_non_nullable
               as List<Object>?,
-      similarProducts: freezed == similarProducts
+      similarProducts: null == similarProducts
           ? _value._similarProducts
           : similarProducts // ignore: cast_nullable_to_non_nullable
-              as List<Product>?,
+              as List<Object>,
     ));
   }
 }
@@ -2180,7 +2180,7 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
       this.isSponsored,
       this.offer,
       final List<Object>? stores,
-      final List<Product>? similarProducts})
+      final List<Object> similarProducts = const []})
       : _imageUrls = imageUrls,
         _frequentlyBoughtTogether = frequentlyBoughtTogether,
         _nutritionFacts = nutritionFacts,
@@ -2267,14 +2267,13 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
     return EqualUnmodifiableListView(value);
   }
 
-  final List<Product>? _similarProducts;
+  final List<Object> _similarProducts;
   @override
-  List<Product>? get similarProducts {
-    final value = _similarProducts;
-    if (value == null) return null;
+  @JsonKey()
+  List<Object> get similarProducts {
     if (_similarProducts is EqualUnmodifiableListView) return _similarProducts;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
+    return EqualUnmodifiableListView(_similarProducts);
   }
 
   @override
@@ -2410,7 +2409,7 @@ abstract class _Product implements Product {
       final bool? isSponsored,
       final Object? offer,
       final List<Object>? stores,
-      final List<Product>? similarProducts}) = _$ProductImpl;
+      final List<Object> similarProducts}) = _$ProductImpl;
 
   factory _Product.fromJson(Map<String, dynamic> json) = _$ProductImpl.fromJson;
 
@@ -2451,7 +2450,7 @@ abstract class _Product implements Product {
   @override
   List<Object>? get stores;
   @override
-  List<Product>? get similarProducts;
+  List<Object> get similarProducts;
 
   /// Create a copy of Product
   /// with the given fields replaced by the non-null parameter values.

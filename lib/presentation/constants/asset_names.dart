@@ -132,6 +132,7 @@ class AssetNames {
   static String expDate = 'assets/images/exp_date.png';
   static String cvv = 'assets/images/cvv.png';
   static const greenTag = 'assets/images/green_tag.png';
+  static const addGiftCard = 'assets/images/add_gift_card.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';
@@ -148,4 +149,5 @@ class AssetNames {
   static const fastFoodBNW = 'assets/images/fast_food_black_n_white.jpg';
   static String dataNPrivacy2 = 'assets/images/data_n_privacy2.jpg';
   static const fallenIceCream = 'assets/images/fallen_ice_cream.jpg';
+  static const giftCardPlaceholder = 'assets/images/gift_card_placeholder.jpg';
 }

@@ -661,7 +661,8 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                                         BorderRadius.circular(
                                                             15),
                                                     child: Container(
-                                                      color: Colors.blue,
+                                                      color:
+                                                          AppColors.neutral100,
                                                       width: 110,
                                                       height: 200,
                                                     )),

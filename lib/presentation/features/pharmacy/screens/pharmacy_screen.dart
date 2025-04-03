@@ -867,11 +867,18 @@ class _PharmacyScreenState extends ConsumerState<PharmacyScreen> {
                                         pharmacyStore.closingTime.minute);
                             return ListTile(
                                 titleAlignment: ListTileTitleAlignment.top,
-                                onTap: () => navigatorKey.currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          StoreScreen(pharmacyStore),
-                                    )),
+                                onTap: () async {
+                                  await FirebaseFirestore.instance
+                                      .collection(FirestoreCollections.stores)
+                                      .doc(pharmacyStore.id)
+                                      .update(
+                                          {'visits': FieldValue.increment(1)});
+                                  await navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        StoreScreen(pharmacyStore),
+                                  ));
+                                },
                                 leading: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Stack(

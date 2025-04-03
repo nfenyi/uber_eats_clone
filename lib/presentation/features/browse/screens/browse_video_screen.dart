@@ -18,6 +18,7 @@ import 'package:video_player/video_player.dart';
 import '../../../../app_functions.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_text.dart';
+import '../../../services/sign_in_view_model.dart';
 
 class BrowseVideoScreen extends StatefulWidget {
   final List<BrowseVideo> browseVideos;
@@ -315,22 +316,31 @@ class _BrowseVideoScreenState extends State<BrowseVideoScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           GestureDetector(
-                                            onTap: () => navigatorKey
-                                                .currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) {
-                                                if (_stores[index]
-                                                    .type
-                                                    .toLowerCase()
-                                                    .contains('grocery')) {
-                                                  return GroceryStoreMainScreen(
-                                                      _stores[index]);
-                                                } else {
-                                                  return StoreScreen(
-                                                      _stores[index]);
-                                                }
-                                              },
-                                            )),
+                                            onTap: () async {
+                                              await FirebaseFirestore.instance
+                                                  .collection(
+                                                      FirestoreCollections
+                                                          .stores)
+                                                  .doc(store.id)
+                                                  .update({
+                                                'visits':
+                                                    FieldValue.increment(1)
+                                              });
+                                              await navigatorKey.currentState!
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) {
+                                                  if (_stores[index]
+                                                      .type
+                                                      .toLowerCase()
+                                                      .contains('grocery')) {
+                                                    return GroceryStoreMainScreen(
+                                                        store);
+                                                  } else {
+                                                    return StoreScreen(store);
+                                                  }
+                                                },
+                                              ));
+                                            },
                                             child: Row(
                                               children: [
                                                 ClipRRect(

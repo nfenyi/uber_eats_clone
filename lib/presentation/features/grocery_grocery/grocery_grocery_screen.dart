@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
@@ -9,6 +10,7 @@ import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
+import '../../services/sign_in_view_model.dart';
 import '../home/home_screen.dart';
 import '../store/store_screen.dart';
 
@@ -49,10 +51,16 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                   (timeOfDayNow.hour >= groceryStore.closingTime.hour &&
                       timeOfDayNow.minute >= groceryStore.closingTime.minute);
               return ListTile(
-                  onTap: () => navigatorKey.currentState!
-                          .pushReplacement(MaterialPageRoute(
-                        builder: (context) => StoreScreen(groceryStore),
-                      )),
+                  onTap: () async {
+                    await FirebaseFirestore.instance
+                        .collection(FirestoreCollections.stores)
+                        .doc(groceryStore.id)
+                        .update({'visits': FieldValue.increment(1)});
+                    await navigatorKey.currentState!
+                        .pushReplacement(MaterialPageRoute(
+                      builder: (context) => StoreScreen(groceryStore),
+                    ));
+                  },
                   leading: Container(
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),

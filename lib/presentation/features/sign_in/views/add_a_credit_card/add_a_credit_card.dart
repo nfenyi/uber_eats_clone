@@ -116,11 +116,15 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                                   await controller.lockCaptureOrientation(
                                       DeviceOrientation.portraitUp);
                                   //TODO: complete camera capture
-                                  await navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        AddACardCameraView(controller),
-                                  ));
+                                  if (context.mounted) {
+                                    await navigatorKey.currentState!
+                                        .push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddACardCameraView(controller),
+                                    ));
+                                  } else {
+                                    await controller.dispose();
+                                  }
                                 }).catchError((Object e) {
                                   if (e is CameraException) {
                                     switch (e.code) {

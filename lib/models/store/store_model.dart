@@ -138,7 +138,7 @@ class Product with _$Product {
     bool? isSponsored,
     Object? offer,
     List<Object>? stores,
-    List<Product>? similarProducts,
+    @Default([]) List<Object> similarProducts,
   }) = _Product;
 
   factory Product.fromJson(Map<String, Object?> json) =>

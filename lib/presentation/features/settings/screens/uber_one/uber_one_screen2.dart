@@ -14,6 +14,7 @@ import '../../../../constants/weblinks.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_text.dart';
 import '../../../home/home_screen.dart';
+import '../../../main_screen/screens/main_screen.dart';
 import '../../../webview/webview_screen.dart';
 
 class UberOneScreen2 extends StatefulWidget {
@@ -28,12 +29,12 @@ class _UberOneScreen2State extends State<UberOneScreen2> {
     Offer(
         id: '456343432',
         product: products.entries.first.value,
-        store: stores[2],
+        store: allStores[2],
         title: "Buy 1 get 1 free"),
     Offer(
         id: '764534',
         product: products.entries.first.value,
-        store: stores[2],
+        store: allStores[2],
         title: "Buy 1 get 1 free"),
   ];
 

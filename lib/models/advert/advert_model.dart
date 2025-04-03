@@ -10,6 +10,7 @@ class Advert with _$Advert {
     required String title,
     required String shopId,
     required List<Object> products,
+    required String type,
   }) = _Advert;
 
   factory Advert.fromJson(Map<String, dynamic> json) => _$AdvertFromJson(json);

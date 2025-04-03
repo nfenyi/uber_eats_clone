@@ -11,8 +11,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:iconify_flutter_plus/icons/bi.dart';
 import 'package:latlong2/latlong.dart' as lt;
-import 'package:location_platform_interface/location_platform_interface.dart'
-    show LocationData;
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
@@ -23,6 +21,7 @@ import '../../../constants/asset_names.dart';
 import '../../../constants/other_constants.dart';
 import '../../../core/app_text.dart';
 import '../../../core/widgets.dart';
+import '../../main_screen/screens/main_screen.dart';
 import '../../sign_in/views/drop_off_options_screen.dart';
 
 class MapScreen extends StatefulWidget {
@@ -167,7 +166,7 @@ class _MapScreenState extends State<MapScreen> {
                                   Timer(const Duration(seconds: 1), () async {
                                 if (value != null) {
                                   setState(() {
-                                    _stores = stores
+                                    _stores = allStores
                                         .where(
                                           (element) => element.name
                                               .toLowerCase()

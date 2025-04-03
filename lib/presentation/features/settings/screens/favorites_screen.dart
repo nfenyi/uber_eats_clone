@@ -8,6 +8,7 @@ import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../home/home_screen.dart';
+import '../../main_screen/screens/main_screen.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -24,7 +25,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   void initState() {
     super.initState();
     TimeOfDay timeOfDayNow = TimeOfDay.now();
-    for (var store in stores) {
+    for (var store in allStores) {
       if (favoriteStores.any((element) => element.id == store.id)) {
         if (timeOfDayNow.hour < store.openingTime.hour ||
             (timeOfDayNow.hour >= store.closingTime.hour &&

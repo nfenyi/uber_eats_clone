@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter_plus/icons/ic.dart';
 import 'package:uber_eats_clone/main.dart';
@@ -106,6 +107,8 @@ class _SendGiftsIntroState extends ConsumerState<SendGiftsIntroScreen> {
               callback: () {
                 navigatorKey.currentState!.pop();
                 ref.read(bottomNavIndexProvider.notifier).showGiftScreen();
+                Hive.box(AppBoxes.appState)
+                    .put(BoxKeys.firstTimeSendingGift, false);
               },
             ),
           ),

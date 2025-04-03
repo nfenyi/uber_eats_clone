@@ -9,10 +9,10 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import '../../../../main.dart';
 import '../../../../state/delivery_schedule_provider.dart';
 import '../../../core/app_colors.dart';
-import 'addresses_screen.dart';
 
 class ScheduleDeliveryScreen extends ConsumerStatefulWidget {
-  const ScheduleDeliveryScreen({super.key});
+  final bool isFromGiftScreen;
+  const ScheduleDeliveryScreen({super.key, required this.isFromGiftScreen});
 
   @override
   ConsumerState<ScheduleDeliveryScreen> createState() =>
@@ -66,10 +66,19 @@ class _ScheduleDeliveryScreenState
                   // navigatorKey.currentState!.pop(_selectedDay.copyWith(
                   //     hour: _selectedTime.hour, minute: _selectedTime.minute));
                   // Hive.box(AppBoxes.appState).put(BoxKeys.activatedPromoPath, value)
-                  ref.read(deliveryScheduleProvider.notifier).state =
-                      _selectedDay.copyWith(
-                          hour: _selectedTime.hour,
-                          minute: _selectedTime.minute);
+                  if (widget.isFromGiftScreen) {
+                    ref
+                            .read(deliveryScheduleProviderForRecipient.notifier)
+                            .state =
+                        _selectedDay.copyWith(
+                            hour: _selectedTime.hour,
+                            minute: _selectedTime.minute);
+                  } else {
+                    ref.read(deliveryScheduleProvider.notifier).state =
+                        _selectedDay.copyWith(
+                            hour: _selectedTime.hour,
+                            minute: _selectedTime.minute);
+                  }
                   navigatorKey.currentState!.pop();
                 } else {
                   showInfoToast(
@@ -130,7 +139,7 @@ class _ScheduleDeliveryScreenState
           ),
           const Gap(10),
           SizedBox(
-            height: 70,
+            height: 75,
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.horizontalPaddingSmall),

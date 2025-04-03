@@ -31,6 +31,7 @@ import '../../constants/asset_names.dart';
 import '../../services/sign_in_view_model.dart';
 import '../address/screens/addresses_screen.dart';
 import '../home/home_screen.dart';
+import '../main_screen/screens/main_screen.dart';
 import '../uber_one/join_uber_one_screen.dart';
 
 class StoreScreen extends StatefulWidget {

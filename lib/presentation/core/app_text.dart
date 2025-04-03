@@ -32,6 +32,7 @@ class AppText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
+      textScaler: TextScaler.noScaling,
       style: TextStyle(
         fontSize: size,
         fontWeight: weight,

@@ -39,6 +39,7 @@ dependencies:
   country_flags: ^3.2.0
   country_ip: ^3.0.0
   cupertino_icons: ^1.0.8
+  custom_timer: ^0.2.3
   date_time_format: ^2.0.1
   deepcopy: ^1.1.2
   dio: ^5.8.0+1
@@ -46,7 +47,7 @@ dependencies:
   firebase_auth: ^5.3.4
   firebase_core: ^3.9.0
   firebase_dynamic_links: ^6.1.2
-  firebase_storage: ^12.4.4
+  firebase_storage: ^12.4.5
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.14.2
