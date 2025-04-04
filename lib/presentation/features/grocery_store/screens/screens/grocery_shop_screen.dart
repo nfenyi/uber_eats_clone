@@ -329,7 +329,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                               'Make Cinco de Mayo delicious! Get 30% off on DellMax'),
                                       AppButton2(
                                         text: 'Order Now',
-                                        color: Colors.white,
+                                        backgroundColor: Colors.white,
                                         callback: () {},
                                       )
                                     ],
@@ -614,7 +614,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                             : 4,
                         itemBuilder: (context, index) {
                           final aisle = widget.groceryStore.aisles![index];
-                          final category = aisle.productCategories.first;
+                          final category = aisle.productCategories.firstOrNull;
 
                           return Column(
                             children: [
@@ -638,25 +638,40 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal:
                                             AppSizes.horizontalPaddingSmall),
-                                    itemCount:
-                                        category.productsAndQuantities.length,
+                                    itemCount: category
+                                            ?.productsAndQuantities.length ??
+                                        0,
                                     separatorBuilder: (context, index) =>
                                         const Gap(15),
                                     itemBuilder: (context, index) {
                                       final productReference =
-                                          category.productsAndQuantities[index]
-                                              ['product'];
-                                      return FutureBuilder<Product>(
-                                          future:
-                                              AppFunctions.loadProductReference(
-                                                  productReference
-                                                      as DocumentReference),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.waiting) {
-                                              return Skeletonizer(
-                                                enabled: true,
-                                                child: ClipRRect(
+                                          category?.productsAndQuantities[index]
+                                              ['product'] as DocumentReference?;
+                                      if (productReference == null) {
+                                        return SizedBox.shrink();
+                                      } else {
+                                        return FutureBuilder<Product>(
+                                            future: AppFunctions
+                                                .loadProductReference(
+                                                    productReference),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return Skeletonizer(
+                                                  enabled: true,
+                                                  child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                      child: Container(
+                                                        color: AppColors
+                                                            .neutral100,
+                                                        width: 110,
+                                                        height: 200,
+                                                      )),
+                                                );
+                                              } else if (snapshot.hasError) {
+                                                return ClipRRect(
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             15),
@@ -665,199 +680,192 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                                           AppColors.neutral100,
                                                       width: 110,
                                                       height: 200,
-                                                    )),
-                                              );
-                                            } else if (snapshot.hasError) {
-                                              return ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  child: Container(
-                                                    color: AppColors.neutral100,
-                                                    width: 110,
-                                                    height: 200,
-                                                    child: AppText(
-                                                      text: snapshot.error
-                                                          .toString(),
-                                                      size:
-                                                          AppSizes.bodySmallest,
+                                                      child: AppText(
+                                                        text: snapshot.error
+                                                            .toString(),
+                                                        size: AppSizes
+                                                            .bodySmallest,
+                                                      ),
+                                                    ));
+                                              }
+                                              final product = snapshot.data!;
+                                              return InkWell(
+                                                onTap: () {
+                                                  navigatorKey.currentState!
+                                                      .push(MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProductScreen(
+                                                      product: product,
+                                                      store:
+                                                          widget.groceryStore,
                                                     ),
                                                   ));
-                                            }
-                                            final product = snapshot.data!;
-                                            return InkWell(
-                                              onTap: () {
-                                                navigatorKey.currentState!
-                                                    .push(MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProductScreen(
-                                                    product: product,
-                                                    store: widget.groceryStore,
-                                                  ),
-                                                ));
-                                              },
-                                              child: Ink(
-                                                child: SizedBox(
-                                                  width: 110,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        child: Stack(
-                                                          alignment: Alignment
-                                                              .bottomRight,
-                                                          children: [
-                                                            CachedNetworkImage(
-                                                              imageUrl: product
-                                                                  .imageUrls
-                                                                  .first,
-                                                              width: 110,
-                                                              height: 120,
-                                                              fit: BoxFit.fill,
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      right:
-                                                                          8.0,
-                                                                      top: 8.0),
-                                                              child: InkWell(
-                                                                onTap: () {},
-                                                                child: Ink(
-                                                                  child:
-                                                                      Container(
-                                                                    padding:
-                                                                        const EdgeInsets
-                                                                            .all(
-                                                                            5),
-                                                                    decoration: BoxDecoration(
-                                                                        boxShadow: const [
-                                                                          BoxShadow(
-                                                                            color:
-                                                                                Colors.black12,
-                                                                            offset:
-                                                                                Offset(2, 2),
-                                                                          )
-                                                                        ],
-                                                                        color: Colors
-                                                                            .white,
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(50)),
+                                                },
+                                                child: Ink(
+                                                  child: SizedBox(
+                                                    width: 110,
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          child: Stack(
+                                                            alignment: Alignment
+                                                                .bottomRight,
+                                                            children: [
+                                                              CachedNetworkImage(
+                                                                imageUrl: product
+                                                                    .imageUrls
+                                                                    .first,
+                                                                width: 110,
+                                                                height: 120,
+                                                                fit:
+                                                                    BoxFit.fill,
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            8.0,
+                                                                        top:
+                                                                            8.0),
+                                                                child: InkWell(
+                                                                  onTap: () {},
+                                                                  child: Ink(
                                                                     child:
-                                                                        const Icon(
-                                                                      Icons.add,
+                                                                        Container(
+                                                                      padding:
+                                                                          const EdgeInsets
+                                                                              .all(
+                                                                              5),
+                                                                      decoration: BoxDecoration(
+                                                                          boxShadow: const [
+                                                                            BoxShadow(
+                                                                              color: Colors.black12,
+                                                                              offset: Offset(2, 2),
+                                                                            )
+                                                                          ],
+                                                                          color: Colors
+                                                                              .white,
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(50)),
+                                                                      child:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .add,
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const Gap(5),
+                                                        Row(
+                                                          children: [
+                                                            Visibility(
+                                                              visible: product
+                                                                      .promoPrice !=
+                                                                  null,
+                                                              child: Row(
+                                                                children: [
+                                                                  AppText(
+                                                                      text:
+                                                                          '\$${product.promoPrice} ',
+                                                                      color: Colors
+                                                                          .green),
+                                                                ],
                                                               ),
+                                                            ),
+                                                            AppText(
+                                                              text:
+                                                                  "\$${product.initialPrice}",
+                                                              color: AppColors
+                                                                  .neutral500,
+                                                              decoration: product
+                                                                          .promoPrice !=
+                                                                      null
+                                                                  ? TextDecoration
+                                                                      .lineThrough
+                                                                  : TextDecoration
+                                                                      .none,
                                                             )
                                                           ],
                                                         ),
-                                                      ),
-                                                      const Gap(5),
-                                                      Row(
-                                                        children: [
-                                                          Visibility(
-                                                            visible: product
-                                                                    .promoPrice !=
-                                                                null,
-                                                            child: Row(
-                                                              children: [
-                                                                AppText(
-                                                                    text:
-                                                                        '\$${product.promoPrice} ',
-                                                                    color: Colors
-                                                                        .green),
-                                                              ],
-                                                            ),
-                                                          ),
+                                                        if (product.quantity !=
+                                                            null)
                                                           AppText(
-                                                            text:
-                                                                "\$${product.initialPrice}",
-                                                            color: AppColors
-                                                                .neutral500,
-                                                            decoration: product
-                                                                        .promoPrice !=
-                                                                    null
-                                                                ? TextDecoration
-                                                                    .lineThrough
-                                                                : TextDecoration
-                                                                    .none,
-                                                          )
-                                                        ],
-                                                      ),
-                                                      if (product.quantity !=
-                                                          null)
+                                                              text: product
+                                                                  .quantity!),
                                                         AppText(
-                                                            text: product
-                                                                .quantity!),
-                                                      AppText(
-                                                        text: product.name,
-                                                        maxLines: 3,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      product.promoPrice != null
-                                                          ? Container(
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            50),
-                                                                color: Colors
-                                                                    .green,
-                                                              ),
-                                                              child: AppText(
-                                                                text: ((product.promoPrice! /
-                                                                            product
-                                                                                .initialPrice) *
-                                                                        100)
-                                                                    .toStringAsFixed(
-                                                                        0),
-                                                              ))
-                                                          : Builder(builder:
-                                                              (context) {
-                                                              Offer?
-                                                                  matchingOffer;
-                                                              return (widget.groceryStore.offers !=
-                                                                          null &&
-                                                                      widget
-                                                                          .groceryStore
-                                                                          .offers!
-                                                                          .isNotEmpty &&
-                                                                      widget
-                                                                          .groceryStore
-                                                                          .offers!
-                                                                          .any(
-                                                                        (offer) {
-                                                                          if (offer.title ==
-                                                                              product.id) {
-                                                                            matchingOffer =
-                                                                                offer;
-                                                                            return true;
-                                                                          } else {
-                                                                            return false;
-                                                                          }
-                                                                        },
-                                                                      ))
-                                                                  ? AppTextBadge(
-                                                                      text: matchingOffer!
-                                                                          .title)
-                                                                  : const SizedBox
-                                                                      .shrink();
-                                                            })
-                                                    ],
+                                                          text: product.name,
+                                                          maxLines: 3,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                        product.promoPrice !=
+                                                                null
+                                                            ? Container(
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              50),
+                                                                  color: Colors
+                                                                      .green,
+                                                                ),
+                                                                child: AppText(
+                                                                  text: ((product.promoPrice! /
+                                                                              product
+                                                                                  .initialPrice) *
+                                                                          100)
+                                                                      .toStringAsFixed(
+                                                                          0),
+                                                                ))
+                                                            : Builder(builder:
+                                                                (context) {
+                                                                Offer?
+                                                                    matchingOffer;
+                                                                return (widget.groceryStore.offers !=
+                                                                            null &&
+                                                                        widget
+                                                                            .groceryStore
+                                                                            .offers!
+                                                                            .isNotEmpty &&
+                                                                        widget
+                                                                            .groceryStore
+                                                                            .offers!
+                                                                            .any(
+                                                                          (offer) {
+                                                                            if (offer.title ==
+                                                                                product.id) {
+                                                                              matchingOffer = offer;
+                                                                              return true;
+                                                                            } else {
+                                                                              return false;
+                                                                            }
+                                                                          },
+                                                                        ))
+                                                                    ? AppTextBadge(
+                                                                        text: matchingOffer!
+                                                                            .title)
+                                                                    : const SizedBox
+                                                                        .shrink();
+                                                              })
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            );
-                                          });
+                                              );
+                                            });
+                                      }
                                     }),
                               ),
                             ],

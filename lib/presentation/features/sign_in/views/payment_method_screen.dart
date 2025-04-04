@@ -9,10 +9,12 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/add_a_credit
 import '../../../../main.dart';
 import '../../../../models/payment_method_model.dart';
 import '../../../constants/app_sizes.dart';
+import '../../gifts/screens/redeem_gift_card_screen.dart';
 import 'uber_one_screen.dart';
 
 class PaymentMethodScreen extends ConsumerStatefulWidget {
-  const PaymentMethodScreen({super.key});
+  final bool isOnboarding;
+  const PaymentMethodScreen({super.key, this.isOnboarding = false});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -38,18 +40,21 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          Padding(
-            padding:
-                const EdgeInsets.only(right: AppSizes.horizontalPaddingSmall),
-            child: AppTextButton(
-              callback: () => navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => const UberOneScreen(),
-              )),
-              text: 'Skip',
-            ),
-          )
-        ],
+        actions: widget.isOnboarding
+            ? [
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: AppSizes.horizontalPaddingSmall),
+                  child: AppTextButton(
+                    callback: () =>
+                        navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => const UberOneScreen(),
+                    )),
+                    text: 'Skip',
+                  ),
+                )
+              ]
+            : null,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -83,12 +88,23 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
                   itemBuilder: (context, index) {
                     final paymentMethod = _paymentMethods[index];
                     return ListTile(
-                      onTap: () {
+                      onTap: () async {
                         if (paymentMethod.name == 'Credit or Debit') {
-                          navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => const AddCardScreen()));
+                          await navigatorKey.currentState!.push(
+                              MaterialPageRoute(
+                                  builder: (context) => const AddCardScreen()));
+                        } else if (paymentMethod.name == 'Gift Card') {
+                          await showModalBottomSheet(
+                            useSafeArea: true,
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (context) {
+                              return const RedeemGiftCardScreen();
+                            },
+                          );
                         } else {
-                          navigatorKey.currentState!.push(MaterialPageRoute(
+                          await navigatorKey.currentState!
+                              .push(MaterialPageRoute(
                             builder: (context) => const UberOneScreen(),
                           ));
                         }

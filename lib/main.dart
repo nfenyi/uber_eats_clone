@@ -9,14 +9,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:showcaseview/showcaseview.dart';
 import 'package:uber_eats_clone/firebase_options.dart';
 import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
+import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen_wrapper_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
 import 'hive_adapters/country/country_ip_model.dart';
 import 'presentation/constants/app_sizes.dart';
-import 'presentation/features/main_screen/screens/main_screen.dart';
 import 'presentation/features/sign_in/views/get_started/get_started_screen.dart';
 import 'presentation/features/sign_in/views/name_screen.dart';
 import 'presentation/features/sign_in/views/phone_number_screen.dart';
@@ -85,6 +84,21 @@ void main() async {
               .update({
             'groupOrders': FieldValue.arrayUnion([groupOrderRef])
           });
+        } else if (initialLink.link.toString().contains('gift-card')) {
+          var giftCardId = initialLink.link.toString().split('%').last;
+          DocumentReference giftCardRef = FirebaseFirestore.instance
+              .collection(FirestoreCollections.giftCardsAnkasa)
+              .doc(giftCardId);
+
+          await FirebaseFirestore.instance
+              .collection(FirestoreCollections.users)
+              .doc(user.uid)
+              .update({
+            'giftCards': FieldValue.arrayUnion([giftCardRef])
+          });
+          await Hive.box(AppBoxes.appState).put(BoxKeys.hasGiftCard, true);
+          await Hive.box(AppBoxes.appState)
+              .put(BoxKeys.newGiftCardId, giftCardId);
         } else {
           await user.reload();
           if (user.emailVerified) {
@@ -301,9 +315,7 @@ class Wrapper extends ConsumerWidget {
           if (!authenticated) {
             return const SignInScreen();
           } else {
-            return ShowCaseWidget(builder: (context) {
-              return const MainScreen();
-            });
+            return const MainScreenWrapperScreen();
           }
         });
   }
@@ -332,6 +344,8 @@ class BoxKeys {
   static const String recentlyViewed = 'recentlyViewed';
   static const String firstTimeSendingGift = 'firstTimeSendingGift';
   static const String isOnboardedToUberGifts = 'isOnboardedToUberGifts';
+  static const String hasGiftCard = 'hasGiftCard';
+  static const String newGiftCardId = 'newGiftCardId';
 
   const BoxKeys._();
 }

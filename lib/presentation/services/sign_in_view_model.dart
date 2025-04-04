@@ -162,6 +162,7 @@ class FirestoreCollections {
   static String featuredStores = 'featured stores';
   static String giftCards = 'gift cards';
   static String giftCardCategories = 'gift card categories';
+  static String giftCardsAnkasa = 'gift cards ankasa';
 
   FirestoreCollections._();
 }

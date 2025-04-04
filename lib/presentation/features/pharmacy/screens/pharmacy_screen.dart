@@ -868,16 +868,8 @@ class _PharmacyScreenState extends ConsumerState<PharmacyScreen> {
                             return ListTile(
                                 titleAlignment: ListTileTitleAlignment.top,
                                 onTap: () async {
-                                  await FirebaseFirestore.instance
-                                      .collection(FirestoreCollections.stores)
-                                      .doc(pharmacyStore.id)
-                                      .update(
-                                          {'visits': FieldValue.increment(1)});
-                                  await navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        StoreScreen(pharmacyStore),
-                                  ));
+                                  await AppFunctions.navigateToStoreScreen(
+                                      pharmacyStore);
                                 },
                                 leading: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),

@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,6 +13,7 @@ import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
 import 'package:uber_eats_clone/models/store/store_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/account_screen.dart';
 import 'package:uber_eats_clone/presentation/features/browse/screens/browse_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen.dart';
@@ -20,8 +24,9 @@ import 'package:uber_eats_clone/state/shops_state_stream_provider.dart';
 
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
-import '../../alcohol/alcohol_screen.dart';
+import '../../../services/sign_in_view_model.dart';
 import '../../gifts/screens/gift_screen.dart';
+import '../../gifts/screens/redeem_gift_card_screen.dart';
 import '../../pharmacy/screens/pharmacy_screen.dart';
 import '../state/bottom_nav_index_provider.dart';
 
@@ -54,6 +59,61 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     super.initState();
     _getAccountStatus();
     _currentScreen = ref.read(bottomNavIndexProvider);
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
+      try {
+        final user = FirebaseAuth.instance.currentUser!;
+
+        if (dynamicLinkData.link.toString().contains('group-order')) {
+          var groupOrderId = dynamicLinkData.link.toString().split('%').last;
+          DocumentReference groupOrderRef = FirebaseFirestore.instance
+              .collection(FirestoreCollections.groupOrders)
+              .doc(groupOrderId);
+          await groupOrderRef.update({
+            'persons': FieldValue.arrayUnion([user.uid])
+          });
+          await FirebaseFirestore.instance
+              .collection(FirestoreCollections.users)
+              .doc(user.uid)
+              .update({
+            'groupOrders': FieldValue.arrayUnion([groupOrderRef])
+          });
+          showInfoToast('Group order added!',
+              context: navigatorKey.currentContext);
+        } else if (dynamicLinkData.link.toString().contains('gift-card')) {
+          var giftCardId = dynamicLinkData.link.toString().split('%').last;
+          DocumentReference giftCardRef = FirebaseFirestore.instance
+              .collection(FirestoreCollections.giftCardsAnkasa)
+              .doc(giftCardId);
+
+          await FirebaseFirestore.instance
+              .collection(FirestoreCollections.users)
+              .doc(user.uid)
+              .update({
+            'giftCards': FieldValue.arrayUnion([giftCardRef])
+          });
+          await navigatorKey.currentState!.push(MaterialPageRoute(
+            builder: (context) =>
+                RedeemGiftCardScreen(newGiftCardId: giftCardId),
+          ));
+        }
+      } catch (e) {
+        await showAppInfoDialog(navigatorKey.currentContext!,
+            description: e.toString());
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (Hive.box(AppBoxes.appState)
+          .get(BoxKeys.hasGiftCard, defaultValue: false)) {
+        await navigatorKey.currentState!.push(MaterialPageRoute(
+          builder: (context) => RedeemGiftCardScreen(
+              newGiftCardId:
+                  Hive.box(AppBoxes.appState).get(BoxKeys.newGiftCardId)),
+        ));
+        await Hive.box(AppBoxes.appState).put(BoxKeys.hasGiftCard, false);
+        await Hive.box(AppBoxes.appState).delete(BoxKeys.newGiftCardId);
+      }
+    });
   }
 
   @override

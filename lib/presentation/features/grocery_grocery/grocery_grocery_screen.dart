@@ -52,14 +52,7 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                       timeOfDayNow.minute >= groceryStore.closingTime.minute);
               return ListTile(
                   onTap: () async {
-                    await FirebaseFirestore.instance
-                        .collection(FirestoreCollections.stores)
-                        .doc(groceryStore.id)
-                        .update({'visits': FieldValue.increment(1)});
-                    await navigatorKey.currentState!
-                        .pushReplacement(MaterialPageRoute(
-                      builder: (context) => StoreScreen(groceryStore),
-                    ));
+                    await AppFunctions.navigateToStoreScreen(groceryStore);
                   },
                   leading: Container(
                     decoration: BoxDecoration(

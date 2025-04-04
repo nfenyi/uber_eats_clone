@@ -86,7 +86,7 @@ class _RecordedMessagePlayerScreenState
                               _preparedVideoController.value.isPlaying
                                   ? Icons.pause
                                   : Icons.play_arrow,
-                              size: 40,
+                              size: 35,
                             ));
                       }),
                       const Gap(20),

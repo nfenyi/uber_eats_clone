@@ -178,7 +178,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                         AppTextFormField(
                           validator: FormBuilderValidators.compose(
                               [FormBuilderValidators.required()]),
-                          onChanged: (value) async {
+                          onChanged: (value) {
                             if (_debounce?.isActive ?? false) {
                               _debounce?.cancel();
                             }
@@ -396,8 +396,9 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                           .put('addressDetailsSaved', true);
                       await navigatorKey.currentState!.pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const PaymentMethodScreen()), (r) {
+                              builder: (context) => const PaymentMethodScreen(
+                                    isOnboarding: true,
+                                  )), (r) {
                         return false;
                       });
                     }

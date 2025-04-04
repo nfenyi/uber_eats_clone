@@ -1,12 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
-import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
-import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
@@ -55,16 +51,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
             children: [
               ListTile(
                   onTap: () async {
-                    await FirebaseFirestore.instance
-                        .collection(FirestoreCollections.stores)
-                        .doc(widget.store.id)
-                        .update({'visits': FieldValue.increment(1)});
-                    await navigatorKey.currentState!
-                        .pushReplacement(MaterialPageRoute(
-                      builder: (context) => StoreScreen(
-                        widget.store,
-                      ),
-                    ));
+                    await AppFunctions.navigateToStoreScreen(widget.store);
                   },
                   leading: Container(
                     padding: const EdgeInsets.all(2),

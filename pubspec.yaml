@@ -35,9 +35,12 @@ dependencies:
   chips_choice: ^3.0.1
   cloud_firestore: ^5.6.0
   collection: ^1.19.1
+  colorful_iconify_flutter: ^0.0.5
   connectivity_plus: ^6.1.1
   country_flags: ^3.2.0
   country_ip: ^3.0.0
+  credit_card_type_detector: ^3.0.0
+  credit_card_validator: ^2.1.0
   cupertino_icons: ^1.0.8
   custom_timer: ^0.2.3
   date_time_format: ^2.0.1

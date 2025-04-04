@@ -8,6 +8,7 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
+import '../../../app_functions.dart';
 import '../../../main.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
@@ -46,21 +47,7 @@ class _StoresListScreenState extends State<StoresListScreen> {
 
           return InkWell(
             onTap: () async {
-              await FirebaseFirestore.instance
-                  .collection(FirestoreCollections.stores)
-                  .doc(store.id)
-                  .update({'visits': FieldValue.increment(1)});
-              await navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) {
-                  if (store.type.toLowerCase().contains('grocery')) {
-                    return GroceryStoreMainScreen(store);
-                  } else {
-                    return StoreScreen(
-                      store,
-                    );
-                  }
-                },
-              ));
+              await AppFunctions.navigateToStoreScreen(store);
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

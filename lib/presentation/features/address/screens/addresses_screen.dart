@@ -713,11 +713,13 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                 const Gap(10),
                                 ListTile(
                                   onTap: () {
-                                    navigatorKey.currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PaymentOptionsScreen(),
-                                    ));
+                                    showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        useSafeArea: true,
+                                        context: context,
+                                        builder: (context) {
+                                          return const PaymentOptionsScreen();
+                                        });
                                   },
                                   leading:
                                       CupertinoSlidingSegmentedControl<int>(
@@ -777,13 +779,15 @@ class AppButton2 extends StatefulWidget {
   final String text;
   final VoidCallback callback;
   final OutlinedBorder? shape;
-  final Color color;
+  final Color textColor;
+  final Color backgroundColor;
 
   const AppButton2({
     required this.text,
     required this.callback,
     this.shape,
-    this.color = AppColors.neutral100,
+    this.backgroundColor = AppColors.neutral100,
+    this.textColor = Colors.black,
     super.key,
   });
 
@@ -797,13 +801,13 @@ class _AppButton2State extends State<AppButton2> {
     return TextButton(
       onPressed: widget.callback,
       style: TextButton.styleFrom(
-        backgroundColor: widget.color,
+        backgroundColor: widget.backgroundColor,
         shape: widget.shape ??
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       ),
       child: AppText(
         text: widget.text,
-        size: AppSizes.bodySmall,
+        color: widget.textColor,
       ),
     );
   }

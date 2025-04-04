@@ -18,13 +18,12 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/grocery_store/screens/screens/grocery_store_main_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uber_eats_clone/state/user_location_providers.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
@@ -38,13 +37,11 @@ import '../main_screen/screens/main_screen.dart';
 import '../stores_list/stores_list_screen.dart';
 import '../product/product_screen.dart';
 import '../promotion/promo_screen.dart';
-import '../store/store_screen.dart';
 import '../webview/webview_screen.dart';
 import 'map/map_screen.dart';
 
 Map<String, Product> products = {};
 
-GeoPoint? storedUserLocation;
 // List<Store> stores = [
 //   Store(
 //     id: const Uuid().v4(),
@@ -342,12 +339,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   String? _selectedSort;
   final _scrollController = ScrollController();
 
-  late List<AnimationController> _animationControllers;
+  List<AnimationController> _animationControllers = [];
   late List<Animation<double>> _rotations;
 
   late List<Store> _popularNearYou;
 
-  LocationData? _currentLocation;
   FoodCategory? _selectedFoodCategory;
 
   @override
@@ -381,6 +377,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final currentLocation = ref.watch(userCurrentGeoLocationProvider);
+    final storedGeoPoint = ref.watch(selectedLocationGeoPoint);
     // var addressDetails = const AddressDetails(
     //     instruction: "bring your own tip",
     //     apartment: "A1",
@@ -802,7 +800,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   builder: (context, appStateBox, child) {
                     var timePreference = ref.watch(deliveryScheduleProvider);
                     return appStateBox.get(BoxKeys.userInfo) == null ||
-                            _currentLocation == null
+                            currentLocation == null
                         ? FutureBuilder(
                             future: _getLocation(),
                             builder: (context, snapshot) {
@@ -857,13 +855,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               return LocationWidget(
                                 appStateBox: appStateBox,
                                 timePreference: timePreference,
-                                currentLocation: _currentLocation,
                               );
                             })
                         : LocationWidget(
                             appStateBox: appStateBox,
                             timePreference: timePreference,
-                            currentLocation: _currentLocation,
                           );
                   }),
             ),
@@ -1264,7 +1260,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                     builder: (context) =>
                                                         MapScreen(
                                                       userLocation:
-                                                          storedUserLocation!,
+                                                          storedGeoPoint!,
                                                       filteredStores: allStores,
                                                       selectedFilters:
                                                           _selectedFilters,
@@ -1321,33 +1317,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                     .minute);
                                                     return InkWell(
                                                       onTap: () async {
-                                                        await FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                FirestoreCollections
-                                                                    .stores)
-                                                            .doc(store.id)
-                                                            .update({
-                                                          'visits': FieldValue
-                                                              .increment(1)
-                                                        });
-                                                        await navigatorKey
-                                                            .currentState!
-                                                            .push(
-                                                                MaterialPageRoute(
-                                                          builder: (context) {
-                                                            if (store.type
-                                                                .toLowerCase()
-                                                                .contains(
-                                                                    'grocery')) {
-                                                              return GroceryStoreMainScreen(
-                                                                  store);
-                                                            } else {
-                                                              return StoreScreen(
-                                                                  store);
-                                                            }
-                                                          },
-                                                        ));
+                                                        await AppFunctions
+                                                            .navigateToStoreScreen(
+                                                                store);
                                                       },
                                                       child: Ink(
                                                         child: Column(
@@ -2458,28 +2430,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           onTap: () async {
-                                            await FirebaseFirestore.instance
-                                                .collection(
-                                                    FirestoreCollections.stores)
-                                                .doc(store.id)
-                                                .update({
-                                              'visits': FieldValue.increment(1)
-                                            });
-                                            await navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) {
-                                                if (store.type
-                                                    .toLowerCase()
-                                                    .contains('grocery')) {
-                                                  return GroceryStoreMainScreen(
-                                                      store);
-                                                } else {
-                                                  return StoreScreen(
-                                                    store,
-                                                  );
-                                                }
-                                              },
-                                            ));
+                                            await AppFunctions
+                                                .navigateToStoreScreen(store);
                                           },
                                           child: Ink(
                                             // decoration: BoxDecoration(
@@ -2709,28 +2661,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         final store = allStores[index];
                                         return InkWell(
                                           onTap: () async {
-                                            await FirebaseFirestore.instance
-                                                .collection(
-                                                    FirestoreCollections.stores)
-                                                .doc(store.id)
-                                                .update({
-                                              'visits': FieldValue.increment(1)
-                                            });
-                                            await navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) {
-                                                if (store.type
-                                                    .toLowerCase()
-                                                    .contains('grocery')) {
-                                                  return GroceryStoreMainScreen(
-                                                      store);
-                                                } else {
-                                                  return StoreScreen(
-                                                    store,
-                                                  );
-                                                }
-                                              },
-                                            ));
+                                            await AppFunctions
+                                                .navigateToStoreScreen(store);
                                           },
                                           child: Ink(
                                             child: SizedBox(
@@ -3027,28 +2959,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                             _popularNearYou[index];
                                         return InkWell(
                                           onTap: () async {
-                                            await FirebaseFirestore.instance
-                                                .collection(
-                                                    FirestoreCollections.stores)
-                                                .doc(popularStore.id)
-                                                .update({
-                                              'visits': FieldValue.increment(1)
-                                            });
-                                            await navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) {
-                                                if (popularStore.type
-                                                    .toLowerCase()
-                                                    .contains('grocery')) {
-                                                  return GroceryStoreMainScreen(
-                                                      popularStore);
-                                                } else {
-                                                  return StoreScreen(
-                                                    popularStore,
-                                                  );
-                                                }
-                                              },
-                                            ));
+                                            await AppFunctions
+                                                .navigateToStoreScreen(
+                                                    popularStore);
                                           },
                                           child: Ink(
                                             child: SizedBox(
@@ -3858,107 +3771,96 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     Map<dynamic, dynamic>? userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
     userInfo ??= await AppFunctions.getUserInfo();
-
-    final location = Location();
-    _currentLocation = await location.getLocation();
   }
 }
 
-class LocationWidget extends StatelessWidget {
-  const LocationWidget(
-      {super.key,
-      required this.timePreference,
-      required this.appStateBox,
-      required LocationData? currentLocation})
-      : _currentLocation = currentLocation;
+class LocationWidget extends ConsumerWidget {
+  const LocationWidget({
+    super.key,
+    required this.timePreference,
+    required this.appStateBox,
+  });
 
   final DateTime? timePreference;
-  final LocationData? _currentLocation;
+
   final Box<dynamic> appStateBox;
 
   @override
-  Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final locationFarAway = GlobalKey();
-      Map userInfo = appStateBox.get(BoxKeys.userInfo);
-      String? userPlaceDescription =
-          userInfo['selectedAddress']['placeDescription'];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storedGeoPoint = ref.read(selectedLocationGeoPoint)!;
+    final currentLocation = ref.read(userCurrentGeoLocationProvider);
+    final locationFarAway = GlobalKey();
+    return Padding(
+      padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+      child: InkWell(
+        onTap: () async {
+          await navigatorKey.currentState!.push(MaterialPageRoute(
+            builder: (context) => const AddressesScreen(),
+          ));
+        },
+        child: Ink(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppText(
+                text: timePreference == null
+                    ? 'Deliver now'
+                    : '${AppFunctions.formatDate(timePreference.toString(), format: 'D, G:i A')} - ${AppFunctions.formatDate(timePreference!.add(const Duration(minutes: 30)).toString(), format: 'G:i A')}',
+                color: AppColors.neutral500,
+              ),
+              Showcase(
+                overlayOpacity: 0.05,
+                // disableMovingAnimation: true,
+                textColor: Colors.white,
+                tooltipBackgroundColor: Colors.black87,
+                tooltipBorderRadius: BorderRadius.circular(5),
+                description:
+                    'Is this the right address? You seem quite far away',
+                key: locationFarAway,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Builder(builder: (context) {
+                      const distance = Distance(roundResult: true);
+                      final distanceResult = distance.as(
+                          LengthUnit.Meter,
+                          LatLng(currentLocation!.latitude!,
+                              currentLocation.longitude!),
+                          LatLng(storedGeoPoint.latitude,
+                              storedGeoPoint.longitude));
 
-      storedUserLocation = GeoPoint(
-          userInfo['selectedAddress']['latlng'].latitude,
-          userInfo['selectedAddress']['latlng'].longitude);
-      return Padding(
-        padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
-        child: InkWell(
-          onTap: () async {
-            await navigatorKey.currentState!.push(MaterialPageRoute(
-              builder: (context) => const AddressesScreen(),
-            ));
-          },
-          child: Ink(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AppText(
-                  text: timePreference == null
-                      ? 'Deliver now'
-                      : '${AppFunctions.formatDate(timePreference.toString(), format: 'D, G:i A')} - ${AppFunctions.formatDate(timePreference!.add(const Duration(minutes: 30)).toString(), format: 'G:i A')}',
-                  color: AppColors.neutral500,
-                ),
-                Showcase(
-                  overlayOpacity: 0.05,
-                  // disableMovingAnimation: true,
-                  textColor: Colors.white,
-                  tooltipBackgroundColor: Colors.black87,
-                  tooltipBorderRadius: BorderRadius.circular(5),
-                  description:
-                      'Is this the right address? You seem quite far away',
-                  key: locationFarAway,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Builder(builder: (context) {
-                        const distance = Distance(roundResult: true);
-                        final distanceResult = distance.as(
-                            LengthUnit.Meter,
-                            LatLng(_currentLocation!.latitude!,
-                                _currentLocation!.longitude!),
-                            LatLng(storedUserLocation!.latitude,
-                                storedUserLocation!.longitude));
-
-                        if (distanceResult > 400) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (distanceResult > 400) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (context.mounted) {
+                            ShowCaseWidget.of(context)
+                                .startShowCase([locationFarAway]);
+                          }
+                        });
+                        Future.delayed(
+                          const Duration(seconds: 30),
+                          () {
                             if (context.mounted) {
-                              ShowCaseWidget.of(context)
-                                  .startShowCase([locationFarAway]);
+                              ShowCaseWidget.of(context).dismiss();
                             }
-                          });
-                          Future.delayed(
-                            const Duration(seconds: 30),
-                            () {
-                              if (context.mounted) {
-                                ShowCaseWidget.of(context).dismiss();
-                              }
-                            },
-                          );
-                        }
-                        return AppText(
-                            text: AppFunctions.formatPlaceDescription(
-                                    userPlaceDescription!)
-                                .split(', ')
-                                .first);
-                      }),
-                      const Icon(Icons.keyboard_arrow_down)
-                    ],
-                  ),
-                )
-              ],
-            ),
+                          },
+                        );
+                      }
+                      return AppText(
+                          text: AppFunctions.formatPlaceDescription(ref
+                              .read(selectedLocationDescription)
+                              .split(', ')
+                              .first));
+                    }),
+                    const Icon(Icons.keyboard_arrow_down)
+                  ],
+                ),
+              )
+            ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 
@@ -4289,21 +4191,7 @@ class AllStoresResultDisplay extends StatelessWidget {
                         timeOfDayNow.minute >= store.closingTime.minute);
                 return InkWell(
                   onTap: () async {
-                    await FirebaseFirestore.instance
-                        .collection(FirestoreCollections.stores)
-                        .doc(store.id)
-                        .update({'visits': FieldValue.increment(1)});
-                    await navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) {
-                        if (store.type.toLowerCase().contains('grocery')) {
-                          return GroceryStoreMainScreen(store);
-                        } else {
-                          return StoreScreen(
-                            store,
-                          );
-                        }
-                      },
-                    ));
+                    await AppFunctions.navigateToStoreScreen(store);
                   },
                   child: Ink(
                     child: Column(
@@ -4487,144 +4375,118 @@ class SearchResultDisplay extends StatelessWidget {
                 }
               }
               // logger.d(matchingProducts);
-              return InkWell(
-                onTap: () async {
-                  await FirebaseFirestore.instance
-                      .collection(FirestoreCollections.stores)
-                      .doc(store.id)
-                      .update({'visits': FieldValue.increment(1)});
-                  await navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) {
-                      if (store.type.toLowerCase().contains('grocery')) {
-                        return GroceryStoreMainScreen(store);
-                      } else {
-                        return StoreScreen(
-                          store,
-                        );
-                      }
+              return Column(
+                children: [
+                  ListTile(
+                    onTap: () async {
+                      await AppFunctions.navigateToStoreScreen(store);
                     },
-                  ));
-                },
-                child: Ink(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(50),
-                          child: CachedNetworkImage(
-                            imageUrl: store.logo,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        title: AppText(
-                          text: store.name,
-                          size: AppSizes.bodySmall,
-                          weight: FontWeight.bold,
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: CachedNetworkImage(
+                        imageUrl: store.logo,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                    title: AppText(
+                      text: store.name,
+                      size: AppSizes.bodySmall,
+                      weight: FontWeight.bold,
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Visibility(
-                                    visible: store.isUberOneShop,
-                                    child: Image.asset(
-                                      AssetNames.uberOneSmall,
-                                      height: 10,
-                                      color: AppColors.uberOneGold,
-                                    )),
-                                AppText(
-                                    text:
-                                        '\$${store.delivery.fee} Delivery Fee',
-                                    color: store.isUberOneShop
-                                        ? const Color.fromARGB(
-                                            255, 163, 133, 42)
-                                        : AppColors.neutral500),
-                                AppText(
-                                  text:
-                                      ' • ${store.delivery.estimatedDeliveryTime} min',
-                                  color: AppColors.neutral500,
-                                ),
-                              ],
+                            Visibility(
+                                visible: store.isUberOneShop,
+                                child: Image.asset(
+                                  AssetNames.uberOneSmall,
+                                  height: 10,
+                                  color: AppColors.uberOneGold,
+                                )),
+                            AppText(
+                                text: '\$${store.delivery.fee} Delivery Fee',
+                                color: store.isUberOneShop
+                                    ? const Color.fromARGB(255, 163, 133, 42)
+                                    : AppColors.neutral500),
+                            AppText(
+                              text:
+                                  ' • ${store.delivery.estimatedDeliveryTime} min',
+                              color: AppColors.neutral500,
                             ),
-                            const AppText(
-                              text: 'Offers available',
-                              color: AppColors.primary2,
-                            )
                           ],
                         ),
-                      ),
-                      const Gap(10),
-                      if (showProducts)
-                        SizedBox(
-                          height: 200,
-                          child: ListView.separated(
-                            cacheExtent: 300,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            separatorBuilder: (context, index) => const Gap(10),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: matchingProducts.length <= 10
-                                ? matchingProducts.length
-                                : 11,
-                            itemBuilder: (context, index) {
-                              final productReference = matchingProducts[index];
-                              if (index == 11) {
-                                return AppButton2(
-                                  text: 'View Store',
-                                  // isSecondary: true,
-                                  callback: () async {
-                                    await FirebaseFirestore.instance
-                                        .collection(FirestoreCollections.stores)
-                                        .doc(store.id)
-                                        .update({
-                                      'visits': FieldValue.increment(1)
-                                    });
-                                    await navigatorKey.currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) {
-                                        if (store.type
-                                            .toLowerCase()
-                                            .contains('grocery')) {
-                                          return GroceryStoreMainScreen(store);
-                                        } else {
-                                          return StoreScreen(
-                                            store,
-                                          );
-                                        }
-                                      },
-                                    ));
-                                  },
-                                );
-                              }
+                        const AppText(
+                          text: 'Offers available',
+                          color: AppColors.primary2,
+                        )
+                      ],
+                    ),
+                  ),
+                  const Gap(10),
+                  if (showProducts)
+                    SizedBox(
+                      height: 207,
+                      child: ListView.separated(
+                        cacheExtent: 300,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.horizontalPaddingSmall),
+                        separatorBuilder: (context, index) => const Gap(10),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: matchingProducts.length <= 10
+                            ? matchingProducts.length
+                            : 11,
+                        itemBuilder: (context, index) {
+                          final productReference = matchingProducts[index];
+                          if (index == 11) {
+                            return AppButton2(
+                              text: 'View Store',
+                              // isSecondary: true,
+                              callback: () async {
+                                await AppFunctions.navigateToStoreScreen(store);
+                              },
+                            );
+                          }
 
-                              return SizedBox(
-                                width: 100,
-                                child: FutureBuilder<Product>(
-                                    future: AppFunctions.loadProductReference(
-                                        productReference),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return Skeletonizer(
-                                            enabled: true,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              child: Container(
-                                                color: AppColors.neutral100,
-                                                width: 100,
-                                                height: 140,
-                                              ),
-                                            ));
-                                      } else if (snapshot.hasError) {
-                                        return AppText(
-                                            text: snapshot.error.toString());
-                                      }
-                                      final product = snapshot.data!;
-                                      return Column(
+                          return SizedBox(
+                            width: 100,
+                            child: FutureBuilder<Product>(
+                                future: AppFunctions.loadProductReference(
+                                    productReference),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Skeletonizer(
+                                        enabled: true,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          child: Container(
+                                            color: AppColors.neutral100,
+                                            width: 100,
+                                            height: 140,
+                                          ),
+                                        ));
+                                  } else if (snapshot.hasError) {
+                                    return AppText(
+                                        text: snapshot.error.toString());
+                                  }
+                                  final product = snapshot.data!;
+                                  return InkWell(
+                                    onTap: () {
+                                      navigatorKey.currentState!
+                                          .push(MaterialPageRoute(
+                                        builder: (context) => ProductScreen(
+                                          product: product,
+                                          store: store,
+                                        ),
+                                      ));
+                                    },
+                                    child: Ink(
+                                      child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
@@ -4634,9 +4496,9 @@ class SearchResultDisplay extends StatelessWidget {
                                             child: Stack(
                                               alignment: Alignment.bottomRight,
                                               children: [
-                                                CachedNetworkImage(
-                                                  imageUrl:
-                                                      product.imageUrls.first,
+                                                AppFunctions
+                                                    .displayNetworkImage(
+                                                  product.imageUrls.first,
                                                   width: 100,
                                                   height: 120,
                                                   fit: BoxFit.fill,
@@ -4645,31 +4507,24 @@ class SearchResultDisplay extends StatelessWidget {
                                                   padding:
                                                       const EdgeInsets.only(
                                                           right: 8.0, top: 8.0),
-                                                  child: InkWell(
-                                                    onTap: () {},
-                                                    child: Ink(
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(5),
-                                                        decoration: BoxDecoration(
-                                                            boxShadow: const [
-                                                              BoxShadow(
-                                                                color: Colors
-                                                                    .black12,
-                                                                offset: Offset(
-                                                                    2, 2),
-                                                              )
-                                                            ],
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        50)),
-                                                        child: const Icon(
-                                                          Icons.add,
-                                                        ),
-                                                      ),
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(5),
+                                                    decoration: BoxDecoration(
+                                                        boxShadow: const [
+                                                          BoxShadow(
+                                                            color:
+                                                                Colors.black12,
+                                                            offset:
+                                                                Offset(2, 2),
+                                                          )
+                                                        ],
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50)),
+                                                    child: const Icon(
+                                                      Icons.add,
                                                     ),
                                                   ),
                                                 )
@@ -4693,8 +4548,8 @@ class SearchResultDisplay extends StatelessWidget {
                                                 ),
                                               ),
                                               AppText(
-                                                text: product.initialPrice
-                                                    .toString(),
+                                                text:
+                                                    '\$${product.initialPrice}',
                                                 decoration:
                                                     product.promoPrice != null
                                                         ? TextDecoration
@@ -4732,15 +4587,15 @@ class SearchResultDisplay extends StatelessWidget {
                                                 : const SizedBox.shrink();
                                           }),
                                         ],
-                                      );
-                                    }),
-                              );
-                            },
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          );
+                        },
+                      ),
+                    ),
+                ],
               );
             },
           ),
@@ -4780,12 +4635,11 @@ class NoSearchResult extends StatelessWidget {
             ),
             const Gap(10),
             if (_tabController != null && _tabController.index != 0)
-              AppButton(
+              AppButton2(
                 text: 'Search in all',
+                textColor: Colors.white,
                 callback: () => _tabController.animateTo(0),
-                borderRadius: 50,
-                width: 120,
-                height: 40,
+                backgroundColor: Colors.black,
               ),
           ],
         )

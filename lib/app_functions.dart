@@ -4,6 +4,7 @@ import 'dart:typed_data' show Uint8List;
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:credit_card_type_detector/models.dart';
 import 'package:date_time_format/date_time_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,8 @@ import 'main.dart';
 import 'models/advert/advert_model.dart';
 import 'models/store/store_model.dart';
 import 'presentation/constants/other_constants.dart';
+import 'presentation/features/grocery_store/screens/screens/grocery_store_main_screen.dart';
+import 'presentation/features/store/store_screen.dart';
 import 'presentation/services/sign_in_view_model.dart';
 
 class AppFunctions {
@@ -65,6 +68,27 @@ class AppFunctions {
     giftAdverts.shuffle();
 
     return giftAdverts;
+  }
+
+  static Future<void> navigateToStoreScreen(Store store) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.stores)
+        .where('id', isEqualTo: store.id)
+        .get();
+
+    await querySnapshot.docs.first.reference
+        .update({'visits': FieldValue.increment(1)});
+    await navigatorKey.currentState!.push(MaterialPageRoute(
+      builder: (context) {
+        if (store.type.toLowerCase().contains('grocery')) {
+          return GroceryStoreMainScreen(store);
+        } else {
+          return StoreScreen(
+            store,
+          );
+        }
+      },
+    ));
   }
 
   static Future<List<GiftCardCategory>> getGiftCardCategories() async {
@@ -311,6 +335,20 @@ class AppFunctions {
       storedCreditCards.add(CreditCardDetails.fromJson(card));
     }
     return storedCreditCards;
+  }
+
+  static String getCreditCardName(List<CreditCardType> types) {
+    if (types.isEmpty) {
+      return 'N/A';
+    } else {
+      return types.first == CreditCardType.visa()
+          ? 'Visa'
+          : types.first == CreditCardType.americanExpress()
+              ? 'American Express'
+              : types.first == CreditCardType.discover()
+                  ? 'Discover'
+                  : 'Mastercard';
+    }
   }
 
   // static Future<List<Store>> getStores()async {

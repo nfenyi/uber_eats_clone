@@ -585,7 +585,8 @@ class BannerCarousel extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 7),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,

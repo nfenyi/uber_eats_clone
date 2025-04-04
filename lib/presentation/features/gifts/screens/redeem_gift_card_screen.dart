@@ -9,10 +9,12 @@ import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
+import '../../../../models/gift_card/gift_card_model.dart';
 import '../../../services/sign_in_view_model.dart';
 
 class RedeemGiftCardScreen extends StatefulWidget {
-  const RedeemGiftCardScreen({super.key});
+  final String? newGiftCardId;
+  const RedeemGiftCardScreen({super.key, this.newGiftCardId});
 
   @override
   State<RedeemGiftCardScreen> createState() => _RedeemGiftCardScreenState();
@@ -116,25 +118,4 @@ class _RedeemGiftCardScreenState extends State<RedeemGiftCardScreen> {
       ),
     );
   }
-}
-
-class GiftCard {
-  final String id;
-  final String senderName;
-  final String receiverName;
-  final String imageUrl;
-  final int giftAmount;
-  final String senderUid;
-  final String? optionalVideoUrl;
-  final String? optionalMessage;
-
-  GiftCard(
-      {required this.imageUrl,
-      required this.giftAmount,
-      required this.senderUid,
-      required this.receiverName,
-      required this.senderName,
-      this.optionalVideoUrl,
-      this.optionalMessage,
-      required this.id});
 }

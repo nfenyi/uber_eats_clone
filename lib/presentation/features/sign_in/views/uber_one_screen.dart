@@ -46,70 +46,7 @@ class UberOneScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 8.0, top: 8),
                       child: GestureDetector(
                         onTap: () async {
-                          await Hive.box(AppBoxes.appState)
-                              .delete('isVerifiedViaLink');
-                          await Hive.box(AppBoxes.appState)
-                              .delete(BoxKeys.addedEmailToPhoneNumber);
-                          await Hive.box(AppBoxes.appState)
-                              .delete(BoxKeys.addressDetailsSaved);
-                          final userCredential =
-                              FirebaseAuth.instance.currentUser;
-                          await FirebaseFirestore.instance
-                              .collection(FirestoreCollections.users)
-                              .doc(userCredential!.uid)
-                              .update({
-                            'hasUberOne': false,
-                            'type': "Personal",
-                            "onboarded": true,
-                            "redeemedPromos": <String>[],
-                            "groupOrders": <String>[],
-                            'displayName': userCredential.displayName,
-                            'uberCash': const UberCash().toJson(),
-                          });
-
-                          String udid = await FlutterUdid.consistentUdid;
-
-                          var deviceRef = FirebaseFirestore.instance
-                              .collection(FirestoreCollections.devices)
-                              .doc(udid);
-                          var deviceSnapshot = await deviceRef.get();
-                          final info = <String, dynamic>{
-                            userCredential.uid: {
-                              'name': userCredential.displayName,
-                              'profilePic': userCredential.photoURL,
-                              "email": userCredential.email,
-                              "phoneNumber": userCredential.phoneNumber
-                            }
-                          };
-                          if (!deviceSnapshot.exists) {
-                            await deviceRef.set(info);
-                          } else {
-                            if (deviceSnapshot[userCredential.uid] == null) {
-                              await deviceRef.update(info);
-                            }
-                          }
-                          //creating favorite stores field
-                          await FirebaseFirestore.instance
-                              .collection(FirestoreCollections.favoriteStores)
-                              .doc(userCredential.uid)
-                              .set({});
-                          await Hive.box(AppBoxes.appState)
-                              .put(BoxKeys.authenticated, true);
-                          await Hive.box(AppBoxes.appState)
-                              .delete(BoxKeys.signedInWithEmail);
-                          await Hive.box(AppBoxes.appState)
-                              .delete(BoxKeys.addedEmailToPhoneNumber);
-                          await Hive.box(AppBoxes.appState)
-                              .delete(BoxKeys.addressDetailsSaved);
-                          await navigatorKey.currentState!.pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ShowCaseWidget(builder: (context) {
-                                  return const MainScreen();
-                                }),
-                              ), (r) {
-                            return false;
-                          });
+                          await _executeOnboardingUploads();
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -206,72 +143,71 @@ class UberOneScreen extends StatelessWidget {
             child: AppButton(
               text: 'Got it',
               callback: () async {
-                await Hive.box(AppBoxes.appState).delete('isVerifiedViaLink');
-                await Hive.box(AppBoxes.appState)
-                    .delete(BoxKeys.addedEmailToPhoneNumber);
-                await Hive.box(AppBoxes.appState)
-                    .delete(BoxKeys.addressDetailsSaved);
-                final userCredential = FirebaseAuth.instance.currentUser;
-                await FirebaseFirestore.instance
-                    .collection(FirestoreCollections.users)
-                    .doc(userCredential!.uid)
-                    .update({
-                  'hasUberOne': false,
-                  'type': "Personal",
-                  "onboarded": true,
-                  "redeemedPromos": <String>[],
-                  "groupOrders": <String>[],
-                  'displayName': userCredential.displayName,
-                  'uberCash': const UberCash().toJson(),
-                });
-
-                String udid = await FlutterUdid.consistentUdid;
-
-                var deviceRef = FirebaseFirestore.instance
-                    .collection(FirestoreCollections.devices)
-                    .doc(udid);
-                var deviceSnapshot = await deviceRef.get();
-                final info = <String, dynamic>{
-                  userCredential.uid: {
-                    'name': userCredential.displayName,
-                    'profilePic': userCredential.photoURL,
-                    "email": userCredential.email,
-                    "phoneNumber": userCredential.phoneNumber
-                  }
-                };
-                if (!deviceSnapshot.exists) {
-                  await deviceRef.set(info);
-                } else {
-                  if (deviceSnapshot.data()![userCredential.uid] == null) {
-                    await deviceRef.update(info);
-                  }
-                }
-                //creating favorite stores field
-                await FirebaseFirestore.instance
-                    .collection(FirestoreCollections.favoriteStores)
-                    .doc(userCredential.uid)
-                    .set({});
-                await Hive.box(AppBoxes.appState)
-                    .put(BoxKeys.authenticated, true);
-                await Hive.box(AppBoxes.appState)
-                    .delete(BoxKeys.signedInWithEmail);
-                await Hive.box(AppBoxes.appState)
-                    .delete(BoxKeys.addedEmailToPhoneNumber);
-                await Hive.box(AppBoxes.appState)
-                    .delete(BoxKeys.addressDetailsSaved);
-                await navigatorKey.currentState!.pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => ShowCaseWidget(builder: (context) {
-                        return const MainScreen();
-                      }),
-                    ), (r) {
-                  return false;
-                });
+                await _executeOnboardingUploads();
               },
             ),
           )
         ],
       )),
     );
+  }
+
+  Future<void> _executeOnboardingUploads() async {
+    await Hive.box(AppBoxes.appState).delete('isVerifiedViaLink');
+    await Hive.box(AppBoxes.appState).delete(BoxKeys.addedEmailToPhoneNumber);
+    await Hive.box(AppBoxes.appState).delete(BoxKeys.addressDetailsSaved);
+    final userCredential = FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance
+        .collection(FirestoreCollections.users)
+        .doc(userCredential!.uid)
+        .update({
+      'hasUberOne': false,
+      'type': "Personal",
+      "onboarded": true,
+      "redeemedPromos": <String>[],
+      "groupOrders": <Object>[],
+      "giftCards": <Object>[],
+      'displayName': userCredential.displayName,
+      'uberCash': const UberCash().toJson(),
+    });
+
+    String udid = await FlutterUdid.consistentUdid;
+
+    var deviceRef = FirebaseFirestore.instance
+        .collection(FirestoreCollections.devices)
+        .doc(udid);
+    var deviceSnapshot = await deviceRef.get();
+    final info = <String, dynamic>{
+      userCredential.uid: {
+        'name': userCredential.displayName,
+        'profilePic': userCredential.photoURL,
+        "email": userCredential.email,
+        "phoneNumber": userCredential.phoneNumber
+      }
+    };
+    if (!deviceSnapshot.exists) {
+      await deviceRef.set(info);
+    } else {
+      if (deviceSnapshot.data()![userCredential.uid] == null) {
+        await deviceRef.update(info);
+      }
+    }
+    //creating favorite stores field
+    await FirebaseFirestore.instance
+        .collection(FirestoreCollections.favoriteStores)
+        .doc(userCredential.uid)
+        .set({});
+    await Hive.box(AppBoxes.appState).put(BoxKeys.authenticated, true);
+    await Hive.box(AppBoxes.appState).delete(BoxKeys.signedInWithEmail);
+    await Hive.box(AppBoxes.appState).delete(BoxKeys.addedEmailToPhoneNumber);
+    await Hive.box(AppBoxes.appState).delete(BoxKeys.addressDetailsSaved);
+    await navigatorKey.currentState!.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => ShowCaseWidget(builder: (context) {
+            return const MainScreen();
+          }),
+        ), (r) {
+      return false;
+    });
   }
 }

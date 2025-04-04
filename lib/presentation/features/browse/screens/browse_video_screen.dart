@@ -317,29 +317,8 @@ class _BrowseVideoScreenState extends State<BrowseVideoScreen> {
                                         children: [
                                           GestureDetector(
                                             onTap: () async {
-                                              await FirebaseFirestore.instance
-                                                  .collection(
-                                                      FirestoreCollections
-                                                          .stores)
-                                                  .doc(store.id)
-                                                  .update({
-                                                'visits':
-                                                    FieldValue.increment(1)
-                                              });
-                                              await navigatorKey.currentState!
-                                                  .push(MaterialPageRoute(
-                                                builder: (context) {
-                                                  if (_stores[index]
-                                                      .type
-                                                      .toLowerCase()
-                                                      .contains('grocery')) {
-                                                    return GroceryStoreMainScreen(
-                                                        store);
-                                                  } else {
-                                                    return StoreScreen(store);
-                                                  }
-                                                },
-                                              ));
+                                              await AppFunctions
+                                                  .navigateToStoreScreen(store);
                                             },
                                             child: Row(
                                               children: [

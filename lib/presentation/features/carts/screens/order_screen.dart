@@ -6,7 +6,6 @@ import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/address/screens/payment_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/receipt_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/what_delivery_people_see_screen.dart';
 
@@ -14,6 +13,7 @@ import '../../../../main.dart';
 import '../../../../models/order/order_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_text.dart';
+import '../../address/screens/addresses_screen.dart';
 
 class OrderScreen extends StatefulWidget {
   final IndividualOrder order;

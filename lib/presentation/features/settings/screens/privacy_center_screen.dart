@@ -6,11 +6,10 @@ import 'package:iconify_flutter/icons/icon_park_solid.dart';
 import 'package:iconify_flutter_plus/icons/mdi.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/address/screens/payment_options_screen.dart';
 
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
+import '../../address/screens/addresses_screen.dart';
 
 class PrivacyCenterScreen extends StatelessWidget {
   const PrivacyCenterScreen({super.key});

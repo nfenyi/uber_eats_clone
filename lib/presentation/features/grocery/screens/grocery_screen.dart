@@ -21,10 +21,10 @@ import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../../app_functions.dart';
 import '../../../../models/advert/advert_model.dart';
 import '../../../../models/store/store_model.dart';
+import '../../../../state/user_location_providers.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../grocery_store/screens/screens/grocery_store_main_screen.dart';
 import '../../home/home_screen.dart';
 import '../../home/map/map_screen.dart';
 import '../../main_screen/screens/main_screen.dart';
@@ -43,20 +43,11 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
 
   List<FoodCategory> _groceryCategories = [];
 
-  List<String> _selectedFilters = [];
-
   // bool _onSearchScreen = false;
   bool _onFilterScreen = false;
 
   // final FocusNode _focus = FocusNode();
 
-  List<Store> _filteredStores = [];
-
-  int? _selectedDeliveryFeeIndex;
-  int? _selectedRatingIndex;
-  String? _selectedPrice;
-  List<String> _selectedDietaryOptions = [];
-  String? _selectedSort;
   List<Store> _groceryScreenStores = [];
   final _scrollController = ScrollController();
   final List<Store> _groceryGroceryStores = [];
@@ -162,6 +153,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedGeoPoint = ref.read(selectedLocationGeoPoint)!;
     // FirebaseFirestore.instance
     //     .collection(FirestoreCollections.featuredStores)
     //     .doc()
@@ -249,13 +241,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                         text: 'Reset',
                         callback: () {
                           setState(() {
-                            _selectedFilters = [];
                             _onFilterScreen = false;
-                            _selectedDeliveryFeeIndex = null;
-                            _selectedRatingIndex = null;
-                            _selectedPrice = null;
-                            _selectedDietaryOptions = [];
-                            _selectedSort = null;
                           });
                         },
                       ),
@@ -266,7 +252,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                     onTap: () async {
                       await navigatorKey.currentState!.push(MaterialPageRoute(
                         builder: (context) => MapScreen(
-                          userLocation: storedUserLocation!,
+                          userLocation: selectedGeoPoint,
                           filteredStores: const [],
                         ),
                       ));
@@ -523,27 +509,8 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           onTap: () async {
-                                            await FirebaseFirestore.instance
-                                                .collection(
-                                                    FirestoreCollections.stores)
-                                                .doc(store.id)
-                                                .update({
-                                              'visits': FieldValue.increment(1)
-                                            });
-                                            await navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) {
-                                                // if (store.type
-                                                //     .contains('Grocery')) {
-                                                return GroceryStoreMainScreen(
-                                                    store);
-                                                // } else {
-                                                //   return StoreScreen(
-                                                //     store,
-                                                //   );
-                                                // }
-                                              },
-                                            ));
+                                            await AppFunctions
+                                                .navigateToStoreScreen(store);
                                           },
                                           child: Ink(
                                             // decoration: BoxDecoration(
@@ -696,7 +663,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   subtitle: 'Fresh groceries delivered to your door',
                 ),
                 SizedBox(
-                  height: 185,
+                  height: 190,
                   child: ListView.separated(
                     cacheExtent: 300,
                     padding: const EdgeInsets.symmetric(
@@ -1078,7 +1045,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                       subtitle: 'From ${store.name}',
                                       imageUrl: store.logo),
                                   SizedBox(
-                                    height: 200,
+                                    height: 207,
                                     child: ListView.separated(
                                         scrollDirection: Axis.horizontal,
                                         padding: const EdgeInsets.symmetric(
@@ -1106,7 +1073,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                         child: Container(
                                                           color: Colors.blue,
                                                           width: 110,
-                                                          height: 200,
+                                                          height: 207,
                                                         )),
                                                   );
                                                 } else if (snapshot.hasError) {
@@ -1379,7 +1346,7 @@ class CategoriesListView extends ConsumerWidget {
               }
             },
             child: SizedBox(
-              width: 55,
+              width: 62,
               child: Column(
                 children: [
                   CachedNetworkImage(

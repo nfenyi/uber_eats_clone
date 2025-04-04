@@ -117,7 +117,7 @@ class InviteAFriendScreen extends StatelessWidget {
                         callback: () {
                           showInfoToast('Copied', context: context);
                         },
-                        color: Colors.white,
+                        backgroundColor: Colors.white,
                       ),
                     ),
                   ),

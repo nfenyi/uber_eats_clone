@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
@@ -21,7 +22,7 @@ import 'package:uber_eats_clone/presentation/features/group_order/group_order_se
 import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/search_menu_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_details_screen.dart';
-import 'dart:math' as math;
+import 'package:uber_eats_clone/state/user_location_providers.dart';
 
 import '../../../main.dart';
 import '../../../models/favourite/favourite_model.dart';
@@ -30,28 +31,28 @@ import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
 import '../../services/sign_in_view_model.dart';
 import '../address/screens/addresses_screen.dart';
-import '../home/home_screen.dart';
 import '../main_screen/screens/main_screen.dart';
 import '../uber_one/join_uber_one_screen.dart';
 
-class StoreScreen extends StatefulWidget {
+class StoreScreen extends ConsumerStatefulWidget {
   final Store store;
 
   const StoreScreen(this.store, {super.key});
 
   @override
-  State<StoreScreen> createState() => _StoreScreenState();
+  ConsumerState<StoreScreen> createState() => _StoreScreenState();
 }
 
-class _StoreScreenState extends State<StoreScreen> {
+class _StoreScreenState extends ConsumerState<StoreScreen> {
   late final Store _store;
   late final List<GlobalKey> _categoryKeys;
-  late final _storeLatLng;
+  late final GeoPoint _storeLatLng;
   // final _scrollController = ScrollController();
   // late final ScrollNotification _scrollNotification;
   late Distance _distance;
   int? _retrievalFilter = 0;
   late bool _isFavorite;
+  late final GeoPoint _selectedGeoPoint;
 
   int _currentCategoryIndex = 0;
 
@@ -106,6 +107,7 @@ class _StoreScreenState extends State<StoreScreen> {
       statusBarIconBrightness: Brightness.light,
       statusBarColor: null,
     ));
+    _selectedGeoPoint = ref.read(selectedLocationGeoPoint)!;
     _store = widget.store;
     _storeLatLng = _store.location.latlng as GeoPoint;
     if (_store.productCategories != null) {
@@ -624,7 +626,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                         },
                                       )
                                     : SizedBox(
-                                        height: 191,
+                                        height: 200,
                                         child: ListView.separated(
                                             scrollDirection: Axis.horizontal,
                                             itemBuilder: (context, index) {
@@ -670,15 +672,18 @@ class _StoreScreenState extends State<StoreScreen> {
                                                       ));
                                                     } else if (snapshot
                                                         .hasError) {
-                                                      return AppText(
-                                                          text: snapshot.error
-                                                              .toString());
+                                                      return SizedBox(
+                                                        width: 145,
+                                                        child: AppText(
+                                                            text: snapshot.error
+                                                                .toString()),
+                                                      );
                                                     }
 
                                                     final product =
                                                         snapshot.data!;
                                                     return SizedBox(
-                                                      width: 140,
+                                                      width: 145,
                                                       child: InkWell(
                                                         onTap: () {
                                                           navigatorKey
@@ -1284,7 +1289,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                           ),
                                         AppText(
                                             text:
-                                                ' • ${_distance.as(LengthUnit.Kilometer, LatLng(_storeLatLng.latitude, _storeLatLng.longitude), LatLng(storedUserLocation!.latitude, storedUserLocation!.longitude))} km '),
+                                                ' • ${_distance.as(LengthUnit.Kilometer, LatLng(_storeLatLng.latitude, _storeLatLng.longitude), LatLng(_selectedGeoPoint!.latitude, _selectedGeoPoint!.longitude))} km '),
                                         const Icon(Icons.keyboard_arrow_right)
                                       ],
                                     ),

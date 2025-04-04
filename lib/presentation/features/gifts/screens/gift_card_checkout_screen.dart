@@ -1,27 +1,43 @@
+import 'dart:async';
+
 import 'package:chips_choice/chips_choice.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:credit_card_type_detector/credit_card_type_detector.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/bx.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:uber_eats_clone/app_functions.dart';
-import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
+import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
+import 'package:uber_eats_clone/presentation/features/address/screens/payment_options_screen.dart';
+import 'package:uber_eats_clone/presentation/features/address/screens/schedule_delivery_screen.dart';
+import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
+import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
+import '../../../../models/gift_card/gift_card_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/widgets.dart';
+import '../../sign_in/views/add_a_credit_card/add_a_credit_card.dart';
 import '../../webview/webview_screen.dart';
 
 class GiftCardCheckoutScreen extends ConsumerStatefulWidget {
-  const GiftCardCheckoutScreen({super.key});
+  final GiftCard giftCard;
+  const GiftCardCheckoutScreen(this.giftCard, {super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -31,13 +47,16 @@ class GiftCardCheckoutScreen extends ConsumerStatefulWidget {
 class _GiftCardCheckoutScreenState
     extends ConsumerState<GiftCardCheckoutScreen> {
   late String _selectedSendMethod;
-
+  Timer? _debounce;
   final List<String> _giftSchedules = ['Send Now', 'Schedule'];
   late String _selectedSendSchedule;
   final List<String> _sendMethods = ['Message', 'Email'];
   final _webViewcontroller = WebViewControllerPlus();
+  CreditCardDetails? _selectedPaymentMethod;
 
   final _emailController = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -49,11 +68,14 @@ class _GiftCardCheckoutScreenState
   @override
   void dispose() {
     _emailController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    DateTime? selectedScheduleDateTime =
+        ref.watch(deliveryScheduleProviderForRecipient);
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
@@ -84,7 +106,7 @@ class _GiftCardCheckoutScreenState
                       setState(() {
                         _selectedSendSchedule = value;
                         if (value == 'Schedule') {
-                          _selectedSendMethod == 'Email';
+                          _selectedSendMethod = 'Email';
                         }
                       });
                     },
@@ -108,6 +130,7 @@ class _GiftCardCheckoutScreenState
                   ),
                   if (_selectedSendSchedule == 'Schedule')
                     ListTile(
+                      contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.calendar_month_outlined),
                       title: const AppText(
                         text: 'Schedule',
@@ -115,8 +138,16 @@ class _GiftCardCheckoutScreenState
                       ),
                       subtitle: AppText(
                           text:
-                              '${AppFunctions.formatDate(DateTime.now().toString(), format: 'l, M j, g:i A')}\nonly emails can be scheduled'),
-                      trailing: AppButton2(text: 'Change', callback: () {}),
+                              '${AppFunctions.formatDate((selectedScheduleDateTime ?? DateTime.now()).toString(), format: 'l, M j, g:i A')}\nonly emails can be scheduled'),
+                      trailing: AppButton2(
+                          text: 'Change',
+                          callback: () {
+                            navigatorKey.currentState!.push(MaterialPageRoute(
+                              builder: (context) =>
+                                  const ScheduleDeliveryScreen(
+                                      isFromGiftScreen: true),
+                            ));
+                          }),
                     ),
                   const Gap(15),
                   const AppText(
@@ -125,6 +156,20 @@ class _GiftCardCheckoutScreenState
                     weight: FontWeight.w600,
                   ),
                   ChipsChoice<String>.single(
+                    choiceLabelBuilder: (item, i) {
+                      if (i == 0) {
+                        return AppText(
+                          text: item.label,
+                          color: _selectedSendSchedule == 'Schedule'
+                              ? AppColors.neutral500
+                              : null,
+                        );
+                      } else {
+                        return AppText(
+                          text: item.label,
+                        );
+                      }
+                    },
                     wrapped: false,
                     padding: EdgeInsets.zero,
                     value: _selectedSendMethod,
@@ -139,8 +184,16 @@ class _GiftCardCheckoutScreenState
                       if (value == 'Record video') {}
                     },
                     choiceLeadingBuilder: (item, i) {
-                      return Icon(
-                          i == 0 ? Icons.speaker_notes_rounded : Icons.mail);
+                      if (i == 0) {
+                        return Icon(
+                          Icons.speaker_notes_rounded,
+                          color: _selectedSendSchedule == 'Schedule'
+                              ? AppColors.neutral500
+                              : null,
+                        );
+                      } else {
+                        return const Icon(Icons.mail);
+                      }
                     },
                     choiceItems: C2Choice.listFrom<String, String>(
                       source: _sendMethods,
@@ -165,7 +218,7 @@ class _GiftCardCheckoutScreenState
                       ? Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 221, 237, 244),
+                            color: const Color.fromARGB(255, 241, 244, 255),
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: const Column(
@@ -201,20 +254,40 @@ class _GiftCardCheckoutScreenState
                               ),
                               Gap(15),
                               AppText(
+                                overflow: TextOverflow.clip,
                                 text:
                                     'You can choose the messaging app after payment',
-                                size: AppSizes.bodySmall,
                               )
                             ],
                           ),
                         )
-                      : AppTextFormField(
-                          controller: _emailController,
-                          suffixIcon: GestureDetector(
-                            onTap: _emailController.clear,
-                            child: const Icon(Icons.cancel),
+                      : Form(
+                          key: _formKey,
+                          child: AppTextFormField(
+                            onChanged: (value) {
+                              if (_debounce?.isActive ?? false) {
+                                _debounce?.cancel();
+                              }
+                              _debounce =
+                                  Timer(const Duration(milliseconds: 500), () {
+                                setState(() {});
+                              });
+                            },
+                            controller: _emailController,
+                            validator: FormBuilderValidators.compose(
+                                [FormBuilderValidators.email()]),
+                            keyboardType: TextInputType.emailAddress,
+                            suffixIcon: _emailController.text.isNotEmpty
+                                ? GestureDetector(
+                                    onTap: () {
+                                      _emailController.clear();
+                                      setState(() {});
+                                    },
+                                    child: const Icon(Icons.cancel),
+                                  )
+                                : null,
+                            hintText: "Enter the recipient's email",
                           ),
-                          hintText: "Enter the recipient's email",
                         )
                 ],
               ),
@@ -247,7 +320,7 @@ class _GiftCardCheckoutScreenState
                             navigatorKey.currentState!.push(MaterialPageRoute(
                               builder: (context) => WebViewScreen(
                                 controller: _webViewcontroller,
-                                link: Weblinks.uberOneTerms,
+                                link: Weblinks.giftTerms,
                               ),
                             ));
                           },
@@ -275,13 +348,9 @@ class _GiftCardCheckoutScreenState
                           decoration: TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => WebViewScreen(
-                                controller: _webViewcontroller,
-                                link: Weblinks.uberOneTerms,
-                              ),
-                            ));
+                          ..onTap = () async {
+                            await launchUrl(
+                                Uri.parse(Weblinks.genericGiftCardStore));
                           },
                       ),
                     ]),
@@ -303,13 +372,9 @@ class _GiftCardCheckoutScreenState
                           decoration: TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => WebViewScreen(
-                                controller: _webViewcontroller,
-                                link: Weblinks.uberOneTerms,
-                              ),
-                            ));
+                          ..onTap = () async {
+                            await launchUrl(
+                                Uri.parse(Weblinks.corporatePortal));
                           },
                       ),
                     ]),
@@ -338,7 +403,7 @@ class _GiftCardCheckoutScreenState
                             navigatorKey.currentState!.push(MaterialPageRoute(
                               builder: (context) => WebViewScreen(
                                 controller: _webViewcontroller,
-                                link: Weblinks.uberOneTerms,
+                                link: Weblinks.giftTerms,
                               ),
                             ));
                           },
@@ -357,90 +422,83 @@ class _GiftCardCheckoutScreenState
         Column(
           children: [
             ListTile(
-              onTap: () {
-                showModalBottomSheet(
+              onTap: () async {
+                final result = await showModalBottomSheet(
                   isScrollControlled: true,
                   useSafeArea: true,
                   context: context,
                   builder: (context) {
-                    return Container(
-                      height: double.infinity,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10))),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppBar(
-                            leading: GestureDetector(
-                                onTap: () => navigatorKey.currentState!.pop(),
-                                child: const Icon(Icons.clear)),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            child: AppText(
-                              text: 'Payment Options',
-                              weight: FontWeight.w600,
-                              size: AppSizes.heading4,
-                            ),
-                          ),
-                          const Divider(),
-                          const Gap(20),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const AppText(text: 'Payment Method'),
-                                ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  leading: Image.asset(
-                                    AssetNames.masterCardLogo,
-                                    width: 30,
-                                    fit: BoxFit.cover,
-                                    height: 20,
-                                  ),
-                                  title: const AppText(
-                                    text: 'Mastercard••••1320 ',
-                                  ),
-                                ),
-                                AppTextButton(
-                                  text: 'Add payment method',
-                                  callback: () {},
-                                  color: Colors.green,
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    return const PaymentOptionsScreen(
+                      showOnlyPaymentMethods: true,
                     );
                   },
                 );
+                if (result != null) {
+                  setState(() {
+                    _selectedPaymentMethod = result;
+                  });
+                }
               },
+              leading: _selectedPaymentMethod == null
+                  ? null
+                  : CreditCardLogo(
+                      types: detectCCType(_selectedPaymentMethod!.cardNumber)),
               // contentPadding: EdgeInsets.symmetric(
               //     horizontal: AppSizes.horizontalPaddingSmall),
-              title: const AppText(
-                text: 'Select Payment',
+              title: AppText(
+                text: _selectedPaymentMethod == null
+                    ? 'Select Payment'
+                    : '${AppFunctions.getCreditCardName(detectCCType(_selectedPaymentMethod!.cardNumber))}••••${_selectedPaymentMethod!.cardNumber.substring(6)}',
                 weight: FontWeight.w600,
-                size: AppSizes.bodySmall,
               ),
               trailing: const Icon(Icons.keyboard_arrow_right),
             ),
             const Gap(10),
             AppButton(
-              callback: _selectedSendMethod == 'Message' ||
+              callback: _selectedPaymentMethod != null &&
+                          _selectedSendMethod == 'Message' ||
                       (_selectedSendMethod == 'Email' &&
-                          _emailController.text.isNotEmpty)
-                  ? () {
-                      // ref.read(bottomNavIndexProvider.notifier).updateIndex(3);
-                      // navigatorKey.currentState!. pushAndRemoveUntil(
-                      navigatorKey.currentState!.popUntil(
-                          (route) => route.settings.name == '/giftCardScreen');
+                          _formKey.currentState!.validate())
+                  ? () async {
+                      final dynamicLinkParams = DynamicLinkParameters(
+                        link: Uri.parse(
+                            "https://uber-eats-clone-d792a.firebaseapp.com/gift-card?id=${widget.giftCard.id}"),
+                        uriPrefix: "https://ubereatsclone.page.link",
+                        androidParameters: const AndroidParameters(
+                          packageName: 'com.example.uber_eats_clone',
+                        ),
+                        iosParameters: const IOSParameters(
+                          bundleId: 'com.example.uberEatsClone',
+                        ),
+                      );
+
+                      final dynamicLink = await FirebaseDynamicLinks.instance
+                          .buildLink(dynamicLinkParams);
+                      if (_selectedSendMethod == 'Message') {
+                        //
+                        await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.giftCardsAnkasa)
+                            .doc(widget.giftCard.id)
+                            .set(widget.giftCard.toJson());
+                        //
+                        final shareResult = await Share.share(
+                            dynamicLink.toString(),
+                            subject:
+                                '${FirebaseAuth.instance.currentUser!.displayName} sent you a gift card!');
+                        if (shareResult.status == ShareResultStatus.success) {
+                          navigatorKey.currentState!.popUntil((route) =>
+                              route.settings.name == '/giftCardScreen');
+                        }
+                      } else {
+                        final didSendMail = await sendEmail(
+                            _emailController.text.trim(),
+                            'You Have Received a Gift from ${widget.giftCard.senderName}',
+                            'Tap the link below to access it:\n${dynamicLink.toString()}');
+                        if (didSendMail) {
+                          navigatorKey.currentState!.popUntil((route) =>
+                              route.settings.name == '/giftCardScreen');
+                        }
+                      }
                     }
                   : null,
               text: 'Buy gift',
@@ -449,5 +507,24 @@ class _GiftCardCheckoutScreenState
         )
       ],
     );
+  }
+
+  Future<bool> sendEmail(String recipient, String subject, String body) async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: recipient,
+      queryParameters: {
+        'subject': subject,
+        'body': body,
+      },
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      return await launchUrl(emailUri);
+    } else {
+      showInfoToast('Could not launch $emailUri',
+          context: navigatorKey.currentContext);
+      return false;
+    }
   }
 }

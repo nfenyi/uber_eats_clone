@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
@@ -9,20 +10,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 // import 'package:image_picker/image_picker.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_card_checkout_screen.dart';
+import 'package:uuid/uuid.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../main.dart';
+import '../../../../models/gift_card/gift_card_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/weblinks.dart';
 import '../../webview/webview_screen.dart';
 import 'record_message_screen.dart';
 import 'recorded_message_player_screen.dart';
+import 'redeem_gift_card_screen.dart';
 
 class CustomizeGiftScreen extends StatefulWidget {
   final String initiallySelectedCard;
@@ -33,7 +38,7 @@ class CustomizeGiftScreen extends StatefulWidget {
 }
 
 class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
-  late String _selectedCard;
+  late String _selectedCardUrl;
 
   final List<String> _giftAmounts = ['25', '50', '100', '200'];
   late String _selectedGiftAmount;
@@ -41,6 +46,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
   final _toTextEditingController = TextEditingController();
   final _textMessageController = TextEditingController();
   final _progress = ValueNotifier<double>(0);
+  Timer? _debounce;
 
   String? _selectedMessageOption;
 
@@ -60,7 +66,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedCard = widget.initiallySelectedCard;
+    _selectedCardUrl = widget.initiallySelectedCard;
     _selectedGiftAmount = _giftAmounts.first;
     _userDisplayName =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo)['displayName'];
@@ -69,6 +75,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     try {
       if (_downloadUrl != null) {
         final ref = FirebaseStorage.instance.refFromURL(_downloadUrl!);
@@ -104,12 +111,11 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    AppFunctions.displayNetworkImage(
-                      _selectedCard,
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
+                    AppFunctions.displayNetworkImage(_selectedCardUrl,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                        placeholderAssetImage: AssetNames.giftCardPlaceholder),
                     // Container(
                     //   color: Colors.black45,
                     //   width: double.infinity,
@@ -197,8 +203,12 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
               AppTextFormField(
                 hintText: 'Enter their name or nickname',
                 onChanged: (value) {
-                  // TODO: apply debounce
-                  setState(() {});
+                  if (_debounce?.isActive ?? false) {
+                    _debounce?.cancel();
+                  }
+                  _debounce = Timer(const Duration(milliseconds: 500), () {
+                    setState(() {});
+                  });
                 },
                 controller: _toTextEditingController,
                 suffixIcon: GestureDetector(
@@ -386,6 +396,10 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                             context:
                                                 navigatorKey.currentContext),
                                       );
+                                  setState(() {
+                                    _uploadTask = null;
+                                    _selectedMessageOption = null;
+                                  });
                                 }
                               } catch (e) {
                                 showInfoToast(e.toString(),
@@ -496,7 +510,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                       .push(MaterialPageRoute(
                                     builder: (context) => WebViewScreen(
                                       controller: _webViewcontroller,
-                                      link: Weblinks.uberOneTerms,
+                                      link: Weblinks.userGeneratedContent,
                                     ),
                                   ));
                                 },
@@ -619,7 +633,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                                                 .circular(15),
                                                         child: AppFunctions
                                                             .displayNetworkImage(
-                                                          _selectedCard,
+                                                          _selectedCardUrl,
                                                           width:
                                                               double.infinity,
                                                           height: 200,
@@ -749,8 +763,21 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                       _agreedToTerms == false
                   ? null
                   : () {
+                      final giftCard = GiftCard(
+                          optionalVideoUrl: _downloadUrl,
+                          id: const Uuid().v4(),
+                          giftAmount: int.parse(_selectedGiftAmount),
+                          imageUrl: _selectedCardUrl,
+                          receiverName: _toTextEditingController.text.trim(),
+                          senderName:
+                              _fromTextEditingController.text.toString(),
+                          senderUid: FirebaseAuth.instance.currentUser!.uid,
+                          optionalMessage:
+                              _textMessageController.text.trim().isEmpty
+                                  ? null
+                                  : _textMessageController.text);
                       navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => const GiftCardCheckoutScreen(),
+                        builder: (context) => GiftCardCheckoutScreen(giftCard),
                       ));
                     },
               text: 'Go to checkout',

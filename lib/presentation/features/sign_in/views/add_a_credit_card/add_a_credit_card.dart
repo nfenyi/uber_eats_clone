@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:colorful_iconify_flutter/icons/logos.dart';
 import 'package:country_flags/country_flags.dart';
+import 'package:credit_card_type_detector/credit_card_type_detector.dart';
+import 'package:credit_card_type_detector/models.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/cib.dart';
 import 'package:phonecodes/phonecodes.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/hive_adapters/country/country_ip_model.dart';
@@ -31,6 +38,7 @@ class AddCardScreen extends ConsumerStatefulWidget {
 }
 
 class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
+  Timer? _debounce;
   // final List<CountryCode> _countryCodes = [
   //   CountryCode(flag: AssetNames.ghanaFlag, countryName: "Ghana", code: '+233'),
   //   CountryCode(flag: AssetNames.usaFlag, countryName: "USA", code: '+1'),
@@ -51,6 +59,8 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
 
   bool _isLoading = false;
 
+  final _cardNumberNotifier = ValueNotifier<String>('');
+
   @override
   void initState() {
     super.initState();
@@ -60,6 +70,12 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
     );
     _countryController.text = storedCountry.country!;
     _countryCode = storedCountry.code!;
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   @override
@@ -91,15 +107,28 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                         ),
                         const Gap(15),
                         AppTextFormField(
+                          onChanged: (value) {
+                            if (value != null) {
+                              if (_debounce?.isActive ?? false) {
+                                _debounce?.cancel();
+                              }
+                              _debounce =
+                                  Timer(const Duration(milliseconds: 500), () {
+                                _cardNumberNotifier.value = value;
+                              });
+                            }
+                          },
                           keyboardType: const TextInputType.numberWithOptions(),
                           validator: FormBuilderValidators.compose(
                               [FormBuilderValidators.required()]),
                           controller: _cardNumberController,
                           removePrefixConstraints: true,
-                          prefixIcon: Image.asset(
-                            AssetNames.creditCard,
-                            height: 30,
-                            width: 30,
+                          prefixIcon: ValueListenableBuilder(
+                            valueListenable: _cardNumberNotifier,
+                            builder: (context, value, child) {
+                              final types = detectCCType(value);
+                              return CreditCardLogo(types: types);
+                            },
                           ),
                           suffixIcon: GestureDetector(
                               onTap: () async {
@@ -555,5 +584,37 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
         ],
       ),
     );
+  }
+}
+
+class CreditCardLogo extends StatelessWidget {
+  const CreditCardLogo({
+    super.key,
+    required this.types,
+  });
+
+  final List<CreditCardType> types;
+
+  @override
+  Widget build(BuildContext context) {
+    if (types.isEmpty) {
+      return Image.asset(
+        AssetNames.creditCard,
+        width: 30,
+        height: 20,
+        fit: BoxFit.fitWidth,
+      );
+    } else {
+      return Iconify(
+        types.first == CreditCardType.visa()
+            ? Logos.visa
+            : types.first == CreditCardType.americanExpress()
+                ? Cib.american_express
+                : types.first == CreditCardType.discover()
+                    ? Logos.discover
+                    : Logos.mastercard,
+        size: 30,
+      );
+    }
   }
 }

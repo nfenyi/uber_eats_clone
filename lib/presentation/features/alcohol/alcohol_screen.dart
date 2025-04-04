@@ -425,22 +425,7 @@
 //                                           borderRadius:
 //                                               BorderRadius.circular(12),
 //                                           onTap: () async {
-//                                             await FirebaseFirestore.instance
-//                                                 .collection(
-//                                                     FirestoreCollections.stores)
-//                                                 .doc(store.id)
-//                                                 .update({
-//                                               'visits': FieldValue.increment(1)
-//                                             });
-
-//                                             await navigatorKey.currentState!
-//                                                 .push(MaterialPageRoute(
-//                                               builder: (context) {
-//                                                 return StoreScreen(
-//                                                   store,
-//                                                 );
-//                                               },
-//                                             ));
+//                                             await AppFunctions.navigateToStore(store);
 //                                           },
 //                                           child: Ink(
 //                                             // decoration: BoxDecoration(
