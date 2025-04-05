@@ -28,6 +28,11 @@ mixin _$GiftCard {
   String get senderUid => throw _privateConstructorUsedError;
   String? get optionalVideoUrl => throw _privateConstructorUsedError;
   String? get optionalMessage => throw _privateConstructorUsedError;
+  DateTime? get deliverySchedule => throw _privateConstructorUsedError;
+  String? get recipientAddress => throw _privateConstructorUsedError;
+  bool? get sent => throw _privateConstructorUsedError;
+  String? get dynamicLink => throw _privateConstructorUsedError;
+  bool get used => throw _privateConstructorUsedError;
 
   /// Serializes this GiftCard to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,7 +57,12 @@ abstract class $GiftCardCopyWith<$Res> {
       int giftAmount,
       String senderUid,
       String? optionalVideoUrl,
-      String? optionalMessage});
+      String? optionalMessage,
+      DateTime? deliverySchedule,
+      String? recipientAddress,
+      bool? sent,
+      String? dynamicLink,
+      bool used});
 }
 
 /// @nodoc
@@ -78,6 +88,11 @@ class _$GiftCardCopyWithImpl<$Res, $Val extends GiftCard>
     Object? senderUid = null,
     Object? optionalVideoUrl = freezed,
     Object? optionalMessage = freezed,
+    Object? deliverySchedule = freezed,
+    Object? recipientAddress = freezed,
+    Object? sent = freezed,
+    Object? dynamicLink = freezed,
+    Object? used = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -112,6 +127,26 @@ class _$GiftCardCopyWithImpl<$Res, $Val extends GiftCard>
           ? _value.optionalMessage
           : optionalMessage // ignore: cast_nullable_to_non_nullable
               as String?,
+      deliverySchedule: freezed == deliverySchedule
+          ? _value.deliverySchedule
+          : deliverySchedule // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      recipientAddress: freezed == recipientAddress
+          ? _value.recipientAddress
+          : recipientAddress // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sent: freezed == sent
+          ? _value.sent
+          : sent // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      dynamicLink: freezed == dynamicLink
+          ? _value.dynamicLink
+          : dynamicLink // ignore: cast_nullable_to_non_nullable
+              as String?,
+      used: null == used
+          ? _value.used
+          : used // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -132,7 +167,12 @@ abstract class _$$GiftCardImplCopyWith<$Res>
       int giftAmount,
       String senderUid,
       String? optionalVideoUrl,
-      String? optionalMessage});
+      String? optionalMessage,
+      DateTime? deliverySchedule,
+      String? recipientAddress,
+      bool? sent,
+      String? dynamicLink,
+      bool used});
 }
 
 /// @nodoc
@@ -156,6 +196,11 @@ class __$$GiftCardImplCopyWithImpl<$Res>
     Object? senderUid = null,
     Object? optionalVideoUrl = freezed,
     Object? optionalMessage = freezed,
+    Object? deliverySchedule = freezed,
+    Object? recipientAddress = freezed,
+    Object? sent = freezed,
+    Object? dynamicLink = freezed,
+    Object? used = null,
   }) {
     return _then(_$GiftCardImpl(
       id: null == id
@@ -190,6 +235,26 @@ class __$$GiftCardImplCopyWithImpl<$Res>
           ? _value.optionalMessage
           : optionalMessage // ignore: cast_nullable_to_non_nullable
               as String?,
+      deliverySchedule: freezed == deliverySchedule
+          ? _value.deliverySchedule
+          : deliverySchedule // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      recipientAddress: freezed == recipientAddress
+          ? _value.recipientAddress
+          : recipientAddress // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sent: freezed == sent
+          ? _value.sent
+          : sent // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      dynamicLink: freezed == dynamicLink
+          ? _value.dynamicLink
+          : dynamicLink // ignore: cast_nullable_to_non_nullable
+              as String?,
+      used: null == used
+          ? _value.used
+          : used // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -205,7 +270,12 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
       required this.giftAmount,
       required this.senderUid,
       this.optionalVideoUrl,
-      this.optionalMessage});
+      this.optionalMessage,
+      this.deliverySchedule,
+      this.recipientAddress,
+      this.sent,
+      this.dynamicLink,
+      this.used = false});
 
   factory _$GiftCardImpl.fromJson(Map<String, dynamic> json) =>
       _$$GiftCardImplFromJson(json);
@@ -226,10 +296,21 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
   final String? optionalVideoUrl;
   @override
   final String? optionalMessage;
+  @override
+  final DateTime? deliverySchedule;
+  @override
+  final String? recipientAddress;
+  @override
+  final bool? sent;
+  @override
+  final String? dynamicLink;
+  @override
+  @JsonKey()
+  final bool used;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'GiftCard(id: $id, senderName: $senderName, receiverName: $receiverName, imageUrl: $imageUrl, giftAmount: $giftAmount, senderUid: $senderUid, optionalVideoUrl: $optionalVideoUrl, optionalMessage: $optionalMessage)';
+    return 'GiftCard(id: $id, senderName: $senderName, receiverName: $receiverName, imageUrl: $imageUrl, giftAmount: $giftAmount, senderUid: $senderUid, optionalVideoUrl: $optionalVideoUrl, optionalMessage: $optionalMessage, deliverySchedule: $deliverySchedule, recipientAddress: $recipientAddress, sent: $sent, dynamicLink: $dynamicLink, used: $used)';
   }
 
   @override
@@ -244,7 +325,12 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
       ..add(DiagnosticsProperty('giftAmount', giftAmount))
       ..add(DiagnosticsProperty('senderUid', senderUid))
       ..add(DiagnosticsProperty('optionalVideoUrl', optionalVideoUrl))
-      ..add(DiagnosticsProperty('optionalMessage', optionalMessage));
+      ..add(DiagnosticsProperty('optionalMessage', optionalMessage))
+      ..add(DiagnosticsProperty('deliverySchedule', deliverySchedule))
+      ..add(DiagnosticsProperty('recipientAddress', recipientAddress))
+      ..add(DiagnosticsProperty('sent', sent))
+      ..add(DiagnosticsProperty('dynamicLink', dynamicLink))
+      ..add(DiagnosticsProperty('used', used));
   }
 
   @override
@@ -266,13 +352,34 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
             (identical(other.optionalVideoUrl, optionalVideoUrl) ||
                 other.optionalVideoUrl == optionalVideoUrl) &&
             (identical(other.optionalMessage, optionalMessage) ||
-                other.optionalMessage == optionalMessage));
+                other.optionalMessage == optionalMessage) &&
+            (identical(other.deliverySchedule, deliverySchedule) ||
+                other.deliverySchedule == deliverySchedule) &&
+            (identical(other.recipientAddress, recipientAddress) ||
+                other.recipientAddress == recipientAddress) &&
+            (identical(other.sent, sent) || other.sent == sent) &&
+            (identical(other.dynamicLink, dynamicLink) ||
+                other.dynamicLink == dynamicLink) &&
+            (identical(other.used, used) || other.used == used));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, senderName, receiverName,
-      imageUrl, giftAmount, senderUid, optionalVideoUrl, optionalMessage);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      senderName,
+      receiverName,
+      imageUrl,
+      giftAmount,
+      senderUid,
+      optionalVideoUrl,
+      optionalMessage,
+      deliverySchedule,
+      recipientAddress,
+      sent,
+      dynamicLink,
+      used);
 
   /// Create a copy of GiftCard
   /// with the given fields replaced by the non-null parameter values.
@@ -299,7 +406,12 @@ abstract class _GiftCard implements GiftCard {
       required final int giftAmount,
       required final String senderUid,
       final String? optionalVideoUrl,
-      final String? optionalMessage}) = _$GiftCardImpl;
+      final String? optionalMessage,
+      final DateTime? deliverySchedule,
+      final String? recipientAddress,
+      final bool? sent,
+      final String? dynamicLink,
+      final bool used}) = _$GiftCardImpl;
 
   factory _GiftCard.fromJson(Map<String, dynamic> json) =
       _$GiftCardImpl.fromJson;
@@ -320,6 +432,16 @@ abstract class _GiftCard implements GiftCard {
   String? get optionalVideoUrl;
   @override
   String? get optionalMessage;
+  @override
+  DateTime? get deliverySchedule;
+  @override
+  String? get recipientAddress;
+  @override
+  bool? get sent;
+  @override
+  String? get dynamicLink;
+  @override
+  bool get used;
 
   /// Create a copy of GiftCard
   /// with the given fields replaced by the non-null parameter values.

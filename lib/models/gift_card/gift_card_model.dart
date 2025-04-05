@@ -15,6 +15,11 @@ class GiftCard with _$GiftCard {
     required String senderUid,
     String? optionalVideoUrl,
     String? optionalMessage,
+    DateTime? deliverySchedule,
+    String? recipientAddress,
+    bool? sent,
+    String? dynamicLink,
+    @Default(false) bool used,
   }) = _GiftCard;
 
   factory GiftCard.fromJson(Map<String, Object?> json) =>

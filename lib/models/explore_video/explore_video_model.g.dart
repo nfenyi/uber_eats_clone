@@ -1,20 +1,20 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'browse_video_model.dart';
+part of 'explore_video_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$BrowseVideoImpl _$$BrowseVideoImplFromJson(Map<String, dynamic> json) =>
-    _$BrowseVideoImpl(
+_$ExploreVideoImpl _$$ExploreVideoImplFromJson(Map<String, dynamic> json) =>
+    _$ExploreVideoImpl(
       id: json['id'] as String,
       productRef: json['productRef'] as Object,
       storeRef: json['storeRef'] as Object,
       videoUrl: json['videoUrl'] as String,
     );
 
-Map<String, dynamic> _$$BrowseVideoImplToJson(_$BrowseVideoImpl instance) =>
+Map<String, dynamic> _$$ExploreVideoImplToJson(_$ExploreVideoImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'productRef': instance.productRef,

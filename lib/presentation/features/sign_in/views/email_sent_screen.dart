@@ -39,12 +39,12 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
         if (FirebaseAuth.instance
             .isSignInWithEmailLink(dynamicLinkData.link.toString())) {
           final user = FirebaseAuth.instance.currentUser;
-          logger.d(user.toString());
+          // logger.d(user.toString());
           if (user != null) {
             final credential = EmailAuthProvider.credentialWithLink(
                 email: widget.email,
                 emailLink: dynamicLinkData.link.toString());
-            logger.d(credential);
+            // logger.d(credential);
             await user.linkWithCredential(credential);
             await user.reload();
 

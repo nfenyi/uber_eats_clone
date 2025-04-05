@@ -16,6 +16,13 @@ _$GiftCardImpl _$$GiftCardImplFromJson(Map<String, dynamic> json) =>
       senderUid: json['senderUid'] as String,
       optionalVideoUrl: json['optionalVideoUrl'] as String?,
       optionalMessage: json['optionalMessage'] as String?,
+      deliverySchedule: json['deliverySchedule'] == null
+          ? null
+          : DateTime.parse(json['deliverySchedule'] as String),
+      recipientAddress: json['recipientAddress'] as String?,
+      sent: json['sent'] as bool?,
+      dynamicLink: json['dynamicLink'] as String?,
+      used: json['used'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$GiftCardImplToJson(_$GiftCardImpl instance) =>
@@ -28,4 +35,9 @@ Map<String, dynamic> _$$GiftCardImplToJson(_$GiftCardImpl instance) =>
       'senderUid': instance.senderUid,
       'optionalVideoUrl': instance.optionalVideoUrl,
       'optionalMessage': instance.optionalMessage,
+      'deliverySchedule': instance.deliverySchedule?.toIso8601String(),
+      'recipientAddress': instance.recipientAddress,
+      'sent': instance.sent,
+      'dynamicLink': instance.dynamicLink,
+      'used': instance.used,
     };

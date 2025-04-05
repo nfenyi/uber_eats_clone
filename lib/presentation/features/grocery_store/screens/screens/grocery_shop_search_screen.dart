@@ -248,7 +248,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                 padding: EdgeInsets.zero,
                 value: _selectedFilters,
                 onChanged: (value) {
-                  logger.d(value);
+                  // logger.d(value);
 
                   late String newFilter;
                   if (value.any(

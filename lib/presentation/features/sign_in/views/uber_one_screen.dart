@@ -166,7 +166,7 @@ class UberOneScreen extends StatelessWidget {
       "onboarded": true,
       "redeemedPromos": <String>[],
       "groupOrders": <Object>[],
-      "giftCards": <Object>[],
+      "totalGiftCardAmount": 0,
       'displayName': userCredential.displayName,
       'uberCash': const UberCash().toJson(),
     });

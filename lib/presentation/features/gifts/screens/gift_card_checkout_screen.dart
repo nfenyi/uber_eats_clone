@@ -58,6 +58,8 @@ class _GiftCardCheckoutScreenState
 
   final _formKey = GlobalKey<FormState>();
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -74,8 +76,9 @@ class _GiftCardCheckoutScreenState
 
   @override
   Widget build(BuildContext context) {
-    DateTime? selectedScheduleDateTime =
-        ref.watch(deliveryScheduleProviderForRecipient);
+    DateTime selectedScheduleDateTime =
+        ref.watch(deliveryScheduleProviderForRecipient) ??
+            DateTime.now().add(const Duration(minutes: 20));
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
@@ -138,7 +141,7 @@ class _GiftCardCheckoutScreenState
                       ),
                       subtitle: AppText(
                           text:
-                              '${AppFunctions.formatDate((selectedScheduleDateTime ?? DateTime.now()).toString(), format: 'l, M j, g:i A')}\nonly emails can be scheduled'),
+                              '${AppFunctions.formatDate(selectedScheduleDateTime.toString(), format: 'l, M j, g:i A')}\nonly emails can be scheduled'),
                       trailing: AppButton2(
                           text: 'Change',
                           callback: () {
@@ -422,6 +425,8 @@ class _GiftCardCheckoutScreenState
         Column(
           children: [
             ListTile(
+              contentPadding: EdgeInsets.zero,
+              dense: true,
               onTap: () async {
                 final result = await showModalBottomSheet(
                   isScrollControlled: true,
@@ -455,11 +460,15 @@ class _GiftCardCheckoutScreenState
             ),
             const Gap(10),
             AppButton(
+              isLoading: _isLoading,
               callback: _selectedPaymentMethod != null &&
-                          _selectedSendMethod == 'Message' ||
-                      (_selectedSendMethod == 'Email' &&
-                          _formKey.currentState!.validate())
+                      (_selectedSendMethod == 'Message' ||
+                          (_selectedSendMethod == 'Email' &&
+                              _formKey.currentState!.validate()))
                   ? () async {
+                      setState(() {
+                        _isLoading = true;
+                      });
                       final dynamicLinkParams = DynamicLinkParameters(
                         link: Uri.parse(
                             "https://uber-eats-clone-d792a.firebaseapp.com/gift-card?id=${widget.giftCard.id}"),
@@ -490,15 +499,25 @@ class _GiftCardCheckoutScreenState
                               route.settings.name == '/giftCardScreen');
                         }
                       } else {
-                        final didSendMail = await sendEmail(
-                            _emailController.text.trim(),
-                            'You Have Received a Gift from ${widget.giftCard.senderName}',
-                            'Tap the link below to access it:\n${dynamicLink.toString()}');
-                        if (didSendMail) {
-                          navigatorKey.currentState!.popUntil((route) =>
-                              route.settings.name == '/giftCardScreen');
-                        }
+                        final giftCardWithEmailProperties = widget.giftCard
+                            .copyWith(
+                                deliverySchedule: selectedScheduleDateTime,
+                                recipientAddress: _emailController.text.trim(),
+                                sent: false,
+                                dynamicLink: dynamicLink.toString());
+                        await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.giftCardsAnkasa)
+                            .doc(giftCardWithEmailProperties.id)
+                            .set(giftCardWithEmailProperties.toJson())
+                            .then(
+                              (value) => navigatorKey.currentState!.popUntil(
+                                  (route) =>
+                                      route.settings.name == '/giftCardScreen'),
+                            );
                       }
+                      setState(() {
+                        _isLoading = false;
+                      });
                     }
                   : null,
               text: 'Buy gift',

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +16,6 @@ import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 
 import '../../../core/widgets.dart';
-import '../../home/home_screen.dart';
 import '../../main_screen/screens/main_screen.dart';
 import '../../sign_in/views/drop_off_options_screen.dart';
 
@@ -164,7 +161,7 @@ class _BoxCateringScreenState extends State<BoxCateringScreen> {
                         horizontal: AppSizes.horizontalPaddingSmall),
                     value: _selectedFilters,
                     onChanged: (value) {
-                      logger.d(value);
+                      // logger.d(value);
 
                       late String newFilter;
                       if (value.any(

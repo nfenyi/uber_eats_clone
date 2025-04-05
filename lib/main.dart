@@ -85,18 +85,9 @@ void main() async {
             'groupOrders': FieldValue.arrayUnion([groupOrderRef])
           });
         } else if (initialLink.link.toString().contains('gift-card')) {
-          var giftCardId = initialLink.link.toString().split('%').last;
-          DocumentReference giftCardRef = FirebaseFirestore.instance
-              .collection(FirestoreCollections.giftCardsAnkasa)
-              .doc(giftCardId);
+          final uri = Uri.parse(initialLink.link.toString());
+          var giftCardId = uri.queryParameters['id'];
 
-          await FirebaseFirestore.instance
-              .collection(FirestoreCollections.users)
-              .doc(user.uid)
-              .update({
-            'giftCards': FieldValue.arrayUnion([giftCardRef])
-          });
-          await Hive.box(AppBoxes.appState).put(BoxKeys.hasGiftCard, true);
           await Hive.box(AppBoxes.appState)
               .put(BoxKeys.newGiftCardId, giftCardId);
         } else {
@@ -344,7 +335,7 @@ class BoxKeys {
   static const String recentlyViewed = 'recentlyViewed';
   static const String firstTimeSendingGift = 'firstTimeSendingGift';
   static const String isOnboardedToUberGifts = 'isOnboardedToUberGifts';
-  static const String hasGiftCard = 'hasGiftCard';
+
   static const String newGiftCardId = 'newGiftCardId';
 
   const BoxKeys._();

@@ -681,9 +681,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     //       type: 'sweets gift advert'),
     // ];
 
-    // for (var vid in _browseVideos) {
+    // for (var vid in _exploreVideos) {
     //   FirebaseFirestore.instance
-    //       .collection(FirestoreCollections.browseVideos)
+    //       .collection(FirestoreCollections.exploreVideos)
     //       .doc(vid.id)
     //       .set(vid.toJson());
     // }

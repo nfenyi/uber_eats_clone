@@ -10,8 +10,9 @@ import '../../../constants/app_sizes.dart';
 import '../../../core/app_text.dart';
 
 class RecordedMessagePlayerScreen extends StatefulWidget {
-  final XFile videoFile;
-  const RecordedMessagePlayerScreen({super.key, required this.videoFile});
+  final XFile? videoFile;
+  final String? videoUrl;
+  const RecordedMessagePlayerScreen({super.key, this.videoFile, this.videoUrl});
 
   @override
   State<RecordedMessagePlayerScreen> createState() =>
@@ -21,12 +22,18 @@ class RecordedMessagePlayerScreen extends StatefulWidget {
 class _RecordedMessagePlayerScreenState
     extends State<RecordedMessagePlayerScreen> {
   late VideoPlayerController _preparedVideoController;
-  Future<VideoPlayerController> prepareController() async {
-    final controller = VideoPlayerController.file(File(widget.videoFile.path));
-    await controller.initialize();
-    await controller.setLooping(true);
-    await controller.play();
-    return controller;
+  Future<void> _prepareController() async {
+    if (widget.videoFile != null) {
+      _preparedVideoController =
+          VideoPlayerController.file(File(widget.videoFile!.path));
+    } else {
+      _preparedVideoController =
+          VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!));
+    }
+
+    await _preparedVideoController.initialize();
+    await _preparedVideoController.setLooping(true);
+    await _preparedVideoController.play();
   }
 
   @override
@@ -38,7 +45,6 @@ class _RecordedMessagePlayerScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const AppText(
           text: 'Your message',
@@ -56,49 +62,16 @@ class _RecordedMessagePlayerScreenState
           ),
         ),
       ),
-      body: FutureBuilder<VideoPlayerController>(
-          future: prepareController(),
+      body: FutureBuilder(
+          future: _prepareController(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              _preparedVideoController = snapshot.data!;
-              return Stack(
-                alignment: AlignmentDirectional.bottomCenter,
-                children: [
-                  VideoPlayer(_preparedVideoController),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      StatefulBuilder(builder: (context, setState) {
-                        return TextButton(
-                            style: TextButton.styleFrom(
-                                shape: const CircleBorder(),
-                                backgroundColor: Colors.white),
-                            onPressed: () async {
-                              if (_preparedVideoController.value.isPlaying) {
-                                await _preparedVideoController.pause();
-                              } else {
-                                await _preparedVideoController.play();
-                              }
-                              setState(() {});
-                            },
-                            child: Icon(
-                              _preparedVideoController.value.isPlaying
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                              size: 35,
-                            ));
-                      }),
-                      const Gap(20),
-                    ],
-                  )
-                ],
-              );
-            } else if (snapshot.hasError) {
+            if (snapshot.hasError) {
               return Container(
                 width: double.infinity,
                 height: double.infinity,
                 color: Colors.black,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.horizontalPaddingSmall),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -110,7 +83,7 @@ class _RecordedMessagePlayerScreenState
                   ],
                 ),
               );
-            } else {
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(
                 width: double.infinity,
                 height: double.infinity,
@@ -127,6 +100,40 @@ class _RecordedMessagePlayerScreenState
                 ),
               );
             }
+
+            return Stack(
+              alignment: AlignmentDirectional.bottomCenter,
+              children: [
+                VideoPlayer(_preparedVideoController),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    StatefulBuilder(builder: (context, setState) {
+                      return TextButton(
+                          style: TextButton.styleFrom(
+                              shape: const CircleBorder(),
+                              backgroundColor: Colors.white),
+                          onPressed: () async {
+                            if (_preparedVideoController.value.isPlaying) {
+                              await _preparedVideoController.pause();
+                            } else {
+                              await _preparedVideoController.play();
+                            }
+                            setState(() {});
+                          },
+                          child: Icon(
+                            _preparedVideoController.value.isPlaying
+                                ? Icons.pause
+                                : Icons.play_arrow,
+                            size: 35,
+                          ));
+                    }),
+                    const Gap(40),
+                  ],
+                )
+              ],
+            );
           }),
     );
   }

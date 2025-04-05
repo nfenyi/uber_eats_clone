@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
@@ -27,7 +28,6 @@ import '../../../constants/weblinks.dart';
 import '../../webview/webview_screen.dart';
 import 'record_message_screen.dart';
 import 'recorded_message_player_screen.dart';
-import 'redeem_gift_card_screen.dart';
 
 class CustomizeGiftScreen extends StatefulWidget {
   final String initiallySelectedCard;
@@ -63,6 +63,8 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
 
   String? _downloadUrl;
 
+  final _textMessageKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -76,14 +78,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
   @override
   void dispose() {
     _debounce?.cancel();
-    try {
-      if (_downloadUrl != null) {
-        final ref = FirebaseStorage.instance.refFromURL(_downloadUrl!);
-        ref.delete();
-      }
-    } catch (e) {
-      showInfoToast(e.toString(), context: navigatorKey.currentContext);
-    }
+
     _fromTextEditingController.dispose();
     _toTextEditingController.dispose();
     _textMessageController.dispose();
@@ -94,6 +89,14 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: InkWell(
+            onTap: () {
+              if (_downloadUrl != null) {
+                final ref = FirebaseStorage.instance.refFromURL(_downloadUrl!);
+                ref.delete();
+              }
+            },
+            child: Ink(child: const Icon(Icons.arrow_back))),
         title: const AppText(
           text: 'Customize your gift',
           size: AppSizes.body,
@@ -291,7 +294,7 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                               cameraController: cameraController,
                             ),
                           );
-                          logger.d(listResult);
+                          // logger.d(listResult);
                           if (listResult != null) {
                             _videoFile = listResult[0];
                             final storageRef = FirebaseStorage.instance.ref().child(
@@ -356,9 +359,15 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
               const Gap(15),
               Visibility(
                   visible: _selectedMessageOption == 'Write text',
-                  child: AppTextFormField(
-                    controller: _textMessageController,
-                    hintText: 'Congratulations! You must be Uber the moon!',
+                  child: Form(
+                    key: _textMessageKey,
+                    child: AppTextFormField(
+                      validator: FormBuilderValidators.required(
+                          errorText:
+                              'Please provide your message or turn off \'Write text\''),
+                      controller: _textMessageController,
+                      hintText: 'Congratulations! You must be Uber the moon!',
+                    ),
                   )),
               // const Gap(15),
 
@@ -421,15 +430,13 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                           InkWell(
                             onTap: () async {
                               if (context.mounted) {
-                                await showModalBottomSheet(
-                                  useSafeArea: true,
-                                  isScrollControlled: true,
-                                  context: context,
+                                await navigatorKey.currentState!
+                                    .push(MaterialPageRoute(
                                   builder: (context) =>
                                       RecordedMessagePlayerScreen(
                                     videoFile: _videoFile!,
                                   ),
-                                );
+                                ));
                               }
                             },
                             child: Ink(
@@ -582,170 +589,153 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal:
                                           AppSizes.horizontalPaddingSmall),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: AppColors.neutral300,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                              width: double.infinity,
-                                              decoration: const BoxDecoration(
-                                                  color: AppColors.neutral100,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                          topLeft:
-                                                              Radius.circular(
-                                                                  10),
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  10))),
-                                              child: Center(
-                                                child: AppText(
-                                                    text:
-                                                        "${_toTextEditingController.text} will see this:"),
-                                              ),
-                                            ),
-                                            const Gap(20),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 15.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: AppColors.neutral300,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          width: double.infinity,
+                                          decoration: const BoxDecoration(
+                                              color: AppColors.neutral100,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  topRight:
+                                                      Radius.circular(10))),
+                                          child: Center(
+                                            child: AppText(
+                                                text:
+                                                    "${_toTextEditingController.text} will see this:"),
+                                          ),
+                                        ),
+                                        const Gap(20),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Stack(
                                                 children: [
-                                                  Stack(
-                                                    children: [
-                                                      ClipRRect(
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    child: AppFunctions
+                                                        .displayNetworkImage(
+                                                      placeholderAssetImage:
+                                                          AssetNames
+                                                              .giftCardPlaceholder,
+                                                      _selectedCardUrl,
+                                                      width: double.infinity,
+                                                      height: 200,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width: double.infinity,
+                                                    height: 200,
+                                                    decoration: BoxDecoration(
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(15),
-                                                        child: AppFunctions
-                                                            .displayNetworkImage(
-                                                          _selectedCardUrl,
-                                                          width:
-                                                              double.infinity,
-                                                          height: 200,
-                                                          fit: BoxFit.cover,
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                        width: double.infinity,
-                                                        height: 200,
-                                                        decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15),
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .grey
-                                                                    .withAlpha(
-                                                                        180))),
-                                                      ),
-                                                    ],
+                                                        border: Border.all(
+                                                            color: Colors.grey
+                                                                .withAlpha(
+                                                                    180))),
                                                   ),
-                                                  const Gap(20),
-                                                  AppText(
-                                                    text:
-                                                        '\$$_selectedGiftAmount USD',
-                                                    weight: FontWeight.w600,
-                                                    size: AppSizes.heading4,
-                                                  ),
-                                                  const Gap(30),
-                                                  AppText(
-                                                      weight: FontWeight.w600,
-                                                      size: AppSizes.heading6,
-                                                      text:
-                                                          "${_toTextEditingController.text}, here's an Uber gift from Nana!"),
-                                                  const Gap(10),
-                                                  if (_selectedMessageOption ==
-                                                          'Record video' &&
-                                                      _downloadUrl != null)
-                                                    Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 15,
-                                                          vertical: 20),
-                                                      decoration: BoxDecoration(
-                                                        color: AppColors
-                                                            .neutral100,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                      ),
-                                                      child: Row(
-                                                        children: [
-                                                          const Icon(Icons
-                                                              .videocam_sharp),
-                                                          const Gap(10),
-                                                          AppText(
-                                                              text:
-                                                                  'You got a video from ${_fromTextEditingController.text}!')
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  if (_selectedMessageOption ==
-                                                      'Write text')
-                                                    AppText(
-                                                      text: _textMessageController
-                                                              .text
-                                                              .trim()
-                                                              .isEmpty
-                                                          ? 'Optional message not added yet!'
-                                                          : _textMessageController
-                                                              .text,
-                                                      color:
-                                                          _textMessageController
-                                                                  .text
-                                                                  .trim()
-                                                                  .isEmpty
-                                                              ? AppColors
-                                                                  .neutral500
-                                                              : null,
-                                                    ),
-                                                  const Gap(15),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      navigatorKey.currentState!
-                                                          .push(
-                                                              MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            WebViewScreen(
-                                                          controller:
-                                                              webViewcontroller,
-                                                          link: Weblinks
-                                                              .uberGiftCardTerms,
-                                                        ),
-                                                      ));
-                                                    },
-                                                    child: const AppText(
-                                                      text: 'Terms apply',
-                                                      decoration: TextDecoration
-                                                          .underline,
-                                                      color:
-                                                          AppColors.neutral500,
-                                                    ),
-                                                  ),
-                                                  const Gap(10)
                                                 ],
                                               ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                              const Gap(20),
+                                              AppText(
+                                                text:
+                                                    '\$$_selectedGiftAmount USD',
+                                                weight: FontWeight.w600,
+                                                size: AppSizes.heading4,
+                                              ),
+                                              const Gap(30),
+                                              AppText(
+                                                  weight: FontWeight.w600,
+                                                  size: AppSizes.heading6,
+                                                  text:
+                                                      "${_toTextEditingController.text}, here's an Uber gift from ${_fromTextEditingController.text}!"),
+                                              const Gap(10),
+                                              if (_selectedMessageOption ==
+                                                      'Record video' &&
+                                                  _downloadUrl != null)
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 20),
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.neutral100,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                          Icons.videocam_sharp),
+                                                      const Gap(10),
+                                                      AppText(
+                                                          text:
+                                                              'You got a video from ${_fromTextEditingController.text}!')
+                                                    ],
+                                                  ),
+                                                ),
+                                              if (_selectedMessageOption ==
+                                                  'Write text')
+                                                AppText(
+                                                  text: _textMessageController
+                                                          .text
+                                                          .trim()
+                                                          .isEmpty
+                                                      ? 'Optional message not added yet!'
+                                                      : _textMessageController
+                                                          .text,
+                                                  color: _textMessageController
+                                                          .text
+                                                          .trim()
+                                                          .isEmpty
+                                                      ? AppColors.neutral500
+                                                      : null,
+                                                ),
+                                              const Gap(15),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  navigatorKey.currentState!
+                                                      .push(MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        WebViewScreen(
+                                                      controller:
+                                                          webViewcontroller,
+                                                      link: Weblinks
+                                                          .uberGiftCardTerms,
+                                                    ),
+                                                  ));
+                                                },
+                                                child: const AppText(
+                                                  text: 'Terms apply',
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  color: AppColors.neutral500,
+                                                ),
+                                              ),
+                                              const Gap(10)
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -763,22 +753,31 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                       _agreedToTerms == false
                   ? null
                   : () {
-                      final giftCard = GiftCard(
-                          optionalVideoUrl: _downloadUrl,
-                          id: const Uuid().v4(),
-                          giftAmount: int.parse(_selectedGiftAmount),
-                          imageUrl: _selectedCardUrl,
-                          receiverName: _toTextEditingController.text.trim(),
-                          senderName:
-                              _fromTextEditingController.text.toString(),
-                          senderUid: FirebaseAuth.instance.currentUser!.uid,
-                          optionalMessage:
-                              _textMessageController.text.trim().isEmpty
-                                  ? null
-                                  : _textMessageController.text);
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => GiftCardCheckoutScreen(giftCard),
-                      ));
+                      if (_selectedMessageOption == null ||
+                          _selectedMessageOption == 'Record video' ||
+                          (_selectedMessageOption == 'Write text' &&
+                              _textMessageKey.currentState!.validate())) {
+                        final giftCard = GiftCard(
+                            optionalVideoUrl:
+                                _selectedMessageOption == 'Record video'
+                                    ? _downloadUrl
+                                    : null,
+                            id: const Uuid().v4(),
+                            giftAmount: int.parse(_selectedGiftAmount),
+                            imageUrl: _selectedCardUrl,
+                            receiverName: _toTextEditingController.text.trim(),
+                            senderName:
+                                _fromTextEditingController.text.toString(),
+                            senderUid: FirebaseAuth.instance.currentUser!.uid,
+                            optionalMessage:
+                                _selectedMessageOption == 'Write text'
+                                    ? _textMessageController.text
+                                    : null);
+                        navigatorKey.currentState!.push(MaterialPageRoute(
+                          builder: (context) =>
+                              GiftCardCheckoutScreen(giftCard),
+                        ));
+                      }
                     },
               text: 'Go to checkout',
             ),

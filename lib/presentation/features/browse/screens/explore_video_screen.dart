@@ -6,40 +6,37 @@ import 'package:gap/gap.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
-import 'package:uber_eats_clone/models/browse_video/browse_video_model.dart';
+import 'package:uber_eats_clone/models/explore_video/explore_video_model.dart';
 import 'package:uber_eats_clone/models/store/store_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
-import 'package:uber_eats_clone/presentation/features/grocery_store/screens/screens/grocery_store_main_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
-import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../app_functions.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_text.dart';
-import '../../../services/sign_in_view_model.dart';
 
-class BrowseVideoScreen extends StatefulWidget {
-  final List<BrowseVideo> browseVideos;
-  final int initialBrowseVideoIndex;
+class ExploreVideoScreen extends StatefulWidget {
+  final List<ExploreVideo> exploreVideos;
+  final int initialExploreVideoIndex;
   final Store initialStore;
   final Product initialProduct;
   final VideoPlayerController initialVideoController;
-  const BrowseVideoScreen(
+  const ExploreVideoScreen(
       {super.key,
-      required this.browseVideos,
-      required this.initialBrowseVideoIndex,
+      required this.exploreVideos,
+      required this.initialExploreVideoIndex,
       required this.initialStore,
       required this.initialProduct,
       required this.initialVideoController});
 
   @override
-  State<BrowseVideoScreen> createState() => _BrowseVideoScreenState();
+  State<ExploreVideoScreen> createState() => _ExploreVideoScreenState();
 }
 
-class _BrowseVideoScreenState extends State<BrowseVideoScreen> {
-  late List<BrowseVideo> _browseVideos;
+class _ExploreVideoScreenState extends State<ExploreVideoScreen> {
+  late List<ExploreVideo> _exploreVideos;
   final List<VideoPlayerController> _videoPlayerControllers = [];
   final List<Store> _stores = [];
   final List<Product> _products = [];
@@ -49,7 +46,7 @@ class _BrowseVideoScreenState extends State<BrowseVideoScreen> {
   Future<VideoPlayerController> _prepareController(int index) async {
     if (_videoPlayerControllers.elementAtOrNull(index) == null) {
       final videoController = VideoPlayerController.networkUrl(
-          Uri.parse(_browseVideos[index].videoUrl),
+          Uri.parse(_exploreVideos[index].videoUrl),
           videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
       await videoController.initialize();
       await videoController.setVolume(0);
@@ -72,7 +69,7 @@ class _BrowseVideoScreenState extends State<BrowseVideoScreen> {
       statusBarIconBrightness: Brightness.light,
       statusBarColor: Colors.black38,
     ));
-    _browseVideos = widget.browseVideos;
+    _exploreVideos = widget.exploreVideos;
     _videoPlayerControllers.add(widget.initialVideoController);
     _stores.add(widget.initialStore);
     _products.add(widget.initialProduct);
@@ -115,7 +112,7 @@ class _BrowseVideoScreenState extends State<BrowseVideoScreen> {
               });
             },
           ),
-          itemCount: _browseVideos.length,
+          itemCount: _exploreVideos.length,
           itemBuilder: (context, index, realIndex) {
             return Column(
               children: [
@@ -550,7 +547,7 @@ class _BrowseVideoScreenState extends State<BrowseVideoScreen> {
 
                                             final hasSimilarProducts =
                                                 similarProducts.isNotEmpty;
-                                            logger.d(similarProducts);
+
                                             return Theme(
                                               data: Theme.of(context).copyWith(
                                                   dividerColor:
@@ -790,9 +787,9 @@ class _BrowseVideoScreenState extends State<BrowseVideoScreen> {
   Future<void> _getStoreAndProduct(int index) async {
     if (_videoPlayerControllers.elementAtOrNull(index) == null) {
       _stores.add(await AppFunctions.loadStoreReference(
-          _browseVideos[index].storeRef as DocumentReference));
+          _exploreVideos[index].storeRef as DocumentReference));
       _products.add(await AppFunctions.loadProductReference(
-          _browseVideos[index].productRef as DocumentReference));
+          _exploreVideos[index].productRef as DocumentReference));
     }
   }
 }

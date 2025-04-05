@@ -86,8 +86,7 @@ class _RecordMessageScreenState extends State<RecordMessageScreen>
       body: Stack(
         children: [
           (_videoFile == null)
-              ? Transform.rotate(
-                  angle: pi / 2, child: _cameraController.buildPreview())
+              ? _cameraController.buildPreview()
               : FutureBuilder<VideoPlayerController>(
                   future: _prepareController(),
                   builder: (context, snapshot) {
@@ -301,7 +300,7 @@ class _RecordMessageScreenState extends State<RecordMessageScreen>
                                   ],
                                 )),
                           ]),
-                const Gap(30)
+                const Gap(40)
               ],
             ),
           )

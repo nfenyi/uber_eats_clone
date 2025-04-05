@@ -15,7 +15,7 @@ import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/account_screen.dart';
-import 'package:uber_eats_clone/presentation/features/browse/screens/browse_screen.dart';
+import 'package:uber_eats_clone/presentation/features/explore/screens/explore_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_category_screen.dart';
 import 'package:uber_eats_clone/presentation/features/grocery/screens/grocery_screen.dart';
@@ -45,7 +45,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const GroceryScreen(),
-    const BrowseScreen(),
+    const ExploreScreen(),
     const CartsScreen(),
     const AccountScreen()
   ];
@@ -80,17 +80,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           showInfoToast('Group order added!',
               context: navigatorKey.currentContext);
         } else if (dynamicLinkData.link.toString().contains('gift-card')) {
-          var giftCardId = dynamicLinkData.link.toString().split('%').last;
-          DocumentReference giftCardRef = FirebaseFirestore.instance
-              .collection(FirestoreCollections.giftCardsAnkasa)
-              .doc(giftCardId);
-
-          await FirebaseFirestore.instance
-              .collection(FirestoreCollections.users)
-              .doc(user.uid)
-              .update({
-            'giftCards': FieldValue.arrayUnion([giftCardRef])
-          });
+          final uri = Uri.parse(dynamicLinkData.link.toString());
+          var giftCardId = uri.queryParameters['id'];
+          logger.d(giftCardId);
           await navigatorKey.currentState!.push(MaterialPageRoute(
             builder: (context) =>
                 RedeemGiftCardScreen(newGiftCardId: giftCardId),
@@ -103,14 +95,13 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (Hive.box(AppBoxes.appState)
-          .get(BoxKeys.hasGiftCard, defaultValue: false)) {
+      if (Hive.box(AppBoxes.appState).get(BoxKeys.newGiftCardId) != null) {
         await navigatorKey.currentState!.push(MaterialPageRoute(
           builder: (context) => RedeemGiftCardScreen(
               newGiftCardId:
                   Hive.box(AppBoxes.appState).get(BoxKeys.newGiftCardId)),
         ));
-        await Hive.box(AppBoxes.appState).put(BoxKeys.hasGiftCard, false);
+
         await Hive.box(AppBoxes.appState).delete(BoxKeys.newGiftCardId);
       }
     });

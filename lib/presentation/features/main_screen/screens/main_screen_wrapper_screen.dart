@@ -6,6 +6,7 @@ import 'package:showcaseview/showcaseview.dart';
 import '../../../../app_functions.dart';
 import '../../../../state/user_location_providers.dart';
 import '../../../constants/app_sizes.dart';
+import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 import 'main_screen.dart';
 
@@ -44,6 +45,7 @@ class _MainScreenWrapperScreenState
             });
           }
           return Scaffold(
+            backgroundColor: AppColors.primary2,
             body: Padding(
               padding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.horizontalPaddingSmall),

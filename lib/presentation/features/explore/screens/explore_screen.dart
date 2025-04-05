@@ -9,9 +9,9 @@ import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
-import 'package:uber_eats_clone/models/browse_video/browse_video_model.dart';
+import 'package:uber_eats_clone/models/explore_video/explore_video_model.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:uber_eats_clone/presentation/features/browse/screens/browse_video_screen.dart';
+import 'package:uber_eats_clone/presentation/features/explore/screens/explore_video_screen.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/send_gifts_intro_screen.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
@@ -30,14 +30,14 @@ import '../../home/home_screen.dart';
 import '../../home/screens/search_screen.dart';
 import '../../main_screen/screens/main_screen.dart';
 
-class BrowseScreen extends ConsumerStatefulWidget {
-  const BrowseScreen({super.key});
+class ExploreScreen extends ConsumerStatefulWidget {
+  const ExploreScreen({super.key});
 
   @override
-  ConsumerState<BrowseScreen> createState() => _BrowseScreenState();
+  ConsumerState<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-class _BrowseScreenState extends ConsumerState<BrowseScreen> {
+class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final List<FoodCategory> _shopsNearYou = [
     FoodCategory('Grocery', AssetNames.grocery2),
     FoodCategory('Convenience', AssetNames.convenience),
@@ -128,8 +128,6 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
       ..._retailStores,
       ..._boxCateringStores
     ]).toSet().toList();
-    // _loadVideo(
-    //     'https://firebasestorage.googleapis.com/v0/b/uber-eats-clone-d792a.firebasestorage.app/o/browse%20videos%2FThis%20how%20we%20make%20a%20bacon%20egg%20and%20cheese%20mcqwidle%20fyp%20viral%20mcdonalds%20fyp%E3%82%B7%20trending%20tiktok%20foryou.mp4?alt=media&token=c185ab55-2fbe-40d8-9f44-63ee847de899');
   }
 
   @override
@@ -294,7 +292,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                         ),
                       ),
                       FutureBuilder(
-                          future: _getBrowseVideos(),
+                          future: _getExploreVideos(),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -311,9 +309,9 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                                 ),
                               );
                             }
-                            final browseVideos = snapshot.data!;
+                            final exploreVideos = snapshot.data!;
                             return SliverStaggeredGrid.countBuilder(
-                              itemCount: browseVideos.length,
+                              itemCount: exploreVideos.length,
                               staggeredTileBuilder: (index) =>
                                   const StaggeredTile.fit(1),
                               crossAxisCount: 2,
@@ -321,7 +319,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                               crossAxisSpacing: 4,
                               itemBuilder: (context, index) {
                                 return VideoThumbnail(
-                                    browseVideos: browseVideos, index: index);
+                                    exloreVideos: exploreVideos, index: index);
                               },
                             );
                           })
@@ -407,26 +405,26 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                 )));
   }
 
-  Future<List<BrowseVideo>> _getBrowseVideos() async {
-    List<BrowseVideo> browseVideos = [];
+  Future<List<ExploreVideo>> _getExploreVideos() async {
+    List<ExploreVideo> exploreVideos = [];
     final videoSnapshots = await FirebaseFirestore.instance
-        .collection(FirestoreCollections.browseVideos)
+        .collection(FirestoreCollections.exploreVideos)
         .get();
     for (var videoSnapshot in videoSnapshots.docs) {
-      browseVideos.add(BrowseVideo.fromJson(videoSnapshot.data()));
+      exploreVideos.add(ExploreVideo.fromJson(videoSnapshot.data()));
     }
-    return browseVideos;
+    return exploreVideos;
   }
 }
 
 class VideoThumbnail extends StatefulWidget {
   const VideoThumbnail({
     super.key,
-    required this.browseVideos,
+    required this.exloreVideos,
     required this.index,
   });
 
-  final List<BrowseVideo> browseVideos;
+  final List<ExploreVideo> exloreVideos;
 
   final int index;
 
@@ -436,7 +434,7 @@ class VideoThumbnail extends StatefulWidget {
 
 class _VideoThumbnailState extends State<VideoThumbnail> {
   late final int _index;
-  late final BrowseVideo _browseVideo;
+  late final ExploreVideo _exploreVideo;
   late Store store;
   late Product product;
 
@@ -444,18 +442,18 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
 
   bool _isVideoVisible = false;
 
-  Future<void> _prepareController(BrowseVideo browseVideo, int index) async {
+  Future<void> _prepareController(ExploreVideo exploreVideo, int index) async {
     if (_videoController == null) {
       _videoController = VideoPlayerController.networkUrl(
-          Uri.parse(browseVideo.videoUrl),
+          Uri.parse(exploreVideo.videoUrl),
           videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
       await _videoController!.initialize();
       await _videoController!.setVolume(0);
       await _videoController!.setLooping(true);
       store = await AppFunctions.loadStoreReference(
-          browseVideo.storeRef as DocumentReference);
+          exploreVideo.storeRef as DocumentReference);
       product = await AppFunctions.loadProductReference(
-          browseVideo.productRef as DocumentReference);
+          exploreVideo.productRef as DocumentReference);
     }
   }
 
@@ -463,7 +461,7 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
   void initState() {
     super.initState();
     _index = widget.index;
-    _browseVideo = widget.browseVideos[_index];
+    _exploreVideo = widget.exloreVideos[_index];
   }
 
   @override
@@ -482,7 +480,7 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
     return ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: FutureBuilder(
-            future: _prepareController(_browseVideo, _index),
+            future: _prepareController(_exploreVideo, _index),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Skeletonizer(
@@ -493,7 +491,7 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
                 ));
               } else if (snapshot.hasError) {
                 logger.d(snapshot.error.toString());
-                logger.d(_index);
+                // logger.d(_index);
                 return SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -506,11 +504,11 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
                 return GestureDetector(
                     onTap: () {
                       navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => BrowseVideoScreen(
-                          browseVideos: widget.browseVideos,
+                        builder: (context) => ExploreVideoScreen(
+                          exploreVideos: widget.exloreVideos,
                           initialStore: store,
                           initialVideoController: _videoController!,
-                          initialBrowseVideoIndex: widget.index,
+                          initialExploreVideoIndex: widget.index,
                           initialProduct: product,
                         ),
                       ));
