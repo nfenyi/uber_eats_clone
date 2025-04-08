@@ -22,19 +22,19 @@ GroupOrder _$GroupOrderFromJson(Map<String, dynamic> json) {
 mixin _$GroupOrder {
   String? get id => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
-  String? get name => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
   DateTime? get firstOrderSchedule => throw _privateConstructorUsedError;
   String? get frequency => throw _privateConstructorUsedError;
   DateTime? get endDate => throw _privateConstructorUsedError;
-  List<String> get storeIds => throw _privateConstructorUsedError;
-  String? get ownerId => throw _privateConstructorUsedError;
-  String? get location => throw _privateConstructorUsedError;
+  Object get storeRef => throw _privateConstructorUsedError;
+  String get ownerId => throw _privateConstructorUsedError;
+  String get placeDescription => throw _privateConstructorUsedError;
   DateTime? get orderByDeadline => throw _privateConstructorUsedError;
   String? get orderPlacementSetting => throw _privateConstructorUsedError;
   String? get whoPays => throw _privateConstructorUsedError;
   double? get spendingLimit => throw _privateConstructorUsedError;
   List<String> get persons => throw _privateConstructorUsedError;
-  List<OrderSchedule> get orderSchedules => throw _privateConstructorUsedError;
+  List<Object> get orderScheduleRefs => throw _privateConstructorUsedError;
 
   /// Serializes this GroupOrder to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -55,19 +55,19 @@ abstract class $GroupOrderCopyWith<$Res> {
   $Res call(
       {String? id,
       DateTime? createdAt,
-      String? name,
+      String name,
       DateTime? firstOrderSchedule,
       String? frequency,
       DateTime? endDate,
-      List<String> storeIds,
-      String? ownerId,
-      String? location,
+      Object storeRef,
+      String ownerId,
+      String placeDescription,
       DateTime? orderByDeadline,
       String? orderPlacementSetting,
       String? whoPays,
       double? spendingLimit,
       List<String> persons,
-      List<OrderSchedule> orderSchedules});
+      List<Object> orderScheduleRefs});
 }
 
 /// @nodoc
@@ -87,19 +87,19 @@ class _$GroupOrderCopyWithImpl<$Res, $Val extends GroupOrder>
   $Res call({
     Object? id = freezed,
     Object? createdAt = freezed,
-    Object? name = freezed,
+    Object? name = null,
     Object? firstOrderSchedule = freezed,
     Object? frequency = freezed,
     Object? endDate = freezed,
-    Object? storeIds = null,
-    Object? ownerId = freezed,
-    Object? location = freezed,
+    Object? storeRef = null,
+    Object? ownerId = null,
+    Object? placeDescription = null,
     Object? orderByDeadline = freezed,
     Object? orderPlacementSetting = freezed,
     Object? whoPays = freezed,
     Object? spendingLimit = freezed,
     Object? persons = null,
-    Object? orderSchedules = null,
+    Object? orderScheduleRefs = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -110,10 +110,10 @@ class _$GroupOrderCopyWithImpl<$Res, $Val extends GroupOrder>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      name: freezed == name
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       firstOrderSchedule: freezed == firstOrderSchedule
           ? _value.firstOrderSchedule
           : firstOrderSchedule // ignore: cast_nullable_to_non_nullable
@@ -126,18 +126,15 @@ class _$GroupOrderCopyWithImpl<$Res, $Val extends GroupOrder>
           ? _value.endDate
           : endDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      storeIds: null == storeIds
-          ? _value.storeIds
-          : storeIds // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      ownerId: freezed == ownerId
+      storeRef: null == storeRef ? _value.storeRef : storeRef,
+      ownerId: null == ownerId
           ? _value.ownerId
           : ownerId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      location: freezed == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
+      placeDescription: null == placeDescription
+          ? _value.placeDescription
+          : placeDescription // ignore: cast_nullable_to_non_nullable
+              as String,
       orderByDeadline: freezed == orderByDeadline
           ? _value.orderByDeadline
           : orderByDeadline // ignore: cast_nullable_to_non_nullable
@@ -158,10 +155,10 @@ class _$GroupOrderCopyWithImpl<$Res, $Val extends GroupOrder>
           ? _value.persons
           : persons // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      orderSchedules: null == orderSchedules
-          ? _value.orderSchedules
-          : orderSchedules // ignore: cast_nullable_to_non_nullable
-              as List<OrderSchedule>,
+      orderScheduleRefs: null == orderScheduleRefs
+          ? _value.orderScheduleRefs
+          : orderScheduleRefs // ignore: cast_nullable_to_non_nullable
+              as List<Object>,
     ) as $Val);
   }
 }
@@ -177,19 +174,19 @@ abstract class _$$GroupOrderImplCopyWith<$Res>
   $Res call(
       {String? id,
       DateTime? createdAt,
-      String? name,
+      String name,
       DateTime? firstOrderSchedule,
       String? frequency,
       DateTime? endDate,
-      List<String> storeIds,
-      String? ownerId,
-      String? location,
+      Object storeRef,
+      String ownerId,
+      String placeDescription,
       DateTime? orderByDeadline,
       String? orderPlacementSetting,
       String? whoPays,
       double? spendingLimit,
       List<String> persons,
-      List<OrderSchedule> orderSchedules});
+      List<Object> orderScheduleRefs});
 }
 
 /// @nodoc
@@ -207,19 +204,19 @@ class __$$GroupOrderImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? createdAt = freezed,
-    Object? name = freezed,
+    Object? name = null,
     Object? firstOrderSchedule = freezed,
     Object? frequency = freezed,
     Object? endDate = freezed,
-    Object? storeIds = null,
-    Object? ownerId = freezed,
-    Object? location = freezed,
+    Object? storeRef = null,
+    Object? ownerId = null,
+    Object? placeDescription = null,
     Object? orderByDeadline = freezed,
     Object? orderPlacementSetting = freezed,
     Object? whoPays = freezed,
     Object? spendingLimit = freezed,
     Object? persons = null,
-    Object? orderSchedules = null,
+    Object? orderScheduleRefs = null,
   }) {
     return _then(_$GroupOrderImpl(
       id: freezed == id
@@ -230,10 +227,10 @@ class __$$GroupOrderImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      name: freezed == name
+      name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       firstOrderSchedule: freezed == firstOrderSchedule
           ? _value.firstOrderSchedule
           : firstOrderSchedule // ignore: cast_nullable_to_non_nullable
@@ -246,18 +243,15 @@ class __$$GroupOrderImplCopyWithImpl<$Res>
           ? _value.endDate
           : endDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      storeIds: null == storeIds
-          ? _value._storeIds
-          : storeIds // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      ownerId: freezed == ownerId
+      storeRef: null == storeRef ? _value.storeRef : storeRef,
+      ownerId: null == ownerId
           ? _value.ownerId
           : ownerId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      location: freezed == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
+      placeDescription: null == placeDescription
+          ? _value.placeDescription
+          : placeDescription // ignore: cast_nullable_to_non_nullable
+              as String,
       orderByDeadline: freezed == orderByDeadline
           ? _value.orderByDeadline
           : orderByDeadline // ignore: cast_nullable_to_non_nullable
@@ -278,10 +272,10 @@ class __$$GroupOrderImplCopyWithImpl<$Res>
           ? _value._persons
           : persons // ignore: cast_nullable_to_non_nullable
               as List<String>,
-      orderSchedules: null == orderSchedules
-          ? _value._orderSchedules
-          : orderSchedules // ignore: cast_nullable_to_non_nullable
-              as List<OrderSchedule>,
+      orderScheduleRefs: null == orderScheduleRefs
+          ? _value._orderScheduleRefs
+          : orderScheduleRefs // ignore: cast_nullable_to_non_nullable
+              as List<Object>,
     ));
   }
 }
@@ -290,24 +284,23 @@ class __$$GroupOrderImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
   _$GroupOrderImpl(
-      {this.id,
-      this.createdAt,
-      this.name,
+      {required this.id,
+      required this.createdAt,
+      required this.name,
       this.firstOrderSchedule,
       this.frequency,
       this.endDate,
-      required final List<String> storeIds,
-      this.ownerId,
-      this.location,
+      required this.storeRef,
+      required this.ownerId,
+      required this.placeDescription,
       this.orderByDeadline,
       this.orderPlacementSetting,
-      this.whoPays,
+      required this.whoPays,
       this.spendingLimit,
-      required final List<String> persons,
-      required final List<OrderSchedule> orderSchedules})
-      : _storeIds = storeIds,
-        _persons = persons,
-        _orderSchedules = orderSchedules;
+      final List<String> persons = const [],
+      final List<Object> orderScheduleRefs = const []})
+      : _persons = persons,
+        _orderScheduleRefs = orderScheduleRefs;
 
   factory _$GroupOrderImpl.fromJson(Map<String, dynamic> json) =>
       _$$GroupOrderImplFromJson(json);
@@ -317,25 +310,19 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
   @override
   final DateTime? createdAt;
   @override
-  final String? name;
+  final String name;
   @override
   final DateTime? firstOrderSchedule;
   @override
   final String? frequency;
   @override
   final DateTime? endDate;
-  final List<String> _storeIds;
   @override
-  List<String> get storeIds {
-    if (_storeIds is EqualUnmodifiableListView) return _storeIds;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_storeIds);
-  }
-
+  final Object storeRef;
   @override
-  final String? ownerId;
+  final String ownerId;
   @override
-  final String? location;
+  final String placeDescription;
   @override
   final DateTime? orderByDeadline;
   @override
@@ -346,23 +333,26 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
   final double? spendingLimit;
   final List<String> _persons;
   @override
+  @JsonKey()
   List<String> get persons {
     if (_persons is EqualUnmodifiableListView) return _persons;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_persons);
   }
 
-  final List<OrderSchedule> _orderSchedules;
+  final List<Object> _orderScheduleRefs;
   @override
-  List<OrderSchedule> get orderSchedules {
-    if (_orderSchedules is EqualUnmodifiableListView) return _orderSchedules;
+  @JsonKey()
+  List<Object> get orderScheduleRefs {
+    if (_orderScheduleRefs is EqualUnmodifiableListView)
+      return _orderScheduleRefs;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_orderSchedules);
+    return EqualUnmodifiableListView(_orderScheduleRefs);
   }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'GroupOrder(id: $id, createdAt: $createdAt, name: $name, firstOrderSchedule: $firstOrderSchedule, frequency: $frequency, endDate: $endDate, storeIds: $storeIds, ownerId: $ownerId, location: $location, orderByDeadline: $orderByDeadline, orderPlacementSetting: $orderPlacementSetting, whoPays: $whoPays, spendingLimit: $spendingLimit, persons: $persons, orderSchedules: $orderSchedules)';
+    return 'GroupOrder(id: $id, createdAt: $createdAt, name: $name, firstOrderSchedule: $firstOrderSchedule, frequency: $frequency, endDate: $endDate, storeRef: $storeRef, ownerId: $ownerId, placeDescription: $placeDescription, orderByDeadline: $orderByDeadline, orderPlacementSetting: $orderPlacementSetting, whoPays: $whoPays, spendingLimit: $spendingLimit, persons: $persons, orderScheduleRefs: $orderScheduleRefs)';
   }
 
   @override
@@ -376,15 +366,15 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
       ..add(DiagnosticsProperty('firstOrderSchedule', firstOrderSchedule))
       ..add(DiagnosticsProperty('frequency', frequency))
       ..add(DiagnosticsProperty('endDate', endDate))
-      ..add(DiagnosticsProperty('storeIds', storeIds))
+      ..add(DiagnosticsProperty('storeRef', storeRef))
       ..add(DiagnosticsProperty('ownerId', ownerId))
-      ..add(DiagnosticsProperty('location', location))
+      ..add(DiagnosticsProperty('placeDescription', placeDescription))
       ..add(DiagnosticsProperty('orderByDeadline', orderByDeadline))
       ..add(DiagnosticsProperty('orderPlacementSetting', orderPlacementSetting))
       ..add(DiagnosticsProperty('whoPays', whoPays))
       ..add(DiagnosticsProperty('spendingLimit', spendingLimit))
       ..add(DiagnosticsProperty('persons', persons))
-      ..add(DiagnosticsProperty('orderSchedules', orderSchedules));
+      ..add(DiagnosticsProperty('orderScheduleRefs', orderScheduleRefs));
   }
 
   @override
@@ -401,10 +391,10 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
             (identical(other.frequency, frequency) ||
                 other.frequency == frequency) &&
             (identical(other.endDate, endDate) || other.endDate == endDate) &&
-            const DeepCollectionEquality().equals(other._storeIds, _storeIds) &&
+            const DeepCollectionEquality().equals(other.storeRef, storeRef) &&
             (identical(other.ownerId, ownerId) || other.ownerId == ownerId) &&
-            (identical(other.location, location) ||
-                other.location == location) &&
+            (identical(other.placeDescription, placeDescription) ||
+                other.placeDescription == placeDescription) &&
             (identical(other.orderByDeadline, orderByDeadline) ||
                 other.orderByDeadline == orderByDeadline) &&
             (identical(other.orderPlacementSetting, orderPlacementSetting) ||
@@ -414,7 +404,7 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
                 other.spendingLimit == spendingLimit) &&
             const DeepCollectionEquality().equals(other._persons, _persons) &&
             const DeepCollectionEquality()
-                .equals(other._orderSchedules, _orderSchedules));
+                .equals(other._orderScheduleRefs, _orderScheduleRefs));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -427,15 +417,15 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
       firstOrderSchedule,
       frequency,
       endDate,
-      const DeepCollectionEquality().hash(_storeIds),
+      const DeepCollectionEquality().hash(storeRef),
       ownerId,
-      location,
+      placeDescription,
       orderByDeadline,
       orderPlacementSetting,
       whoPays,
       spendingLimit,
       const DeepCollectionEquality().hash(_persons),
-      const DeepCollectionEquality().hash(_orderSchedules));
+      const DeepCollectionEquality().hash(_orderScheduleRefs));
 
   /// Create a copy of GroupOrder
   /// with the given fields replaced by the non-null parameter values.
@@ -455,21 +445,21 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
 
 abstract class _GroupOrder implements GroupOrder {
   factory _GroupOrder(
-      {final String? id,
-      final DateTime? createdAt,
-      final String? name,
+      {required final String? id,
+      required final DateTime? createdAt,
+      required final String name,
       final DateTime? firstOrderSchedule,
       final String? frequency,
       final DateTime? endDate,
-      required final List<String> storeIds,
-      final String? ownerId,
-      final String? location,
+      required final Object storeRef,
+      required final String ownerId,
+      required final String placeDescription,
       final DateTime? orderByDeadline,
       final String? orderPlacementSetting,
-      final String? whoPays,
+      required final String? whoPays,
       final double? spendingLimit,
-      required final List<String> persons,
-      required final List<OrderSchedule> orderSchedules}) = _$GroupOrderImpl;
+      final List<String> persons,
+      final List<Object> orderScheduleRefs}) = _$GroupOrderImpl;
 
   factory _GroupOrder.fromJson(Map<String, dynamic> json) =
       _$GroupOrderImpl.fromJson;
@@ -479,7 +469,7 @@ abstract class _GroupOrder implements GroupOrder {
   @override
   DateTime? get createdAt;
   @override
-  String? get name;
+  String get name;
   @override
   DateTime? get firstOrderSchedule;
   @override
@@ -487,11 +477,11 @@ abstract class _GroupOrder implements GroupOrder {
   @override
   DateTime? get endDate;
   @override
-  List<String> get storeIds;
+  Object get storeRef;
   @override
-  String? get ownerId;
+  String get ownerId;
   @override
-  String? get location;
+  String get placeDescription;
   @override
   DateTime? get orderByDeadline;
   @override
@@ -503,7 +493,7 @@ abstract class _GroupOrder implements GroupOrder {
   @override
   List<String> get persons;
   @override
-  List<OrderSchedule> get orderSchedules;
+  List<Object> get orderScheduleRefs;
 
   /// Create a copy of GroupOrder
   /// with the given fields replaced by the non-null parameter values.

@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../state/user_location_providers.dart';
 import '../../../constants/app_sizes.dart';
+import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 import 'main_screen.dart';
@@ -45,22 +47,44 @@ class _MainScreenWrapperScreenState
             });
           }
           return Scaffold(
-            backgroundColor: AppColors.primary2,
-            body: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.horizontalPaddingSmall),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Builder(builder: (context) {
-                    if (snapshot.hasError) {
-                      return AppText(text: snapshot.error.toString());
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  })
-                ],
-              ),
+            backgroundColor: snapshot.hasError
+                ? Colors.white
+                : const Color.fromARGB(255, 3, 189, 106),
+            body: SafeArea(
+              child: Builder(builder: (context) {
+                if (snapshot.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSizes.horizontalPaddingSmall),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AppText(
+                          text: snapshot.error.toString(),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const LinearProgressIndicator(
+                        color: AppColors.neutral600,
+                        backgroundColor: AppColors.neutral300,
+                      ),
+                      Image.asset(
+                        AssetNames.appLogo,
+                        width: Adaptive.w(40),
+                      ),
+                      const SizedBox(
+                        height: 1,
+                      ),
+                    ],
+                  );
+                }
+              }),
             ),
           );
         });

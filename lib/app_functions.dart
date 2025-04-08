@@ -12,7 +12,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/models/gift_card_category_model.dart';
+import 'package:uber_eats_clone/models/group_order/group_order_model.dart';
 import 'package:uber_eats_clone/models/offer/offer_model.dart';
+import 'package:uber_eats_clone/models/order/order_model.dart';
 import 'package:uber_eats_clone/models/promotion/promotion_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -51,6 +53,17 @@ class AppFunctions {
     return snapshot.data() as Map<String, dynamic>;
   }
 
+  // static DateTime? timestampToDateTime(dynamic value) {
+  //   if (value is Timestamp) {
+  //     return value.toDate();
+  //   }
+  //   return null;
+  //   // // Handle cases where createdAt might already be a DateTime or null
+  //   // return value is DateTime
+  //   //     ? value
+  //   //     : DateTime.now(); // Or handle null as needed
+  // }
+
   static Future<List<Advert>> getGiftAdverts() async {
     final advertsSnapshot = await FirebaseFirestore.instance
         .collection(FirestoreCollections.adverts)
@@ -70,14 +83,16 @@ class AppFunctions {
     return giftAdverts;
   }
 
-  static Future<void> navigateToStoreScreen(Store store) async {
+  static Future<void> navigateToStoreScreen(Store store,
+      {bool increaseVisitCount = true}) async {
     final querySnapshot = await FirebaseFirestore.instance
         .collection(FirestoreCollections.stores)
         .where('id', isEqualTo: store.id)
         .get();
-
-    await querySnapshot.docs.first.reference
-        .update({'visits': FieldValue.increment(1)});
+    if (increaseVisitCount) {
+      await querySnapshot.docs.first.reference
+          .update({'visits': FieldValue.increment(1)});
+    }
     await navigatorKey.currentState!.push(MaterialPageRoute(
       builder: (context) {
         if (store.type.toLowerCase().contains('grocery')) {
@@ -179,6 +194,27 @@ class AppFunctions {
     return Store.fromJson(storeJson);
   }
 
+  static Future<OrderSchedule> loadOrderScheduleReference(
+      DocumentReference reference) async {
+    final orderScheduleJson = await loadDocReference(reference);
+
+    return OrderSchedule.fromJson(orderScheduleJson);
+  }
+
+  static Future<GroupOrder> loadGroupOrderReference(
+      DocumentReference reference) async {
+    final groupOrderJson = await loadDocReference(reference);
+
+    return GroupOrder.fromJson(groupOrderJson);
+  }
+
+  static Future<Promotion> loadPromoReference(
+      DocumentReference reference) async {
+    final promoJson = await loadDocReference(reference);
+
+    return Promotion.fromJson(promoJson);
+  }
+
   static Widget displayNetworkImage(String image,
       {double? width,
       double? height,
@@ -270,8 +306,8 @@ class AppFunctions {
     //storing document paths instead of document references
     List<String> groupOrdersPaths = [];
     if (userInfo['groupOrders'] != null) {
-      for (DocumentReference groupOrder in userInfo['groupOrders']) {
-        groupOrdersPaths.add(groupOrder.path);
+      for (String groupOrder in userInfo['groupOrders']) {
+        groupOrdersPaths.add(groupOrder);
       }
 
       userInfoForHiveBox['groupOrders'] = groupOrdersPaths;
@@ -289,7 +325,7 @@ class AppFunctions {
         FirebaseAuth.instance.currentUser!.displayName;
 
     await Hive.box(AppBoxes.appState).put(BoxKeys.userInfo, userInfoForHiveBox);
-    logger.d(userInfo);
+    // logger.d(userInfo);
     return userInfo;
   }
 

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/app_functions.dart';
+import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 
 import '../../../../../main.dart';
 import '../../../../../models/store/store_model.dart';
@@ -195,14 +196,19 @@ class _DealsScreenState extends State<DealsScreen> {
                                   shrinkWrap: true,
                                   gridDelegate:
                                       const SliverGridDelegateWithFixedCrossAxisCount(
+                                          mainAxisExtent: 200,
                                           crossAxisCount: 2),
                                   itemCount: aisleAndProducts.value.length,
                                   itemBuilder: (context, index) {
                                     final product =
                                         aisleAndProducts.value.elementAt(index);
-                                    return GrocerySearchProductGridTile(
-                                        store: widget.groceryStore,
-                                        product: product);
+                                    return ProductGridTilePriceFirst(
+                                            product: product,
+                                            store: widget.groceryStore)
+                                        // GrocerySearchProductGridTile(
+                                        //     store: widget.groceryStore,
+                                        //     product: product)
+                                        ;
                                   },
                                 ),
                               ],

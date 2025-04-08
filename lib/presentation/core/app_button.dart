@@ -146,9 +146,9 @@ class AppButton extends ConsumerWidget {
               ? const Size(double.infinity, 50)
               : const Size.fromHeight(40),
           backgroundColor: isSecondary
-              ? buttonColor ?? Colors.black12
+              ? buttonColor ?? AppColors.neutral200
               : callback == null
-                  ? Colors.black12
+                  ? AppColors.neutral200
                   : buttonColor ?? Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),

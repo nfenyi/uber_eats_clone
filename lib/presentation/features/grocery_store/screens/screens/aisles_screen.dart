@@ -11,7 +11,7 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/grocery_store/screens/screens/grocery_shop_search_screen.dart';
-import 'package:uber_eats_clone/presentation/features/grocery_store/state/grocery_store_bottom_nav_index_provider.dart';
+import 'package:uber_eats_clone/presentation/features/promotion/promo_screen.dart';
 
 import '../../../../../models/store/store_model.dart';
 import '../../../../constants/app_sizes.dart';
@@ -83,137 +83,7 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                       const SliverGap(10),
                       SliverList(
                           delegate: SliverChildListDelegate([
-                        SizedBox(
-                          height: 145,
-                          child: ListView(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            scrollDirection: Axis.horizontal,
-                            children: [
-                              Container(
-                                  width: Adaptive.w(80),
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    color: Colors.brown,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 2,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(15.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    AppText(
-                                                      color: Colors.white,
-                                                      text:
-                                                          '\$0 Delivery Fee + up to 10% off with Uber One',
-                                                    ),
-                                                    Gap(10),
-                                                    AppText(
-                                                      color: Colors.white,
-                                                      text:
-                                                          'Save on your next ride',
-                                                    ),
-                                                  ]),
-                                              AppButton2(
-                                                  text: 'Try free for 4 weeks',
-                                                  callback: () {
-                                                    navigatorKey.currentState!
-                                                        .push(MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const JoinUberOneScreen(),
-                                                    ));
-                                                  }),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                          flex: 1,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                    topRight:
-                                                        Radius.circular(10),
-                                                    bottomRight:
-                                                        Radius.circular(10)),
-                                            child: Image.asset(
-                                              height: double.infinity,
-                                              AssetNames.hamburger,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ))
-                                    ],
-                                  )),
-                              const Gap(10),
-                              Container(
-                                  width: Adaptive.w(80),
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    color: const Color.fromARGB(
-                                        255, 201, 176, 102),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Expanded(
-                                        flex: 2,
-                                        child: Padding(
-                                          padding: EdgeInsets.all(15.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    AppText(
-                                                      text:
-                                                          'Save 20% when you order \$25 or more',
-                                                    ),
-                                                    Gap(10),
-                                                    AppText(
-                                                      text:
-                                                          'Use by May 31, 2025 11 PM',
-                                                    ),
-                                                  ]),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                          flex: 1,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                    topRight:
-                                                        Radius.circular(10),
-                                                    bottomRight:
-                                                        Radius.circular(10)),
-                                            child: Image.asset(
-                                              height: double.infinity,
-                                              AssetNames.greenTag,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ))
-                                    ],
-                                  )),
-                            ],
-                          ),
-                        ),
+                        const BannerCarousel(),
                         const Gap(10),
                       ])),
                       (_aisle.productCategories.isNotEmpty)
@@ -440,10 +310,9 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                               child: Center(
                                   child: Column(
                                 children: [
-                                  Gap(50),
+                                  Gap(90),
                                   AppText(
                                     text: 'Products not added yet',
-                                    size: AppSizes.heading6,
                                   ),
                                 ],
                               )),

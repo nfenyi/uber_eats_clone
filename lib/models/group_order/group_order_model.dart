@@ -1,29 +1,27 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
-import '../order/order_model.dart';
-
 part 'group_order_model.freezed.dart';
 part 'group_order_model.g.dart';
 
 @freezed
 class GroupOrder with _$GroupOrder {
   factory GroupOrder({
-    String? id,
-    DateTime? createdAt,
-    String? name,
+    required String? id,
+    required DateTime? createdAt,
+    required String name,
     DateTime? firstOrderSchedule,
     String? frequency,
     DateTime? endDate,
-    required List<String> storeIds,
-    String? ownerId,
-    String? location,
+    required Object storeRef,
+    required String ownerId,
+    required String placeDescription,
     DateTime? orderByDeadline,
     String? orderPlacementSetting,
-    String? whoPays,
+    required String? whoPays,
     double? spendingLimit,
-    required List<String> persons,
-    required List<OrderSchedule> orderSchedules,
+    @Default([]) List<String> persons,
+    @Default([]) List<Object> orderScheduleRefs,
   }) = _GroupOrder;
   factory GroupOrder.fromJson(Map<String, Object?> json) =>
       _$GroupOrderFromJson(json);

@@ -26,6 +26,7 @@ mixin _$GiftCard {
   String get imageUrl => throw _privateConstructorUsedError;
   int get giftAmount => throw _privateConstructorUsedError;
   String get senderUid => throw _privateConstructorUsedError;
+  DateTime get dateCreated => throw _privateConstructorUsedError;
   String? get optionalVideoUrl => throw _privateConstructorUsedError;
   String? get optionalMessage => throw _privateConstructorUsedError;
   DateTime? get deliverySchedule => throw _privateConstructorUsedError;
@@ -56,6 +57,7 @@ abstract class $GiftCardCopyWith<$Res> {
       String imageUrl,
       int giftAmount,
       String senderUid,
+      DateTime dateCreated,
       String? optionalVideoUrl,
       String? optionalMessage,
       DateTime? deliverySchedule,
@@ -86,6 +88,7 @@ class _$GiftCardCopyWithImpl<$Res, $Val extends GiftCard>
     Object? imageUrl = null,
     Object? giftAmount = null,
     Object? senderUid = null,
+    Object? dateCreated = null,
     Object? optionalVideoUrl = freezed,
     Object? optionalMessage = freezed,
     Object? deliverySchedule = freezed,
@@ -119,6 +122,10 @@ class _$GiftCardCopyWithImpl<$Res, $Val extends GiftCard>
           ? _value.senderUid
           : senderUid // ignore: cast_nullable_to_non_nullable
               as String,
+      dateCreated: null == dateCreated
+          ? _value.dateCreated
+          : dateCreated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       optionalVideoUrl: freezed == optionalVideoUrl
           ? _value.optionalVideoUrl
           : optionalVideoUrl // ignore: cast_nullable_to_non_nullable
@@ -166,6 +173,7 @@ abstract class _$$GiftCardImplCopyWith<$Res>
       String imageUrl,
       int giftAmount,
       String senderUid,
+      DateTime dateCreated,
       String? optionalVideoUrl,
       String? optionalMessage,
       DateTime? deliverySchedule,
@@ -194,6 +202,7 @@ class __$$GiftCardImplCopyWithImpl<$Res>
     Object? imageUrl = null,
     Object? giftAmount = null,
     Object? senderUid = null,
+    Object? dateCreated = null,
     Object? optionalVideoUrl = freezed,
     Object? optionalMessage = freezed,
     Object? deliverySchedule = freezed,
@@ -227,6 +236,10 @@ class __$$GiftCardImplCopyWithImpl<$Res>
           ? _value.senderUid
           : senderUid // ignore: cast_nullable_to_non_nullable
               as String,
+      dateCreated: null == dateCreated
+          ? _value.dateCreated
+          : dateCreated // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       optionalVideoUrl: freezed == optionalVideoUrl
           ? _value.optionalVideoUrl
           : optionalVideoUrl // ignore: cast_nullable_to_non_nullable
@@ -269,6 +282,7 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
       required this.imageUrl,
       required this.giftAmount,
       required this.senderUid,
+      required this.dateCreated,
       this.optionalVideoUrl,
       this.optionalMessage,
       this.deliverySchedule,
@@ -293,6 +307,8 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
   @override
   final String senderUid;
   @override
+  final DateTime dateCreated;
+  @override
   final String? optionalVideoUrl;
   @override
   final String? optionalMessage;
@@ -310,7 +326,7 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'GiftCard(id: $id, senderName: $senderName, receiverName: $receiverName, imageUrl: $imageUrl, giftAmount: $giftAmount, senderUid: $senderUid, optionalVideoUrl: $optionalVideoUrl, optionalMessage: $optionalMessage, deliverySchedule: $deliverySchedule, recipientAddress: $recipientAddress, sent: $sent, dynamicLink: $dynamicLink, used: $used)';
+    return 'GiftCard(id: $id, senderName: $senderName, receiverName: $receiverName, imageUrl: $imageUrl, giftAmount: $giftAmount, senderUid: $senderUid, dateCreated: $dateCreated, optionalVideoUrl: $optionalVideoUrl, optionalMessage: $optionalMessage, deliverySchedule: $deliverySchedule, recipientAddress: $recipientAddress, sent: $sent, dynamicLink: $dynamicLink, used: $used)';
   }
 
   @override
@@ -324,6 +340,7 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
       ..add(DiagnosticsProperty('imageUrl', imageUrl))
       ..add(DiagnosticsProperty('giftAmount', giftAmount))
       ..add(DiagnosticsProperty('senderUid', senderUid))
+      ..add(DiagnosticsProperty('dateCreated', dateCreated))
       ..add(DiagnosticsProperty('optionalVideoUrl', optionalVideoUrl))
       ..add(DiagnosticsProperty('optionalMessage', optionalMessage))
       ..add(DiagnosticsProperty('deliverySchedule', deliverySchedule))
@@ -349,6 +366,8 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
                 other.giftAmount == giftAmount) &&
             (identical(other.senderUid, senderUid) ||
                 other.senderUid == senderUid) &&
+            (identical(other.dateCreated, dateCreated) ||
+                other.dateCreated == dateCreated) &&
             (identical(other.optionalVideoUrl, optionalVideoUrl) ||
                 other.optionalVideoUrl == optionalVideoUrl) &&
             (identical(other.optionalMessage, optionalMessage) ||
@@ -373,6 +392,7 @@ class _$GiftCardImpl with DiagnosticableTreeMixin implements _GiftCard {
       imageUrl,
       giftAmount,
       senderUid,
+      dateCreated,
       optionalVideoUrl,
       optionalMessage,
       deliverySchedule,
@@ -405,6 +425,7 @@ abstract class _GiftCard implements GiftCard {
       required final String imageUrl,
       required final int giftAmount,
       required final String senderUid,
+      required final DateTime dateCreated,
       final String? optionalVideoUrl,
       final String? optionalMessage,
       final DateTime? deliverySchedule,
@@ -428,6 +449,8 @@ abstract class _GiftCard implements GiftCard {
   int get giftAmount;
   @override
   String get senderUid;
+  @override
+  DateTime get dateCreated;
   @override
   String? get optionalVideoUrl;
   @override

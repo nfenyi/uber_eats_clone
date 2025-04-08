@@ -24,9 +24,7 @@ import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/widgets.dart';
-import '../../box_catering/screens/box_catering_screens.dart';
 import '../../grocery_grocery/grocery_grocery_screen.dart';
-import '../../home/home_screen.dart';
 import '../../home/screens/search_screen.dart';
 import '../../main_screen/screens/main_screen.dart';
 
@@ -76,7 +74,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final List<Store> _alcoholStores = [];
   final List<Store> _pharmacyStores = [];
   List<Store> _groceryScreenStores = [];
-  final List<Store> _boxCateringStores = [];
   final List<Store> _babyStores = [];
   final List<Store> _specialtyFoodsStores = [];
   final List<Store> _petSuppliesStores = [];
@@ -113,9 +110,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       if (store.type.contains('Retail')) {
         _retailStores.add(store);
       }
-      if (store.type.contains('Box Catering')) {
-        _boxCateringStores.add(store);
-      }
     }
     _groceryScreenStores = List<Store>.from([
       ..._groceryGroceryStores,
@@ -126,7 +120,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       ..._specialtyFoodsStores,
       ..._petSuppliesStores,
       ..._retailStores,
-      ..._boxCateringStores
     ]).toSet().toList();
   }
 
@@ -251,12 +244,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                       .showGiftScreen();
                                 }
                               } else if (shopNearYou.name == 'Box Catering') {
-                                navigatorKey.currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) => BoxCateringScreen(
-                                    boxCateringStores: _boxCateringStores,
-                                  ),
-                                ));
+                                ref
+                                    .read(bottomNavIndexProvider.notifier)
+                                    .showBoxCateringScreen();
                               }
                             },
                             child: SizedBox(
@@ -269,6 +259,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   ),
                                   AppText(
                                     text: shopNearYou.name,
+                                    size: AppSizes.bodySmallest,
                                     overflow: TextOverflow.ellipsis,
                                   )
                                 ],
@@ -277,20 +268,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           );
                         },
                       ),
-                      const SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Gap(10),
-                            // AppText(
-                            //   text: 'Food near you',
-                            //   size: AppSizes.heading6,
-                            //   weight: FontWeight.w600,
-                            // ),
-                            // Gap(5),
-                          ],
-                        ),
-                      ),
+                      const SliverGap(10),
                       FutureBuilder(
                           future: _getExploreVideos(),
                           builder: (context, snapshot) {

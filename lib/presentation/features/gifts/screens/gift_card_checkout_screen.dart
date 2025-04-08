@@ -76,9 +76,8 @@ class _GiftCardCheckoutScreenState
 
   @override
   Widget build(BuildContext context) {
-    DateTime selectedScheduleDateTime =
-        ref.watch(deliveryScheduleProviderForRecipient) ??
-            DateTime.now().add(const Duration(minutes: 20));
+    DateTime? scheduleProviderValue =
+        ref.watch(deliveryScheduleProviderForRecipient);
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
@@ -141,7 +140,7 @@ class _GiftCardCheckoutScreenState
                       ),
                       subtitle: AppText(
                           text:
-                              '${AppFunctions.formatDate(selectedScheduleDateTime.toString(), format: 'l, M j, g:i A')}\nonly emails can be scheduled'),
+                              '${AppFunctions.formatDate((scheduleProviderValue ?? DateTime.now()).toString(), format: 'l, M j, g:i A')}\nonly emails can be scheduled'),
                       trailing: AppButton2(
                           text: 'Change',
                           callback: () {
@@ -461,11 +460,12 @@ class _GiftCardCheckoutScreenState
             const Gap(10),
             AppButton(
               isLoading: _isLoading,
-              callback: _selectedPaymentMethod != null &&
-                      (_selectedSendMethod == 'Message' ||
-                          (_selectedSendMethod == 'Email' &&
-                              _formKey.currentState!.validate()))
+              callback: _selectedPaymentMethod != null
                   ? () async {
+                      if ((_selectedSendMethod == 'Email' &&
+                          !_formKey.currentState!.validate())) {
+                        return;
+                      }
                       setState(() {
                         _isLoading = true;
                       });
@@ -501,7 +501,12 @@ class _GiftCardCheckoutScreenState
                       } else {
                         final giftCardWithEmailProperties = widget.giftCard
                             .copyWith(
-                                deliverySchedule: selectedScheduleDateTime,
+                                deliverySchedule:
+                                    _selectedSendSchedule == 'Send Now' ||
+                                            scheduleProviderValue == null
+                                        ? DateTime.now()
+                                            .add(const Duration(minutes: 5))
+                                        : scheduleProviderValue,
                                 recipientAddress: _emailController.text.trim(),
                                 sent: false,
                                 dynamicLink: dynamicLink.toString());
@@ -514,6 +519,8 @@ class _GiftCardCheckoutScreenState
                                   (route) =>
                                       route.settings.name == '/giftCardScreen'),
                             );
+                        showInfoToast('Email will be delivered',
+                            context: navigatorKey.currentContext);
                       }
                       setState(() {
                         _isLoading = false;

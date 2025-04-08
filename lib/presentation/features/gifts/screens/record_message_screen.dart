@@ -36,10 +36,12 @@ class _RecordMessageScreenState extends State<RecordMessageScreen>
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarIconBrightness: Brightness.light,
-      statusBarColor: Colors.black38,
-    ));
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light,
+        statusBarColor: Colors.black38,
+      ));
+    });
     _timerController = CustomTimerController(
         vsync: this,
         begin: const Duration(),

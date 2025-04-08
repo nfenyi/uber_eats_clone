@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -14,7 +12,6 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
-import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../../../main.dart';
 import '../../../../../models/store/store_model.dart';
@@ -23,7 +20,6 @@ import '../../../../constants/other_constants.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/widgets.dart';
 import '../../../home/home_screen.dart';
-import '../../../sign_in/views/drop_off_options_screen.dart';
 
 class GroceryShopSearchScreen extends StatefulWidget {
   final Store store;
@@ -41,11 +37,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
   final _searchController = TextEditingController();
   Timer? _debounce;
   final List<String> _searchFilters = ['Sort', 'Aisle', 'Brand', 'Deals'];
-  final _sortOptions = [
-    'Recommended',
-    'Price low to high',
-    'Price high to low'
-  ];
+  final _sortOptions = ['Price low to high', 'Price high to low'];
   bool _showSearchListView = true;
   int? _selectedDeliveryFeeIndex;
   int? _selectedRatingIndex;
@@ -285,7 +277,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                     )),
                                     ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount: 3,
+                                      itemCount: _sortOptions.length,
                                       itemBuilder: (context, index) {
                                         final sortOption = _sortOptions[index];
                                         return RadioListTile<String>.adaptive(

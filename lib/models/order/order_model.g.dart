@@ -14,21 +14,20 @@ _$IndividualOrderImpl _$$IndividualOrderImplFromJson(
       deliveryDate: DateTime.parse(json['deliveryDate'] as String),
       tip: (json['tip'] as num?)?.toDouble(),
       orderNumber: json['orderNumber'] as String,
-      courier: json['courier'] as String,
-      promo: json['promo'] == null
-          ? null
-          : Promotion.fromJson(json['promo'] as Map<String, dynamic>),
+      placeDescription: json['placeDescription'] as String,
+      courier: json['courier'] as String? ?? 'Jonathan',
+      promoApplied: json['promoApplied'],
       serviceFee: (json['serviceFee'] as num).toDouble(),
       tax: (json['tax'] as num).toDouble(),
-      caDriverBenefits: (json['caDriverBenefits'] as num?)?.toDouble(),
+      caDriverBenefits: (json['caDriverBenefits'] as num?)?.toDouble() ?? 0,
       deliveryFee: (json['deliveryFee'] as num).toDouble(),
       membershipBenefit: (json['membershipBenefit'] as num?)?.toDouble(),
       totalFee: (json['totalFee'] as num).toDouble(),
       payments: (json['payments'] as List<dynamic>)
           .map((e) => Payment.fromJson(e as Map<String, dynamic>))
           .toList(),
-      store: Store.fromJson(json['store'] as Map<String, dynamic>),
-      status: json['status'] as String,
+      storeRef: json['storeRef'] as Object,
+      status: json['status'] as String? ?? 'Pending',
     );
 
 Map<String, dynamic> _$$IndividualOrderImplToJson(
@@ -38,8 +37,9 @@ Map<String, dynamic> _$$IndividualOrderImplToJson(
       'deliveryDate': instance.deliveryDate.toIso8601String(),
       'tip': instance.tip,
       'orderNumber': instance.orderNumber,
+      'placeDescription': instance.placeDescription,
       'courier': instance.courier,
-      'promo': instance.promo?.toJson(),
+      'promoApplied': instance.promoApplied,
       'serviceFee': instance.serviceFee,
       'tax': instance.tax,
       'caDriverBenefits': instance.caDriverBenefits,
@@ -47,14 +47,14 @@ Map<String, dynamic> _$$IndividualOrderImplToJson(
       'membershipBenefit': instance.membershipBenefit,
       'totalFee': instance.totalFee,
       'payments': instance.payments.map((e) => e.toJson()).toList(),
-      'store': instance.store.toJson(),
+      'storeRef': instance.storeRef,
       'status': instance.status,
     };
 
 _$OrderScheduleImpl _$$OrderScheduleImplFromJson(Map<String, dynamic> json) =>
     _$OrderScheduleImpl(
       deliveryDate: DateTime.parse(json['deliveryDate'] as String),
-      storeId: json['storeId'] as String,
+      storeRef: json['storeRef'] as Object,
       orderNumber: json['orderNumber'] as String,
       orderItems: (json['orderItems'] as List<dynamic>?)
               ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
@@ -81,7 +81,7 @@ _$OrderScheduleImpl _$$OrderScheduleImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$OrderScheduleImplToJson(_$OrderScheduleImpl instance) =>
     <String, dynamic>{
       'deliveryDate': instance.deliveryDate.toIso8601String(),
-      'storeId': instance.storeId,
+      'storeRef': instance.storeRef,
       'orderNumber': instance.orderNumber,
       'orderItems': instance.orderItems.map((e) => e.toJson()).toList(),
       'tip': instance.tip,

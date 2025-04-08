@@ -25,16 +25,17 @@ mixin _$IndividualOrder {
   DateTime get deliveryDate => throw _privateConstructorUsedError;
   double? get tip => throw _privateConstructorUsedError;
   String get orderNumber => throw _privateConstructorUsedError;
+  String get placeDescription => throw _privateConstructorUsedError;
   String get courier => throw _privateConstructorUsedError;
-  Promotion? get promo => throw _privateConstructorUsedError;
+  Object? get promoApplied => throw _privateConstructorUsedError;
   double get serviceFee => throw _privateConstructorUsedError;
   double get tax => throw _privateConstructorUsedError;
-  double? get caDriverBenefits => throw _privateConstructorUsedError;
+  double get caDriverBenefits => throw _privateConstructorUsedError;
   double get deliveryFee => throw _privateConstructorUsedError;
   double? get membershipBenefit => throw _privateConstructorUsedError;
   double get totalFee => throw _privateConstructorUsedError;
   List<Payment> get payments => throw _privateConstructorUsedError;
-  Store get store => throw _privateConstructorUsedError;
+  Object get storeRef => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
 
   /// Serializes this IndividualOrder to a JSON map.
@@ -58,20 +59,18 @@ abstract class $IndividualOrderCopyWith<$Res> {
       DateTime deliveryDate,
       double? tip,
       String orderNumber,
+      String placeDescription,
       String courier,
-      Promotion? promo,
+      Object? promoApplied,
       double serviceFee,
       double tax,
-      double? caDriverBenefits,
+      double caDriverBenefits,
       double deliveryFee,
       double? membershipBenefit,
       double totalFee,
       List<Payment> payments,
-      Store store,
+      Object storeRef,
       String status});
-
-  $PromotionCopyWith<$Res>? get promo;
-  $StoreCopyWith<$Res> get store;
 }
 
 /// @nodoc
@@ -93,16 +92,17 @@ class _$IndividualOrderCopyWithImpl<$Res, $Val extends IndividualOrder>
     Object? deliveryDate = null,
     Object? tip = freezed,
     Object? orderNumber = null,
+    Object? placeDescription = null,
     Object? courier = null,
-    Object? promo = freezed,
+    Object? promoApplied = freezed,
     Object? serviceFee = null,
     Object? tax = null,
-    Object? caDriverBenefits = freezed,
+    Object? caDriverBenefits = null,
     Object? deliveryFee = null,
     Object? membershipBenefit = freezed,
     Object? totalFee = null,
     Object? payments = null,
-    Object? store = null,
+    Object? storeRef = null,
     Object? status = null,
   }) {
     return _then(_value.copyWith(
@@ -122,14 +122,16 @@ class _$IndividualOrderCopyWithImpl<$Res, $Val extends IndividualOrder>
           ? _value.orderNumber
           : orderNumber // ignore: cast_nullable_to_non_nullable
               as String,
+      placeDescription: null == placeDescription
+          ? _value.placeDescription
+          : placeDescription // ignore: cast_nullable_to_non_nullable
+              as String,
       courier: null == courier
           ? _value.courier
           : courier // ignore: cast_nullable_to_non_nullable
               as String,
-      promo: freezed == promo
-          ? _value.promo
-          : promo // ignore: cast_nullable_to_non_nullable
-              as Promotion?,
+      promoApplied:
+          freezed == promoApplied ? _value.promoApplied : promoApplied,
       serviceFee: null == serviceFee
           ? _value.serviceFee
           : serviceFee // ignore: cast_nullable_to_non_nullable
@@ -138,10 +140,10 @@ class _$IndividualOrderCopyWithImpl<$Res, $Val extends IndividualOrder>
           ? _value.tax
           : tax // ignore: cast_nullable_to_non_nullable
               as double,
-      caDriverBenefits: freezed == caDriverBenefits
+      caDriverBenefits: null == caDriverBenefits
           ? _value.caDriverBenefits
           : caDriverBenefits // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as double,
       deliveryFee: null == deliveryFee
           ? _value.deliveryFee
           : deliveryFee // ignore: cast_nullable_to_non_nullable
@@ -158,39 +160,12 @@ class _$IndividualOrderCopyWithImpl<$Res, $Val extends IndividualOrder>
           ? _value.payments
           : payments // ignore: cast_nullable_to_non_nullable
               as List<Payment>,
-      store: null == store
-          ? _value.store
-          : store // ignore: cast_nullable_to_non_nullable
-              as Store,
+      storeRef: null == storeRef ? _value.storeRef : storeRef,
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
     ) as $Val);
-  }
-
-  /// Create a copy of IndividualOrder
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $PromotionCopyWith<$Res>? get promo {
-    if (_value.promo == null) {
-      return null;
-    }
-
-    return $PromotionCopyWith<$Res>(_value.promo!, (value) {
-      return _then(_value.copyWith(promo: value) as $Val);
-    });
-  }
-
-  /// Create a copy of IndividualOrder
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $StoreCopyWith<$Res> get store {
-    return $StoreCopyWith<$Res>(_value.store, (value) {
-      return _then(_value.copyWith(store: value) as $Val);
-    });
   }
 }
 
@@ -207,22 +182,18 @@ abstract class _$$IndividualOrderImplCopyWith<$Res>
       DateTime deliveryDate,
       double? tip,
       String orderNumber,
+      String placeDescription,
       String courier,
-      Promotion? promo,
+      Object? promoApplied,
       double serviceFee,
       double tax,
-      double? caDriverBenefits,
+      double caDriverBenefits,
       double deliveryFee,
       double? membershipBenefit,
       double totalFee,
       List<Payment> payments,
-      Store store,
+      Object storeRef,
       String status});
-
-  @override
-  $PromotionCopyWith<$Res>? get promo;
-  @override
-  $StoreCopyWith<$Res> get store;
 }
 
 /// @nodoc
@@ -242,16 +213,17 @@ class __$$IndividualOrderImplCopyWithImpl<$Res>
     Object? deliveryDate = null,
     Object? tip = freezed,
     Object? orderNumber = null,
+    Object? placeDescription = null,
     Object? courier = null,
-    Object? promo = freezed,
+    Object? promoApplied = freezed,
     Object? serviceFee = null,
     Object? tax = null,
-    Object? caDriverBenefits = freezed,
+    Object? caDriverBenefits = null,
     Object? deliveryFee = null,
     Object? membershipBenefit = freezed,
     Object? totalFee = null,
     Object? payments = null,
-    Object? store = null,
+    Object? storeRef = null,
     Object? status = null,
   }) {
     return _then(_$IndividualOrderImpl(
@@ -271,14 +243,16 @@ class __$$IndividualOrderImplCopyWithImpl<$Res>
           ? _value.orderNumber
           : orderNumber // ignore: cast_nullable_to_non_nullable
               as String,
+      placeDescription: null == placeDescription
+          ? _value.placeDescription
+          : placeDescription // ignore: cast_nullable_to_non_nullable
+              as String,
       courier: null == courier
           ? _value.courier
           : courier // ignore: cast_nullable_to_non_nullable
               as String,
-      promo: freezed == promo
-          ? _value.promo
-          : promo // ignore: cast_nullable_to_non_nullable
-              as Promotion?,
+      promoApplied:
+          freezed == promoApplied ? _value.promoApplied : promoApplied,
       serviceFee: null == serviceFee
           ? _value.serviceFee
           : serviceFee // ignore: cast_nullable_to_non_nullable
@@ -287,10 +261,10 @@ class __$$IndividualOrderImplCopyWithImpl<$Res>
           ? _value.tax
           : tax // ignore: cast_nullable_to_non_nullable
               as double,
-      caDriverBenefits: freezed == caDriverBenefits
+      caDriverBenefits: null == caDriverBenefits
           ? _value.caDriverBenefits
           : caDriverBenefits // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as double,
       deliveryFee: null == deliveryFee
           ? _value.deliveryFee
           : deliveryFee // ignore: cast_nullable_to_non_nullable
@@ -307,10 +281,7 @@ class __$$IndividualOrderImplCopyWithImpl<$Res>
           ? _value._payments
           : payments // ignore: cast_nullable_to_non_nullable
               as List<Payment>,
-      store: null == store
-          ? _value.store
-          : store // ignore: cast_nullable_to_non_nullable
-              as Store,
+      storeRef: null == storeRef ? _value.storeRef : storeRef,
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -329,17 +300,18 @@ class _$IndividualOrderImpl
       required this.deliveryDate,
       this.tip,
       required this.orderNumber,
-      required this.courier,
-      this.promo,
+      required this.placeDescription,
+      this.courier = 'Jonathan',
+      this.promoApplied,
       required this.serviceFee,
       required this.tax,
-      this.caDriverBenefits,
+      this.caDriverBenefits = 0,
       required this.deliveryFee,
       this.membershipBenefit,
       required this.totalFee,
       required final List<Payment> payments,
-      required this.store,
-      required this.status})
+      required this.storeRef,
+      this.status = 'Pending'})
       : _productsAndQuantities = productsAndQuantities,
         _payments = payments;
 
@@ -362,15 +334,19 @@ class _$IndividualOrderImpl
   @override
   final String orderNumber;
   @override
+  final String placeDescription;
+  @override
+  @JsonKey()
   final String courier;
   @override
-  final Promotion? promo;
+  final Object? promoApplied;
   @override
   final double serviceFee;
   @override
   final double tax;
   @override
-  final double? caDriverBenefits;
+  @JsonKey()
+  final double caDriverBenefits;
   @override
   final double deliveryFee;
   @override
@@ -386,13 +362,14 @@ class _$IndividualOrderImpl
   }
 
   @override
-  final Store store;
+  final Object storeRef;
   @override
+  @JsonKey()
   final String status;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'IndividualOrder(productsAndQuantities: $productsAndQuantities, deliveryDate: $deliveryDate, tip: $tip, orderNumber: $orderNumber, courier: $courier, promo: $promo, serviceFee: $serviceFee, tax: $tax, caDriverBenefits: $caDriverBenefits, deliveryFee: $deliveryFee, membershipBenefit: $membershipBenefit, totalFee: $totalFee, payments: $payments, store: $store, status: $status)';
+    return 'IndividualOrder(productsAndQuantities: $productsAndQuantities, deliveryDate: $deliveryDate, tip: $tip, orderNumber: $orderNumber, placeDescription: $placeDescription, courier: $courier, promoApplied: $promoApplied, serviceFee: $serviceFee, tax: $tax, caDriverBenefits: $caDriverBenefits, deliveryFee: $deliveryFee, membershipBenefit: $membershipBenefit, totalFee: $totalFee, payments: $payments, storeRef: $storeRef, status: $status)';
   }
 
   @override
@@ -404,8 +381,9 @@ class _$IndividualOrderImpl
       ..add(DiagnosticsProperty('deliveryDate', deliveryDate))
       ..add(DiagnosticsProperty('tip', tip))
       ..add(DiagnosticsProperty('orderNumber', orderNumber))
+      ..add(DiagnosticsProperty('placeDescription', placeDescription))
       ..add(DiagnosticsProperty('courier', courier))
-      ..add(DiagnosticsProperty('promo', promo))
+      ..add(DiagnosticsProperty('promoApplied', promoApplied))
       ..add(DiagnosticsProperty('serviceFee', serviceFee))
       ..add(DiagnosticsProperty('tax', tax))
       ..add(DiagnosticsProperty('caDriverBenefits', caDriverBenefits))
@@ -413,7 +391,7 @@ class _$IndividualOrderImpl
       ..add(DiagnosticsProperty('membershipBenefit', membershipBenefit))
       ..add(DiagnosticsProperty('totalFee', totalFee))
       ..add(DiagnosticsProperty('payments', payments))
-      ..add(DiagnosticsProperty('store', store))
+      ..add(DiagnosticsProperty('storeRef', storeRef))
       ..add(DiagnosticsProperty('status', status));
   }
 
@@ -429,8 +407,11 @@ class _$IndividualOrderImpl
             (identical(other.tip, tip) || other.tip == tip) &&
             (identical(other.orderNumber, orderNumber) ||
                 other.orderNumber == orderNumber) &&
+            (identical(other.placeDescription, placeDescription) ||
+                other.placeDescription == placeDescription) &&
             (identical(other.courier, courier) || other.courier == courier) &&
-            (identical(other.promo, promo) || other.promo == promo) &&
+            const DeepCollectionEquality()
+                .equals(other.promoApplied, promoApplied) &&
             (identical(other.serviceFee, serviceFee) ||
                 other.serviceFee == serviceFee) &&
             (identical(other.tax, tax) || other.tax == tax) &&
@@ -443,7 +424,7 @@ class _$IndividualOrderImpl
             (identical(other.totalFee, totalFee) ||
                 other.totalFee == totalFee) &&
             const DeepCollectionEquality().equals(other._payments, _payments) &&
-            (identical(other.store, store) || other.store == store) &&
+            const DeepCollectionEquality().equals(other.storeRef, storeRef) &&
             (identical(other.status, status) || other.status == status));
   }
 
@@ -455,8 +436,9 @@ class _$IndividualOrderImpl
       deliveryDate,
       tip,
       orderNumber,
+      placeDescription,
       courier,
-      promo,
+      const DeepCollectionEquality().hash(promoApplied),
       serviceFee,
       tax,
       caDriverBenefits,
@@ -464,7 +446,7 @@ class _$IndividualOrderImpl
       membershipBenefit,
       totalFee,
       const DeepCollectionEquality().hash(_payments),
-      store,
+      const DeepCollectionEquality().hash(storeRef),
       status);
 
   /// Create a copy of IndividualOrder
@@ -490,17 +472,18 @@ abstract class _IndividualOrder implements IndividualOrder {
       required final DateTime deliveryDate,
       final double? tip,
       required final String orderNumber,
-      required final String courier,
-      final Promotion? promo,
+      required final String placeDescription,
+      final String courier,
+      final Object? promoApplied,
       required final double serviceFee,
       required final double tax,
-      final double? caDriverBenefits,
+      final double caDriverBenefits,
       required final double deliveryFee,
       final double? membershipBenefit,
       required final double totalFee,
       required final List<Payment> payments,
-      required final Store store,
-      required final String status}) = _$IndividualOrderImpl;
+      required final Object storeRef,
+      final String status}) = _$IndividualOrderImpl;
 
   factory _IndividualOrder.fromJson(Map<String, dynamic> json) =
       _$IndividualOrderImpl.fromJson;
@@ -514,15 +497,17 @@ abstract class _IndividualOrder implements IndividualOrder {
   @override
   String get orderNumber;
   @override
+  String get placeDescription;
+  @override
   String get courier;
   @override
-  Promotion? get promo;
+  Object? get promoApplied;
   @override
   double get serviceFee;
   @override
   double get tax;
   @override
-  double? get caDriverBenefits;
+  double get caDriverBenefits;
   @override
   double get deliveryFee;
   @override
@@ -532,7 +517,7 @@ abstract class _IndividualOrder implements IndividualOrder {
   @override
   List<Payment> get payments;
   @override
-  Store get store;
+  Object get storeRef;
   @override
   String get status;
 
@@ -551,7 +536,7 @@ OrderSchedule _$OrderScheduleFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$OrderSchedule {
   DateTime get deliveryDate => throw _privateConstructorUsedError;
-  String get storeId => throw _privateConstructorUsedError;
+  Object get storeRef => throw _privateConstructorUsedError;
   String get orderNumber => throw _privateConstructorUsedError;
   List<OrderItem> get orderItems => throw _privateConstructorUsedError;
   double get tip => throw _privateConstructorUsedError;
@@ -584,7 +569,7 @@ abstract class $OrderScheduleCopyWith<$Res> {
   @useResult
   $Res call(
       {DateTime deliveryDate,
-      String storeId,
+      Object storeRef,
       String orderNumber,
       List<OrderItem> orderItems,
       double tip,
@@ -618,7 +603,7 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
   @override
   $Res call({
     Object? deliveryDate = null,
-    Object? storeId = null,
+    Object? storeRef = null,
     Object? orderNumber = null,
     Object? orderItems = null,
     Object? tip = null,
@@ -638,10 +623,7 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
           ? _value.deliveryDate
           : deliveryDate // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      storeId: null == storeId
-          ? _value.storeId
-          : storeId // ignore: cast_nullable_to_non_nullable
-              as String,
+      storeRef: null == storeRef ? _value.storeRef : storeRef,
       orderNumber: null == orderNumber
           ? _value.orderNumber
           : orderNumber // ignore: cast_nullable_to_non_nullable
@@ -722,7 +704,7 @@ abstract class _$$OrderScheduleImplCopyWith<$Res>
   @useResult
   $Res call(
       {DateTime deliveryDate,
-      String storeId,
+      Object storeRef,
       String orderNumber,
       List<OrderItem> orderItems,
       double tip,
@@ -755,7 +737,7 @@ class __$$OrderScheduleImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? deliveryDate = null,
-    Object? storeId = null,
+    Object? storeRef = null,
     Object? orderNumber = null,
     Object? orderItems = null,
     Object? tip = null,
@@ -775,10 +757,7 @@ class __$$OrderScheduleImplCopyWithImpl<$Res>
           ? _value.deliveryDate
           : deliveryDate // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      storeId: null == storeId
-          ? _value.storeId
-          : storeId // ignore: cast_nullable_to_non_nullable
-              as String,
+      storeRef: null == storeRef ? _value.storeRef : storeRef,
       orderNumber: null == orderNumber
           ? _value.orderNumber
           : orderNumber // ignore: cast_nullable_to_non_nullable
@@ -842,7 +821,7 @@ class _$OrderScheduleImpl
     implements _OrderSchedule {
   const _$OrderScheduleImpl(
       {required this.deliveryDate,
-      required this.storeId,
+      required this.storeRef,
       required this.orderNumber,
       final List<OrderItem> orderItems = const [],
       this.tip = 0,
@@ -865,7 +844,7 @@ class _$OrderScheduleImpl
   @override
   final DateTime deliveryDate;
   @override
-  final String storeId;
+  final Object storeRef;
   @override
   final String orderNumber;
   final List<OrderItem> _orderItems;
@@ -918,7 +897,7 @@ class _$OrderScheduleImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'OrderSchedule(deliveryDate: $deliveryDate, storeId: $storeId, orderNumber: $orderNumber, orderItems: $orderItems, tip: $tip, courier: $courier, status: $status, promo: $promo, serviceFee: $serviceFee, tax: $tax, caDriverBenefits: $caDriverBenefits, deliveryFee: $deliveryFee, membershipBenefit: $membershipBenefit, payments: $payments, totalFee: $totalFee)';
+    return 'OrderSchedule(deliveryDate: $deliveryDate, storeRef: $storeRef, orderNumber: $orderNumber, orderItems: $orderItems, tip: $tip, courier: $courier, status: $status, promo: $promo, serviceFee: $serviceFee, tax: $tax, caDriverBenefits: $caDriverBenefits, deliveryFee: $deliveryFee, membershipBenefit: $membershipBenefit, payments: $payments, totalFee: $totalFee)';
   }
 
   @override
@@ -927,7 +906,7 @@ class _$OrderScheduleImpl
     properties
       ..add(DiagnosticsProperty('type', 'OrderSchedule'))
       ..add(DiagnosticsProperty('deliveryDate', deliveryDate))
-      ..add(DiagnosticsProperty('storeId', storeId))
+      ..add(DiagnosticsProperty('storeRef', storeRef))
       ..add(DiagnosticsProperty('orderNumber', orderNumber))
       ..add(DiagnosticsProperty('orderItems', orderItems))
       ..add(DiagnosticsProperty('tip', tip))
@@ -950,7 +929,7 @@ class _$OrderScheduleImpl
             other is _$OrderScheduleImpl &&
             (identical(other.deliveryDate, deliveryDate) ||
                 other.deliveryDate == deliveryDate) &&
-            (identical(other.storeId, storeId) || other.storeId == storeId) &&
+            const DeepCollectionEquality().equals(other.storeRef, storeRef) &&
             (identical(other.orderNumber, orderNumber) ||
                 other.orderNumber == orderNumber) &&
             const DeepCollectionEquality()
@@ -978,7 +957,7 @@ class _$OrderScheduleImpl
   int get hashCode => Object.hash(
       runtimeType,
       deliveryDate,
-      storeId,
+      const DeepCollectionEquality().hash(storeRef),
       orderNumber,
       const DeepCollectionEquality().hash(_orderItems),
       tip,
@@ -1012,7 +991,7 @@ class _$OrderScheduleImpl
 abstract class _OrderSchedule implements OrderSchedule {
   const factory _OrderSchedule(
       {required final DateTime deliveryDate,
-      required final String storeId,
+      required final Object storeRef,
       required final String orderNumber,
       final List<OrderItem> orderItems,
       final double tip,
@@ -1033,7 +1012,7 @@ abstract class _OrderSchedule implements OrderSchedule {
   @override
   DateTime get deliveryDate;
   @override
-  String get storeId;
+  Object get storeRef;
   @override
   String get orderNumber;
   @override

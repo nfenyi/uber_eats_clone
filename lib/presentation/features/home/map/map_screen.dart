@@ -795,7 +795,8 @@ class _MapScreenState extends State<MapScreen> {
                                       )),
                                       ListView.builder(
                                         shrinkWrap: true,
-                                        itemCount: 3,
+                                        itemCount:
+                                            OtherConstants.sortOptions.length,
                                         itemBuilder: (context, index) {
                                           final sortOption =
                                               OtherConstants.sortOptions[index];

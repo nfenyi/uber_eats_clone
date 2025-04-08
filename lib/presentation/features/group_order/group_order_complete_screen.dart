@@ -38,11 +38,9 @@ class _GroupOrderCompleteScreenState
             onTap: () {
               navigatorKey.currentState!.pushReplacement(MaterialPageRoute(
                 builder: (context) {
-                  List<String> groupOrders = Hive.box(AppBoxes.appState)
-                      .get(BoxKeys.userInfo)['groupOrders'];
                   return GroupOrderScreen(
-                    groupOrderPaths: groupOrders,
                     store: widget.store,
+                    groupOrder: widget.groupOrder,
                   );
                 },
               ));
@@ -144,7 +142,8 @@ class _GroupOrderCompleteScreenState
                         subject:
                             '$displayName invites you to their group order');
                   } on Exception catch (e) {
-                    await showAppInfoDialog(context, description: e.toString());
+                    await showAppInfoDialog(navigatorKey.currentContext!,
+                        description: e.toString());
                   }
                   setState(() {
                     _isLoading = false;
@@ -157,11 +156,9 @@ class _GroupOrderCompleteScreenState
                 callback: () async => navigatorKey.currentState!
                         .pushReplacement(MaterialPageRoute(
                       builder: (context) {
-                        List<String> groupOrders = Hive.box(AppBoxes.appState)
-                            .get(BoxKeys.userInfo)['groupOrders'];
                         return GroupOrderScreen(
-                          groupOrderPaths: groupOrders,
                           store: widget.store,
+                          groupOrder: widget.groupOrder,
                         );
                       },
                     ))),

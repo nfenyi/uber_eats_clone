@@ -13,6 +13,7 @@ class GiftCard with _$GiftCard {
     required String imageUrl,
     required int giftAmount,
     required String senderUid,
+    required DateTime dateCreated,
     String? optionalVideoUrl,
     String? optionalMessage,
     DateTime? deliverySchedule,

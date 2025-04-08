@@ -15,12 +15,16 @@ class BottomNavIndexNotifier extends StateNotifier<int> {
     state = 7;
   }
 
-  void showAlcoholScreen() {
+  void showPharmacyScreen() {
     state = 8;
   }
 
-  void showPharmacyScreen() {
+  void showBoxCateringScreen() {
     state = 9;
+  }
+
+  void showAlcoholScreen() {
+    state = 10;
   }
 }
 

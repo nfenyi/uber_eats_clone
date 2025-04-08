@@ -14,6 +14,7 @@ _$GiftCardImpl _$$GiftCardImplFromJson(Map<String, dynamic> json) =>
       imageUrl: json['imageUrl'] as String,
       giftAmount: (json['giftAmount'] as num).toInt(),
       senderUid: json['senderUid'] as String,
+      dateCreated: DateTime.parse(json['dateCreated'] as String),
       optionalVideoUrl: json['optionalVideoUrl'] as String?,
       optionalMessage: json['optionalMessage'] as String?,
       deliverySchedule: json['deliverySchedule'] == null
@@ -33,6 +34,7 @@ Map<String, dynamic> _$$GiftCardImplToJson(_$GiftCardImpl instance) =>
       'imageUrl': instance.imageUrl,
       'giftAmount': instance.giftAmount,
       'senderUid': instance.senderUid,
+      'dateCreated': instance.dateCreated.toIso8601String(),
       'optionalVideoUrl': instance.optionalVideoUrl,
       'optionalMessage': instance.optionalMessage,
       'deliverySchedule': instance.deliverySchedule?.toIso8601String(),

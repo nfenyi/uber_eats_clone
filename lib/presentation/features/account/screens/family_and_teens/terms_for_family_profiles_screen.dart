@@ -1,15 +1,14 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:showcaseview/showcaseview.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../../main.dart';
 import '../../../../constants/weblinks.dart';
+import '../../../main_screen/screens/main_screen_wrapper_screen.dart';
 import '../../../webview/webview_screen.dart';
 
 class TermsForFamilyProfilesScreen extends StatefulWidget {
@@ -213,9 +212,7 @@ class _TermsForFamilyProfilesScreenState
                           await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      ShowCaseWidget(builder: (context) {
-                                        return const MainScreen();
-                                      })), (r) {
+                                      const MainScreenWrapperScreen()), (r) {
                             return false;
                           });
                         }

@@ -15,6 +15,7 @@ import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/account_screen.dart';
+import 'package:uber_eats_clone/presentation/features/box_catering/screens/box_catering_screens.dart';
 import 'package:uber_eats_clone/presentation/features/explore/screens/explore_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_category_screen.dart';
@@ -25,6 +26,7 @@ import 'package:uber_eats_clone/state/shops_state_stream_provider.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
 import '../../../services/sign_in_view_model.dart';
+import '../../alcohol/alcohol_screen.dart';
 import '../../gifts/screens/gift_screen.dart';
 import '../../gifts/screens/redeem_gift_card_screen.dart';
 import '../../pharmacy/screens/pharmacy_screen.dart';
@@ -129,7 +131,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 ? const GiftScreen()
                 : bottomNavIndex == 7
                     ? const GiftCategoryScreen()
-                    : const PharmacyScreen(),
+                    : bottomNavIndex == 8
+                        ? const PharmacyScreen()
+                        : bottomNavIndex == 9
+                            ? const BoxCateringScreen()
+                            : const AlcoholScreen(),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentScreen,
           onTap: (value) {

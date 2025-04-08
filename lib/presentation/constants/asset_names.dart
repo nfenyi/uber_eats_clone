@@ -25,6 +25,7 @@ class AssetNames {
   static const indian = 'assets/images/indian.png';
   static const uberOneSmall = 'assets/images/uber_one_small.png';
   static const map = 'assets/images/map.png';
+  static const appLogo = 'assets/images/app_logo.png';
   static const groupOrder = 'assets/images/group_order.png';
   static const groupOrderComplete = 'assets/images/group_order_complete.png';
   static const didntFindMatch = 'assets/images/didnt_find_match.png';

@@ -103,456 +103,462 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.horizontalPaddingSmall),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    AppFunctions.displayNetworkImage(_selectedCardUrl,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                        placeholderAssetImage: AssetNames.giftCardPlaceholder),
-                    // Container(
-                    //   color: Colors.black45,
-                    //   width: double.infinity,
-                    //   height: 200,
-                    // ),
-                    // TextButton(
-                    //   onPressed: () {
-                    //     // navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => ,))
-                    //   },
-                    //   style: TextButton.styleFrom(
-                    //       backgroundColor: Colors.white70,
-                    //       shape: RoundedRectangleBorder(
-                    //           borderRadius: BorderRadius.circular(50))),
-                    //   child: const Row(
-                    //     mainAxisSize: MainAxisSize.min,
-                    //     children: [
-                    //       Icon(Icons.edit, size: 15),
-                    //       Gap(15),
-                    //       AppText(text: 'Change')
-                    //     ],
-                    //   ),
-                    // )
-                  ],
-                ),
-              ),
-              const Gap(30),
-              const AppText(
-                text: 'Gift Amount',
-                color: AppColors.neutral500,
-              ),
-              const Gap(5),
-              AppText(
-                text: '\$$_selectedGiftAmount USD',
-                weight: FontWeight.w600,
-                size: AppSizes.heading2,
-              ),
-              ChipsChoice<String>.single(
-                wrapped: false,
-                padding: EdgeInsets.zero,
-                value: _selectedGiftAmount,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedGiftAmount = value;
-                  });
-                },
-                choiceItems: C2Choice.listFrom<String, String>(
-                  source: _giftAmounts,
-                  value: (i, v) => v,
-                  label: (i, v) => '\$ $v',
-                ),
-                choiceStyle: C2ChipStyle.filled(
-                  selectedStyle: const C2ChipStyle(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.black,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(100),
-                    ),
+        child: Scrollbar(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.horizontalPaddingSmall),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      AppFunctions.displayNetworkImage(_selectedCardUrl,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                          placeholderAssetImage:
+                              AssetNames.giftCardPlaceholder),
+                      // Container(
+                      //   color: Colors.black45,
+                      //   width: double.infinity,
+                      //   height: 200,
+                      // ),
+                      // TextButton(
+                      //   onPressed: () {
+                      //     // navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => ,))
+                      //   },
+                      //   style: TextButton.styleFrom(
+                      //       backgroundColor: Colors.white70,
+                      //       shape: RoundedRectangleBorder(
+                      //           borderRadius: BorderRadius.circular(50))),
+                      //   child: const Row(
+                      //     mainAxisSize: MainAxisSize.min,
+                      //     children: [
+                      //       Icon(Icons.edit, size: 15),
+                      //       Gap(15),
+                      //       AppText(text: 'Change')
+                      //     ],
+                      //   ),
+                      // )
+                    ],
                   ),
-                  height: 30,
-                  borderRadius: BorderRadius.circular(100),
-                  color: AppColors.neutral200,
                 ),
-              ),
-              const Gap(10),
-              const AppText(text: "Who's this gift card from?"),
-              const Gap(5),
-              AppTextFormField(
-                controller: _fromTextEditingController,
-                enabled: false,
-              ),
-              const Gap(15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const AppText(text: "Who's this gift for?"),
-                  AppText(
-                    text: '${_toTextEditingController.text.length}/30',
-                    color: _toTextEditingController.text.length < 31
-                        ? Colors.black
-                        : Colors.red.shade800,
-                  )
-                ],
-              ),
-              const Gap(5),
-              AppTextFormField(
-                hintText: 'Enter their name or nickname',
-                onChanged: (value) {
-                  if (_debounce?.isActive ?? false) {
-                    _debounce?.cancel();
-                  }
-                  _debounce = Timer(const Duration(milliseconds: 500), () {
-                    setState(() {});
-                  });
-                },
-                controller: _toTextEditingController,
-                suffixIcon: GestureDetector(
-                    onTap: _toTextEditingController.clear,
-                    child: Visibility(
-                      visible: _toTextEditingController.text.isNotEmpty,
-                      child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _toTextEditingController.clear();
-                            });
-                          },
-                          child: const Icon(Icons.cancel)),
-                    )),
-              ),
-              const Gap(5),
-              Visibility(
-                visible: _toTextEditingController.text.isNotEmpty,
-                child: const AppText(
-                  text: "Input recipient's name",
-                  size: AppSizes.bodySmallest,
+                const Gap(30),
+                const AppText(
+                  text: 'Gift Amount',
+                  color: AppColors.neutral500,
                 ),
-              ),
-              const Gap(20),
-              const AppText(text: 'Add a message (optional)'),
-
-              Visibility(
-                visible: _selectedMessageOption == null &&
-                    (_uploadTask == null ||
-                        _textMessageController.text.trim().isEmpty),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const Gap(5),
+                AppText(
+                  text: '\$$_selectedGiftAmount USD',
+                  weight: FontWeight.w600,
+                  size: AppSizes.heading2,
+                ),
+                ChipsChoice<String>.single(
+                  wrapped: false,
+                  padding: EdgeInsets.zero,
+                  value: _selectedGiftAmount,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGiftAmount = value;
+                    });
+                  },
+                  choiceItems: C2Choice.listFrom<String, String>(
+                    source: _giftAmounts,
+                    value: (i, v) => v,
+                    label: (i, v) => '\$ $v',
+                  ),
+                  choiceStyle: C2ChipStyle.filled(
+                    selectedStyle: const C2ChipStyle(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.black,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(100),
+                      ),
+                    ),
+                    height: 30,
+                    borderRadius: BorderRadius.circular(100),
+                    color: AppColors.neutral200,
+                  ),
+                ),
+                const Gap(10),
+                const AppText(text: "Who's this gift card from?"),
+                const Gap(5),
+                AppTextFormField(
+                  controller: _fromTextEditingController,
+                  enabled: false,
+                ),
+                const Gap(15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Gap(5),
+                    const AppText(text: "Who's this gift for?"),
                     AppText(
-                      text: 'You can add either a video or a text message',
-                      size: AppSizes.bodySmallest,
-                    ),
+                      text: '${_toTextEditingController.text.length}/30',
+                      color: _toTextEditingController.text.length < 31
+                          ? Colors.black
+                          : Colors.red.shade800,
+                    )
                   ],
                 ),
-              ),
-              const Gap(10),
-              ChipsChoice<String>.single(
-                wrapped: false,
-                padding: EdgeInsets.zero,
-                value: _selectedMessageOption,
-                onChanged: (value) async {
-                  if (_selectedMessageOption == value) {
-                    setState(() {
-                      _selectedMessageOption = null;
-                    });
-                    return;
-                  } else {
-                    setState(() {
-                      _selectedMessageOption = value;
-                    });
-
-                    if (value == 'Record video' && _uploadTask == null) {
-                      List<CameraDescription> cameras =
-                          await availableCameras();
-
-                      // logger.d(cameras);
-                      final cameraController =
-                          CameraController(cameras.first, ResolutionPreset.max);
-                      await cameraController.initialize().then((_) async {
-                        await cameraController.lockCaptureOrientation(
-                            DeviceOrientation.portraitUp);
-                        //the following is needed for iOS
-                        await cameraController.prepareForVideoRecording();
-                        //TODO: complete camera capture
-                        if (context.mounted) {
-                          final listResult = await showModalBottomSheet(
-                            barrierColor: Colors.transparent,
-                            context: context,
-                            isDismissible: false,
-                            isScrollControlled: true,
-                            useSafeArea: true,
-                            builder: (context) => RecordMessageScreen(
-                              availableCameras: cameras,
-                              cameraController: cameraController,
-                            ),
-                          );
-                          // logger.d(listResult);
-                          if (listResult != null) {
-                            _videoFile = listResult[0];
-                            final storageRef = FirebaseStorage.instance.ref().child(
-                                'user media/${FirebaseAuth.instance.currentUser!.uid}/recorded messages/${DateTime.now().millisecondsSinceEpoch}.mp4');
-                            setState(() {
-                              _uploadTask =
-                                  storageRef.putFile(File(_videoFile!.path));
-                              _videoLength = listResult[1];
-                            });
-                            _uploadTask!.snapshotEvents.listen(
-                              (snapshot) {
-                                // if(snapshot.state != TaskState.canceled && snapshot.state != TaskState.error) {
-                                _progress.value = snapshot.bytesTransferred /
-                                    snapshot.totalBytes;
-                                if (snapshot.state == TaskState.success) {
-                                  setState(() {});
-                                }
-                                // }else{
-
-                                // }
-                              },
-                            );
-                            final snapshot = await _uploadTask;
-                            _downloadUrl = await snapshot!.ref.getDownloadURL();
-                          } else {
-                            setState(() {
-                              if (_videoLength.isEmpty) {
-                                _selectedMessageOption = null;
-                              }
-                            });
-                          }
-                        } else {
-                          await cameraController.dispose();
-                        }
-                      });
+                const Gap(5),
+                AppTextFormField(
+                  hintText: 'Enter their name or nickname',
+                  onChanged: (value) {
+                    if (_debounce?.isActive ?? false) {
+                      _debounce?.cancel();
                     }
-                  }
-                },
-                choiceLeadingBuilder: (item, i) {
-                  return Icon(i == 0
-                      ? Icons.videocam_rounded
-                      : Icons.speaker_notes_rounded);
-                },
-                choiceItems: C2Choice.listFrom<String, String>(
-                  source: ['Record video', 'Write text'],
-                  value: (i, v) => v,
-                  label: (i, v) => v,
+                    _debounce = Timer(const Duration(milliseconds: 500), () {
+                      setState(() {});
+                    });
+                  },
+                  controller: _toTextEditingController,
+                  suffixIcon: GestureDetector(
+                      onTap: _toTextEditingController.clear,
+                      child: Visibility(
+                        visible: _toTextEditingController.text.isNotEmpty,
+                        child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _toTextEditingController.clear();
+                              });
+                            },
+                            child: const Icon(Icons.cancel)),
+                      )),
                 ),
-                choiceStyle: C2ChipStyle.filled(
-                  selectedStyle: const C2ChipStyle(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.black,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(100),
-                    ),
-                  ),
-                  height: 30,
-                  borderRadius: BorderRadius.circular(100),
-                  color: AppColors.neutral200,
-                ),
-              ),
-              const Gap(15),
-              Visibility(
-                  visible: _selectedMessageOption == 'Write text',
-                  child: Form(
-                    key: _textMessageKey,
-                    child: AppTextFormField(
-                      validator: FormBuilderValidators.required(
-                          errorText:
-                              'Please provide your message or turn off \'Write text\''),
-                      controller: _textMessageController,
-                      hintText: 'Congratulations! You must be Uber the moon!',
-                    ),
-                  )),
-              // const Gap(15),
-
-              if (_uploadTask != null &&
-                  _selectedMessageOption == 'Record video')
+                const Gap(5),
                 Visibility(
-                  visible: _progress.value != 1.toDouble(),
-                  replacement: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: AppColors.neutral300)),
-                    child: ListTile(
-                      leading: const Icon(Icons.videocam_rounded),
-                      subtitle: const AppText(
-                        text: 'Upload successful',
-                        color: Colors.green,
-                      ),
-                      title: AppText(
-                        text: _videoLength,
-                        // size: AppSizes.bodySmaller,
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          InkWell(
-                            onTap: () async {
-                              try {
-                                if (_downloadUrl != null) {
-                                  final ref = FirebaseStorage.instance
-                                      .refFromURL(_downloadUrl!);
+                  visible: _toTextEditingController.text.isNotEmpty,
+                  child: const AppText(
+                    text: "Input recipient's name",
+                    size: AppSizes.bodySmallest,
+                  ),
+                ),
+                const Gap(20),
+                const AppText(text: 'Add a message (optional)'),
 
-                                  await ref.delete().then(
-                                        (value) => showInfoToast(
-                                            'Video deleted',
-                                            context:
-                                                navigatorKey.currentContext),
-                                      );
-                                  setState(() {
-                                    _uploadTask = null;
-                                    _selectedMessageOption = null;
-                                  });
+                Visibility(
+                  visible: _selectedMessageOption == null &&
+                      (_uploadTask == null ||
+                          _textMessageController.text.trim().isEmpty),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Gap(5),
+                      AppText(
+                        text: 'You can add either a video or a text message',
+                        size: AppSizes.bodySmallest,
+                      ),
+                    ],
+                  ),
+                ),
+                const Gap(10),
+                ChipsChoice<String>.single(
+                  wrapped: false,
+                  padding: EdgeInsets.zero,
+                  value: _selectedMessageOption,
+                  onChanged: (value) async {
+                    if (_selectedMessageOption == value) {
+                      setState(() {
+                        _selectedMessageOption = null;
+                      });
+                      return;
+                    } else {
+                      setState(() {
+                        _selectedMessageOption = value;
+                      });
+
+                      if (value == 'Record video' && _uploadTask == null) {
+                        List<CameraDescription> cameras =
+                            await availableCameras();
+
+                        // logger.d(cameras);
+                        final cameraController = CameraController(
+                            cameras.first, ResolutionPreset.max);
+                        await cameraController.initialize().then((_) async {
+                          await cameraController.lockCaptureOrientation(
+                              DeviceOrientation.portraitUp);
+                          //the following is needed for iOS
+                          await cameraController.prepareForVideoRecording();
+                          //TODO: complete camera capture
+                          if (context.mounted) {
+                            final listResult = await showModalBottomSheet(
+                              barrierColor: Colors.transparent,
+                              context: context,
+                              isDismissible: false,
+                              isScrollControlled: true,
+                              useSafeArea: true,
+                              builder: (context) => RecordMessageScreen(
+                                availableCameras: cameras,
+                                cameraController: cameraController,
+                              ),
+                            );
+                            // logger.d(listResult);
+                            if (listResult != null) {
+                              _videoFile = listResult[0];
+                              final storageRef = FirebaseStorage.instance
+                                  .ref()
+                                  .child(
+                                      'user media/${FirebaseAuth.instance.currentUser!.uid}/recorded messages/${DateTime.now().millisecondsSinceEpoch}.mp4');
+                              setState(() {
+                                _uploadTask =
+                                    storageRef.putFile(File(_videoFile!.path));
+                                _videoLength = listResult[1];
+                              });
+                              _uploadTask!.snapshotEvents.listen(
+                                (snapshot) {
+                                  // if(snapshot.state != TaskState.canceled && snapshot.state != TaskState.error) {
+                                  _progress.value = snapshot.bytesTransferred /
+                                      snapshot.totalBytes;
+                                  if (snapshot.state == TaskState.success) {
+                                    setState(() {});
+                                  }
+                                },
+                              );
+                              final snapshot = await _uploadTask;
+                              _downloadUrl =
+                                  await snapshot!.ref.getDownloadURL();
+                            } else {
+                              setState(() {
+                                if (_videoLength.isEmpty) {
+                                  _selectedMessageOption = null;
                                 }
-                              } catch (e) {
-                                showInfoToast(e.toString(),
-                                    context: navigatorKey.currentContext);
-                              }
-                            },
-                            child: Ink(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  color: AppColors.neutral100,
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: const Icon(
-                                Icons.delete,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                          const Gap(5),
-                          InkWell(
-                            onTap: () async {
-                              if (context.mounted) {
-                                await navigatorKey.currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      RecordedMessagePlayerScreen(
-                                    videoFile: _videoFile!,
-                                  ),
-                                ));
-                              }
-                            },
-                            child: Ink(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  color: AppColors.neutral100,
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: const Icon(
-                                Icons.play_arrow,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ],
+                              });
+                            }
+                          } else {
+                            await cameraController.dispose();
+                          }
+                        });
+                      }
+                    }
+                  },
+                  choiceLeadingBuilder: (item, i) {
+                    return Icon(i == 0
+                        ? Icons.videocam_rounded
+                        : Icons.speaker_notes_rounded);
+                  },
+                  choiceItems: C2Choice.listFrom<String, String>(
+                    source: ['Record video', 'Write text'],
+                    value: (i, v) => v,
+                    label: (i, v) => v,
+                  ),
+                  choiceStyle: C2ChipStyle.filled(
+                    selectedStyle: const C2ChipStyle(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.black,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(100),
                       ),
                     ),
+                    height: 30,
+                    borderRadius: BorderRadius.circular(100),
+                    color: AppColors.neutral200,
                   ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: AppColors.neutral300)),
-                    child: ListTile(
-                      leading: const Icon(Icons.videocam_rounded),
-                      subtitle: ValueListenableBuilder<double>(
-                          valueListenable: _progress,
-                          builder: (context, value, child) {
-                            return LinearProgressIndicator(
-                              value: value,
-                            );
-                          }),
-                      title: const AppText(
-                        text: 'Uploading video',
-                        // size: AppSizes.bodySmaller,
+                ),
+                const Gap(15),
+                Visibility(
+                    visible: _selectedMessageOption == 'Write text',
+                    child: Form(
+                      key: _textMessageKey,
+                      child: AppTextFormField(
+                        validator: FormBuilderValidators.required(
+                            errorText:
+                                'Please provide your message or turn off \'Write text\''),
+                        controller: _textMessageController,
+                        hintText: 'Congratulations! You must be Uber the moon!',
                       ),
-                      trailing: InkWell(
-                        onTap: () async {
-                          await _uploadTask!.cancel();
-                          _selectedMessageOption == null;
-                          _uploadTask == null;
-                          _videoLength = '';
-                        },
-                        child: Ink(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: AppColors.neutral100,
-                              borderRadius: BorderRadius.circular(50)),
-                          child: const Icon(
-                            Icons.delete,
-                            size: 15,
+                    )),
+                // const Gap(15),
+
+                if (_uploadTask != null &&
+                    _selectedMessageOption == 'Record video')
+                  Visibility(
+                    visible: _progress.value != 1.toDouble(),
+                    replacement: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: AppColors.neutral300)),
+                      child: ListTile(
+                        leading: const Icon(Icons.videocam_rounded),
+                        subtitle: const AppText(
+                          text: 'Upload successful',
+                          color: Colors.green,
+                        ),
+                        title: AppText(
+                          text: _videoLength,
+                          // size: AppSizes.bodySmaller,
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            InkWell(
+                              onTap: () async {
+                                try {
+                                  if (_downloadUrl != null) {
+                                    final ref = FirebaseStorage.instance
+                                        .refFromURL(_downloadUrl!);
+
+                                    await ref.delete().then(
+                                          (value) => showInfoToast(
+                                              'Video deleted',
+                                              context:
+                                                  navigatorKey.currentContext),
+                                        );
+                                    setState(() {
+                                      _uploadTask = null;
+                                      _selectedMessageOption = null;
+                                      _downloadUrl = null;
+                                      _videoLength = '';
+                                      _progress.value = 0;
+                                    });
+                                  }
+                                } catch (e) {
+                                  showInfoToast(e.toString(),
+                                      context: navigatorKey.currentContext);
+                                }
+                              },
+                              child: Ink(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                    color: AppColors.neutral100,
+                                    borderRadius: BorderRadius.circular(50)),
+                                child: const Icon(
+                                  Icons.delete,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                            const Gap(5),
+                            InkWell(
+                              onTap: () async {
+                                if (context.mounted) {
+                                  await navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        RecordedMessagePlayerScreen(
+                                      videoFile: _videoFile!,
+                                    ),
+                                  ));
+                                }
+                              },
+                              child: Ink(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                    color: AppColors.neutral100,
+                                    borderRadius: BorderRadius.circular(50)),
+                                child: const Icon(
+                                  Icons.play_arrow,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: AppColors.neutral300)),
+                      child: ListTile(
+                        leading: const Icon(Icons.videocam_rounded),
+                        subtitle: ValueListenableBuilder<double>(
+                            valueListenable: _progress,
+                            builder: (context, value, child) {
+                              return LinearProgressIndicator(
+                                value: value,
+                              );
+                            }),
+                        title: const AppText(
+                          text: 'Uploading video',
+                          // size: AppSizes.bodySmaller,
+                        ),
+                        trailing: InkWell(
+                          onTap: () async {
+                            await _uploadTask!.cancel();
+                            _selectedMessageOption == null;
+                            _uploadTask == null;
+                            _videoLength = '';
+                          },
+                          child: Ink(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: AppColors.neutral100,
+                                borderRadius: BorderRadius.circular(50)),
+                            child: const Icon(
+                              Icons.delete,
+                              size: 15,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              const Gap(20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: RichText(
-                      text: TextSpan(
-                          text:
-                              "I have read and agree to the User Generated Content Terms and Uber Privacy Notice. ",
-                          style: const TextStyle(
-                            fontSize: AppSizes.bodySmallest,
-                            color: Colors.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'See User Generated Content Terms. ',
-                              style: const TextStyle(
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) => WebViewScreen(
-                                      controller: _webViewcontroller,
-                                      link: Weblinks.userGeneratedContent,
-                                    ),
-                                  ));
-                                },
+                const Gap(20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: RichText(
+                        text: TextSpan(
+                            text:
+                                "I have read and agree to the User Generated Content Terms and Uber Privacy Notice. ",
+                            style: const TextStyle(
+                              fontSize: AppSizes.bodySmallest,
+                              color: Colors.black,
                             ),
-                            TextSpan(
-                              text: 'See Uber Privacy Notice.',
-                              style: const TextStyle(
-                                decoration: TextDecoration.underline,
+                            children: [
+                              TextSpan(
+                                text: 'See User Generated Content Terms. ',
+                                style: const TextStyle(
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    navigatorKey.currentState!
+                                        .push(MaterialPageRoute(
+                                      builder: (context) => WebViewScreen(
+                                        controller: _webViewcontroller,
+                                        link: Weblinks.userGeneratedContent,
+                                      ),
+                                    ));
+                                  },
                               ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) => WebViewScreen(
-                                      controller: _webViewcontroller,
-                                      link: Weblinks.policyNotice,
-                                    ),
-                                  ));
-                                },
-                            ),
-                          ]),
+                              TextSpan(
+                                text: 'See Uber Privacy Notice.',
+                                style: const TextStyle(
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    navigatorKey.currentState!
+                                        .push(MaterialPageRoute(
+                                      builder: (context) => WebViewScreen(
+                                        controller: _webViewcontroller,
+                                        link: Weblinks.policyNotice,
+                                      ),
+                                    ));
+                                  },
+                              ),
+                            ]),
+                      ),
                     ),
-                  ),
-                  const Gap(10),
-                  Checkbox(
-                      value: _agreedToTerms,
-                      onChanged: (value) {
-                        setState(() {
-                          _agreedToTerms = value;
-                        });
-                      })
-                ],
-              ),
-              const Gap(30),
-            ],
+                    const Gap(10),
+                    Checkbox(
+                        value: _agreedToTerms,
+                        onChanged: (value) {
+                          setState(() {
+                            _agreedToTerms = value;
+                          });
+                        })
+                  ],
+                ),
+                const Gap(30),
+              ],
+            ),
           ),
         ),
       ),
@@ -750,14 +756,15 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
             const Gap(10),
             AppButton(
               callback: _toTextEditingController.text.isEmpty ||
+                      (_selectedMessageOption == 'Record video' &&
+                          _downloadUrl == null) ||
                       _agreedToTerms == false
                   ? null
                   : () {
-                      if (_selectedMessageOption == null ||
-                          _selectedMessageOption == 'Record video' ||
-                          (_selectedMessageOption == 'Write text' &&
-                              _textMessageKey.currentState!.validate())) {
+                      if (_selectedMessageOption != 'Write text' ||
+                          _textMessageKey.currentState!.validate()) {
                         final giftCard = GiftCard(
+                            dateCreated: DateTime.now(),
                             optionalVideoUrl:
                                 _selectedMessageOption == 'Record video'
                                     ? _downloadUrl

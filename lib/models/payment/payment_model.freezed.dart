@@ -20,7 +20,7 @@ Payment _$PaymentFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Payment {
-  PaymentMethod get paymentMethod => throw _privateConstructorUsedError;
+  PaymentMethod get paymentMethodId => throw _privateConstructorUsedError;
   int get amountPaid => throw _privateConstructorUsedError;
   String get cardNumber => throw _privateConstructorUsedError;
   DateTime get datePaid => throw _privateConstructorUsedError;
@@ -40,12 +40,12 @@ abstract class $PaymentCopyWith<$Res> {
       _$PaymentCopyWithImpl<$Res, Payment>;
   @useResult
   $Res call(
-      {PaymentMethod paymentMethod,
+      {PaymentMethod paymentMethodId,
       int amountPaid,
       String cardNumber,
       DateTime datePaid});
 
-  $PaymentMethodCopyWith<$Res> get paymentMethod;
+  $PaymentMethodCopyWith<$Res> get paymentMethodId;
 }
 
 /// @nodoc
@@ -63,15 +63,15 @@ class _$PaymentCopyWithImpl<$Res, $Val extends Payment>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? paymentMethod = null,
+    Object? paymentMethodId = null,
     Object? amountPaid = null,
     Object? cardNumber = null,
     Object? datePaid = null,
   }) {
     return _then(_value.copyWith(
-      paymentMethod: null == paymentMethod
-          ? _value.paymentMethod
-          : paymentMethod // ignore: cast_nullable_to_non_nullable
+      paymentMethodId: null == paymentMethodId
+          ? _value.paymentMethodId
+          : paymentMethodId // ignore: cast_nullable_to_non_nullable
               as PaymentMethod,
       amountPaid: null == amountPaid
           ? _value.amountPaid
@@ -92,9 +92,9 @@ class _$PaymentCopyWithImpl<$Res, $Val extends Payment>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $PaymentMethodCopyWith<$Res> get paymentMethod {
-    return $PaymentMethodCopyWith<$Res>(_value.paymentMethod, (value) {
-      return _then(_value.copyWith(paymentMethod: value) as $Val);
+  $PaymentMethodCopyWith<$Res> get paymentMethodId {
+    return $PaymentMethodCopyWith<$Res>(_value.paymentMethodId, (value) {
+      return _then(_value.copyWith(paymentMethodId: value) as $Val);
     });
   }
 }
@@ -107,13 +107,13 @@ abstract class _$$PaymentImplCopyWith<$Res> implements $PaymentCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {PaymentMethod paymentMethod,
+      {PaymentMethod paymentMethodId,
       int amountPaid,
       String cardNumber,
       DateTime datePaid});
 
   @override
-  $PaymentMethodCopyWith<$Res> get paymentMethod;
+  $PaymentMethodCopyWith<$Res> get paymentMethodId;
 }
 
 /// @nodoc
@@ -129,15 +129,15 @@ class __$$PaymentImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? paymentMethod = null,
+    Object? paymentMethodId = null,
     Object? amountPaid = null,
     Object? cardNumber = null,
     Object? datePaid = null,
   }) {
     return _then(_$PaymentImpl(
-      paymentMethod: null == paymentMethod
-          ? _value.paymentMethod
-          : paymentMethod // ignore: cast_nullable_to_non_nullable
+      paymentMethodId: null == paymentMethodId
+          ? _value.paymentMethodId
+          : paymentMethodId // ignore: cast_nullable_to_non_nullable
               as PaymentMethod,
       amountPaid: null == amountPaid
           ? _value.amountPaid
@@ -159,7 +159,7 @@ class __$$PaymentImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
   const _$PaymentImpl(
-      {required this.paymentMethod,
+      {required this.paymentMethodId,
       required this.amountPaid,
       required this.cardNumber,
       required this.datePaid});
@@ -168,7 +168,7 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
       _$$PaymentImplFromJson(json);
 
   @override
-  final PaymentMethod paymentMethod;
+  final PaymentMethod paymentMethodId;
   @override
   final int amountPaid;
   @override
@@ -178,7 +178,7 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Payment(paymentMethod: $paymentMethod, amountPaid: $amountPaid, cardNumber: $cardNumber, datePaid: $datePaid)';
+    return 'Payment(paymentMethodId: $paymentMethodId, amountPaid: $amountPaid, cardNumber: $cardNumber, datePaid: $datePaid)';
   }
 
   @override
@@ -186,7 +186,7 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'Payment'))
-      ..add(DiagnosticsProperty('paymentMethod', paymentMethod))
+      ..add(DiagnosticsProperty('paymentMethodId', paymentMethodId))
       ..add(DiagnosticsProperty('amountPaid', amountPaid))
       ..add(DiagnosticsProperty('cardNumber', cardNumber))
       ..add(DiagnosticsProperty('datePaid', datePaid));
@@ -197,8 +197,8 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PaymentImpl &&
-            (identical(other.paymentMethod, paymentMethod) ||
-                other.paymentMethod == paymentMethod) &&
+            (identical(other.paymentMethodId, paymentMethodId) ||
+                other.paymentMethodId == paymentMethodId) &&
             (identical(other.amountPaid, amountPaid) ||
                 other.amountPaid == amountPaid) &&
             (identical(other.cardNumber, cardNumber) ||
@@ -209,8 +209,8 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, paymentMethod, amountPaid, cardNumber, datePaid);
+  int get hashCode => Object.hash(
+      runtimeType, paymentMethodId, amountPaid, cardNumber, datePaid);
 
   /// Create a copy of Payment
   /// with the given fields replaced by the non-null parameter values.
@@ -230,7 +230,7 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
 
 abstract class _Payment implements Payment {
   const factory _Payment(
-      {required final PaymentMethod paymentMethod,
+      {required final PaymentMethod paymentMethodId,
       required final int amountPaid,
       required final String cardNumber,
       required final DateTime datePaid}) = _$PaymentImpl;
@@ -238,7 +238,7 @@ abstract class _Payment implements Payment {
   factory _Payment.fromJson(Map<String, dynamic> json) = _$PaymentImpl.fromJson;
 
   @override
-  PaymentMethod get paymentMethod;
+  PaymentMethod get paymentMethodId;
   @override
   int get amountPaid;
   @override

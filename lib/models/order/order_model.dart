@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 
 import '../payment/payment_model.dart';
 import '../promotion/promotion_model.dart';
-import '../store/store_model.dart';
 
 part 'order_model.freezed.dart';
 part 'order_model.g.dart';
@@ -15,17 +14,18 @@ class IndividualOrder with _$IndividualOrder {
     required DateTime deliveryDate,
     double? tip,
     required String orderNumber,
-    required String courier,
-    Promotion? promo,
+    required String placeDescription,
+    @Default('Jonathan') String courier,
+    Object? promoApplied,
     required double serviceFee,
     required double tax,
-    double? caDriverBenefits,
+    @Default(0) double caDriverBenefits,
     required double deliveryFee,
     double? membershipBenefit,
     required double totalFee,
     required List<Payment> payments,
-    required Store store,
-    required String status,
+    required Object storeRef,
+    @Default('Pending') String status,
   }) = _IndividualOrder;
 
   factory IndividualOrder.fromJson(Map<String, Object?> json) =>
@@ -52,7 +52,7 @@ class IndividualOrder with _$IndividualOrder {
 class OrderSchedule with _$OrderSchedule {
   const factory OrderSchedule({
     required DateTime deliveryDate,
-    required String storeId,
+    required Object storeRef,
     required String orderNumber,
     @Default([]) List<OrderItem> orderItems,
     @Default(0) double tip,

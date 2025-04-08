@@ -15,6 +15,7 @@ import '../../../../models/gift_card_category_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
 import 'customize_gift_screen.dart';
+import 'my_gifts_screen.dart';
 import 'redeem_gift_card_screen.dart';
 
 class GiftCardScreen extends ConsumerStatefulWidget {
@@ -164,11 +165,18 @@ class _GiftCardScreenState extends ConsumerState<GiftCardScreen> {
               Padding(
                 padding: const EdgeInsets.only(
                     right: AppSizes.horizontalPaddingSmall),
-                child: GestureDetector(
-                    child: const AppText(
-                  text: 'My gifts',
-                  size: AppSizes.bodySmall,
-                )),
+                child: InkWell(
+                    onTap: () {
+                      navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => const MyGiftsScreen(),
+                      ));
+                    },
+                    child: Ink(
+                      child: const AppText(
+                        text: 'My gifts',
+                        size: AppSizes.bodySmall,
+                      ),
+                    )),
               )
             ],
 

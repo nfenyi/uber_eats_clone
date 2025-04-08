@@ -27,7 +27,7 @@ mixin _$Store {
   String? get dietary => throw _privateConstructorUsedError;
   List<Product>? get featuredItems => throw _privateConstructorUsedError;
   String get priceCategory => throw _privateConstructorUsedError;
-  bool get isGroupFriendly => throw _privateConstructorUsedError;
+  int? get groupSize => throw _privateConstructorUsedError;
   String get type => throw _privateConstructorUsedError;
   List<Offer>? get offers => throw _privateConstructorUsedError;
   List<Aisle>? get aisles => throw _privateConstructorUsedError;
@@ -39,6 +39,7 @@ mixin _$Store {
   Delivery get delivery => throw _privateConstructorUsedError;
   Rating get rating => throw _privateConstructorUsedError;
   String get cardImage => throw _privateConstructorUsedError;
+  bool get bestOverall => throw _privateConstructorUsedError;
   int get visits => throw _privateConstructorUsedError;
   DateTime get openingTime => throw _privateConstructorUsedError;
   DateTime get closingTime => throw _privateConstructorUsedError;
@@ -65,7 +66,7 @@ abstract class $StoreCopyWith<$Res> {
       String? dietary,
       List<Product>? featuredItems,
       String priceCategory,
-      bool isGroupFriendly,
+      int? groupSize,
       String type,
       List<Offer>? offers,
       List<Aisle>? aisles,
@@ -76,6 +77,7 @@ abstract class $StoreCopyWith<$Res> {
       Delivery delivery,
       Rating rating,
       String cardImage,
+      bool bestOverall,
       int visits,
       DateTime openingTime,
       DateTime closingTime});
@@ -107,7 +109,7 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
     Object? dietary = freezed,
     Object? featuredItems = freezed,
     Object? priceCategory = null,
-    Object? isGroupFriendly = null,
+    Object? groupSize = freezed,
     Object? type = null,
     Object? offers = freezed,
     Object? aisles = freezed,
@@ -118,6 +120,7 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
     Object? delivery = null,
     Object? rating = null,
     Object? cardImage = null,
+    Object? bestOverall = null,
     Object? visits = null,
     Object? openingTime = null,
     Object? closingTime = null,
@@ -151,10 +154,10 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
           ? _value.priceCategory
           : priceCategory // ignore: cast_nullable_to_non_nullable
               as String,
-      isGroupFriendly: null == isGroupFriendly
-          ? _value.isGroupFriendly
-          : isGroupFriendly // ignore: cast_nullable_to_non_nullable
-              as bool,
+      groupSize: freezed == groupSize
+          ? _value.groupSize
+          : groupSize // ignore: cast_nullable_to_non_nullable
+              as int?,
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -195,6 +198,10 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
           ? _value.cardImage
           : cardImage // ignore: cast_nullable_to_non_nullable
               as String,
+      bestOverall: null == bestOverall
+          ? _value.bestOverall
+          : bestOverall // ignore: cast_nullable_to_non_nullable
+              as bool,
       visits: null == visits
           ? _value.visits
           : visits // ignore: cast_nullable_to_non_nullable
@@ -256,7 +263,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       String? dietary,
       List<Product>? featuredItems,
       String priceCategory,
-      bool isGroupFriendly,
+      int? groupSize,
       String type,
       List<Offer>? offers,
       List<Aisle>? aisles,
@@ -267,6 +274,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       Delivery delivery,
       Rating rating,
       String cardImage,
+      bool bestOverall,
       int visits,
       DateTime openingTime,
       DateTime closingTime});
@@ -299,7 +307,7 @@ class __$$StoreImplCopyWithImpl<$Res>
     Object? dietary = freezed,
     Object? featuredItems = freezed,
     Object? priceCategory = null,
-    Object? isGroupFriendly = null,
+    Object? groupSize = freezed,
     Object? type = null,
     Object? offers = freezed,
     Object? aisles = freezed,
@@ -310,6 +318,7 @@ class __$$StoreImplCopyWithImpl<$Res>
     Object? delivery = null,
     Object? rating = null,
     Object? cardImage = null,
+    Object? bestOverall = null,
     Object? visits = null,
     Object? openingTime = null,
     Object? closingTime = null,
@@ -343,10 +352,10 @@ class __$$StoreImplCopyWithImpl<$Res>
           ? _value.priceCategory
           : priceCategory // ignore: cast_nullable_to_non_nullable
               as String,
-      isGroupFriendly: null == isGroupFriendly
-          ? _value.isGroupFriendly
-          : isGroupFriendly // ignore: cast_nullable_to_non_nullable
-              as bool,
+      groupSize: freezed == groupSize
+          ? _value.groupSize
+          : groupSize // ignore: cast_nullable_to_non_nullable
+              as int?,
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -387,6 +396,10 @@ class __$$StoreImplCopyWithImpl<$Res>
           ? _value.cardImage
           : cardImage // ignore: cast_nullable_to_non_nullable
               as String,
+      bestOverall: null == bestOverall
+          ? _value.bestOverall
+          : bestOverall // ignore: cast_nullable_to_non_nullable
+              as bool,
       visits: null == visits
           ? _value.visits
           : visits // ignore: cast_nullable_to_non_nullable
@@ -414,7 +427,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       this.dietary,
       final List<Product>? featuredItems,
       required this.priceCategory,
-      required this.isGroupFriendly,
+      this.groupSize,
       required this.type,
       final List<Offer>? offers,
       final List<Aisle>? aisles,
@@ -425,6 +438,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       required this.delivery,
       required this.rating,
       required this.cardImage,
+      this.bestOverall = false,
       this.visits = 0,
       required this.openingTime,
       required this.closingTime})
@@ -469,7 +483,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   @override
   final String priceCategory;
   @override
-  final bool isGroupFriendly;
+  final int? groupSize;
   @override
   final String type;
   final List<Offer>? _offers;
@@ -517,6 +531,9 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   final String cardImage;
   @override
   @JsonKey()
+  final bool bestOverall;
+  @override
+  @JsonKey()
   final int visits;
   @override
   final DateTime openingTime;
@@ -525,7 +542,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, storeSchedules: $storeSchedules, dietary: $dietary, featuredItems: $featuredItems, priceCategory: $priceCategory, isGroupFriendly: $isGroupFriendly, type: $type, offers: $offers, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, visits: $visits, openingTime: $openingTime, closingTime: $closingTime)';
+    return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, storeSchedules: $storeSchedules, dietary: $dietary, featuredItems: $featuredItems, priceCategory: $priceCategory, groupSize: $groupSize, type: $type, offers: $offers, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, bestOverall: $bestOverall, visits: $visits, openingTime: $openingTime, closingTime: $closingTime)';
   }
 
   @override
@@ -540,7 +557,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       ..add(DiagnosticsProperty('dietary', dietary))
       ..add(DiagnosticsProperty('featuredItems', featuredItems))
       ..add(DiagnosticsProperty('priceCategory', priceCategory))
-      ..add(DiagnosticsProperty('isGroupFriendly', isGroupFriendly))
+      ..add(DiagnosticsProperty('groupSize', groupSize))
       ..add(DiagnosticsProperty('type', type))
       ..add(DiagnosticsProperty('offers', offers))
       ..add(DiagnosticsProperty('aisles', aisles))
@@ -551,6 +568,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       ..add(DiagnosticsProperty('delivery', delivery))
       ..add(DiagnosticsProperty('rating', rating))
       ..add(DiagnosticsProperty('cardImage', cardImage))
+      ..add(DiagnosticsProperty('bestOverall', bestOverall))
       ..add(DiagnosticsProperty('visits', visits))
       ..add(DiagnosticsProperty('openingTime', openingTime))
       ..add(DiagnosticsProperty('closingTime', closingTime));
@@ -573,8 +591,8 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
                 .equals(other._featuredItems, _featuredItems) &&
             (identical(other.priceCategory, priceCategory) ||
                 other.priceCategory == priceCategory) &&
-            (identical(other.isGroupFriendly, isGroupFriendly) ||
-                other.isGroupFriendly == isGroupFriendly) &&
+            (identical(other.groupSize, groupSize) ||
+                other.groupSize == groupSize) &&
             (identical(other.type, type) || other.type == type) &&
             const DeepCollectionEquality().equals(other._offers, _offers) &&
             const DeepCollectionEquality().equals(other._aisles, _aisles) &&
@@ -589,6 +607,8 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
             (identical(other.rating, rating) || other.rating == rating) &&
             (identical(other.cardImage, cardImage) ||
                 other.cardImage == cardImage) &&
+            (identical(other.bestOverall, bestOverall) ||
+                other.bestOverall == bestOverall) &&
             (identical(other.visits, visits) || other.visits == visits) &&
             (identical(other.openingTime, openingTime) ||
                 other.openingTime == openingTime) &&
@@ -607,7 +627,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
         dietary,
         const DeepCollectionEquality().hash(_featuredItems),
         priceCategory,
-        isGroupFriendly,
+        groupSize,
         type,
         const DeepCollectionEquality().hash(_offers),
         const DeepCollectionEquality().hash(_aisles),
@@ -618,6 +638,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
         delivery,
         rating,
         cardImage,
+        bestOverall,
         visits,
         openingTime,
         closingTime
@@ -648,7 +669,7 @@ abstract class _Store implements Store {
       final String? dietary,
       final List<Product>? featuredItems,
       required final String priceCategory,
-      required final bool isGroupFriendly,
+      final int? groupSize,
       required final String type,
       final List<Offer>? offers,
       final List<Aisle>? aisles,
@@ -659,6 +680,7 @@ abstract class _Store implements Store {
       required final Delivery delivery,
       required final Rating rating,
       required final String cardImage,
+      final bool bestOverall,
       final int visits,
       required final DateTime openingTime,
       required final DateTime closingTime}) = _$StoreImpl;
@@ -680,7 +702,7 @@ abstract class _Store implements Store {
   @override
   String get priceCategory;
   @override
-  bool get isGroupFriendly;
+  int? get groupSize;
   @override
   String get type;
   @override
@@ -701,6 +723,8 @@ abstract class _Store implements Store {
   Rating get rating;
   @override
   String get cardImage;
+  @override
+  bool get bestOverall;
   @override
   int get visits;
   @override

@@ -15,7 +15,7 @@ import '../../../../main.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../main_screen/screens/main_screen.dart';
+import '../../main_screen/screens/main_screen_wrapper_screen.dart';
 import 'name_screen.dart';
 
 class EmailSentScreen extends StatefulWidget {
@@ -97,8 +97,12 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                   }
                   await Hive.box(AppBoxes.appState)
                       .put(BoxKeys.authenticated, true);
-                  await navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => const MainScreen()));
+                  await navigatorKey.currentState!.pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const MainScreenWrapperScreen()), (r) {
+                    return false;
+                  });
                 } else {
                   await navigatorKey.currentState!.push(MaterialPageRoute(
                       builder: (context) => const PhoneNumberScreen()));

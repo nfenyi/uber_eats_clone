@@ -25,7 +25,7 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/whats_your_e
 
 import '../../../../core/app_colors.dart';
 import '../../../../services/sign_in_view_model.dart';
-import '../../../main_screen/screens/main_screen.dart';
+import '../../../main_screen/screens/main_screen_wrapper_screen.dart';
 import '../email_address_screen.dart';
 import '../email_sent_screen.dart';
 import '../phone_number_screen.dart';
@@ -243,10 +243,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           }
                           await Hive.box(AppBoxes.appState)
                               .put(BoxKeys.authenticated, true);
-                          await navigatorKey.currentState!
-                              .push(MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
-                          ));
+                          await navigatorKey.currentState!.pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const MainScreenWrapperScreen()), (r) {
+                            return false;
+                          });
                         } else {
                           await navigatorKey.currentState!
                               .push(MaterialPageRoute(
@@ -343,9 +345,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           }
                           await Hive.box(AppBoxes.appState)
                               .put(BoxKeys.authenticated, true);
-                          await navigatorKey.currentState!.push(
+                          await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (context) => const MainScreen()));
+                                  builder: (context) =>
+                                      const MainScreenWrapperScreen()), (r) {
+                            return false;
+                          });
                         } else {
                           await navigatorKey.currentState!.push(
                               MaterialPageRoute(
@@ -416,11 +421,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   //     await deviceRef.update(info);
                   //   }
                   // }
-                  // await Hive.box(AppBoxes.appState)
-                  //     .put(BoxKeys.authenticated, true);
-                  //       navigatorKey.currentState!.push(MaterialPageRoute(
-                  //         builder: (context) => const MainScreen(),
-                  //       ));
+                  // await navigatorKey.currentState!.pushAndRemoveUntil(
+                  //             MaterialPageRoute(
+                  //                 builder: (context) =>
+                  //                     const MainScreenWrapperScreen()), (r) {
+                  //           return false;
+                  //         });
                   //     } else {
                   //       navigatorKey.currentState!.push(MaterialPageRoute(
                   //         builder: (context) => const EmailAddressScreen(),
@@ -541,10 +547,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                                     .put(BoxKeys.authenticated,
                                                         true);
                                                 await navigatorKey.currentState!
-                                                    .push(MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const MainScreen(),
-                                                ));
+                                                    .pushAndRemoveUntil(
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const MainScreenWrapperScreen()),
+                                                        (r) {
+                                                  return false;
+                                                });
                                               },
                                               // autoRetrievedSmsCodeForTesting: '',
                                               verificationFailed:

@@ -17,7 +17,7 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/name_screen.
 import '../../../../main.dart';
 import '../../../core/app_colors.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../main_screen/screens/main_screen.dart';
+import '../../main_screen/screens/main_screen_wrapper_screen.dart';
 
 class VerifyPhoneNumberScreen extends ConsumerStatefulWidget {
   final String verificationId;
@@ -162,10 +162,12 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                           }
                           await Hive.box(AppBoxes.appState)
                               .put(BoxKeys.authenticated, true);
-                          await navigatorKey.currentState!
-                              .push(MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
-                          ));
+                          await navigatorKey.currentState!.pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const MainScreenWrapperScreen()), (r) {
+                            return false;
+                          });
                         } else {
                           await navigatorKey.currentState!.pushReplacement(
                               MaterialPageRoute(
@@ -194,9 +196,13 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                               await Hive.box(AppBoxes.appState)
                                   .put(BoxKeys.authenticated, true);
                               await navigatorKey.currentState!
-                                  .push(MaterialPageRoute(
-                                builder: (context) => const MainScreen(),
-                              ));
+                                  .pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const MainScreenWrapperScreen()),
+                                      (r) {
+                                return false;
+                              });
                             },
                             // autoRetrievedSmsCodeForTesting: '',
                             verificationFailed: (FirebaseAuthException e) {

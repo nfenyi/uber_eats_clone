@@ -381,12 +381,12 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                 var groupOrder = GroupOrder(
                     createdAt: DateTime.now(),
                     //TODO: may have to add applied promos and chosen payment method here
-                    orderSchedules: _frequency == null
+                    orderScheduleRefs: _frequency == null
                         ? []
                         : [
                             OrderSchedule(
                               deliveryDate: _firstOrderSchedule!,
-                              storeId: widget.store.id,
+                              storeRef: widget.store.id,
                               orderNumber: '1',
                             )
                           ],
@@ -394,7 +394,7 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                     endDate: _endDate,
                     firstOrderSchedule: _firstOrderSchedule,
                     frequency: _frequency,
-                    location: _userPlaceDescription,
+                    placeDescription: _userPlaceDescription,
                     name: _groupOrderName,
                     orderByDeadline:
                         _orderByDeadline == null && _firstOrderSchedule != null
@@ -403,7 +403,7 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                     orderPlacementSetting: _orderPlacementSetting,
                     ownerId: userId,
                     spendingLimit: double.tryParse(_spendingLimit),
-                    storeIds: [widget.store.id],
+                    storeRef: widget.store.id,
                     persons: [],
                     whoPays: _whoPays);
                 await FirebaseFirestore.instance

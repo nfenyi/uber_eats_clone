@@ -34,7 +34,6 @@ class _RedeemGiftCardScreenState extends State<RedeemGiftCardScreen> {
   DocumentReference<Map<String, Object?>>? _searchedGiftCardRef;
 
   GiftCard? _searchedGiftCard;
-  final _webViewcontroller = WebViewControllerPlus();
 
   @override
   void initState() {
@@ -107,107 +106,8 @@ class _RedeemGiftCardScreenState extends State<RedeemGiftCardScreen> {
               if (_searchedGiftCard != null)
                 Padding(
                   padding: const EdgeInsets.all(AppSizes.horizontalPadding),
-                  child: Container(
-                    padding: const EdgeInsets.all(15.0),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppColors.neutral300,
-                        ),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: AppFunctions.displayNetworkImage(
-                                _searchedGiftCard!.imageUrl,
-                                placeholderAssetImage:
-                                    AssetNames.giftCardPlaceholder,
-                                width: double.infinity,
-                                height: 200,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              height: 200,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(
-                                      color: Colors.grey.withAlpha(180))),
-                            ),
-                          ],
-                        ),
-                        const Gap(20),
-                        AppText(
-                          text: '\$${_searchedGiftCard!.giftAmount} USD',
-                          weight: FontWeight.w600,
-                          size: AppSizes.heading4,
-                        ),
-                        const Gap(30),
-                        AppText(
-                            weight: FontWeight.w600,
-                            size: AppSizes.heading6,
-                            text:
-                                "${_searchedGiftCard!.receiverName}, here's an Uber gift from ${_searchedGiftCard!.senderName}!"),
-                        const Gap(10),
-                        if (_searchedGiftCard!.optionalVideoUrl != null)
-                          InkWell(
-                            onTap: () async {
-                              if (context.mounted) {
-                                await navigatorKey.currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      RecordedMessagePlayerScreen(
-                                    videoUrl:
-                                        _searchedGiftCard!.optionalVideoUrl!,
-                                  ),
-                                ));
-                              }
-                            },
-                            child: Ink(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 20),
-                              decoration: BoxDecoration(
-                                color: AppColors.neutral100,
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.videocam_sharp),
-                                  const Gap(10),
-                                  AppText(
-                                      text:
-                                          'You got a video from ${_searchedGiftCard!.senderName}!')
-                                ],
-                              ),
-                            ),
-                          ),
-                        if (_searchedGiftCard!.optionalMessage != null)
-                          AppText(
-                            text: _searchedGiftCard!.optionalMessage!,
-                          ),
-                        const Gap(15),
-                        GestureDetector(
-                          onTap: () {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => WebViewScreen(
-                                controller: _webViewcontroller,
-                                link: Weblinks.uberGiftCardTerms,
-                              ),
-                            ));
-                          },
-                          child: const AppText(
-                            text: 'Terms apply',
-                            decoration: TextDecoration.underline,
-                            color: AppColors.neutral500,
-                          ),
-                        ),
-                        const Gap(10)
-                      ],
-                    ),
+                  child: GiftCardWidget(
+                    searchedGiftCard: _searchedGiftCard,
                   ),
                 ),
             ],
@@ -277,6 +177,117 @@ class _RedeemGiftCardScreenState extends State<RedeemGiftCardScreen> {
           ),
         )
       ],
+    );
+  }
+}
+
+class GiftCardWidget extends StatelessWidget {
+  const GiftCardWidget({
+    super.key,
+    required GiftCard? searchedGiftCard,
+  }) : _searchedGiftCard = searchedGiftCard;
+
+  final GiftCard? _searchedGiftCard;
+
+  @override
+  Widget build(BuildContext context) {
+    final webViewcontroller = WebViewControllerPlus();
+    return Container(
+      padding: const EdgeInsets.all(15.0),
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColors.neutral300,
+          ),
+          borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: AppFunctions.displayNetworkImage(
+                  _searchedGiftCard!.imageUrl,
+                  placeholderAssetImage: AssetNames.giftCardPlaceholder,
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                height: 200,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.grey.withAlpha(180))),
+              ),
+            ],
+          ),
+          const Gap(20),
+          AppText(
+            text: '\$${_searchedGiftCard!.giftAmount} USD',
+            weight: FontWeight.w600,
+            size: AppSizes.heading4,
+          ),
+          const Gap(30),
+          AppText(
+              weight: FontWeight.w600,
+              size: AppSizes.heading6,
+              text:
+                  "${_searchedGiftCard!.receiverName}, here's an Uber gift from ${_searchedGiftCard!.senderName}!"),
+          const Gap(10),
+          if (_searchedGiftCard!.optionalVideoUrl != null)
+            InkWell(
+              onTap: () async {
+                if (context.mounted) {
+                  await navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) => RecordedMessagePlayerScreen(
+                      videoUrl: _searchedGiftCard!.optionalVideoUrl!,
+                    ),
+                  ));
+                }
+              },
+              child: Ink(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                decoration: BoxDecoration(
+                  color: AppColors.neutral100,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.videocam_sharp),
+                    const Gap(10),
+                    AppText(
+                        text:
+                            'You got a video from ${_searchedGiftCard!.senderName}!')
+                  ],
+                ),
+              ),
+            ),
+          if (_searchedGiftCard!.optionalMessage != null)
+            AppText(
+              text: _searchedGiftCard!.optionalMessage!,
+            ),
+          const Gap(15),
+          GestureDetector(
+            onTap: () {
+              navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => WebViewScreen(
+                  controller: webViewcontroller,
+                  link: Weblinks.uberGiftCardTerms,
+                ),
+              ));
+            },
+            child: const AppText(
+              text: 'Terms apply',
+              decoration: TextDecoration.underline,
+              color: AppColors.neutral500,
+            ),
+          ),
+          const Gap(10)
+        ],
+      ),
     );
   }
 }

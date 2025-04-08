@@ -26,6 +26,7 @@ import 'package:uber_eats_clone/state/user_location_providers.dart';
 
 import '../../../main.dart';
 import '../../../models/favourite/favourite_model.dart';
+import '../../../models/group_order/group_order_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
@@ -1289,7 +1290,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                           ),
                                         AppText(
                                             text:
-                                                ' • ${_distance.as(LengthUnit.Kilometer, LatLng(_storeLatLng.latitude, _storeLatLng.longitude), LatLng(_selectedGeoPoint!.latitude, _selectedGeoPoint!.longitude))} km '),
+                                                ' • ${_distance.as(LengthUnit.Kilometer, LatLng(_storeLatLng.latitude, _storeLatLng.longitude), LatLng(_selectedGeoPoint.latitude, _selectedGeoPoint.longitude))} km '),
                                         const Icon(Icons.keyboard_arrow_right)
                                       ],
                                     ),
@@ -1326,38 +1327,60 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                       },
                                     ),
                                     InkWell(
-                                      onTap: () {
+                                      onTap: () async {
                                         // var userInfo =
                                         //     Hive.box(AppBoxes.appState)
                                         //         .get(BoxKeys.userInfo);
                                         // userInfo['groupOrders'] = <String>[];
                                         // Hive.box(AppBoxes.appState)
                                         //     .put(BoxKeys.userInfo, userInfo);
+                                        List<String> groupOrderIds =
+                                            Hive.box(AppBoxes.appState)
+                                                    .get(BoxKeys.userInfo)[
+                                                'groupOrders'];
+                                        var matchingGroupOrderIds =
+                                            groupOrderIds.where(
+                                          (element) =>
+                                              element.contains(_store.id),
+                                        );
 
-                                        navigatorKey.currentState!
-                                            .push(MaterialPageRoute(
-                                          builder: (context) => ShowCaseWidget(
-                                              builder: (context) {
-                                            List<String> groupOrders =
-                                                Hive.box(AppBoxes.appState)
-                                                        .get(BoxKeys.userInfo)[
-                                                    'groupOrders'];
-                                            var storeGroupOrders =
-                                                groupOrders.where(
-                                              (element) =>
-                                                  element.contains(_store.id),
-                                            );
-                                            if (storeGroupOrders.isEmpty) {
-                                              return GroupOrderSettingsScreen(
-                                                  store: _store);
-                                            } else {
-                                              return GroupOrderScreen(
-                                                  store: _store,
-                                                  groupOrderPaths:
-                                                      storeGroupOrders);
-                                            }
-                                          }),
-                                        ));
+                                        GroupOrder? orderCreatedByUser;
+                                        for (var matchingOrder
+                                            in matchingGroupOrderIds) {
+                                          final ref = FirebaseFirestore.instance
+                                              .collection(FirestoreCollections
+                                                  .groupOrders)
+                                              .doc(matchingOrder);
+                                          final groupOrder = await AppFunctions
+                                              .loadGroupOrderReference(ref);
+                                          if (groupOrder.ownerId ==
+                                              FirebaseAuth
+                                                  .instance.currentUser!.uid) {
+                                            orderCreatedByUser = groupOrder;
+                                            break;
+                                          }
+                                        }
+                                        if (orderCreatedByUser == null) {
+                                          await navigatorKey.currentState!.push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ShowCaseWidget(
+                                                          builder: (context) =>
+                                                              GroupOrderSettingsScreen(
+                                                                  store:
+                                                                      _store))));
+                                        } else {
+                                          await navigatorKey.currentState!.push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ShowCaseWidget(
+                                                          builder: (context) {
+                                                        return GroupOrderScreen(
+                                                            store: _store,
+                                                            groupOrder:
+                                                                orderCreatedByUser!);
+                                                      })));
+                                        }
                                       },
                                       child: Ink(
                                         child: Container(

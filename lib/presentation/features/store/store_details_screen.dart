@@ -1,16 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
-import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/uber_one/join_uber_one_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
@@ -124,7 +119,7 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
                     AppText(
                         color: AppColors.neutral600,
                         text: " • ${widget.store.type}"),
-                    if (widget.store.isGroupFriendly)
+                    if (widget.store.groupSize != null)
                       const AppText(
                           color: AppColors.neutral600,
                           text: ' • Group Friendly'),

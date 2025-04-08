@@ -19,7 +19,7 @@ _$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
           ?.map((e) => Product.fromJson(e as Map<String, dynamic>))
           .toList(),
       priceCategory: json['priceCategory'] as String,
-      isGroupFriendly: json['isGroupFriendly'] as bool,
+      groupSize: (json['groupSize'] as num?)?.toInt(),
       type: json['type'] as String,
       offers: (json['offers'] as List<dynamic>?)
           ?.map((e) => Offer.fromJson(e as Map<String, dynamic>))
@@ -36,6 +36,7 @@ _$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
       delivery: Delivery.fromJson(json['delivery'] as Map<String, dynamic>),
       rating: Rating.fromJson(json['rating'] as Map<String, dynamic>),
       cardImage: json['cardImage'] as String,
+      bestOverall: json['bestOverall'] as bool? ?? false,
       visits: (json['visits'] as num?)?.toInt() ?? 0,
       openingTime: DateTime.parse(json['openingTime'] as String),
       closingTime: DateTime.parse(json['closingTime'] as String),
@@ -51,7 +52,7 @@ Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
       'dietary': instance.dietary,
       'featuredItems': instance.featuredItems?.map((e) => e.toJson()).toList(),
       'priceCategory': instance.priceCategory,
-      'isGroupFriendly': instance.isGroupFriendly,
+      'groupSize': instance.groupSize,
       'type': instance.type,
       'offers': instance.offers?.map((e) => e.toJson()).toList(),
       'aisles': instance.aisles?.map((e) => e.toJson()).toList(),
@@ -63,6 +64,7 @@ Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
       'delivery': instance.delivery.toJson(),
       'rating': instance.rating.toJson(),
       'cardImage': instance.cardImage,
+      'bestOverall': instance.bestOverall,
       'visits': instance.visits,
       'openingTime': instance.openingTime.toIso8601String(),
       'closingTime': instance.closingTime.toIso8601String(),
