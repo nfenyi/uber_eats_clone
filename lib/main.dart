@@ -11,9 +11,11 @@ import 'package:logger/logger.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/firebase_options.dart';
 import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
+import 'package:uber_eats_clone/hive_adapters/hive_credit_card/hive_credit_card_model.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen_wrapper_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
+import 'hive_adapters/cart_item/cart_item_model.dart';
 import 'hive_adapters/country/country_ip_model.dart';
 import 'presentation/constants/app_sizes.dart';
 import 'presentation/features/sign_in/views/get_started/get_started_screen.dart';
@@ -123,18 +125,18 @@ void main() async {
 Future<void> registerHiveAdpapters() async {
   Hive.registerAdapter(CountryResponseAdapter());
   Hive.registerAdapter(HiveGeoPointAdapter());
-  // Hive.registerAdapter(BudgetAdapter());
-  // Hive.registerAdapter(TransactionAdapter());
-  // Hive.registerAdapter(TransactionCategoryAdapter());
-  // Hive.registerAdapter(GoalAdapter());
+  Hive.registerAdapter(CartItemAdapter());
+  Hive.registerAdapter(HiveOptionAdapter());
+  Hive.registerAdapter(CartProductAdapter());
+  Hive.registerAdapter(HiveCreditCardAdapter());
   // Hive.registerAdapter(NotificationAdapter());
 }
 
 Future<void> openBoxes() async {
   await Hive.openBox(AppBoxes.appState);
   await Hive.openBox<String>(AppBoxes.recentSearches);
-  await Hive.openBox(AppBoxes.cart);
-  // await Hive.openBox<AccountTransaction>(AppBoxes.transactions);
+  await Hive.openBox<HiveCartItem>(AppBoxes.carts);
+  await Hive.openBox<HiveCartProduct>(AppBoxes.storedProducts);
   // await Hive.openBox<TransactionCategory>(AppBoxes.transactionsCategories);
   // await Hive.openBox<Goal>(AppBoxes.goals);
 }
@@ -297,7 +299,9 @@ class Wrapper extends ConsumerWidget {
 
           if (Hive.box(AppBoxes.appState).get(BoxKeys.addressDetailsSaved) ==
               true) {
-            return const PaymentMethodScreen();
+            return const PaymentMethodScreen(
+              isOnboarding: true,
+            );
           }
 
           bool authenticated =
@@ -315,7 +319,9 @@ class Wrapper extends ConsumerWidget {
 class AppBoxes {
   static const String appState = 'app_state';
   static const String recentSearches = 'recent_searches';
-  static const String cart = 'cart';
+  static const String carts = 'cart';
+
+  static const String storedProducts = 'stored_products';
   // static const String groupOrder = 'group_orders';
 
   const AppBoxes._();
@@ -335,6 +341,7 @@ class BoxKeys {
   static const String recentlyViewed = 'recentlyViewed';
   static const String firstTimeSendingGift = 'firstTimeSendingGift';
   static const String isOnboardedToUberGifts = 'isOnboardedToUberGifts';
+  static const String creditCardInUse = 'creditCardInUse';
 
   static const String newGiftCardId = 'newGiftCardId';
 

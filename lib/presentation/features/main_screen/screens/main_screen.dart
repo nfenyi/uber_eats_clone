@@ -23,6 +23,7 @@ import 'package:uber_eats_clone/presentation/features/grocery/screens/grocery_sc
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 import 'package:uber_eats_clone/state/shops_state_stream_provider.dart';
 
+import '../../../../hive_adapters/cart_item/cart_item_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
 import '../../../services/sign_in_view_model.dart';
@@ -198,16 +199,34 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
               label: 'Explore',
             ),
-            const BottomNavigationBarItem(
-              activeIcon: Badge(
-                  label: AppText(text: '4'),
-                  child: Iconify(MaterialSymbols.shopping_cart_rounded)),
-              icon: Badge(
-                  label: AppText(text: '4'),
-                  child: Iconify(
-                    MaterialSymbols.shopping_cart_outline_rounded,
-                    color: AppColors.neutral500,
-                  )),
+            BottomNavigationBarItem(
+              activeIcon: ValueListenableBuilder(
+                  valueListenable:
+                      Hive.box<HiveCartItem>(AppBoxes.carts).listenable(),
+                  builder: (context, value, child) {
+                    return value.length == 0
+                        ? const Iconify(MaterialSymbols.shopping_cart_rounded)
+                        : Badge(
+                            label: AppText(text: value.length.toString()),
+                            child: const Iconify(
+                              MaterialSymbols.shopping_cart_rounded,
+                              color: AppColors.neutral500,
+                            ));
+                  }),
+              icon: ValueListenableBuilder(
+                  valueListenable:
+                      Hive.box<HiveCartItem>(AppBoxes.carts).listenable(),
+                  builder: (context, value, child) {
+                    return value.length == 0
+                        ? const Iconify(
+                            MaterialSymbols.shopping_cart_outline_rounded)
+                        : Badge(
+                            label: AppText(text: value.length.toString()),
+                            child: const Iconify(
+                              MaterialSymbols.shopping_cart_outline_rounded,
+                              color: AppColors.neutral500,
+                            ));
+                  }),
               label: 'Carts',
               // 'Budgets',
             ),
@@ -287,7 +306,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Future<void> _getAccountStatus() async {
     Map<dynamic, dynamic>? userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    userInfo ??= await AppFunctions.getUserInfo();
+    userInfo ??= await AppFunctions.getOnlineUserInfo();
 
     _hasUberOne = userInfo['hasUberOne'];
     _accountType = userInfo['type'];

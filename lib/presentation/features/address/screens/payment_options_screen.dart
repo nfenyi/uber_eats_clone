@@ -1,27 +1,23 @@
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
-import 'package:credit_card_type_detector/models.dart';
 import 'package:credit_card_validator/credit_card_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:iconify_flutter/icons/cib.dart';
-import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
-import 'package:uber_eats_clone/models/payment_method_model.dart';
 // import 'package:uber_eats_clone/models/payment_method_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
+import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
-import 'package:colorful_iconify_flutter/icons/logos.dart';
 
-import '../../sign_in/views/add_a_credit_card/add_a_credit_card.dart';
+import '../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
 
 class PaymentOptionsScreen extends ConsumerStatefulWidget {
   final bool showOnlyPaymentMethods;
@@ -168,11 +164,21 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
                               final creditCard = snapshot.data![index];
+
                               final types = detectCCType(creditCard.cardNumber);
 
                               return ListTile(
-                                onTap: () {
-                                  navigatorKey.currentState!.pop(creditCard);
+                                onTap: () async {
+                                  ref
+                                      .read(paymentOptionProvider.notifier)
+                                      .state = creditCard;
+                                  // await Hive.box(AppBoxes.appState).put(
+                                  //     BoxKeys.creditCardInUse,
+                                  //     HiveCreditCard(
+                                  //         obscuredNumber:
+                                  //             '••••${creditCard.cardNumber.substring(6)}',
+                                  //         cardType: types.first.type));
+                                  navigatorKey.currentState!.pop();
                                 },
                                 contentPadding: EdgeInsets.zero,
                                 leading: CreditCardLogo(types: types),
@@ -191,10 +197,13 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
                       }),
                   const Gap(10),
                   GestureDetector(
-                    onTap: () =>
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => const PaymentMethodScreen(),
-                    )),
+                    onTap: () async => await navigatorKey.currentState!
+                        .push(MaterialPageRoute(
+                          builder: (context) => const PaymentMethodScreen(),
+                        ))
+                        .then(
+                          (value) => setState(() {}),
+                        ),
                     child: const AppText(
                       text: 'Add payment method',
                       color: Colors.green,

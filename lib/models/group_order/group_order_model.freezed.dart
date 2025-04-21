@@ -20,7 +20,7 @@ GroupOrder _$GroupOrderFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$GroupOrder {
-  String? get id => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   DateTime? get firstOrderSchedule => throw _privateConstructorUsedError;
@@ -53,7 +53,7 @@ abstract class $GroupOrderCopyWith<$Res> {
       _$GroupOrderCopyWithImpl<$Res, GroupOrder>;
   @useResult
   $Res call(
-      {String? id,
+      {String id,
       DateTime? createdAt,
       String name,
       DateTime? firstOrderSchedule,
@@ -85,7 +85,7 @@ class _$GroupOrderCopyWithImpl<$Res, $Val extends GroupOrder>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
+    Object? id = null,
     Object? createdAt = freezed,
     Object? name = null,
     Object? firstOrderSchedule = freezed,
@@ -102,10 +102,10 @@ class _$GroupOrderCopyWithImpl<$Res, $Val extends GroupOrder>
     Object? orderScheduleRefs = null,
   }) {
     return _then(_value.copyWith(
-      id: freezed == id
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -172,7 +172,7 @@ abstract class _$$GroupOrderImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String? id,
+      {String id,
       DateTime? createdAt,
       String name,
       DateTime? firstOrderSchedule,
@@ -202,7 +202,7 @@ class __$$GroupOrderImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
+    Object? id = null,
     Object? createdAt = freezed,
     Object? name = null,
     Object? firstOrderSchedule = freezed,
@@ -219,10 +219,10 @@ class __$$GroupOrderImplCopyWithImpl<$Res>
     Object? orderScheduleRefs = null,
   }) {
     return _then(_$GroupOrderImpl(
-      id: freezed == id
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -306,7 +306,7 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
       _$$GroupOrderImplFromJson(json);
 
   @override
-  final String? id;
+  final String id;
   @override
   final DateTime? createdAt;
   @override
@@ -445,7 +445,7 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
 
 abstract class _GroupOrder implements GroupOrder {
   factory _GroupOrder(
-      {required final String? id,
+      {required final String id,
       required final DateTime? createdAt,
       required final String name,
       final DateTime? firstOrderSchedule,
@@ -465,7 +465,7 @@ abstract class _GroupOrder implements GroupOrder {
       _$GroupOrderImpl.fromJson;
 
   @override
-  String? get id;
+  String get id;
   @override
   DateTime? get createdAt;
   @override

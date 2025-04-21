@@ -30,7 +30,8 @@ import 'add_a_card_camera_view.dart';
 import 'select_a_country_screen.dart';
 
 class AddCardScreen extends ConsumerStatefulWidget {
-  const AddCardScreen({super.key});
+  final bool isOnboarding;
+  const AddCardScreen({super.key, this.isOnboarding = false});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -60,6 +61,8 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
   bool _isLoading = false;
 
   final _cardNumberNotifier = ValueNotifier<String>('');
+
+  List<CreditCardType> _types = [];
 
   @override
   void initState() {
@@ -126,8 +129,16 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                           prefixIcon: ValueListenableBuilder(
                             valueListenable: _cardNumberNotifier,
                             builder: (context, value, child) {
-                              final types = detectCCType(value);
-                              return CreditCardLogo(types: types);
+                              if (value.isEmpty) {
+                                return Image.asset(
+                                  AssetNames.creditCard,
+                                  width: 30,
+                                  height: 20,
+                                  fit: BoxFit.fitWidth,
+                                );
+                              }
+                              _types = detectCCType(value);
+                              return CreditCardLogo(types: _types);
                             },
                           ),
                           suffixIcon: GestureDetector(
@@ -539,7 +550,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
             padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
             child: AppButton(
               isLoading: _isLoading,
-              text: 'Next',
+              text: widget.isOnboarding ? 'Next' : 'Save',
               callback: () async {
                 if (_formKey.currentState!.validate() &&
                     _countryController.text.isNotEmpty) {
@@ -551,32 +562,31 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                       zipCode: _zipCodeController.text,
                       nickName: _nickyController.text.trim());
 
-                  try {
-                    // await FirebaseFirestore.instance
-                    //     .collection(FirestoreCollections.users)
-                    //     .doc(FirebaseAuth.instance.currentUser!.uid)
-                    //     .set({
-                    //   'credit cards': [creditCardDetails.toJson()]
-                    // }, SetOptions(merge: true));
+                  // try {
+                  // await FirebaseFirestore.instance
+                  //     .collection(FirestoreCollections.users)
+                  //     .doc(FirebaseAuth.instance.currentUser!.uid)
+                  //     .set({
+                  //   'credit cards': [creditCardDetails.toJson()]
+                  // }, SetOptions(merge: true));
 //TODO: to test:
-                    await AppFunctions.addCreditCard(creditCardDetails);
-
+                  await AppFunctions.addCreditCard(creditCardDetails);
+                  if (widget.isOnboarding) {
                     await navigatorKey.currentState!.push(MaterialPageRoute(
                       builder: (context) => const UberOneScreen(),
                     ));
-                  } on FirebaseException catch (e) {
-                    await showAppInfoDialog(navigatorKey.currentContext!,
-                        description: e.code);
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  } catch (e) {
-                    await showAppInfoDialog(navigatorKey.currentContext!,
-                        description: e.toString());
-                    setState(() {
-                      _isLoading = false;
-                    });
+                  } else {
+                    navigatorKey.currentState!.pop();
+                    navigatorKey.currentState!.pop();
                   }
+
+                  // } catch (e) {
+                  //   await showAppInfoDialog(navigatorKey.currentContext!,
+                  //       description: e.toString());
+                  //   setState(() {
+                  //     _isLoading = false;
+                  //   });
+                  // }
                 }
               },
             ),
@@ -605,6 +615,7 @@ class CreditCardLogo extends StatelessWidget {
         fit: BoxFit.fitWidth,
       );
     } else {
+      // logger.d(types.first.type);
       return Iconify(
         types.first == CreditCardType.visa()
             ? Logos.visa
@@ -613,7 +624,7 @@ class CreditCardLogo extends StatelessWidget {
                 : types.first == CreditCardType.discover()
                     ? Logos.discover
                     : Logos.mastercard,
-        size: 30,
+        size: 12,
       );
     }
   }

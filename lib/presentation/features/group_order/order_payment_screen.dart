@@ -59,12 +59,11 @@ class _GroupOrderPaymentScreenState
               children: [
                 const AppText(
                   text: 'Choose who pays',
-                  size: AppSizes.heading5,
+                  size: AppSizes.heading6,
                   weight: FontWeight.w600,
                 ),
                 const Gap(10),
                 const AppText(
-                    size: AppSizes.bodySmall,
                     text:
                         'Pay for the whole order or let each person pay for themselves. Payment methods are charged when the order is placed.'),
                 const Gap(20),

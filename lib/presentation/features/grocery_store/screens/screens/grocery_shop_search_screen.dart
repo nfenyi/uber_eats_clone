@@ -515,7 +515,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                         ),
                         const Gap(15),
                         SizedBox(
-                          height: 150,
+                          height: 250,
                           child: ListView.separated(
                             itemBuilder: (context, index) {
                               final reference = mayAlsoLikeCategory
@@ -559,120 +559,8 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                                       );
                                     }
                                     final product = snapshot.data!;
-                                    return InkWell(
-                                      onTap: () => navigatorKey.currentState!
-                                          .push(MaterialPageRoute(
-                                        builder: (context) => ProductScreen(
-                                            product: product,
-                                            store: widget.store),
-                                      )),
-                                      child: Ink(
-                                        child: SizedBox(
-                                          width: 100,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Stack(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                children: [
-                                                  ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      child: AppFunctions
-                                                          .displayNetworkImage(
-                                                              product.imageUrls
-                                                                  .first,
-                                                              fit: BoxFit.cover,
-                                                              width: double
-                                                                  .infinity,
-                                                              height: 70)),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 5.0,
-                                                            top: .0),
-                                                    child: InkWell(
-                                                      onTap: () {},
-                                                      child: Ink(
-                                                        child: Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(5),
-                                                          decoration: BoxDecoration(
-                                                              boxShadow: const [
-                                                                BoxShadow(
-                                                                  color: Colors
-                                                                      .black12,
-                                                                  offset:
-                                                                      Offset(
-                                                                          2, 2),
-                                                                )
-                                                              ],
-                                                              color:
-                                                                  Colors.white,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          50)),
-                                                          child: const Icon(
-                                                            Icons.add,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              const Gap(5),
-                                              Row(
-                                                children: [
-                                                  Visibility(
-                                                    visible:
-                                                        product.promoPrice !=
-                                                            null,
-                                                    child: AppText(
-                                                        text:
-                                                            '\$${product.promoPrice} ',
-                                                        color: Colors.green),
-                                                  ),
-                                                  AppText(
-                                                    text:
-                                                        '\$${product.initialPrice}',
-                                                    decoration: product
-                                                                .promoPrice !=
-                                                            null
-                                                        ? TextDecoration
-                                                            .lineThrough
-                                                        : TextDecoration.none,
-                                                  ),
-                                                  //  TODO: To uncomment: quantity is not yet mandatory, its nullable
-                                                  // AppText(text: '• ${product.quantity}',color: AppColors.neutral500)
-                                                ],
-                                              ),
-                                              AppText(
-                                                text: product.name,
-                                                maxLines: 3,
-                                                overflow: TextOverflow.ellipsis,
-                                                color: AppColors.neutral500,
-                                              ),
-                                              if (product.promoPrice != null)
-                                                Container(
-                                                    color: Colors.green,
-                                                    child: AppText(
-                                                        text:
-                                                            '${(((product.initialPrice - product.promoPrice!) / product.initialPrice) * 100).toStringAsFixed(0)}% off')),
-                                              if (product.isSponsored ?? false)
-                                                const AppText(
-                                                    text: 'Sponsored',
-                                                    color: AppColors.neutral500)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
+                                    return ProductGridTilePriceFirst(
+                                        product: product, store: widget.store);
                                   });
                             },
                             itemCount: mayAlsoLikeCategory
@@ -855,33 +743,8 @@ class GrocerySearchProductGridTile extends StatelessWidget {
             // )
             ,
             Padding(
-              padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-              child: InkWell(
-                onTap: () {
-                  navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) =>
-                        ProductScreen(product: product, store: store),
-                  ));
-                },
-                child: Ink(
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            offset: Offset(2, 2),
-                          )
-                        ],
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(50)),
-                    child: const Icon(
-                      Icons.add,
-                    ),
-                  ),
-                ),
-              ),
-            )
+                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                child: AddToCartButton(product: product, store: store))
           ],
         ),
         const Gap(5),

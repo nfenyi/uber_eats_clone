@@ -151,7 +151,7 @@ class _BackUpOptionScreenState extends State<BackUpOptionScreen> {
 
                             return InkWell(
                               onTap: () {
-                                navigatorKey.currentState!.pop();
+                                navigatorKey.currentState!.pop(product.id);
                               },
                               child: Ink(
                                 child: SizedBox(

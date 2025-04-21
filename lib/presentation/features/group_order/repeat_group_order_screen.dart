@@ -95,19 +95,16 @@ class _RepeatGroupOrderScreenState
               children: [
                 const AppText(
                   text: 'Repeat group order',
-                  size: AppSizes.heading5,
+                  size: AppSizes.heading6,
                   weight: FontWeight.w600,
                 ),
                 const Gap(10),
                 const AppText(
-                    size: AppSizes.bodySmall,
-                    color: AppColors.neutral500,
                     text:
                         'Select how often you want to place this group order. Everyone gets to choose their own items each time.'),
                 const Gap(20),
                 const AppText(
                   text: 'First order scheduled for',
-                  size: AppSizes.bodySmall,
                 ),
                 const Gap(10),
                 AppTextFormField(
@@ -163,7 +160,6 @@ class _RepeatGroupOrderScreenState
                 const Gap(20),
                 const AppText(
                   text: 'Frequency',
-                  size: AppSizes.bodySmall,
                 ),
                 const Gap(10),
                 AppTextFormField(
@@ -270,6 +266,7 @@ class _RepeatGroupOrderScreenState
                       Form(
                         key: _formKey,
                         child: AppTextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: FormBuilderValidators.required(
                               errorText:
                                   'Provide an end date or turn off end date'),
@@ -324,6 +321,8 @@ class _RepeatGroupOrderScreenState
                 const Gap(10),
                 (_selectedFrequency == null)
                     ? const AppText(
+                        size: AppSizes.bodySmallest,
+                        color: AppColors.neutral500,
                         text:
                             "Once you set up recurring orders at the frequency of your choice with the 'Pay for everybody' option, you'll be charged at your scheduled delivery times for any items placed in the cart for each order, including items added by your guests, so the charge each time will likely vary. You may cancel at any time until the store starts preparing your order.")
                     : AppButton(

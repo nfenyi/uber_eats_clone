@@ -132,8 +132,8 @@ class Product with _$Product {
     String? directions,
     String? quantity,
     String? description,
-    List<Option>? options,
-    @Default(false) bool selectOptionRequired,
+    @Default([]) List<Option> optionalOptions,
+    @Default([]) List<Option> requiredOptions,
     double? calories,
     bool? isSoldOut,
     bool? isSponsored,
@@ -150,12 +150,9 @@ class Product with _$Product {
 class Option with _$Option {
   factory Option({
     required String name,
-    double? price,
-    @Default(true) bool isExclusive,
-    List<SubOption>? subOptions,
-    double? calories,
-    @Default(false) bool canBeMultiple,
     int? canBeMultipleLimit,
+    @Default(true) bool isExclusive,
+    @Default([]) List<SubOption> subOptions,
   }) = _Option;
 
   factory Option.fromJson(Map<String, Object?> json) => _$OptionFromJson(json);
@@ -166,9 +163,10 @@ class SubOption with _$SubOption {
   factory SubOption({
     required String name,
     required bool canBeMultiple,
+    @Default(true) bool isExclusive,
     double? calories,
     double? price,
-    int? canBeMultipleLimit,
+    @Default([]) List<Option> options,
   }) = _SubOption;
 
   factory SubOption.fromJson(Map<String, Object?> json) =>

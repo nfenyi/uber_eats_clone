@@ -9,6 +9,7 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../app_functions.dart';
 import '../../../main.dart';
+import '../../core/app_colors.dart';
 
 class OrderDeadlineScreen extends ConsumerStatefulWidget {
   final DateTime? setDeadline;
@@ -29,7 +30,7 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
   final _controller = TextEditingController();
   DateTime? _setDeadline;
 
-  late String _orderPlacementSetting;
+  String _orderPlacementSetting = 'Remind me to place the order';
 
   @override
   void initState() {
@@ -74,6 +75,7 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
                 const Gap(20),
                 AppTextFormField(
                   readOnly: true,
+                  enabled: widget.firstOrderSchedule == null,
                   controller: _controller,
                   onTap: widget.firstOrderSchedule == null
                       ? () => BottomPicker.dateTime(
@@ -111,20 +113,23 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
                             ),
                           ).show(context)
                       : null,
-                  suffixIcon: const Icon(
+                  suffixIcon: Icon(
                     Icons.keyboard_arrow_down,
-                    color: Colors.black,
+                    color: widget.firstOrderSchedule == null
+                        ? Colors.black
+                        : AppColors.neutral500,
                   ),
                 ),
                 const Gap(20),
-                if (_controller.text != 'No deadline')
+                if (_controller.text != 'No deadline' &&
+                    widget.firstOrderSchedule == null)
                   Column(
                     children: [
                       RadioListTile(
                         title: const AppText(
                           text: 'Remind me to place the order',
                           weight: FontWeight.bold,
-                          size: AppSizes.body,
+                          size: AppSizes.bodySmall,
                         ),
                         onChanged: (value) {
                           if (value != null) {
@@ -135,6 +140,7 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
                         },
                         contentPadding: EdgeInsets.zero,
                         subtitle: const AppText(
+                            size: AppSizes.bodySmaller,
                             text: "We'll remind you to place the order"),
                         groupValue: _orderPlacementSetting,
                         value: 'Remind me to place the order',
@@ -145,7 +151,7 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
                         title: const AppText(
                           text: 'Automatically place the order',
                           weight: FontWeight.bold,
-                          size: AppSizes.body,
+                          size: AppSizes.bodySmall,
                         ),
                         onChanged: (value) {
                           if (value != null) {
@@ -157,6 +163,7 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
                         groupValue: _orderPlacementSetting,
                         contentPadding: EdgeInsets.zero,
                         subtitle: const AppText(
+                            size: AppSizes.bodySmallest,
                             text:
                                 "Add your items and check out. We'll place the order at the deadline."),
                         value: 'Automatically place the order',
@@ -167,7 +174,6 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
                         Center(
                             child: AppTextButton(
                           text: 'Remove Deadline',
-                          size: AppSizes.bodySmall,
                           color: Colors.grey.shade600,
                           callback: () {
                             setState(() {
@@ -186,7 +192,7 @@ class _OrderDeadlineScreenState extends ConsumerState<OrderDeadlineScreen> {
                 AppButton(
                   text: 'Save',
                   callback:
-                      widget.firstOrderSchedule != null || _setDeadline != null
+                      widget.firstOrderSchedule == null && _setDeadline != null
                           ? () {
                               navigatorKey.currentState!.pop({
                                 'setDeadline': widget.firstOrderSchedule != null

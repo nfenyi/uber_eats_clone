@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +36,7 @@ class GroupOrderSettingsScreen extends StatefulWidget {
 }
 
 class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
-  String? _firstName;
+  late String _displayName;
   late final Map _userInfo;
   late String _userPlaceDescription;
   late String _groupOrderName;
@@ -56,9 +58,12 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
   void initState() {
     super.initState();
     _userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    _firstName = _userInfo['displayName'].split(' ').first;
-    _userPlaceDescription = _userInfo['placeDescription'].split(',').first;
-    _groupOrderName = "$_firstName's group order";
+    _displayName = _userInfo['displayName'];
+
+    _userPlaceDescription =
+        _userInfo['selectedAddress']['placeDescription'].split(',').first;
+    _groupOrderName = "${_displayName.split(' ').first}'s group order";
+    _orderPlacementSetting = 'Remind me to place the order';
   }
 
   @override
@@ -152,7 +157,7 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                       children: [
                         AppText(
                           text: _groupOrderName,
-                          size: AppSizes.heading3,
+                          size: AppSizes.heading5,
                         ),
                         const Gap(5),
                         const Icon(
@@ -376,20 +381,36 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                 _isLoading = true;
               });
               try {
-                var userId = FirebaseAuth.instance.currentUser!.uid;
                 var groupOrderId = '${widget.store.id}${const Uuid().v4()}';
+                final List<DocumentReference> orderScheduleRefs = [];
+                final matchingStores = await FirebaseFirestore.instance
+                    .collection(FirestoreCollections.stores)
+                    .where('id', isEqualTo: widget.store.id)
+                    .get();
+                if (_frequency != null) {
+                  String orderNumber = Random().nextInt(4294967296).toString();
+                  final firstOrderSchedule = OrderSchedule(
+                    orderItems: [
+                      GroupOrderItem(person: _displayName, productsAndQuantities: {})
+                    ],
+                    storeRef: matchingStores.docs.first.reference,
+                    orderDate: _firstOrderSchedule!,
+                    orderNumber: orderNumber,
+                  );
+                  final scheduleRef = FirebaseFirestore.instance
+                      .collection(FirestoreCollections.orderSchedules)
+                      .doc(orderNumber);
+                  await scheduleRef.set(firstOrderSchedule.toJson());
+                  orderScheduleRefs.add(scheduleRef);
+                }
+
+                var userId = FirebaseAuth.instance.currentUser!.uid;
+
                 var groupOrder = GroupOrder(
                     createdAt: DateTime.now(),
                     //TODO: may have to add applied promos and chosen payment method here
-                    orderScheduleRefs: _frequency == null
-                        ? []
-                        : [
-                            OrderSchedule(
-                              deliveryDate: _firstOrderSchedule!,
-                              storeRef: widget.store.id,
-                              orderNumber: '1',
-                            )
-                          ],
+
+                    orderScheduleRefs: orderScheduleRefs,
                     id: groupOrderId,
                     endDate: _endDate,
                     firstOrderSchedule: _firstOrderSchedule,
@@ -403,24 +424,22 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                     orderPlacementSetting: _orderPlacementSetting,
                     ownerId: userId,
                     spendingLimit: double.tryParse(_spendingLimit),
-                    storeRef: widget.store.id,
+                    storeRef: matchingStores.docs.first.reference,
                     persons: [],
                     whoPays: _whoPays);
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.groupOrders)
                     .doc(groupOrderId)
                     .set(groupOrder.toJson());
-                // logger.d(groupOrder.toJson());
-                DocumentReference groupOrderRef = FirebaseFirestore.instance
-                    .collection(FirestoreCollections.groupOrders)
-                    .doc(groupOrderId);
+
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.users)
                     .doc(userId)
                     .update({
-                  'groupOrders': FieldValue.arrayUnion([groupOrderRef])
+                  'groupOrders': FieldValue.arrayUnion([groupOrderId])
                 });
-                await AppFunctions.getUserInfo();
+                await AppFunctions.getOnlineUserInfo();
+
                 await navigatorKey.currentState!
                     .pushReplacement(MaterialPageRoute(
                         builder: (context) => GroupOrderCompleteScreen(

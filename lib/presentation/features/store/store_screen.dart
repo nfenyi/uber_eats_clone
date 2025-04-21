@@ -8,17 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong2/latlong.dart' as lt;
+import 'package:marquee_list/marquee_list.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:showcaseview/showcaseview.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/group_order/group_order_screen.dart';
-import 'package:uber_eats_clone/presentation/features/group_order/group_order_settings_screen.dart';
 import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/search_menu_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_details_screen.dart';
@@ -26,10 +24,11 @@ import 'package:uber_eats_clone/state/user_location_providers.dart';
 
 import '../../../main.dart';
 import '../../../models/favourite/favourite_model.dart';
-import '../../../models/group_order/group_order_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
+import '../../services/google_maps_services.dart';
+import '../../services/place_detail_model.dart';
 import '../../services/sign_in_view_model.dart';
 import '../address/screens/addresses_screen.dart';
 import '../main_screen/screens/main_screen.dart';
@@ -50,7 +49,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
   late final GeoPoint _storeLatLng;
   // final _scrollController = ScrollController();
   // late final ScrollNotification _scrollNotification;
-  late Distance _distance;
+  late lt.Distance _distance;
   int? _retrievalFilter = 0;
   late bool _isFavorite;
   late final GeoPoint _selectedGeoPoint;
@@ -122,7 +121,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
 
     // _scrollController.addListener(_animateToTab);
 
-    _distance = const Distance(
+    _distance = const lt.Distance(
       roundResult: true,
     );
     // WidgetsBinding.instance.addPostFrameCallback(
@@ -1178,17 +1177,58 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                                           text: 'Share'),
                                                     ),
                                                     ListTile(
-                                                      onTap: () {
+                                                      onTap: () async {
+                                                        final userLocationData =
+                                                            await AppFunctions
+                                                                .getUserCurrentLocation();
+                                                        if (userLocationData ==
+                                                            null) {
+                                                          if (context.mounted) {
+                                                            await showAppInfoDialog(
+                                                                context,
+                                                                description:
+                                                                    'Seems the necessary location permissions have not been accepted yet');
+                                                          }
+                                                          return;
+                                                        }
+                                                        final result = await GoogleMapsServices()
+                                                            .fetchDetailsFromLatlng(
+                                                                latlng: LatLng(
+                                                                    userLocationData
+                                                                        .latitude!,
+                                                                    userLocationData
+                                                                        .longitude!));
+                                                        final List<PlaceResult>
+                                                            payload =
+                                                            result.payload;
+                                                        final location = payload
+                                                            .first
+                                                            .geometry!
+                                                            .location;
+                                                        final BitmapDescriptor
+                                                            bitmapDescriptor =
+                                                            await BitmapDescriptor
+                                                                .asset(
+                                                          const ImageConfiguration(
+                                                              size:
+                                                                  Size(30, 46)),
+                                                          AssetNames.mapMarker2,
+                                                        );
                                                         navigatorKey
                                                             .currentState!
                                                             .pop();
-                                                        navigatorKey
+                                                        await navigatorKey
                                                             .currentState!
                                                             .push(
                                                                 MaterialPageRoute(
                                                           builder: (context) =>
                                                               StoreDetailsScreen(
-                                                                  _store),
+                                                                  location:
+                                                                      location!,
+                                                                  markerIcon:
+                                                                      bitmapDescriptor,
+                                                                  store: widget
+                                                                      .store),
                                                         ));
                                                       },
                                                       leading: const Icon(
@@ -1250,11 +1290,39 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                 ),
                                 const Gap(5),
                                 InkWell(
-                                  onTap: () {
-                                    navigatorKey.currentState!
+                                  onTap: () async {
+                                    final userLocationData = await AppFunctions
+                                        .getUserCurrentLocation();
+                                    if (userLocationData == null) {
+                                      if (context.mounted) {
+                                        await showAppInfoDialog(context,
+                                            description:
+                                                'Seems the necessary location permissions have not been accepted yet');
+                                      }
+                                      return;
+                                    }
+                                    final result = await GoogleMapsServices()
+                                        .fetchDetailsFromLatlng(
+                                            latlng: LatLng(
+                                                userLocationData.latitude!,
+                                                userLocationData.longitude!));
+                                    final List<PlaceResult> payload =
+                                        result.payload;
+                                    final location =
+                                        payload.first.geometry!.location;
+                                    final BitmapDescriptor bitmapDescriptor =
+                                        await BitmapDescriptor.asset(
+                                      const ImageConfiguration(
+                                          size: Size(30, 46)),
+                                      AssetNames.mapMarker2,
+                                    );
+
+                                    await navigatorKey.currentState!
                                         .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          StoreDetailsScreen(widget.store),
+                                      builder: (context) => StoreDetailsScreen(
+                                          location: location!,
+                                          markerIcon: bitmapDescriptor,
+                                          store: widget.store),
                                     ));
                                   },
                                   child: Ink(
@@ -1290,7 +1358,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                           ),
                                         AppText(
                                             text:
-                                                ' • ${_distance.as(LengthUnit.Kilometer, LatLng(_storeLatLng.latitude, _storeLatLng.longitude), LatLng(_selectedGeoPoint.latitude, _selectedGeoPoint.longitude))} km '),
+                                                ' • ${_distance.as(lt.LengthUnit.Kilometer, lt.LatLng(_storeLatLng.latitude, _storeLatLng.longitude), lt.LatLng(_selectedGeoPoint.latitude, _selectedGeoPoint.longitude))} km '),
                                         const Icon(Icons.keyboard_arrow_right)
                                       ],
                                     ),
@@ -1334,53 +1402,8 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                         // userInfo['groupOrders'] = <String>[];
                                         // Hive.box(AppBoxes.appState)
                                         //     .put(BoxKeys.userInfo, userInfo);
-                                        List<String> groupOrderIds =
-                                            Hive.box(AppBoxes.appState)
-                                                    .get(BoxKeys.userInfo)[
-                                                'groupOrders'];
-                                        var matchingGroupOrderIds =
-                                            groupOrderIds.where(
-                                          (element) =>
-                                              element.contains(_store.id),
-                                        );
-
-                                        GroupOrder? orderCreatedByUser;
-                                        for (var matchingOrder
-                                            in matchingGroupOrderIds) {
-                                          final ref = FirebaseFirestore.instance
-                                              .collection(FirestoreCollections
-                                                  .groupOrders)
-                                              .doc(matchingOrder);
-                                          final groupOrder = await AppFunctions
-                                              .loadGroupOrderReference(ref);
-                                          if (groupOrder.ownerId ==
-                                              FirebaseAuth
-                                                  .instance.currentUser!.uid) {
-                                            orderCreatedByUser = groupOrder;
-                                            break;
-                                          }
-                                        }
-                                        if (orderCreatedByUser == null) {
-                                          await navigatorKey.currentState!.push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ShowCaseWidget(
-                                                          builder: (context) =>
-                                                              GroupOrderSettingsScreen(
-                                                                  store:
-                                                                      _store))));
-                                        } else {
-                                          await navigatorKey.currentState!.push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ShowCaseWidget(
-                                                          builder: (context) {
-                                                        return GroupOrderScreen(
-                                                            store: _store,
-                                                            groupOrder:
-                                                                orderCreatedByUser!);
-                                                      })));
-                                        }
+                                        await AppFunctions.createGroupOrder(
+                                            _store);
                                       },
                                       child: Ink(
                                         child: Container(

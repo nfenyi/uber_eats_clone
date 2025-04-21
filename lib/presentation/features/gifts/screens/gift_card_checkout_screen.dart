@@ -32,7 +32,7 @@ import '../../../constants/app_sizes.dart';
 import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/widgets.dart';
-import '../../sign_in/views/add_a_credit_card/add_a_credit_card.dart';
+import '../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
 import '../../webview/webview_screen.dart';
 
 class GiftCardCheckoutScreen extends ConsumerStatefulWidget {

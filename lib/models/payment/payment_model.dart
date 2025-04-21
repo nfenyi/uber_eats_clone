@@ -1,17 +1,15 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
-import '../payment_method_model.dart';
-
 part 'payment_model.freezed.dart';
 part 'payment_model.g.dart';
 
 @freezed
 class Payment with _$Payment {
   const factory Payment({
-    required PaymentMethod paymentMethodId,
-    required int amountPaid,
-    required String cardNumber,
+    required String paymentMethodName,
+    required double amountPaid,
+    required String? cardNumber,
     required DateTime datePaid,
   }) = _Payment;
 

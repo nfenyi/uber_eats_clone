@@ -60,8 +60,9 @@ class AssetNames {
   static const israeli = 'assets/images/israeli.png';
   static const easternEuropean = 'assets/images/eastern_european.png';
   static const arab = 'assets/images/arab.png';
+  static const storeBNW = 'assets/images/store_placeholder_bnw.png';
   static const mapMarker = 'assets/images/map_marker.png';
-
+  static const mapMarker2 = 'assets/images/map_marker2.png';
   static const sendGifts = 'assets/images/send_gifts.png';
   static const sendGifts2 = 'assets/images/send_gifts2.png';
   static const birthday = 'assets/images/birthday.png';
@@ -95,6 +96,7 @@ class AssetNames {
   static const whatDelivSee1 = 'assets/images/what_deliv_see1.png';
   static const whatDelivSee2 = 'assets/images/what_deliv_see2.png';
   static const whatDelivSee3 = 'assets/images/what_deliv_see3.png';
+  static const bowlOfFood = 'assets/images/bowl_of_food_slider.png';
   static const neverShowDelivInformation =
       'assets/images/never_show_deliv_information.png';
   static const neverShareInfoBag = 'assets/images/never_share_info_bag.png';
@@ -102,6 +104,8 @@ class AssetNames {
   static const noProfilePic = 'assets/images/no_profile_pic.png';
   static const favorites = 'assets/images/favorites.png';
   static const orders = 'assets/images/orders.png';
+  static const groupOrderItemLeading =
+      'assets/images/group_order_item_leading_image.png';
   static const wallet = 'assets/images/wallet.png';
   static const oneHouse = 'assets/images/one_house.png';
   static String walletGift = 'assets/images/wallet_gift.png';
@@ -134,6 +138,7 @@ class AssetNames {
   static String cvv = 'assets/images/cvv.png';
   static const greenTag = 'assets/images/green_tag.png';
   static const addGiftCard = 'assets/images/add_gift_card.png';
+  static const noCarts = 'assets/images/no_carts.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

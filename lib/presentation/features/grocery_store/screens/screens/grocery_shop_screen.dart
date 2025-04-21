@@ -1,19 +1,22 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:image_color_builder/image_color_builder.dart';
 import 'package:marquee_list/marquee_list.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
+import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen.dart';
+import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../../../app_functions.dart';
 import '../../../../../main.dart';
-import '../../../../../models/offer/offer_model.dart';
+import '../../../../../models/favourite/favourite_model.dart';
 import '../../../../../models/store/store_model.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../constants/asset_names.dart';
@@ -21,7 +24,10 @@ import '../../../../core/app_colors.dart';
 import '../../../../core/app_text.dart';
 
 import '../../../../core/widgets.dart';
+import '../../../../services/google_maps_services.dart';
+import '../../../../services/place_detail_model.dart';
 import '../../../address/screens/addresses_screen.dart';
+import '../../../store/store_details_screen.dart';
 import 'grocery_shop_search_screen.dart';
 import '../../../home/home_screen.dart';
 
@@ -94,6 +100,176 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: AppSizes.horizontalPaddingSmall),
                           child: InkWell(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  bool isFavourite =
+                                      favoriteStores.firstWhereOrNull(
+                                                (store) =>
+                                                    store.id ==
+                                                    widget.groceryStore.id,
+                                              ) !=
+                                              null
+                                          ? true
+                                          : false;
+
+                                  return StatefulBuilder(
+                                      builder: (context, setState) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ListTile(
+                                            dense: true,
+                                            onTap: () async {
+                                              if (context.mounted) {
+                                                Navigator.pop(context);
+                                              }
+                                              await AppFunctions
+                                                  .createGroupOrder(
+                                                      widget.groceryStore);
+                                            },
+                                            leading: const Icon(
+                                              Icons.person_add_outlined,
+                                            ),
+                                            title: const AppText(
+                                              text: 'Group order',
+                                            ),
+                                          ),
+                                          const Divider(
+                                            indent: 40,
+                                          ),
+                                          ListTile(
+                                            dense: true,
+                                            onTap: () async {
+                                              if (context.mounted) {
+                                                Navigator.pop(context);
+                                              }
+                                              final userId = FirebaseAuth
+                                                  .instance.currentUser!.uid;
+                                              if (isFavourite) {
+                                                await FirebaseFirestore.instance
+                                                    .collection(
+                                                        FirestoreCollections
+                                                            .favoriteStores)
+                                                    .doc(userId)
+                                                    .update({
+                                                  widget.groceryStore.id:
+                                                      FieldValue.delete()
+                                                }).then(
+                                                  (value) {
+                                                    favoriteStores.removeWhere(
+                                                      (element) =>
+                                                          element.id ==
+                                                          widget
+                                                              .groceryStore.id,
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                var store = FavouriteStore(
+                                                    id: widget.groceryStore.id,
+                                                    dateFavorited:
+                                                        DateTime.now());
+                                                await FirebaseFirestore.instance
+                                                    .collection(
+                                                        FirestoreCollections
+                                                            .favoriteStores)
+                                                    .doc(userId)
+                                                    .update({
+                                                  store.id: store.toJson()
+                                                });
+                                              }
+                                              // setState(() {});
+                                            },
+                                            leading: Icon(
+                                              isFavourite
+                                                  ? Icons.favorite
+                                                  : Icons.favorite_outline,
+                                            ),
+                                            title: AppText(
+                                              text: isFavourite
+                                                  ? 'Remove from favourites'
+                                                  : 'Add to favourites',
+                                            ),
+                                          ),
+                                          const Divider(
+                                            indent: 40,
+                                          ),
+                                          ListTile(
+                                            dense: true,
+                                            onTap: () async {
+                                              final userLocationData =
+                                                  await AppFunctions
+                                                      .getUserCurrentLocation();
+                                              if (userLocationData == null) {
+                                                if (context.mounted) {
+                                                  await showAppInfoDialog(
+                                                      context,
+                                                      description:
+                                                          'Seems the necessary location permissions have not been accepted yet');
+                                                }
+                                                return;
+                                              }
+                                              final result =
+                                                  await GoogleMapsServices()
+                                                      .fetchDetailsFromLatlng(
+                                                          latlng: LatLng(
+                                                              userLocationData
+                                                                  .latitude!,
+                                                              userLocationData
+                                                                  .longitude!));
+                                              final List<PlaceResult> payload =
+                                                  result.payload;
+                                              final location = payload
+                                                  .first.geometry!.location;
+                                              final BitmapDescriptor
+                                                  bitmapDescriptor =
+                                                  await BitmapDescriptor.asset(
+                                                const ImageConfiguration(
+                                                    size: Size(30, 46)),
+                                                AssetNames.mapMarker2,
+                                              );
+                                              navigatorKey.currentState!.pop();
+                                              await navigatorKey.currentState!
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    StoreDetailsScreen(
+                                                        location: location!,
+                                                        markerIcon:
+                                                            bitmapDescriptor,
+                                                        store: widget
+                                                            .groceryStore),
+                                              ));
+                                            },
+                                            leading: const Icon(
+                                              Icons.info_outline,
+                                            ),
+                                            title: const AppText(
+                                              text: 'View store info',
+                                            ),
+                                            subtitle: const AppText(
+                                              text: 'Hours, address and more',
+                                              size: AppSizes.bodySmallest,
+                                            ),
+                                          ),
+                                          const Divider(
+                                            indent: 40,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                                },
+                              );
+                            },
                             child: Ink(
                               child: Container(
                                   padding: const EdgeInsets.all(5),
@@ -152,7 +328,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                     width: 40,
                                     height: 60,
                                     child: Image.asset(
-                                      AssetNames.store,
+                                      AssetNames.storeBNW,
                                       // color: Colors.black,
                                       height: 40,
                                     ),
@@ -165,41 +341,82 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                     weight: FontWeight.w600,
                                   ),
                                   const Gap(10),
-                                  MarqueeList(
-                                      scrollDuration:
-                                          const Duration(seconds: 20),
-                                      children: [
-                                        AppText(
-                                            color: Colors.white,
-                                            text:
-                                                '${widget.groceryStore.delivery.estimatedDeliveryTime} min'),
-                                        AppText(
-                                          color: Colors.white,
-                                          text:
-                                              ' • \$${widget.groceryStore.delivery.fee} Delivery Fee',
-                                        ),
-                                        AppText(
-                                          color: Colors.white,
-                                          text:
-                                              ' • ${widget.groceryStore.location.streetAddress}',
-                                        ),
-                                        Visibility(
-                                          visible:
-                                              widget.groceryStore.delivery.fee <
-                                                  1,
-                                          child: Row(children: [
-                                            const AppText(
-                                              text: ' • ',
+                                  InkWell(
+                                    onTap: () async {
+                                      final userLocationData =
+                                          await AppFunctions
+                                              .getUserCurrentLocation();
+                                      if (userLocationData == null) {
+                                        if (context.mounted) {
+                                          await showAppInfoDialog(context,
+                                              description:
+                                                  'Seems the necessary location permissions have not been accepted yet');
+                                        }
+                                        return;
+                                      }
+                                      final result = await GoogleMapsServices()
+                                          .fetchDetailsFromLatlng(
+                                              latlng: LatLng(
+                                                  userLocationData.latitude!,
+                                                  userLocationData.longitude!));
+                                      final List<PlaceResult> payload =
+                                          result.payload;
+                                      final location =
+                                          payload.first.geometry!.location;
+                                      final BitmapDescriptor bitmapDescriptor =
+                                          await BitmapDescriptor.asset(
+                                        const ImageConfiguration(
+                                            size: Size(30, 46)),
+                                        AssetNames.mapMarker2,
+                                      );
+
+                                      await navigatorKey.currentState!
+                                          .push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            StoreDetailsScreen(
+                                                location: location!,
+                                                markerIcon: bitmapDescriptor,
+                                                store: widget.groceryStore),
+                                      ));
+                                    },
+                                    child: Ink(
+                                      child: MarqueeList(
+                                          scrollDuration:
+                                              const Duration(seconds: 20),
+                                          children: [
+                                            AppText(
+                                                color: Colors.white,
+                                                text:
+                                                    '${widget.groceryStore.delivery.estimatedDeliveryTime} min'),
+                                            AppText(
                                               color: Colors.white,
+                                              text:
+                                                  ' • \$${widget.groceryStore.delivery.fee} Delivery Fee',
                                             ),
-                                            Image.asset(
-                                              AssetNames.uberOneSmall,
+                                            AppText(
                                               color: Colors.white,
-                                              height: 10,
-                                            )
+                                              text:
+                                                  ' • ${widget.groceryStore.location.streetAddress}',
+                                            ),
+                                            Visibility(
+                                              visible: widget.groceryStore
+                                                      .delivery.fee <
+                                                  1,
+                                              child: Row(children: [
+                                                const AppText(
+                                                  text: ' • ',
+                                                  color: Colors.white,
+                                                ),
+                                                Image.asset(
+                                                  AssetNames.uberOneSmall,
+                                                  color: Colors.white,
+                                                  height: 10,
+                                                )
+                                              ]),
+                                            ),
                                           ]),
-                                        ),
-                                      ]),
+                                    ),
+                                  ),
                                   const Gap(10),
                                   InkWell(
                                     onTap: () {
@@ -229,6 +446,15 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                               WidgetsBinding.instance
                                   .addPostFrameCallback((_) async {
                                 _backgroundColorNotifier.value = imageColor;
+                                WidgetsBinding.instance.addPostFrameCallback(
+                                  (timeStamp) {
+                                    SystemChrome.setSystemUIOverlayStyle(
+                                      SystemUiOverlayStyle(
+                                        statusBarColor: imageColor,
+                                      ),
+                                    );
+                                  },
+                                );
                               });
                               final hsl = HSLColor.fromColor(
                                   imageColor ?? Colors.green);

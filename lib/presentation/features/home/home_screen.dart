@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/ic.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:uber_eats_clone/hive_adapters/cart_item/cart_item_model.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
@@ -694,8 +698,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     //       .set(advert.toJson());
     // }
 
-    // _getStoresAndProducts();
-
     DateTime dateTimeNow = DateTime.now();
     return SafeArea(
       child: NestedScrollView(
@@ -1179,7 +1181,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       //     color: Colors.blue),
                                       color: AppColors.neutral100,
                                       width: double.infinity,
-                                      height: 150,
+                                      height: 130,
                                     ),
                                   ),
                                   const Gap(15),
@@ -1936,7 +1938,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                         color: AppColors
                                                             .neutral100,
                                                         width: double.infinity,
-                                                        height: 150,
+                                                        height: 130,
                                                       ),
                                                     ),
                                                     const Gap(15),
@@ -2612,123 +2614,96 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         itemBuilder: (context, index) {
                                           final nationalBrand =
                                               _nationalBrands[index];
-                                          return SizedBox(
-                                            width: 200,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  child: Stack(
-                                                    alignment:
-                                                        Alignment.topRight,
-                                                    children: [
-                                                      Stack(
+                                          return InkWell(
+                                            onTap: () async => AppFunctions
+                                                .navigateToStoreScreen(
+                                                    nationalBrand),
+                                            child: Ink(
+                                              child: SizedBox(
+                                                width: 200,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      child: Stack(
                                                         alignment:
-                                                            Alignment.topLeft,
+                                                            Alignment.topRight,
                                                         children: [
-                                                          CachedNetworkImage(
-                                                            imageUrl:
-                                                                nationalBrand
-                                                                    .cardImage,
-                                                            width: 200,
-                                                            height: 120,
-                                                            fit: BoxFit.fill,
-                                                          ),
-                                                          if (nationalBrand
-                                                                      .offers !=
-                                                                  null &&
-                                                              nationalBrand
-                                                                  .offers!
-                                                                  .isNotEmpty)
-                                                            Padding(
-                                                                padding:
-                                                                    const EdgeInsets
+                                                          Stack(
+                                                            alignment: Alignment
+                                                                .topLeft,
+                                                            children: [
+                                                              CachedNetworkImage(
+                                                                imageUrl:
+                                                                    nationalBrand
+                                                                        .cardImage,
+                                                                width: 200,
+                                                                height: 120,
+                                                                fit:
+                                                                    BoxFit.fill,
+                                                              ),
+                                                              if (nationalBrand
+                                                                          .offers !=
+                                                                      null &&
+                                                                  nationalBrand
+                                                                      .offers!
+                                                                      .isNotEmpty)
+                                                                Padding(
+                                                                    padding: const EdgeInsets
                                                                         .only(
                                                                         left:
                                                                             8.0,
                                                                         top:
                                                                             8.0),
-                                                                child:
-                                                                    Container(
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .circular(5),
-                                                                    color: Colors
-                                                                        .green
-                                                                        .shade900,
-                                                                  ),
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          5,
-                                                                      vertical:
-                                                                          2),
-                                                                  child: Row(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .center,
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    children: [
-                                                                      AppText(
-                                                                          color: Colors
-                                                                              .white,
-                                                                          size: AppSizes
-                                                                              .bodySmallest,
-                                                                          text:
-                                                                              '${nationalBrand.offers?.length == 1 ? nationalBrand.offers?.first.title : '${nationalBrand.offers?.length} Offers available'}'),
-                                                                    ],
-                                                                  ),
-                                                                ))
-                                                        ],
-                                                      ),
-                                                      (dateTimeNow.hour <
-                                                                  nationalBrand
-                                                                      .openingTime
-                                                                      .hour ||
-                                                              (dateTimeNow.hour >=
+                                                                    child:
+                                                                        Container(
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(5),
+                                                                        color: Colors
+                                                                            .green
+                                                                            .shade900,
+                                                                      ),
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          horizontal:
+                                                                              5,
+                                                                          vertical:
+                                                                              2),
+                                                                      child:
+                                                                          Row(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          AppText(
+                                                                              color: Colors.white,
+                                                                              size: AppSizes.bodySmallest,
+                                                                              text: '${nationalBrand.offers?.length == 1 ? nationalBrand.offers?.first.title : '${nationalBrand.offers?.length} Offers available'}'),
+                                                                        ],
+                                                                      ),
+                                                                    ))
+                                                            ],
+                                                          ),
+                                                          (dateTimeNow.hour <
                                                                       nationalBrand
-                                                                          .closingTime
-                                                                          .hour &&
-                                                                  dateTimeNow
-                                                                          .minute >=
-                                                                      nationalBrand
-                                                                          .closingTime
-                                                                          .minute))
-                                                          ? Container(
-                                                              color: Colors
-                                                                  .black
-                                                                  .withOpacity(
-                                                                      0.5),
-                                                              width: 200,
-                                                              height: 120,
-                                                              child:
-                                                                  const Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  AppText(
-                                                                    text:
-                                                                        'Closed',
-                                                                    color: Colors
-                                                                        .white,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )
-                                                          : !nationalBrand
-                                                                  .delivery
-                                                                  .canDeliver
+                                                                          .openingTime
+                                                                          .hour ||
+                                                                  (dateTimeNow.hour >=
+                                                                          nationalBrand
+                                                                              .closingTime
+                                                                              .hour &&
+                                                                      dateTimeNow
+                                                                              .minute >=
+                                                                          nationalBrand
+                                                                              .closingTime
+                                                                              .minute))
                                                               ? Container(
                                                                   color: Colors
                                                                       .black
@@ -2747,57 +2722,94 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                     children: [
                                                                       AppText(
                                                                         text:
-                                                                            'Pick up',
+                                                                            'Closed',
                                                                         color: Colors
                                                                             .white,
                                                                       ),
                                                                     ],
                                                                   ),
                                                                 )
-                                                              : const SizedBox
-                                                                  .shrink(),
-                                                      Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  right: 8.0,
-                                                                  top: 8.0),
-                                                          child: FavouriteButton(
-                                                              store:
-                                                                  nationalBrand))
-                                                    ],
-                                                  ),
-                                                ),
-                                                const Gap(5),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    AppText(
-                                                      text: nationalBrand.name,
-                                                      weight: FontWeight.w600,
+                                                              : !nationalBrand
+                                                                      .delivery
+                                                                      .canDeliver
+                                                                  ? Container(
+                                                                      color: Colors
+                                                                          .black
+                                                                          .withOpacity(
+                                                                              0.5),
+                                                                      width:
+                                                                          200,
+                                                                      height:
+                                                                          120,
+                                                                      child:
+                                                                          const Column(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        children: [
+                                                                          AppText(
+                                                                            text:
+                                                                                'Pick up',
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    )
+                                                                  : const SizedBox
+                                                                      .shrink(),
+                                                          Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      right:
+                                                                          8.0,
+                                                                      top: 8.0),
+                                                              child: FavouriteButton(
+                                                                  store:
+                                                                      nationalBrand))
+                                                        ],
+                                                      ),
                                                     ),
-                                                    AverageRatingWidget(
-                                                        nationalBrand)
+                                                    const Gap(5),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        AppText(
+                                                          text: nationalBrand
+                                                              .name,
+                                                          weight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                        AverageRatingWidget(
+                                                            nationalBrand)
+                                                      ],
+                                                    ),
+                                                    AppText(
+                                                      text:
+                                                          '\$${nationalBrand.delivery.fee} Delivery Fee',
+                                                      color: nationalBrand
+                                                                  .delivery
+                                                                  .fee ==
+                                                              0
+                                                          ? const Color
+                                                              .fromARGB(
+                                                              255, 163, 133, 42)
+                                                          : AppColors
+                                                              .neutral500,
+                                                    ),
+                                                    AppText(
+                                                      text:
+                                                          '${nationalBrand.delivery.estimatedDeliveryTime} min',
+                                                      color:
+                                                          AppColors.neutral500,
+                                                    )
                                                   ],
                                                 ),
-                                                AppText(
-                                                  text:
-                                                      '\$${nationalBrand.delivery.fee} Delivery Fee',
-                                                  color: nationalBrand
-                                                              .delivery.fee ==
-                                                          0
-                                                      ? const Color.fromARGB(
-                                                          255, 163, 133, 42)
-                                                      : AppColors.neutral500,
-                                                ),
-                                                AppText(
-                                                  text:
-                                                      '${nationalBrand.delivery.estimatedDeliveryTime} min',
-                                                  color: AppColors.neutral500,
-                                                )
-                                              ],
+                                              ),
                                             ),
                                           );
                                         },
@@ -3083,7 +3095,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                       'From ${store.name}',
                                                   imageUrl: store.logo),
                                               SizedBox(
-                                                height: 200,
+                                                height: 210,
                                                 child: ListView.separated(
                                                     scrollDirection:
                                                         Axis.horizontal,
@@ -3513,7 +3525,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     final advertsSnapshot = await FirebaseFirestore.instance
         .collection(FirestoreCollections.adverts)
-        .where('type', isEqualTo: 'home screen')
         .get();
 
     Iterable<Advert> allAdverts = advertsSnapshot.docs.map(
@@ -3523,11 +3534,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       },
     );
     //TODO: will let Aloglia take care of .contains function later
-    _homeScreenAdverts = allAdverts
-        .where(
-          (element) => !element.type.toLowerCase().contains('gift'),
-        )
-        .toList();
+    _homeScreenAdverts = allAdverts.where(
+      (element) {
+        return !element.type.toLowerCase().contains('gift');
+      },
+    ).toList();
   }
 
   Future<void> _getFilterdStores(
@@ -3659,7 +3670,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     Map<dynamic, dynamic>? userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
 
-    userInfo ??= await AppFunctions.getUserInfo();
+    userInfo ??= await AppFunctions.getOnlineUserInfo();
 
     return userInfo['redeemedPromos'].length;
   }
@@ -3667,7 +3678,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Future<void> _getLocation() async {
     Map<dynamic, dynamic>? userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    userInfo ??= await AppFunctions.getUserInfo();
+    userInfo ??= await AppFunctions.getOnlineUserInfo();
   }
 }
 
@@ -3888,25 +3899,9 @@ class ProductGridTile extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                      child: InkWell(
-                        onTap: () {},
-                        child: Ink(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    offset: Offset(2, 2),
-                                  )
-                                ],
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50)),
-                            child: const Icon(
-                              Icons.add,
-                            ),
-                          ),
-                        ),
+                      child: AddToCartButton(
+                        product: _product,
+                        store: _store,
                       ),
                     )
                   ],
@@ -3938,14 +3933,197 @@ class ProductGridTile extends StatelessWidget {
                     decoration: _product.promoPrice != null
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
-                  )
+                  ),
                 ],
               ),
+              if (_product.isSponsored ?? false)
+                const AppText(text: 'Sponsored', color: AppColors.neutral500)
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+class AddToCartButton extends ConsumerStatefulWidget {
+  final Product product;
+  final Store store;
+  final bool removeShadow;
+
+  final Color? backgroundColor;
+  const AddToCartButton({
+    required this.product,
+    required this.store,
+    this.removeShadow = false,
+    this.backgroundColor = Colors.white,
+    super.key,
+  });
+
+  @override
+  ConsumerState<AddToCartButton> createState() => _AddToCartButtonState();
+}
+
+class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+        valueListenable:
+            Hive.box<HiveCartProduct>(AppBoxes.storedProducts).listenable(),
+        builder: (context, productsBox, child) {
+          final cartBox = Hive.box<HiveCartItem>(AppBoxes.carts);
+
+          final cartItemInBox = cartBox.get(widget.store.id);
+          final product = productsBox.values.firstWhereOrNull(
+            (element) => element.id == widget.product.id,
+          );
+          return Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                boxShadow: widget.removeShadow
+                    ? null
+                    : const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(2, 2),
+                        )
+                      ],
+                color: widget.backgroundColor,
+                borderRadius: BorderRadius.circular(50)),
+            child: cartItemInBox == null || product == null
+                ? InkWell(
+                    onTap: () async {
+                      if (widget.product.requiredOptions.isNotEmpty) {
+                        await navigatorKey.currentState!.push(MaterialPageRoute(
+                          builder: (context) => ProductScreen(
+                              product: widget.product, store: widget.store),
+                        ));
+                        return;
+                      }
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      await productsBox.add(HiveCartProduct(
+                        id: widget.product.id,
+                        quantity: 1,
+                      ));
+                      if (cartItemInBox == null) {
+                        final newCartItem = HiveCartItem(
+                            initialPricesTotal: widget.product.initialPrice,
+                            subtotal: widget.product.promoPrice ??
+                                widget.product.initialPrice,
+                            placeDescription:
+                                ref.read(selectedLocationDescription),
+                            deliveryDate: ref
+                                .read(deliveryScheduleProvider.notifier)
+                                .state,
+                            storeId: widget.store.id,
+                            products: HiveList(productsBox));
+                        newCartItem.products.add(productsBox.values.last);
+                        await cartBox.put(widget.store.id, newCartItem);
+                      } else {
+                        cartItemInBox.products.add(productsBox.values.last);
+                        await cartItemInBox.save();
+                      }
+
+                      setState(() {
+                        _isLoading = false;
+                      });
+                    },
+                    child: Ink(
+                      child: const Icon(
+                        Icons.add,
+                      ),
+                    ),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                          onTap: () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
+
+                            if (product.quantity == 1) {
+                              await product.delete().then(
+                                (value) {
+                                  if (cartItemInBox.products.isEmpty) {
+                                    cartItemInBox.delete();
+                                  }
+                                },
+                              );
+                            } else {
+                              product.quantity -= 1;
+                              cartItemInBox.subtotal -=
+                                  widget.product.promoPrice ??
+                                      widget.product.initialPrice;
+                              cartItemInBox.initialPricesTotal -=
+                                  widget.product.initialPrice;
+                              await product.save();
+                              await cartItemInBox.save();
+                            }
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          },
+                          child: Ink(
+                            child: product.quantity == 1
+                                ? const Icon(
+                                    Icons.delete_outline,
+                                    size: 15,
+                                  )
+                                : const Iconify(
+                                    Ic.baseline_minus,
+                                    size: 15,
+                                  ),
+                          )),
+                      const Gap(10),
+                      _isLoading
+                          ? const SizedBox(
+                              height: 6,
+                              width: 6,
+                              child: CircularProgressIndicator(
+                                color: Colors.blue,
+                                strokeWidth: 0.3,
+                              ),
+                            )
+                          : AppText(text: product.quantity.toString()),
+                      const Gap(10),
+                      InkWell(
+                          onTap: () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            product.quantity += 1;
+                            cartItemInBox.subtotal +=
+                                widget.product.promoPrice ??
+                                    widget.product.initialPrice;
+                            cartItemInBox.initialPricesTotal +=
+                                widget.product.initialPrice;
+                            await product.save();
+                            await cartItemInBox.save();
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          },
+                          child: Ink(
+                            child: const Icon(
+                              Icons.add,
+                              size: 15,
+                            ),
+                          )),
+                    ],
+                  ),
+          );
+        });
   }
 }
 
@@ -3994,26 +4172,7 @@ class ProductGridTilePriceFirst extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                      child: InkWell(
-                        onTap: () {},
-                        child: Ink(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    offset: Offset(2, 2),
-                                  )
-                                ],
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50)),
-                            child: const Icon(
-                              Icons.add,
-                            ),
-                          ),
-                        ),
-                      ),
+                      child: AddToCartButton(product: _product, store: _store),
                     )
                   ],
                 ),
@@ -4058,7 +4217,9 @@ class ProductGridTilePriceFirst extends StatelessWidget {
                       color: Colors.white,
                       text:
                           '${(((_product.initialPrice - _product.promoPrice!) / _product.initialPrice) * 100).toStringAsFixed(0)}% off'),
-                )
+                ),
+              if (_product.isSponsored ?? false)
+                const AppText(text: 'Sponsored', color: AppColors.neutral500)
             ],
           ),
         ),
@@ -4420,30 +4581,13 @@ class SearchResultDisplay extends StatelessWidget {
                                                   fit: BoxFit.fill,
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 8.0, top: 8.0),
-                                                  child: Container(
                                                     padding:
-                                                        const EdgeInsets.all(5),
-                                                    decoration: BoxDecoration(
-                                                        boxShadow: const [
-                                                          BoxShadow(
-                                                            color:
-                                                                Colors.black12,
-                                                            offset:
-                                                                Offset(2, 2),
-                                                          )
-                                                        ],
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50)),
-                                                    child: const Icon(
-                                                      Icons.add,
-                                                    ),
-                                                  ),
-                                                )
+                                                        const EdgeInsets.only(
+                                                            right: 8.0,
+                                                            top: 8.0),
+                                                    child: AddToCartButton(
+                                                        product: product,
+                                                        store: store))
                                               ],
                                             ),
                                           ),
@@ -4767,7 +4911,7 @@ class MainScreenTopic extends StatelessWidget {
         ListTile(
           dense: true,
           contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.horizontalPaddingSmall, vertical: 5),
+              horizontal: AppSizes.horizontalPaddingSmall),
           leading: imageUrl != null
               ? Container(
                   padding: const EdgeInsets.all(2),

@@ -23,9 +23,9 @@ class ManageMembershipScreen extends StatefulWidget {
 class _ManageMembershipScreenState extends State<ManageMembershipScreen> {
   final _membershipDetails = MembershipDetails(
       paymentMethod: const PaymentMethod(
-          name: 'Mastercard',
-          assetImage: AssetNames.masterCardLogo,
-          cardNumber: '5544454554551'),
+        name: 'Mastercard',
+        assetImage: AssetNames.masterCardLogo,
+      ),
       plan: Plan(period: 'Monthly', bill: 9.99),
       dateRenewed: DateTime.now());
 
@@ -140,11 +140,11 @@ class _ManageMembershipScreenState extends State<ManageMembershipScreen> {
             size: AppSizes.bodySmall,
           ),
           trailing: AppButton2(text: 'Change', callback: () {}),
-          subtitle: AppText(
-            text:
-                '${_membershipDetails.paymentMethod.name} ••••${_membershipDetails.paymentMethod.cardNumber!.substring(5)}',
-            color: AppColors.neutral500,
-          ),
+          // subtitle: AppText(
+          //   text:
+          //       '${_membershipDetails.paymentMethod.name} ••••${_membershipDetails.paymentMethod.cardNumber!.substring(5)}',
+          //   color: AppColors.neutral500,
+          // ),
         ),
         const Divider(
           indent: 60,

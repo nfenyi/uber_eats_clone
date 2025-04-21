@@ -62,7 +62,7 @@ class _GroupOrderCompleteScreenState
               text: widget.groupOrder.frequency != null
                   ? "Repeat group order scheduled"
                   : 'Group order scheduled',
-              size: AppSizes.heading4,
+              size: AppSizes.heading5,
               weight: FontWeight.bold,
             ),
             const Gap(15),

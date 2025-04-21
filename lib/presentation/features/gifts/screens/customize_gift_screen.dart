@@ -30,15 +30,15 @@ import 'record_message_screen.dart';
 import 'recorded_message_player_screen.dart';
 
 class CustomizeGiftScreen extends StatefulWidget {
-  final String initiallySelectedCard;
-  const CustomizeGiftScreen({super.key, required this.initiallySelectedCard});
+  final String? initiallySelectedCard;
+  const CustomizeGiftScreen({super.key, this.initiallySelectedCard});
 
   @override
   State<CustomizeGiftScreen> createState() => _CustomizeGiftScreenState();
 }
 
 class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
-  late String _selectedCardUrl;
+  String? _selectedCardUrl;
 
   final List<String> _giftAmounts = ['25', '50', '100', '200'];
   late String _selectedGiftAmount;
@@ -110,82 +110,92 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Stack(
-                    alignment: Alignment.center,
+                if (_selectedCardUrl != null)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppFunctions.displayNetworkImage(_selectedCardUrl,
-                          width: double.infinity,
-                          height: 200,
-                          fit: BoxFit.cover,
-                          placeholderAssetImage:
-                              AssetNames.giftCardPlaceholder),
-                      // Container(
-                      //   color: Colors.black45,
-                      //   width: double.infinity,
-                      //   height: 200,
-                      // ),
-                      // TextButton(
-                      //   onPressed: () {
-                      //     // navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => ,))
-                      //   },
-                      //   style: TextButton.styleFrom(
-                      //       backgroundColor: Colors.white70,
-                      //       shape: RoundedRectangleBorder(
-                      //           borderRadius: BorderRadius.circular(50))),
-                      //   child: const Row(
-                      //     mainAxisSize: MainAxisSize.min,
-                      //     children: [
-                      //       Icon(Icons.edit, size: 15),
-                      //       Gap(15),
-                      //       AppText(text: 'Change')
-                      //     ],
-                      //   ),
-                      // )
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            AppFunctions.displayNetworkImage(_selectedCardUrl!,
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                                placeholderAssetImage:
+                                    AssetNames.giftCardPlaceholder),
+                            // Container(
+                            //   color: Colors.black45,
+                            //   width: double.infinity,
+                            //   height: 200,
+                            // ),
+                            // TextButton(
+                            //   onPressed: () {
+                            //     // navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => ,))
+                            //   },
+                            //   style: TextButton.styleFrom(
+                            //       backgroundColor: Colors.white70,
+                            //       shape: RoundedRectangleBorder(
+                            //           borderRadius: BorderRadius.circular(50))),
+                            //   child: const Row(
+                            //     mainAxisSize: MainAxisSize.min,
+                            //     children: [
+                            //       Icon(Icons.edit, size: 15),
+                            //       Gap(15),
+                            //       AppText(text: 'Change')
+                            //     ],
+                            //   ),
+                            // )
+                          ],
+                        ),
+                      ),
+                      const Gap(30),
+                      const AppText(
+                        text: 'Gift Amount',
+                        color: AppColors.neutral500,
+                      ),
+                      const Gap(5),
+                      AppText(
+                        text: '\$$_selectedGiftAmount USD',
+                        weight: FontWeight.w600,
+                        size: AppSizes.heading2,
+                      ),
+                      ChipsChoice<String>.single(
+                        wrapped: false,
+                        padding: EdgeInsets.zero,
+                        value: _selectedGiftAmount,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedGiftAmount = value;
+                          });
+                        },
+                        choiceItems: C2Choice.listFrom<String, String>(
+                          source: _giftAmounts,
+                          value: (i, v) => v,
+                          label: (i, v) => '\$ $v',
+                        ),
+                        choiceStyle: C2ChipStyle.filled(
+                          selectedStyle: const C2ChipStyle(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.black,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(100),
+                            ),
+                          ),
+                          height: 30,
+                          borderRadius: BorderRadius.circular(100),
+                          color: AppColors.neutral200,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                const Gap(30),
-                const AppText(
-                  text: 'Gift Amount',
-                  color: AppColors.neutral500,
-                ),
-                const Gap(5),
-                AppText(
-                  text: '\$$_selectedGiftAmount USD',
-                  weight: FontWeight.w600,
-                  size: AppSizes.heading2,
-                ),
-                ChipsChoice<String>.single(
-                  wrapped: false,
-                  padding: EdgeInsets.zero,
-                  value: _selectedGiftAmount,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGiftAmount = value;
-                    });
-                  },
-                  choiceItems: C2Choice.listFrom<String, String>(
-                    source: _giftAmounts,
-                    value: (i, v) => v,
-                    label: (i, v) => '\$ $v',
-                  ),
-                  choiceStyle: C2ChipStyle.filled(
-                    selectedStyle: const C2ChipStyle(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.black,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(100),
-                      ),
-                    ),
-                    height: 30,
-                    borderRadius: BorderRadius.circular(100),
-                    color: AppColors.neutral200,
-                  ),
-                ),
                 const Gap(10),
-                const AppText(text: "Who's this gift card from?"),
+                _selectedCardUrl != null
+                    ? const AppText(text: "Who's this gift card from?")
+                    : const AppText(
+                        text: "Who's this gift from?",
+                      ),
                 const Gap(5),
                 AppTextFormField(
                   controller: _fromTextEditingController,
@@ -565,194 +575,199 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
       persistentFooterButtons: [
         Column(
           children: [
-            AppButton(
-              callback: _toTextEditingController.text.isEmpty
-                  ? null
-                  : () async {
-                      await showModalBottomSheet(
-                        isScrollControlled: true,
-                        useSafeArea: true,
-                        context: context,
-                        builder: (context) {
-                          final webViewcontroller = WebViewControllerPlus();
-                          return Container(
-                            height: double.infinity,
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10))),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                AppBar(
-                                  leading: GestureDetector(
-                                      onTap: () =>
-                                          navigatorKey.currentState!.pop(),
-                                      child: const Icon(Icons.clear)),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal:
-                                          AppSizes.horizontalPaddingSmall),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: AppColors.neutral300,
-                                        ),
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          width: double.infinity,
-                                          decoration: const BoxDecoration(
-                                              color: AppColors.neutral100,
-                                              borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                  topRight:
-                                                      Radius.circular(10))),
-                                          child: Center(
-                                            child: AppText(
-                                                text:
-                                                    "${_toTextEditingController.text} will see this:"),
+            if (_selectedCardUrl != null)
+              AppButton(
+                callback: _toTextEditingController.text.isEmpty
+                    ? null
+                    : () async {
+                        await showModalBottomSheet(
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          context: context,
+                          builder: (context) {
+                            final webViewcontroller = WebViewControllerPlus();
+                            return Container(
+                              height: double.infinity,
+                              decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      topRight: Radius.circular(10))),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AppBar(
+                                    leading: GestureDetector(
+                                        onTap: () =>
+                                            navigatorKey.currentState!.pop(),
+                                        child: const Icon(Icons.clear)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal:
+                                            AppSizes.horizontalPaddingSmall),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: AppColors.neutral300,
                                           ),
-                                        ),
-                                        const Gap(20),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 15.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Stack(
-                                                children: [
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                    child: AppFunctions
-                                                        .displayNetworkImage(
-                                                      placeholderAssetImage:
-                                                          AssetNames
-                                                              .giftCardPlaceholder,
-                                                      _selectedCardUrl,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            width: double.infinity,
+                                            decoration: const BoxDecoration(
+                                                color: AppColors.neutral100,
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(10),
+                                                    topRight:
+                                                        Radius.circular(10))),
+                                            child: Center(
+                                              child: AppText(
+                                                  text:
+                                                      "${_toTextEditingController.text} will see this:"),
+                                            ),
+                                          ),
+                                          const Gap(20),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Stack(
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                      child: AppFunctions
+                                                          .displayNetworkImage(
+                                                        placeholderAssetImage:
+                                                            AssetNames
+                                                                .giftCardPlaceholder,
+                                                        _selectedCardUrl!,
+                                                        width: double.infinity,
+                                                        height: 200,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                    Container(
                                                       width: double.infinity,
                                                       height: 200,
-                                                      fit: BoxFit.cover,
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(15),
+                                                          border: Border.all(
+                                                              color: Colors.grey
+                                                                  .withAlpha(
+                                                                      180))),
                                                     ),
-                                                  ),
-                                                  Container(
-                                                    width: double.infinity,
-                                                    height: 200,
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        border: Border.all(
-                                                            color: Colors.grey
-                                                                .withAlpha(
-                                                                    180))),
-                                                  ),
-                                                ],
-                                              ),
-                                              const Gap(20),
-                                              AppText(
-                                                text:
-                                                    '\$$_selectedGiftAmount USD',
-                                                weight: FontWeight.w600,
-                                                size: AppSizes.heading4,
-                                              ),
-                                              const Gap(30),
-                                              AppText(
-                                                  weight: FontWeight.w600,
-                                                  size: AppSizes.heading6,
-                                                  text:
-                                                      "${_toTextEditingController.text}, here's an Uber gift from ${_fromTextEditingController.text}!"),
-                                              const Gap(10),
-                                              if (_selectedMessageOption ==
-                                                      'Record video' &&
-                                                  _downloadUrl != null)
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 15,
-                                                      vertical: 20),
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.neutral100,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      const Icon(
-                                                          Icons.videocam_sharp),
-                                                      const Gap(10),
-                                                      AppText(
-                                                          text:
-                                                              'You got a video from ${_fromTextEditingController.text}!')
-                                                    ],
-                                                  ),
+                                                  ],
                                                 ),
-                                              if (_selectedMessageOption ==
-                                                  'Write text')
+                                                const Gap(20),
                                                 AppText(
-                                                  text: _textMessageController
-                                                          .text
-                                                          .trim()
-                                                          .isEmpty
-                                                      ? 'Optional message not added yet!'
-                                                      : _textMessageController
-                                                          .text,
-                                                  color: _textMessageController
-                                                          .text
-                                                          .trim()
-                                                          .isEmpty
-                                                      ? AppColors.neutral500
-                                                      : null,
+                                                  text:
+                                                      '\$$_selectedGiftAmount USD',
+                                                  weight: FontWeight.w600,
+                                                  size: AppSizes.heading4,
                                                 ),
-                                              const Gap(15),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  navigatorKey.currentState!
-                                                      .push(MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        WebViewScreen(
-                                                      controller:
-                                                          webViewcontroller,
-                                                      link: Weblinks
-                                                          .uberGiftCardTerms,
+                                                const Gap(30),
+                                                AppText(
+                                                    weight: FontWeight.w600,
+                                                    size: AppSizes.heading6,
+                                                    text:
+                                                        "${_toTextEditingController.text}, here's an Uber gift from ${_fromTextEditingController.text}!"),
+                                                const Gap(10),
+                                                if (_selectedMessageOption ==
+                                                        'Record video' &&
+                                                    _downloadUrl != null)
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 15,
+                                                        vertical: 20),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColors.neutral100,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
                                                     ),
-                                                  ));
-                                                },
-                                                child: const AppText(
-                                                  text: 'Terms apply',
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  color: AppColors.neutral500,
+                                                    child: Row(
+                                                      children: [
+                                                        const Icon(Icons
+                                                            .videocam_sharp),
+                                                        const Gap(10),
+                                                        AppText(
+                                                            text:
+                                                                'You got a video from ${_fromTextEditingController.text}!')
+                                                      ],
+                                                    ),
+                                                  ),
+                                                if (_selectedMessageOption ==
+                                                    'Write text')
+                                                  AppText(
+                                                    text: _textMessageController
+                                                            .text
+                                                            .trim()
+                                                            .isEmpty
+                                                        ? 'Optional message not added yet!'
+                                                        : _textMessageController
+                                                            .text,
+                                                    color:
+                                                        _textMessageController
+                                                                .text
+                                                                .trim()
+                                                                .isEmpty
+                                                            ? AppColors
+                                                                .neutral500
+                                                            : null,
+                                                  ),
+                                                const Gap(15),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    navigatorKey.currentState!
+                                                        .push(MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          WebViewScreen(
+                                                        controller:
+                                                            webViewcontroller,
+                                                        link: Weblinks
+                                                            .uberGiftCardTerms,
+                                                      ),
+                                                    ));
+                                                  },
+                                                  child: const AppText(
+                                                    text: 'Terms apply',
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                    color: AppColors.neutral500,
+                                                  ),
                                                 ),
-                                              ),
-                                              const Gap(10)
-                                            ],
-                                          ),
-                                        )
-                                      ],
+                                                const Gap(10)
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-              text: 'Preview gift',
-              isSecondary: true,
-            ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                text: 'Preview gift',
+                isSecondary: true,
+              ),
             const Gap(10),
             AppButton(
               callback: _toTextEditingController.text.isEmpty ||
@@ -763,30 +778,35 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                   : () {
                       if (_selectedMessageOption != 'Write text' ||
                           _textMessageKey.currentState!.validate()) {
-                        final giftCard = GiftCard(
-                            dateCreated: DateTime.now(),
-                            optionalVideoUrl:
-                                _selectedMessageOption == 'Record video'
-                                    ? _downloadUrl
-                                    : null,
-                            id: const Uuid().v4(),
-                            giftAmount: int.parse(_selectedGiftAmount),
-                            imageUrl: _selectedCardUrl,
-                            receiverName: _toTextEditingController.text.trim(),
-                            senderName:
-                                _fromTextEditingController.text.toString(),
-                            senderUid: FirebaseAuth.instance.currentUser!.uid,
-                            optionalMessage:
-                                _selectedMessageOption == 'Write text'
-                                    ? _textMessageController.text
-                                    : null);
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                          builder: (context) =>
-                              GiftCardCheckoutScreen(giftCard),
-                        ));
+                        if (_selectedCardUrl != null) {
+                          final giftCard = GiftCard(
+                              dateCreated: DateTime.now(),
+                              optionalVideoUrl:
+                                  _selectedMessageOption == 'Record video'
+                                      ? _downloadUrl
+                                      : null,
+                              id: const Uuid().v4(),
+                              giftAmount: int.parse(_selectedGiftAmount),
+                              imageUrl: _selectedCardUrl!,
+                              receiverName:
+                                  _toTextEditingController.text.trim(),
+                              senderName:
+                                  _fromTextEditingController.text.toString(),
+                              senderUid: FirebaseAuth.instance.currentUser!.uid,
+                              optionalMessage:
+                                  _selectedMessageOption == 'Write text'
+                                      ? _textMessageController.text
+                                      : null);
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                            builder: (context) =>
+                                GiftCardCheckoutScreen(giftCard),
+                          ));
+                        }
                       }
                     },
-              text: 'Go to checkout',
+              text: _selectedCardUrl != null
+                  ? 'Go to checkout'
+                  : 'Save and continue',
             ),
             const Gap(5),
           ],

@@ -4,10 +4,12 @@ import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -15,10 +17,14 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen.dart';
 import 'package:uber_eats_clone/presentation/features/product/back_up_option_screen.dart';
+import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
+import 'package:uber_eats_clone/state/user_location_providers.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../app_functions.dart';
+import '../../../hive_adapters/cart_item/cart_item_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/weblinks.dart';
@@ -39,45 +45,71 @@ class ProductScreen extends ConsumerStatefulWidget {
 
 class _ProductScreenState extends ConsumerState<ProductScreen> {
   late final Product _product;
-
-  late final List<bool?> _optionalOptions;
-
+  final _cart = Hive.box<HiveCartItem>(AppBoxes.carts);
+  late double initialSubTotal;
+  late double initialInitialPricesTotal;
+  String? _backupInstruction = 'Best match';
   final _webViewcontroller = WebViewControllerPlus();
-  final String _note = '';
-
   int _activeIndex = 0;
   int _quantity = 1;
-
-  bool _footerButtonTapped = false;
-  late final List<int> _optionQuantities;
-
-  String? _backupInstruction = 'Best match';
-
   final _noteController = TextEditingController();
+  bool _isLoading = false;
+  String? _selectedReplacementId;
+  HiveCartProduct? _productInbox;
+  HiveCartItem? _cartItemInBox;
+  final Map<String, List<HiveOption>> _requiredOptions = {};
+  final Map<String, List<HiveOption>> _optionalOptions = {};
+  // List<String?> _optionalOptions = [];
 
-  String? _selectedExclusiveOption;
+  // List<String> _requiredOptions = [];
+  List<int> _optionQuantities = [];
 
-  String? _selectedSubOption;
+  final _productsBox = Hive.box<HiveCartProduct>(AppBoxes.storedProducts);
+  // String? _selectedSubOption;
 
   @override
   void initState() {
     super.initState();
     _product = widget.product;
-    if (_product.options != null) {
-      //for listtilecheckboxes
-      _optionalOptions = List.generate(
-          _product.options!.length, (index) => false,
-          growable: false);
 
-      if (_product.options!.any(
-        (element) => element.canBeMultiple,
-      )) {
-        //for listtiles with quantity incrementor and decrementor
+    _cartItemInBox = _cart.get(widget.store.id);
+    if (_cartItemInBox != null) {
+      _productInbox = _cartItemInBox!.products.firstWhereOrNull(
+        (element) => element.id == _product.id,
+      );
+      if (_productInbox != null) {
+        for (var storedOptions in _productInbox!.requiredOptions) {
+          if (_requiredOptions[storedOptions.categoryName] == null) {
+            _requiredOptions[storedOptions.categoryName] = [storedOptions];
+          } else {
+            _requiredOptions[storedOptions.categoryName]!.add(storedOptions);
+          }
+          _optionQuantities.add(storedOptions.quantity);
+        }
+
+        for (var storedOptions in _productInbox!.optionalOptions) {
+          if (_optionalOptions[storedOptions.categoryName] == null) {
+            _optionalOptions[storedOptions.categoryName] = [storedOptions];
+          } else {
+            _optionalOptions[storedOptions.categoryName]!.add(storedOptions);
+          }
+          _optionQuantities.add(storedOptions.quantity);
+        }
+        _quantity = _productInbox!.quantity;
+        _noteController.text = _productInbox!.note;
+        _backupInstruction = _productInbox!.backupInstruction;
+        _quantity = _productInbox!.quantity;
+
+        _selectedReplacementId = _productInbox?.productReplacementId;
+      } else {
         _optionQuantities = List.generate(
-            _product.options!.length, (index) => 0,
+            _product.requiredOptions.length + _product.optionalOptions.length,
+            (index) => 0,
             growable: false);
       }
     }
+    initialSubTotal = _cartItemInBox?.subtotal ?? 0;
+    initialInitialPricesTotal = _cartItemInBox?.initialPricesTotal ?? 0;
   }
 
   @override
@@ -88,20 +120,21 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double currentTotal =
+        ((_product.promoPrice ?? _product.initialPrice) * _quantity);
     return Scaffold(
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                SliverAppBar(
+                SliverAppBar.medium(
+                  title: AppText(
+                    text: _product.name,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   pinned: true,
                   floating: true,
                   flexibleSpace: FlexibleSpaceBar(
                     // titlePadding: EdgeInsets.only(left: 50),
-                    expandedTitleScale: 1.1,
-                    title: AppText(
-                      text: _product.name,
-                      weight: FontWeight.bold,
-                      size: AppSizes.heading6,
-                    ),
+
                     background: SafeArea(
                       child: Column(
                         children: [
@@ -184,22 +217,36 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                 enableInfiniteScroll: false,
                                 viewportFraction: 1),
                           ),
-                          const Gap(10),
                           if (_product.imageUrls.length > 1)
-                            AnimatedSmoothIndicator(
-                              activeIndex: _activeIndex,
-                              count: _product.imageUrls.length,
-                              effect: const WormEffect(
-                                  activeDotColor: Colors.black,
-                                  dotHeight: 5,
-                                  dotWidth: 5,
-                                  dotColor: AppColors.neutral100),
-                            )
+                            Column(
+                              children: [
+                                const Gap(10),
+                                AnimatedSmoothIndicator(
+                                  activeIndex: _activeIndex,
+                                  count: _product.imageUrls.length,
+                                  effect: const WormEffect(
+                                      activeDotColor: Colors.black,
+                                      dotHeight: 5,
+                                      dotWidth: 5,
+                                      dotColor: AppColors.neutral100),
+                                ),
+                              ],
+                            ),
+                          const Gap(10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AppSizes.horizontalPaddingSmall),
+                            child: AppText(
+                              text: _product.name,
+                              weight: FontWeight.bold,
+                              size: AppSizes.heading6,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  expandedHeight: 250,
+                  expandedHeight: 280,
                 )
               ],
           body: CustomScrollView(
@@ -225,7 +272,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                 child: Row(
                                   children: [
                                     AppText(
-                                        text: '\$${_product.initialPrice}',
+                                        text: '\$${_product.promoPrice}',
                                         size: AppSizes.body,
                                         weight: FontWeight.bold,
                                         color: Colors.green.shade900),
@@ -246,275 +293,681 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ],
                       ),
                     ),
-                    if (_product.options != null)
+                  ],
+                ),
+              ),
+              SliverList.separated(
+                itemCount: _product.requiredOptions.length,
+                itemBuilder: (context, optionIndex) {
+                  final option = _product.requiredOptions[optionIndex];
+
+                  return Column(
+                    children: [
                       Column(
                         children: [
                           const Divider(
                             thickness: 3,
                           ),
-                          (_product.selectOptionRequired)
-                              ? ListTile(
-                                  title: const AppText(
-                                    text: 'Select Option',
-                                    size: AppSizes.body,
-                                    weight: FontWeight.w600,
-                                  ),
-                                  trailing: Container(
-                                    padding: const EdgeInsets.all(3),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: _selectedExclusiveOption == null
-                                          ? AppColors.neutral100
-                                          : const Color.fromARGB(
-                                              255, 206, 232, 221),
+                          ListTile(
+                            title: AppText(
+                              text: option.name,
+                              size: AppSizes.body,
+                              weight: FontWeight.w600,
+                            ),
+                            trailing: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: _requiredOptions[option.name] != null
+                                    ? const Color.fromARGB(255, 206, 232, 221)
+                                    : AppColors.neutral100,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (_requiredOptions[option.name] != null)
+                                    const Icon(
+                                      Icons.check,
+                                      color: AppColors.primary2,
                                     ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        if (_selectedExclusiveOption != null)
-                                          const Icon(
-                                            Icons.check,
-                                            color: AppColors.primary2,
-                                          ),
-                                        const Gap(3),
-                                        AppText(
-                                          text: 'Required',
-                                          color:
-                                              _selectedExclusiveOption == null
-                                                  ? null
-                                                  : AppColors.primary2,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : ListTile(
-                                  title: AppText(
-                                    text: '${_product.name} Additions',
-                                    size: AppSizes.bodySmall,
-                                    weight: FontWeight.w600,
-                                  ),
-                                ),
+                                  const Gap(3),
+                                  AppText(
+                                      text: 'Required',
+                                      color:
+                                          _requiredOptions[option.name] != null
+                                              ? AppColors.primary2
+                                              : null)
+                                ],
+                              ),
+                            ),
+                          )
                         ],
                       ),
-                  ],
-                ),
-              ),
-              if (_product.options != null)
-                SliverList.separated(
-                  itemCount: _product.options!.length,
-                  itemBuilder: (context, index) {
-                    final option = _product.options![index];
-                    return option.isExclusive == true
-                        ? Column(
-                            children: [
-                              RadioListTile.adaptive(
-                                title: AppText(text: option.name),
-                                value: option.name,
-                                groupValue: _selectedExclusiveOption,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedExclusiveOption = value;
-                                  });
-                                },
-                                controlAffinity:
-                                    ListTileControlAffinity.trailing,
-                                subtitle:
-                                    AppText(text: option.price.toString()),
-                              ),
-                              if (_selectedExclusiveOption == option.name &&
-                                  option.subOptions != null)
-                                Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      color: AppColors.neutral100,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Column(
-                                    children: [
-                                      if (_selectedSubOption != null)
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                      option.isExclusive == true
+                          ? ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: option.subOptions.length,
+                              itemBuilder: (context, subOptionIndex) {
+                                final subOption =
+                                    option.subOptions[subOptionIndex];
+                                final selectedSubOption =
+                                    _requiredOptions[option.name]?.firstOrNull;
+                                return Column(
+                                  children: [
+                                    RadioListTile.adaptive(
+                                      title: AppText(text: subOption.name),
+                                      value: subOption.name,
+                                      groupValue: selectedSubOption,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          setState(() {
+                                            _requiredOptions[option.name] = [
+                                              HiveOption(
+                                                  name: subOption.name,
+                                                  categoryName: option.name)
+                                            ];
+                                          });
+                                        }
+                                      },
+                                      controlAffinity:
+                                          ListTileControlAffinity.trailing,
+                                      subtitle: AppText(
+                                          text: subOption.price.toString()),
+                                    ),
+                                    if (_requiredOptions[option.name] != null &&
+                                        option.subOptions.isNotEmpty)
+                                      Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                            color: AppColors.neutral100,
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: Column(
                                           children: [
-                                            AppText(
-                                              text: '${option.name} Additions',
-                                              weight: FontWeight.bold,
-                                              size: AppSizes.body,
-                                            ),
-                                            AppText(
-                                              text: _selectedSubOption!,
-                                              color: AppColors.neutral500,
+                                            if (selectedSubOption != null)
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  AppText(
+                                                    text:
+                                                        '${option.name} Additions',
+                                                    weight: FontWeight.bold,
+                                                    size: AppSizes.body,
+                                                  ),
+                                                  AppText(
+                                                    text:
+                                                        selectedSubOption.name,
+                                                    color: AppColors.neutral500,
+                                                  )
+                                                ],
+                                              ),
+                                            ListTile(
+                                              onTap: () => navigatorKey
+                                                  .currentState!
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SubOptionSelectionScreen(
+                                                  currentTotal: currentTotal,
+                                                  productInbox: _productInbox,
+                                                  option: option,
+                                                ),
+                                              )),
+                                              title: const AppText(
+                                                text: 'Edit selections',
+                                                weight: FontWeight.bold,
+                                              ),
+                                              trailing: const Icon(
+                                                Icons.keyboard_arrow_right,
+                                                color: AppColors.neutral500,
+                                              ),
                                             )
                                           ],
                                         ),
-                                      ListTile(
-                                        onTap: () => navigatorKey.currentState!
-                                            .push(MaterialPageRoute(
-                                          builder: (context) =>
-                                              SubOptionSelectionScreen(
-                                            productPrice: _product.promoPrice ??
-                                                _product.initialPrice,
-                                            option: option,
-                                          ),
-                                        )),
-                                        title: const AppText(
-                                          text: 'Edit selections',
-                                          weight: FontWeight.bold,
-                                        ),
-                                        trailing: const Icon(
-                                          Icons.keyboard_arrow_right,
-                                          color: AppColors.neutral500,
-                                        ),
                                       )
-                                    ],
-                                  ),
-                                )
-                            ],
-                          )
-                        : option.canBeMultiple
-                            ? ListTile(
-                                trailing: _optionQuantities[index] == 0
-                                    ? TextButton(
-                                        style: TextButton.styleFrom(
-                                            padding: const EdgeInsets.all(0),
-                                            backgroundColor:
-                                                AppColors.neutral100,
-                                            shape: const CircleBorder()),
-                                        onPressed: () {
-                                          setState(() {
-                                            _optionQuantities[index] =
-                                                _optionQuantities[index] + 1;
-                                          });
-                                        },
-                                        child: const AppText(
-                                          text: '+',
-                                          size: AppSizes.body,
-                                        ))
-                                    : Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                            TextButton(
-                                                style: TextButton.styleFrom(
-                                                    padding:
-                                                        const EdgeInsets.all(3),
-                                                    backgroundColor:
-                                                        AppColors.neutral100,
-                                                    shape:
-                                                        const CircleBorder()),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    if (_optionQuantities[
-                                                            index] !=
-                                                        0) {
-                                                      _optionQuantities[index] =
-                                                          _optionQuantities[
-                                                                  index] -
-                                                              1;
-                                                    }
-                                                  });
-                                                },
-                                                child: const AppText(
-                                                    text: '-',
-                                                    size: AppSizes.body)),
-                                            AppText(
-                                                text: _optionQuantities[index]
-                                                    .toString()),
-                                            TextButton(
-                                                style: TextButton.styleFrom(
-                                                    padding:
-                                                        const EdgeInsets.all(3),
-                                                    backgroundColor:
-                                                        AppColors.neutral100,
-                                                    shape:
-                                                        const CircleBorder()),
-                                                onPressed:
-                                                    option.canBeMultipleLimit ==
-                                                                null ||
-                                                            _optionQuantities[
-                                                                    index] <
-                                                                option
-                                                                    .canBeMultipleLimit!
-                                                        ? () {
-                                                            setState(() {
-                                                              if (_optionQuantities[
-                                                                      index] !=
-                                                                  0) {
-                                                                _optionQuantities[
-                                                                        index] =
-                                                                    _optionQuantities[
-                                                                            index] +
-                                                                        1;
-                                                              }
-                                                            });
-                                                          }
-                                                        : null,
-                                                child: const AppText(
-                                                    text: '+',
-                                                    size: AppSizes.body)),
-                                          ]),
-                                title: AppText(
-                                  text: option.name,
-                                ),
-                                subtitle: option.price != null ||
-                                        option.calories != null
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          if (option.price != null)
-                                            AppText(
-                                              text:
-                                                  '+  ${_optionQuantities[index] == 0 ? '\$${option.price}' : '\$${option.price! * _optionQuantities[index]} (\$${option.price!.toStringAsFixed(2)} ea)'} ',
-                                              color: AppColors.neutral500,
-                                            ),
-                                          if (option.calories != null)
-                                            AppText(
-                                              text:
-                                                  '${option.calories!.toInt()} Cal.',
-                                              color: AppColors.neutral500,
-                                            ),
-                                        ],
-                                      )
-                                    : null,
-                              )
-                            : Builder(builder: (context) {
-                                return CheckboxListTile.adaptive(
-                                  controlAffinity:
-                                      ListTileControlAffinity.trailing,
-                                  title: AppText(
-                                    text: option.name,
-                                  ),
-                                  subtitle: option.price != null ||
-                                          option.calories != null
-                                      ? Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            if (option.price != null)
-                                              AppText(
-                                                text: '+ \$${option.price}',
-                                                color: AppColors.neutral500,
-                                              ),
-                                            if (option.calories != null)
-                                              AppText(
-                                                text:
-                                                    '${option.calories!.toInt()} Cal.',
-                                                color: AppColors.neutral500,
-                                              ),
-                                          ],
-                                        )
-                                      : null,
-                                  value: _optionalOptions[index],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _optionalOptions[index] = value;
-                                    });
-                                  },
+                                  ],
                                 );
-                              });
-                  },
-                  separatorBuilder: (context, index) => const Divider(),
-                ),
+                              },
+                            )
+                          : Builder(builder: (context) {
+                              int chosenQuantity = 0;
+                              return ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: option.subOptions.length,
+                                  itemBuilder: (context, subOptionIndex) {
+                                    final subOption =
+                                        option.subOptions[subOptionIndex];
+
+                                    return subOption.canBeMultiple
+                                        ? ListTile(
+                                            trailing: _optionQuantities[
+                                                        subOptionIndex] ==
+                                                    0
+                                                ? TextButton(
+                                                    style: TextButton.styleFrom(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(0),
+                                                        backgroundColor:
+                                                            AppColors
+                                                                .neutral100,
+                                                        shape:
+                                                            const CircleBorder()),
+                                                    onPressed: chosenQuantity ==
+                                                            option
+                                                                .canBeMultipleLimit
+                                                        ? null
+                                                        : () {
+                                                            setState(() {
+                                                              _optionQuantities[
+                                                                  subOptionIndex] = 1;
+                                                              chosenQuantity +=
+                                                                  1;
+                                                            });
+                                                          },
+                                                    child: const AppText(
+                                                      text: '+',
+                                                      size: AppSizes.body,
+                                                    ))
+                                                : Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                        TextButton(
+                                                            style: TextButton.styleFrom(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(3),
+                                                                backgroundColor:
+                                                                    AppColors
+                                                                        .neutral100,
+                                                                shape:
+                                                                    const CircleBorder()),
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                _optionQuantities[
+                                                                    subOptionIndex] -= 1;
+                                                                chosenQuantity -=
+                                                                    1;
+                                                              });
+                                                            },
+                                                            child: const AppText(
+                                                                text: '-',
+                                                                size: AppSizes
+                                                                    .body)),
+                                                        AppText(
+                                                            text: _optionQuantities[
+                                                                    subOptionIndex]
+                                                                .toString()),
+                                                        TextButton(
+                                                            style: TextButton.styleFrom(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(3),
+                                                                backgroundColor:
+                                                                    AppColors
+                                                                        .neutral100,
+                                                                shape:
+                                                                    const CircleBorder()),
+                                                            onPressed: _optionQuantities[
+                                                                        subOptionIndex] <=
+                                                                    option
+                                                                        .canBeMultipleLimit!
+                                                                ? () {
+                                                                    setState(
+                                                                        () {
+                                                                      _optionQuantities[
+                                                                          subOptionIndex] += 1;
+                                                                      chosenQuantity +=
+                                                                          1;
+                                                                    });
+                                                                  }
+                                                                : null,
+                                                            child: const AppText(
+                                                                text: '+',
+                                                                size: AppSizes
+                                                                    .body)),
+                                                      ]),
+                                            title: AppText(
+                                              text: subOption.name,
+                                            ),
+                                            subtitle: subOption.price != null ||
+                                                    subOption.calories != null
+                                                ? Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      if (subOption.price !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              '+  ${_optionQuantities[subOptionIndex] == 0 ? '\$${subOption.price}' : '\$${subOption.price! * _optionQuantities[subOptionIndex]} (\$${subOption.price!.toStringAsFixed(2)} ea)'} ',
+                                                          color: AppColors
+                                                              .neutral500,
+                                                        ),
+                                                      if (subOption.calories !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              '${subOption.calories!.toInt()} Cal.',
+                                                          color: AppColors
+                                                              .neutral500,
+                                                        ),
+                                                    ],
+                                                  )
+                                                : null,
+                                          )
+                                        : CheckboxListTile.adaptive(
+                                            controlAffinity:
+                                                ListTileControlAffinity
+                                                    .trailing,
+                                            title: AppText(
+                                              text: subOption.name,
+                                            ),
+                                            subtitle: subOption.price != null ||
+                                                    subOption.calories != null
+                                                ? Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      if (subOption.price !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              '+ \$${subOption.price}',
+                                                          color: AppColors
+                                                              .neutral500,
+                                                        ),
+                                                      if (subOption.calories !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              '${subOption.calories!.toInt()} Cal.',
+                                                          color: AppColors
+                                                              .neutral500,
+                                                        ),
+                                                    ],
+                                                  )
+                                                : null,
+                                            value: _requiredOptions[
+                                                        option.name] !=
+                                                    null &&
+                                                _requiredOptions[option.name]!
+                                                    .any(
+                                                  (option) =>
+                                                      option.name ==
+                                                      subOption.name,
+                                                ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                if (_requiredOptions[
+                                                        option.name] ==
+                                                    null) {
+                                                  _requiredOptions[
+                                                      option.name] = [
+                                                    HiveOption(
+                                                        name: subOption.name,
+                                                        categoryName:
+                                                            option.name)
+                                                  ];
+                                                } else {
+                                                  if (_requiredOptions[
+                                                              option.name]!
+                                                          .firstWhereOrNull(
+                                                        (option) =>
+                                                            option.name ==
+                                                            subOption.name,
+                                                      ) ==
+                                                      null) {
+                                                    _requiredOptions[
+                                                            option.name]!
+                                                        .add(HiveOption(
+                                                            name:
+                                                                subOption.name,
+                                                            categoryName:
+                                                                option.name));
+                                                  } else {
+                                                    _requiredOptions[
+                                                            option.name]!
+                                                        .removeWhere(
+                                                      (option) =>
+                                                          option.name ==
+                                                          subOption.name,
+                                                    );
+                                                  }
+                                                }
+                                              });
+                                            },
+                                          );
+                                  });
+                            })
+                    ],
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(),
+              ),
+              SliverList.separated(
+                itemCount: _product.optionalOptions.length,
+                itemBuilder: (context, index) {
+                  final option = _product.optionalOptions[index];
+
+                  return Column(
+                    children: [
+                      option.isExclusive == true
+                          ? ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: option.subOptions.length,
+                              itemBuilder: (context, index) {
+                                final subOption = option.subOptions[index];
+                                final selectedSubOption =
+                                    _optionalOptions[option.name]?.firstOrNull;
+                                return Column(
+                                  children: [
+                                    RadioListTile.adaptive(
+                                      title: AppText(text: subOption.name),
+                                      value: subOption.name,
+                                      groupValue: selectedSubOption,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          setState(() {
+                                            _optionalOptions[option.name] = [
+                                              HiveOption(
+                                                  name: subOption.name,
+                                                  categoryName: option.name)
+                                            ];
+                                          });
+                                        }
+                                      },
+                                      controlAffinity:
+                                          ListTileControlAffinity.trailing,
+                                      subtitle: AppText(
+                                          text: subOption.price.toString()),
+                                    ),
+                                    if (_optionalOptions[option.name] != null &&
+                                        option.subOptions.isNotEmpty)
+                                      Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                            color: AppColors.neutral100,
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: Column(
+                                          children: [
+                                            if (selectedSubOption != null)
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  AppText(
+                                                    text:
+                                                        '${option.name} Additions',
+                                                    weight: FontWeight.bold,
+                                                    size: AppSizes.body,
+                                                  ),
+                                                  AppText(
+                                                    text:
+                                                        selectedSubOption.name,
+                                                    color: AppColors.neutral500,
+                                                  )
+                                                ],
+                                              ),
+                                            ListTile(
+                                              onTap: () => navigatorKey
+                                                  .currentState!
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SubOptionSelectionScreen(
+                                                  currentTotal: currentTotal,
+                                                  productInbox: _productInbox,
+                                                  option: option,
+                                                ),
+                                              )),
+                                              title: const AppText(
+                                                text: 'Edit selections',
+                                                weight: FontWeight.bold,
+                                              ),
+                                              trailing: const Icon(
+                                                Icons.keyboard_arrow_right,
+                                                color: AppColors.neutral500,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                  ],
+                                );
+                              },
+                            )
+                          : Builder(builder: (context) {
+                              int chosenQuantity = 0;
+                              return ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: option.subOptions.length,
+                                  itemBuilder: (context, index) {
+                                    final subOption = option.subOptions[index];
+
+                                    return subOption.canBeMultiple
+                                        ? ListTile(
+                                            trailing: _optionQuantities[_product
+                                                            .requiredOptions
+                                                            .length +
+                                                        index] ==
+                                                    0
+                                                ? TextButton(
+                                                    style: TextButton.styleFrom(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(0),
+                                                        backgroundColor:
+                                                            AppColors
+                                                                .neutral100,
+                                                        shape:
+                                                            const CircleBorder()),
+                                                    onPressed: chosenQuantity ==
+                                                            option
+                                                                .canBeMultipleLimit
+                                                        ? null
+                                                        : () {
+                                                            setState(() {
+                                                              _optionQuantities[_product
+                                                                      .requiredOptions
+                                                                      .length +
+                                                                  index] = 1;
+                                                            });
+                                                          },
+                                                    child: const AppText(
+                                                      text: '+',
+                                                      size: AppSizes.body,
+                                                    ))
+                                                : Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                        TextButton(
+                                                            style: TextButton.styleFrom(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(3),
+                                                                backgroundColor:
+                                                                    AppColors
+                                                                        .neutral100,
+                                                                shape:
+                                                                    const CircleBorder()),
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                _optionQuantities[_product
+                                                                        .requiredOptions
+                                                                        .length +
+                                                                    index] -= 1;
+                                                                chosenQuantity -=
+                                                                    1;
+                                                              });
+                                                            },
+                                                            child: const AppText(
+                                                                text: '-',
+                                                                size: AppSizes
+                                                                    .body)),
+                                                        AppText(
+                                                            text: _optionQuantities[_product
+                                                                        .requiredOptions
+                                                                        .length +
+                                                                    index]
+                                                                .toString()),
+                                                        TextButton(
+                                                            style: TextButton.styleFrom(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(3),
+                                                                backgroundColor:
+                                                                    AppColors
+                                                                        .neutral100,
+                                                                shape:
+                                                                    const CircleBorder()),
+                                                            onPressed: _optionQuantities[_product
+                                                                            .requiredOptions
+                                                                            .length +
+                                                                        index] <=
+                                                                    option
+                                                                        .canBeMultipleLimit!
+                                                                ? () {
+                                                                    setState(
+                                                                        () {
+                                                                      _optionQuantities[_product
+                                                                              .requiredOptions
+                                                                              .length +
+                                                                          index] += 1;
+                                                                      chosenQuantity +=
+                                                                          1;
+                                                                    });
+                                                                  }
+                                                                : null,
+                                                            child: const AppText(
+                                                                text: '+',
+                                                                size: AppSizes
+                                                                    .body)),
+                                                      ]),
+                                            title: AppText(
+                                              text: subOption.name,
+                                            ),
+                                            subtitle: subOption.price != null ||
+                                                    subOption.calories != null
+                                                ? Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      if (subOption.price !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              '+  ${_optionQuantities[_product.requiredOptions.length + index] == 0 ? '\$${subOption.price}' : '\$${subOption.price! * _optionQuantities[_product.requiredOptions.length + index]} (\$${subOption.price!.toStringAsFixed(2)} ea)'} ',
+                                                          color: AppColors
+                                                              .neutral500,
+                                                        ),
+                                                      if (subOption.calories !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              '${subOption.calories!.toInt()} Cal.',
+                                                          color: AppColors
+                                                              .neutral500,
+                                                        ),
+                                                    ],
+                                                  )
+                                                : null,
+                                          )
+                                        : CheckboxListTile.adaptive(
+                                            controlAffinity:
+                                                ListTileControlAffinity
+                                                    .trailing,
+                                            title: AppText(
+                                              text: subOption.name,
+                                            ),
+                                            subtitle: subOption.price != null ||
+                                                    subOption.calories != null
+                                                ? Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      if (subOption.price !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              '+ \$${subOption.price}',
+                                                          color: AppColors
+                                                              .neutral500,
+                                                        ),
+                                                      if (subOption.calories !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              '${subOption.calories!.toInt()} Cal.',
+                                                          color: AppColors
+                                                              .neutral500,
+                                                        ),
+                                                    ],
+                                                  )
+                                                : null,
+                                            value: _optionalOptions[
+                                                        option.name] !=
+                                                    null &&
+                                                _optionalOptions[option.name]!
+                                                    .any(
+                                                  (option) =>
+                                                      option.name ==
+                                                      subOption.name,
+                                                ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                if (_optionalOptions[
+                                                        option.name] ==
+                                                    null) {
+                                                  _optionalOptions[
+                                                      option.name] = [
+                                                    HiveOption(
+                                                        name: subOption.name,
+                                                        categoryName:
+                                                            option.name)
+                                                  ];
+                                                } else {
+                                                  if (_optionalOptions[
+                                                              option.name]!
+                                                          .firstWhereOrNull(
+                                                        (option) =>
+                                                            option.name ==
+                                                            subOption.name,
+                                                      ) ==
+                                                      null) {
+                                                    _optionalOptions[
+                                                            option.name]!
+                                                        .add(HiveOption(
+                                                            name:
+                                                                subOption.name,
+                                                            categoryName:
+                                                                option.name));
+                                                  } else {
+                                                    _optionalOptions[
+                                                            option.name]!
+                                                        .removeWhere(
+                                                      (option) =>
+                                                          option.name ==
+                                                          subOption.name,
+                                                    );
+                                                  }
+                                                }
+                                              });
+                                            },
+                                          );
+                                  });
+                            })
+                    ],
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(),
+              ),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppSizes.horizontalPaddingSmall),
@@ -535,23 +988,44 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               InkWell(
-                                  onTap: () {
-                                    if (_quantity != 1) {
+                                  onTap: () async {
+                                    if (_quantity == 1 &&
+                                        _productInbox != null) {
+                                      _cartItemInBox!.subtotal -=
+                                          _product.promoPrice ??
+                                              _product.initialPrice;
+                                      _cartItemInBox!.initialPricesTotal -=
+                                          _product.initialPrice;
+                                      await _cartItemInBox!.save();
+                                      await _productInbox!.delete().then(
+                                        (value) {
+                                          if (_cartItemInBox!
+                                              .products.isEmpty) {
+                                            _cartItemInBox!.delete();
+                                          }
+                                        },
+                                      );
                                       setState(() {
-                                        _quantity -= 1;
-                                        if (_footerButtonTapped == true) {
-                                          _footerButtonTapped = false;
-                                        }
+                                        _productInbox = null;
                                       });
+                                    } else {
+                                      if (_quantity != 1) {
+                                        setState(() {
+                                          _quantity -= 1;
+                                        });
+                                      }
                                     }
                                   },
                                   child: Ink(
-                                      child: Iconify(
-                                    Octicon.dash_24,
-                                    color: (_quantity != 1)
-                                        ? Colors.black
-                                        : AppColors.neutral300,
-                                  ))),
+                                      child: (_quantity == 1 &&
+                                              _productInbox != null)
+                                          ? const Icon(Icons.delete_outline)
+                                          : Iconify(
+                                              Octicon.dash_24,
+                                              color: (_quantity != 1)
+                                                  ? Colors.black
+                                                  : AppColors.neutral300,
+                                            ))),
                               AppText(
                                 text: _quantity.toString(),
                               ),
@@ -559,9 +1033,6 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                   onTap: () {
                                     setState(() {
                                       _quantity += 1;
-                                      if (_footerButtonTapped == true) {
-                                        _footerButtonTapped = false;
-                                      }
                                     });
                                   },
                                   child: Ink(child: const Icon(Icons.add)))
@@ -570,7 +1041,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ),
                       ),
                       // Add note
-                      if (widget.store.type.toLowerCase().contains('grocery'))
+                      if (_product.similarProducts.isNotEmpty)
                         Column(children: [
                           const Gap(10),
                           ListTile(
@@ -660,10 +1131,12 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                 },
                                                 secondary: AppButton2(
                                                     text: 'Select',
-                                                    callback: () {
-                                                      navigatorKey.currentState!
-                                                          .push(
-                                                              MaterialPageRoute(
+                                                    callback: () async {
+                                                      final temp =
+                                                          await navigatorKey
+                                                              .currentState!
+                                                              .push(
+                                                                  MaterialPageRoute(
                                                         builder: (context) {
                                                           return BackUpOptionScreen(
                                                               product: widget
@@ -672,6 +1145,10 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                                   widget.store);
                                                         },
                                                       ));
+                                                      if (temp != null) {
+                                                        _selectedReplacementId =
+                                                            temp;
+                                                      }
                                                     }),
                                                 controlAffinity:
                                                     ListTileControlAffinity
@@ -720,14 +1197,14 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                               contentPadding: EdgeInsets.zero,
                               leading: const Icon(Icons.repeat),
                               title: AppText(
-                                text: _note.isEmpty
+                                text: _noteController.text.trim().isEmpty
                                     ? 'Add note or edit replacement'
-                                    : _note,
+                                    : _noteController.text,
                                 weight: FontWeight.w600,
                               ),
                               trailing: const Icon(Icons.keyboard_arrow_right),
                               subtitle:
-                                  AppText(text: _backupInstruction.toString())),
+                                  AppText(text: _backupInstruction ?? '')),
                           const Gap(10),
                         ])
                     ],
@@ -968,8 +1445,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                     ]),
                   ),
                 ),
-              if (_product.similarProducts != null &&
-                  _product.similarProducts!.isNotEmpty)
+              if (_product.similarProducts.isNotEmpty)
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSizes.horizontalPaddingSmall),
@@ -985,7 +1461,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         separatorBuilder: (context, index) => const Divider(),
-                        itemCount: _product.similarProducts!.length,
+                        itemCount: _product.similarProducts.length,
                         itemBuilder: (context, index) {
                           return FutureBuilder<Product>(
                               future: AppFunctions.loadProductReference(_product
@@ -1073,21 +1549,11 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                         Stack(
                                           alignment: Alignment.bottomRight,
                                           children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              child: Builder(
-                                                builder: (context) {
-                                                  return AppFunctions
-                                                      .displayNetworkImage(
-                                                          similarProduct
-                                                              .imageUrls.first,
-                                                          fit: BoxFit.fill,
-                                                          height: 100,
-                                                          width: 100);
-                                                },
-                                              ),
-                                            ),
+                                            AppFunctions.displayNetworkImage(
+                                                similarProduct.imageUrls.first,
+                                                fit: BoxFit.fill,
+                                                height: 100,
+                                                width: 100),
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   right: 8.0, top: 8.0),
@@ -1142,111 +1608,108 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                     ]),
                   ),
                 ),
-              SliverPadding(
-                  sliver: SliverToBoxAdapter(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      children: [
-                        if (widget.product.description != null)
-                          ExpansionTile(
-                            tilePadding: EdgeInsets.zero,
-                            childrenPadding: EdgeInsets.zero,
-                            title: const AppText(
-                              text: 'Description',
-                              weight: FontWeight.w600,
-                              size: AppSizes.bodySmall,
-                            ),
-                            children: [
-                              AppText(
-                                  text: widget.product.description!,
-                                  color: AppColors.neutral500)
-                            ],
+              Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: SliverToBoxAdapter(
+                  child: ListView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    children: [
+                      if (_product.description != null)
+                        ExpansionTile(
+                          title: const AppText(
+                            text: 'Description',
+                            weight: FontWeight.w600,
+                            size: AppSizes.bodySmall,
                           ),
-                        if (widget.product.nutritionFacts != null)
-                          ExpansionTile(
-                            tilePadding: EdgeInsets.zero,
-                            childrenPadding: EdgeInsets.zero,
-                            title: const AppText(
-                              text: 'Nutrition Facts',
-                              weight: FontWeight.w600,
-                              size: AppSizes.bodySmall,
-                            ),
-                            children:
-                                widget.product.nutritionFacts!.entries.map(
-                              (entry) {
-                                return Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        AppText(
-                                          text: entry.key,
-                                          weight: FontWeight.w600,
-                                        ),
-                                        AppText(text: entry.value)
-                                      ],
-                                    ),
-                                    const Divider(
-                                      color: Colors.black,
-                                    )
-                                  ],
-                                );
-                              },
-                            ).toList(),
+                          children: [
+                            AppText(
+                                text: _product.description!,
+                                color: AppColors.neutral500)
+                          ],
+                        ),
+                      if (_product.nutritionFacts != null)
+                        ExpansionTile(
+                          title: const AppText(
+                            text: 'Nutrition Facts',
+                            weight: FontWeight.w600,
+                            size: AppSizes.bodySmall,
                           ),
-                        if (widget.product.ingredients != null)
-                          ExpansionTile(
-                            tilePadding: EdgeInsets.zero,
-                            childrenPadding: EdgeInsets.zero,
-                            title: const AppText(
-                              text: 'Ingredients',
-                              weight: FontWeight.w600,
-                              size: AppSizes.bodySmall,
-                            ),
-                            children: [
-                              AppText(
-                                  text: widget.product.ingredients!,
-                                  color: AppColors.neutral500)
-                            ],
+                          children: _product.nutritionFacts!.entries.map(
+                            (entry) {
+                              return Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      AppText(
+                                        text: entry.key,
+                                        weight: FontWeight.w600,
+                                      ),
+                                      AppText(text: entry.value)
+                                    ],
+                                  ),
+                                  const Divider(
+                                    color: Colors.black,
+                                  )
+                                ],
+                              );
+                            },
+                          ).toList(),
+                        ),
+                      if (_product.ingredients != null)
+                        ExpansionTile(
+                          title: const AppText(
+                            text: 'Ingredients',
+                            weight: FontWeight.w600,
+                            size: AppSizes.bodySmall,
                           ),
-                        if (widget.product.directions != null)
-                          ExpansionTile(
-                            tilePadding: EdgeInsets.zero,
-                            childrenPadding: EdgeInsets.zero,
-                            title: const AppText(
-                              text: 'Directions',
-                              weight: FontWeight.w600,
-                              size: AppSizes.bodySmall,
-                            ),
-                            children: [
-                              AppText(
-                                  text: widget.product.directions!,
-                                  color: AppColors.neutral500)
-                            ],
+                          children: [
+                            AppText(
+                                text: _product.ingredients!,
+                                color: AppColors.neutral500)
+                          ],
+                        ),
+                      if (_product.directions != null)
+                        ExpansionTile(
+                          title: const AppText(
+                            text: 'Directions',
+                            weight: FontWeight.w600,
+                            size: AppSizes.bodySmall,
                           ),
-                      ],
-                    ),
+                          children: [
+                            AppText(
+                                text: _product.directions!,
+                                color: AppColors.neutral500)
+                          ],
+                        ),
+                    ],
                   ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.horizontalPaddingSmall)),
+                ),
+              ),
               if (widget.store.type.contains('Grocery'))
                 SliverToBoxAdapter(
-                    child: ListView(shrinkWrap: true, children: const [
-                  Divider(
-                    thickness: 1,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    child: AppText(
-                        size: AppSizes.bodySmallest,
-                        color: AppColors.neutral500,
-                        text:
-                            'The information shown here may not be current, complete or accurate. Always check the item\'s packaging for product information and warnings.\n\nThe prices in this catalog are set by the merchant and may be higher than in store. Some in-store promotions may not apply.'),
-                  ),
-                ])),
+                    child: ListView(
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: const [
+                      Divider(
+                        thickness: 1,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: AppSizes.horizontalPaddingSmall),
+                        child: AppText(
+                            size: AppSizes.bodySmallest,
+                            color: AppColors.neutral500,
+                            text:
+                                'The information shown here may not be current, complete or accurate. Always check the item\'s packaging for product information and warnings.\n\nThe prices in this catalog are set by the merchant and may be higher than in store. Some in-store promotions may not apply.'),
+                      ),
+                    ])),
               if (widget.store.type.contains('Fast Food') ||
                   widget.store.type.contains('Restaurant'))
                 SliverToBoxAdapter(
@@ -1293,65 +1756,115 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
             ],
           )),
       persistentFooterButtons: [
-        if (!_footerButtonTapped)
-          InkWell(
-            onTap: () {
-              if (_product.selectOptionRequired == true &&
-                  _selectedExclusiveOption == null) {
+        if (_productInbox?.quantity != _quantity)
+          AppButton(
+            isLoading: _isLoading,
+            text:
+                'Add ($_quantity) to cart • \$${currentTotal.toStringAsFixed(2)}',
+            callback: () async {
+              if (_requiredOptions.length != _product.requiredOptions.length) {
                 showInfoToast('Select an option',
                     context: navigatorKey.currentContext);
               } else {
                 setState(() {
-                  _footerButtonTapped = true;
+                  _isLoading = true;
+                });
+
+                List<HiveOption> requiredOptions = [];
+                for (var i = 0; i < _requiredOptions.values.length; i++) {
+                  var options = _requiredOptions.values.elementAt(i);
+                  for (var j = 0; i < options.length; i++) {
+                    var option = options[j];
+                    option.quantity = _optionQuantities[i + j];
+                    requiredOptions.add(option);
+                  }
+                }
+
+                List<HiveOption> optionalOptions = [];
+                for (var i = _product.requiredOptions.length;
+                    i <
+                        _product.requiredOptions.length +
+                            _optionalOptions.values.length;
+                    i++) {
+                  var options = _optionalOptions.values.elementAt(i);
+                  for (var j = 0; i < options.length; i++) {
+                    var option = options[j];
+                    option.quantity = _optionQuantities[i + j];
+                    optionalOptions.add(option);
+                  }
+                }
+                if (_productInbox == null) {
+                  final newProduct = HiveCartProduct(
+                    id: _product.id,
+                    quantity: _quantity,
+                    backupInstruction: _backupInstruction,
+                    note: _noteController.text,
+                    requiredOptions: requiredOptions,
+                    optionalOptions: optionalOptions,
+                    productReplacementId: _selectedReplacementId,
+                  );
+                  await _productsBox.add(newProduct);
+                  if (_cartItemInBox == null) {
+                    var temp = HiveCartItem(
+                      deliveryDate: ref.read(deliveryScheduleProvider),
+                      placeDescription: ref.read(selectedLocationDescription),
+                      products: HiveList(_productsBox),
+                      initialPricesTotal: _product.initialPrice * _quantity,
+                      subtotal: _product.promoPrice ??
+                          _product.initialPrice * _quantity,
+                      storeId: widget.store.id,
+                    );
+                    temp.products.add(_productsBox.values.last);
+                    await Hive.box<HiveCartItem>(AppBoxes.carts).add(temp);
+                    _cartItemInBox = _cart.values.firstWhere(
+                      (element) => element.storeId == widget.store.id,
+                    );
+                  } else {
+                    _cartItemInBox!.products.add(_productsBox.values.last);
+                    _cartItemInBox!.subtotal = initialSubTotal +
+                        (_product.promoPrice ??
+                            _product.initialPrice * _quantity);
+                    _cartItemInBox!.initialPricesTotal =
+                        initialInitialPricesTotal +
+                            _product.initialPrice * _quantity;
+
+                    await _cartItemInBox!.save();
+                  }
+                  _productInbox = _productsBox.values.last;
+                } else {
+                  _productInbox!.quantity = _quantity;
+                  await _productInbox!.save();
+                  _cartItemInBox!.subtotal = initialSubTotal +
+                      (_product.promoPrice ??
+                          _product.initialPrice * _quantity);
+                  _cartItemInBox!.initialPricesTotal =
+                      initialInitialPricesTotal +
+                          _product.initialPrice * _quantity;
+                  await _cartItemInBox!.save();
+                }
+
+                setState(() {
+                  _isLoading = false;
                 });
               }
             },
-            child: Ink(
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                decoration: BoxDecoration(
-                    color: _product.selectOptionRequired == false
-                        ? Colors.black
-                        : _product.selectOptionRequired == true &&
-                                _selectedExclusiveOption != null
-                            ? Colors.black
-                            : AppColors.neutral200,
-                    borderRadius: BorderRadius.circular(10)),
-                width: double.infinity,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AppText(
-                        color: _product.selectOptionRequired == false
-                            ? Colors.white
-                            : _product.selectOptionRequired == true &&
-                                    _selectedExclusiveOption != null
-                                ? Colors.white
-                                : Colors.black,
-                        text:
-                            'Add $_quantity to cart • \$${((_product.promoPrice ?? _product.initialPrice) * _quantity).toStringAsFixed(2)}'),
-                    Visibility(
-                        visible: _product.promoPrice != null,
-                        child: AppText(
-                            color: Colors.white,
-                            decoration: TextDecoration.lineThrough,
-                            text: (_product.initialPrice * _quantity)
-                                .toStringAsFixed(2)))
-                  ],
-                ),
-              ),
-            ),
           )
-        // AppButton(
-        //     callback: () {
-        //       setState(() {
-        //         _footerButtonTapped = true;
-        //       });
-        //     },
-        //     text:
-        //         'Add $_quantity to cart • \$${(_product.promoPrice ?? _product.initialPrice) * _quantity} ${_product.promoPrice != null ? _product.initialPrice * _quantity : ''}')
         else
-          AppButton(callback: () {}, text: 'View cart ($_quantity)')
+          AppButton(
+              callback: () {
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  context: context,
+                  builder: (context) {
+                    return CartSheet(
+                      store: widget.store,
+                      cartItem: _cartItemInBox!,
+                    );
+                  },
+                );
+              },
+              text: 'View cart ($_quantity)')
       ],
     );
   }

@@ -777,7 +777,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
 
 class AppButton2 extends StatefulWidget {
   final String text;
-  final VoidCallback callback;
+  final VoidCallback? callback;
   final OutlinedBorder? shape;
   final Color textColor;
   final Color backgroundColor;

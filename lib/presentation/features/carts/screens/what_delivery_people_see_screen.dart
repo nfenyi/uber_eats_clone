@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dh_slider/dh_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'dart:ui' as ui;
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -20,6 +24,29 @@ class _WhatDeliveryPeopleSeeScreenState
   double _sliderProgress = 0;
   final _carouselController = CarouselSliderController();
 
+  Future<ui.Image> getImageFuture(
+    ImageProvider provider, {
+    ImageConfiguration config = ImageConfiguration.empty,
+  }) {
+    //new Completer
+    Completer<ui.Image> completer = Completer<ui.Image>();
+    ImageStreamListener? listener;
+    //获取图片流
+    ImageStream stream = provider.resolve(config);
+    listener = ImageStreamListener((ImageInfo frame, bool sync) {
+      //stream 流监听
+      final ui.Image image = frame.image;
+      //完成事件
+      completer.complete(image);
+      //移除监听
+      stream.removeListener(listener!);
+    });
+    //添加监听
+    stream.addListener(listener);
+    //返回image
+    return completer.future;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,37 +64,67 @@ class _WhatDeliveryPeopleSeeScreenState
                   const AppText(
                     text: 'What delivery people see about you',
                     weight: FontWeight.w600,
-                    size: AppSizes.heading3,
+                    size: AppSizes.heading4,
                   ),
                   const Gap(10),
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
+                  Stack(
+                    alignment: AlignmentDirectional.center,
                     children: [
-                      Container(
-                        color: Colors.black,
-                        width: 5,
-                        height: 5,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.horizontalPaddingSmall - 6),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.black,
+                              ),
+                              width: 10,
+                              height: 10,
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.black,
+                              ),
+                              width: 10,
+                              height: 10,
+                            ),
+                          ],
+                        ),
                       ),
-                      Expanded(
-                        child: Slider.adaptive(
-                            thumbColor: Colors.white,
-                            min: 0,
-                            max: 2,
-                            divisions: 2,
-                            value: _sliderProgress,
-                            onChanged: (value) {
-                              setState(() {
-                                _sliderProgress = value;
-                                _carouselController
-                                    .animateToPage(value.toInt());
-                              });
-                            }),
-                      ),
-                      Container(
-                        color: Colors.black,
-                        width: 5,
-                        height: 5,
-                      ),
+                      FutureBuilder(
+                          future:
+                              getImageFuture(AssetImage(AssetNames.bowlOfFood)),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return DHSlider(
+                                margin: EdgeInsets.zero,
+                                padding: EdgeInsets.zero,
+                                inactiveTrackColor: AppColors.neutral100,
+                                enabledThumbRadius: 20,
+                                trackImage: null,
+                                value: _sliderProgress,
+                                thumbImage: snapshot.data,
+                                trackHeight: 3,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _sliderProgress = value;
+                                    _carouselController
+                                        .animateToPage(value.toInt());
+                                  });
+                                },
+                                divisions: 2,
+                                min: 0,
+                                max: 2,
+                              );
+                            } else {
+                              return const SizedBox.shrink();
+                            }
+                          }),
                     ],
                   ),
                 ],
@@ -244,7 +301,7 @@ class _WhatDeliveryPeopleSeeScreenState
                     text:
                         'Uber never shows your delivery person the following information',
                     weight: FontWeight.w600,
-                    size: AppSizes.heading3,
+                    size: AppSizes.heading4,
                   ),
                   const Gap(20),
                   Image.asset(
@@ -296,7 +353,7 @@ class _WhatDeliveryPeopleSeeScreenState
                     text:
                         'Uber removes your information when delivery is complete',
                     weight: FontWeight.w600,
-                    size: AppSizes.heading3,
+                    size: AppSizes.heading4,
                   ),
                   const Gap(20),
                   const ExpansionTile(

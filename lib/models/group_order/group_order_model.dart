@@ -7,7 +7,7 @@ part 'group_order_model.g.dart';
 @freezed
 class GroupOrder with _$GroupOrder {
   factory GroupOrder({
-    required String? id,
+    required String id,
     required DateTime? createdAt,
     required String name,
     DateTime? firstOrderSchedule,

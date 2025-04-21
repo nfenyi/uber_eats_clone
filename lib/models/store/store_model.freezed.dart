@@ -1884,8 +1884,8 @@ mixin _$Product {
   String? get directions => throw _privateConstructorUsedError;
   String? get quantity => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
-  List<Option>? get options => throw _privateConstructorUsedError;
-  bool get selectOptionRequired => throw _privateConstructorUsedError;
+  List<Option> get optionalOptions => throw _privateConstructorUsedError;
+  List<Option> get requiredOptions => throw _privateConstructorUsedError;
   double? get calories => throw _privateConstructorUsedError;
   bool? get isSoldOut => throw _privateConstructorUsedError;
   bool? get isSponsored => throw _privateConstructorUsedError;
@@ -1919,8 +1919,8 @@ abstract class $ProductCopyWith<$Res> {
       String? directions,
       String? quantity,
       String? description,
-      List<Option>? options,
-      bool selectOptionRequired,
+      List<Option> optionalOptions,
+      List<Option> requiredOptions,
       double? calories,
       bool? isSoldOut,
       bool? isSponsored,
@@ -1955,8 +1955,8 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
     Object? directions = freezed,
     Object? quantity = freezed,
     Object? description = freezed,
-    Object? options = freezed,
-    Object? selectOptionRequired = null,
+    Object? optionalOptions = null,
+    Object? requiredOptions = null,
     Object? calories = freezed,
     Object? isSoldOut = freezed,
     Object? isSponsored = freezed,
@@ -2009,14 +2009,14 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      options: freezed == options
-          ? _value.options
-          : options // ignore: cast_nullable_to_non_nullable
-              as List<Option>?,
-      selectOptionRequired: null == selectOptionRequired
-          ? _value.selectOptionRequired
-          : selectOptionRequired // ignore: cast_nullable_to_non_nullable
-              as bool,
+      optionalOptions: null == optionalOptions
+          ? _value.optionalOptions
+          : optionalOptions // ignore: cast_nullable_to_non_nullable
+              as List<Option>,
+      requiredOptions: null == requiredOptions
+          ? _value.requiredOptions
+          : requiredOptions // ignore: cast_nullable_to_non_nullable
+              as List<Option>,
       calories: freezed == calories
           ? _value.calories
           : calories // ignore: cast_nullable_to_non_nullable
@@ -2061,8 +2061,8 @@ abstract class _$$ProductImplCopyWith<$Res> implements $ProductCopyWith<$Res> {
       String? directions,
       String? quantity,
       String? description,
-      List<Option>? options,
-      bool selectOptionRequired,
+      List<Option> optionalOptions,
+      List<Option> requiredOptions,
       double? calories,
       bool? isSoldOut,
       bool? isSponsored,
@@ -2095,8 +2095,8 @@ class __$$ProductImplCopyWithImpl<$Res>
     Object? directions = freezed,
     Object? quantity = freezed,
     Object? description = freezed,
-    Object? options = freezed,
-    Object? selectOptionRequired = null,
+    Object? optionalOptions = null,
+    Object? requiredOptions = null,
     Object? calories = freezed,
     Object? isSoldOut = freezed,
     Object? isSponsored = freezed,
@@ -2149,14 +2149,14 @@ class __$$ProductImplCopyWithImpl<$Res>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      options: freezed == options
-          ? _value._options
-          : options // ignore: cast_nullable_to_non_nullable
-              as List<Option>?,
-      selectOptionRequired: null == selectOptionRequired
-          ? _value.selectOptionRequired
-          : selectOptionRequired // ignore: cast_nullable_to_non_nullable
-              as bool,
+      optionalOptions: null == optionalOptions
+          ? _value._optionalOptions
+          : optionalOptions // ignore: cast_nullable_to_non_nullable
+              as List<Option>,
+      requiredOptions: null == requiredOptions
+          ? _value._requiredOptions
+          : requiredOptions // ignore: cast_nullable_to_non_nullable
+              as List<Option>,
       calories: freezed == calories
           ? _value.calories
           : calories // ignore: cast_nullable_to_non_nullable
@@ -2197,8 +2197,8 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
       this.directions,
       this.quantity,
       this.description,
-      final List<Option>? options,
-      this.selectOptionRequired = false,
+      final List<Option> optionalOptions = const [],
+      final List<Option> requiredOptions = const [],
       this.calories,
       this.isSoldOut,
       this.isSponsored,
@@ -2208,7 +2208,8 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
       : _imageUrls = imageUrls,
         _frequentlyBoughtTogether = frequentlyBoughtTogether,
         _nutritionFacts = nutritionFacts,
-        _options = options,
+        _optionalOptions = optionalOptions,
+        _requiredOptions = requiredOptions,
         _stores = stores,
         _similarProducts = similarProducts;
 
@@ -2260,19 +2261,24 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
   final String? quantity;
   @override
   final String? description;
-  final List<Option>? _options;
-  @override
-  List<Option>? get options {
-    final value = _options;
-    if (value == null) return null;
-    if (_options is EqualUnmodifiableListView) return _options;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
-  }
-
+  final List<Option> _optionalOptions;
   @override
   @JsonKey()
-  final bool selectOptionRequired;
+  List<Option> get optionalOptions {
+    if (_optionalOptions is EqualUnmodifiableListView) return _optionalOptions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_optionalOptions);
+  }
+
+  final List<Option> _requiredOptions;
+  @override
+  @JsonKey()
+  List<Option> get requiredOptions {
+    if (_requiredOptions is EqualUnmodifiableListView) return _requiredOptions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_requiredOptions);
+  }
+
   @override
   final double? calories;
   @override
@@ -2302,7 +2308,7 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Product(name: $name, id: $id, initialPrice: $initialPrice, promoPrice: $promoPrice, imageUrls: $imageUrls, frequentlyBoughtTogether: $frequentlyBoughtTogether, nutritionFacts: $nutritionFacts, ingredients: $ingredients, directions: $directions, quantity: $quantity, description: $description, options: $options, selectOptionRequired: $selectOptionRequired, calories: $calories, isSoldOut: $isSoldOut, isSponsored: $isSponsored, offer: $offer, stores: $stores, similarProducts: $similarProducts)';
+    return 'Product(name: $name, id: $id, initialPrice: $initialPrice, promoPrice: $promoPrice, imageUrls: $imageUrls, frequentlyBoughtTogether: $frequentlyBoughtTogether, nutritionFacts: $nutritionFacts, ingredients: $ingredients, directions: $directions, quantity: $quantity, description: $description, optionalOptions: $optionalOptions, requiredOptions: $requiredOptions, calories: $calories, isSoldOut: $isSoldOut, isSponsored: $isSponsored, offer: $offer, stores: $stores, similarProducts: $similarProducts)';
   }
 
   @override
@@ -2322,8 +2328,8 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
       ..add(DiagnosticsProperty('directions', directions))
       ..add(DiagnosticsProperty('quantity', quantity))
       ..add(DiagnosticsProperty('description', description))
-      ..add(DiagnosticsProperty('options', options))
-      ..add(DiagnosticsProperty('selectOptionRequired', selectOptionRequired))
+      ..add(DiagnosticsProperty('optionalOptions', optionalOptions))
+      ..add(DiagnosticsProperty('requiredOptions', requiredOptions))
       ..add(DiagnosticsProperty('calories', calories))
       ..add(DiagnosticsProperty('isSoldOut', isSoldOut))
       ..add(DiagnosticsProperty('isSponsored', isSponsored))
@@ -2357,9 +2363,10 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
                 other.quantity == quantity) &&
             (identical(other.description, description) ||
                 other.description == description) &&
-            const DeepCollectionEquality().equals(other._options, _options) &&
-            (identical(other.selectOptionRequired, selectOptionRequired) ||
-                other.selectOptionRequired == selectOptionRequired) &&
+            const DeepCollectionEquality()
+                .equals(other._optionalOptions, _optionalOptions) &&
+            const DeepCollectionEquality()
+                .equals(other._requiredOptions, _requiredOptions) &&
             (identical(other.calories, calories) ||
                 other.calories == calories) &&
             (identical(other.isSoldOut, isSoldOut) ||
@@ -2387,8 +2394,8 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
         directions,
         quantity,
         description,
-        const DeepCollectionEquality().hash(_options),
-        selectOptionRequired,
+        const DeepCollectionEquality().hash(_optionalOptions),
+        const DeepCollectionEquality().hash(_requiredOptions),
         calories,
         isSoldOut,
         isSponsored,
@@ -2426,8 +2433,8 @@ abstract class _Product implements Product {
       final String? directions,
       final String? quantity,
       final String? description,
-      final List<Option>? options,
-      final bool selectOptionRequired,
+      final List<Option> optionalOptions,
+      final List<Option> requiredOptions,
       final double? calories,
       final bool? isSoldOut,
       final bool? isSponsored,
@@ -2460,9 +2467,9 @@ abstract class _Product implements Product {
   @override
   String? get description;
   @override
-  List<Option>? get options;
+  List<Option> get optionalOptions;
   @override
-  bool get selectOptionRequired;
+  List<Option> get requiredOptions;
   @override
   double? get calories;
   @override
@@ -2491,12 +2498,9 @@ Option _$OptionFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Option {
   String get name => throw _privateConstructorUsedError;
-  double? get price => throw _privateConstructorUsedError;
-  bool get isExclusive => throw _privateConstructorUsedError;
-  List<SubOption>? get subOptions => throw _privateConstructorUsedError;
-  double? get calories => throw _privateConstructorUsedError;
-  bool get canBeMultiple => throw _privateConstructorUsedError;
   int? get canBeMultipleLimit => throw _privateConstructorUsedError;
+  bool get isExclusive => throw _privateConstructorUsedError;
+  List<SubOption> get subOptions => throw _privateConstructorUsedError;
 
   /// Serializes this Option to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2514,12 +2518,9 @@ abstract class $OptionCopyWith<$Res> {
   @useResult
   $Res call(
       {String name,
-      double? price,
+      int? canBeMultipleLimit,
       bool isExclusive,
-      List<SubOption>? subOptions,
-      double? calories,
-      bool canBeMultiple,
-      int? canBeMultipleLimit});
+      List<SubOption> subOptions});
 }
 
 /// @nodoc
@@ -2538,42 +2539,27 @@ class _$OptionCopyWithImpl<$Res, $Val extends Option>
   @override
   $Res call({
     Object? name = null,
-    Object? price = freezed,
-    Object? isExclusive = null,
-    Object? subOptions = freezed,
-    Object? calories = freezed,
-    Object? canBeMultiple = null,
     Object? canBeMultipleLimit = freezed,
+    Object? isExclusive = null,
+    Object? subOptions = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      price: freezed == price
-          ? _value.price
-          : price // ignore: cast_nullable_to_non_nullable
-              as double?,
-      isExclusive: null == isExclusive
-          ? _value.isExclusive
-          : isExclusive // ignore: cast_nullable_to_non_nullable
-              as bool,
-      subOptions: freezed == subOptions
-          ? _value.subOptions
-          : subOptions // ignore: cast_nullable_to_non_nullable
-              as List<SubOption>?,
-      calories: freezed == calories
-          ? _value.calories
-          : calories // ignore: cast_nullable_to_non_nullable
-              as double?,
-      canBeMultiple: null == canBeMultiple
-          ? _value.canBeMultiple
-          : canBeMultiple // ignore: cast_nullable_to_non_nullable
-              as bool,
       canBeMultipleLimit: freezed == canBeMultipleLimit
           ? _value.canBeMultipleLimit
           : canBeMultipleLimit // ignore: cast_nullable_to_non_nullable
               as int?,
+      isExclusive: null == isExclusive
+          ? _value.isExclusive
+          : isExclusive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      subOptions: null == subOptions
+          ? _value.subOptions
+          : subOptions // ignore: cast_nullable_to_non_nullable
+              as List<SubOption>,
     ) as $Val);
   }
 }
@@ -2587,12 +2573,9 @@ abstract class _$$OptionImplCopyWith<$Res> implements $OptionCopyWith<$Res> {
   @useResult
   $Res call(
       {String name,
-      double? price,
+      int? canBeMultipleLimit,
       bool isExclusive,
-      List<SubOption>? subOptions,
-      double? calories,
-      bool canBeMultiple,
-      int? canBeMultipleLimit});
+      List<SubOption> subOptions});
 }
 
 /// @nodoc
@@ -2609,42 +2592,27 @@ class __$$OptionImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = null,
-    Object? price = freezed,
-    Object? isExclusive = null,
-    Object? subOptions = freezed,
-    Object? calories = freezed,
-    Object? canBeMultiple = null,
     Object? canBeMultipleLimit = freezed,
+    Object? isExclusive = null,
+    Object? subOptions = null,
   }) {
     return _then(_$OptionImpl(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      price: freezed == price
-          ? _value.price
-          : price // ignore: cast_nullable_to_non_nullable
-              as double?,
-      isExclusive: null == isExclusive
-          ? _value.isExclusive
-          : isExclusive // ignore: cast_nullable_to_non_nullable
-              as bool,
-      subOptions: freezed == subOptions
-          ? _value._subOptions
-          : subOptions // ignore: cast_nullable_to_non_nullable
-              as List<SubOption>?,
-      calories: freezed == calories
-          ? _value.calories
-          : calories // ignore: cast_nullable_to_non_nullable
-              as double?,
-      canBeMultiple: null == canBeMultiple
-          ? _value.canBeMultiple
-          : canBeMultiple // ignore: cast_nullable_to_non_nullable
-              as bool,
       canBeMultipleLimit: freezed == canBeMultipleLimit
           ? _value.canBeMultipleLimit
           : canBeMultipleLimit // ignore: cast_nullable_to_non_nullable
               as int?,
+      isExclusive: null == isExclusive
+          ? _value.isExclusive
+          : isExclusive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      subOptions: null == subOptions
+          ? _value._subOptions
+          : subOptions // ignore: cast_nullable_to_non_nullable
+              as List<SubOption>,
     ));
   }
 }
@@ -2654,12 +2622,9 @@ class __$$OptionImplCopyWithImpl<$Res>
 class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
   _$OptionImpl(
       {required this.name,
-      this.price,
+      this.canBeMultipleLimit,
       this.isExclusive = true,
-      final List<SubOption>? subOptions,
-      this.calories,
-      this.canBeMultiple = false,
-      this.canBeMultipleLimit})
+      final List<SubOption> subOptions = const []})
       : _subOptions = subOptions;
 
   factory _$OptionImpl.fromJson(Map<String, dynamic> json) =>
@@ -2668,31 +2633,22 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
   @override
   final String name;
   @override
-  final double? price;
+  final int? canBeMultipleLimit;
   @override
   @JsonKey()
   final bool isExclusive;
-  final List<SubOption>? _subOptions;
+  final List<SubOption> _subOptions;
   @override
-  List<SubOption>? get subOptions {
-    final value = _subOptions;
-    if (value == null) return null;
+  @JsonKey()
+  List<SubOption> get subOptions {
     if (_subOptions is EqualUnmodifiableListView) return _subOptions;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
+    return EqualUnmodifiableListView(_subOptions);
   }
 
   @override
-  final double? calories;
-  @override
-  @JsonKey()
-  final bool canBeMultiple;
-  @override
-  final int? canBeMultipleLimit;
-
-  @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Option(name: $name, price: $price, isExclusive: $isExclusive, subOptions: $subOptions, calories: $calories, canBeMultiple: $canBeMultiple, canBeMultipleLimit: $canBeMultipleLimit)';
+    return 'Option(name: $name, canBeMultipleLimit: $canBeMultipleLimit, isExclusive: $isExclusive, subOptions: $subOptions)';
   }
 
   @override
@@ -2701,12 +2657,9 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
     properties
       ..add(DiagnosticsProperty('type', 'Option'))
       ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('price', price))
+      ..add(DiagnosticsProperty('canBeMultipleLimit', canBeMultipleLimit))
       ..add(DiagnosticsProperty('isExclusive', isExclusive))
-      ..add(DiagnosticsProperty('subOptions', subOptions))
-      ..add(DiagnosticsProperty('calories', calories))
-      ..add(DiagnosticsProperty('canBeMultiple', canBeMultiple))
-      ..add(DiagnosticsProperty('canBeMultipleLimit', canBeMultipleLimit));
+      ..add(DiagnosticsProperty('subOptions', subOptions));
   }
 
   @override
@@ -2715,30 +2668,18 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
         (other.runtimeType == runtimeType &&
             other is _$OptionImpl &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.price, price) || other.price == price) &&
+            (identical(other.canBeMultipleLimit, canBeMultipleLimit) ||
+                other.canBeMultipleLimit == canBeMultipleLimit) &&
             (identical(other.isExclusive, isExclusive) ||
                 other.isExclusive == isExclusive) &&
             const DeepCollectionEquality()
-                .equals(other._subOptions, _subOptions) &&
-            (identical(other.calories, calories) ||
-                other.calories == calories) &&
-            (identical(other.canBeMultiple, canBeMultiple) ||
-                other.canBeMultiple == canBeMultiple) &&
-            (identical(other.canBeMultipleLimit, canBeMultipleLimit) ||
-                other.canBeMultipleLimit == canBeMultipleLimit));
+                .equals(other._subOptions, _subOptions));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      name,
-      price,
-      isExclusive,
-      const DeepCollectionEquality().hash(_subOptions),
-      calories,
-      canBeMultiple,
-      canBeMultipleLimit);
+  int get hashCode => Object.hash(runtimeType, name, canBeMultipleLimit,
+      isExclusive, const DeepCollectionEquality().hash(_subOptions));
 
   /// Create a copy of Option
   /// with the given fields replaced by the non-null parameter values.
@@ -2759,29 +2700,20 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
 abstract class _Option implements Option {
   factory _Option(
       {required final String name,
-      final double? price,
+      final int? canBeMultipleLimit,
       final bool isExclusive,
-      final List<SubOption>? subOptions,
-      final double? calories,
-      final bool canBeMultiple,
-      final int? canBeMultipleLimit}) = _$OptionImpl;
+      final List<SubOption> subOptions}) = _$OptionImpl;
 
   factory _Option.fromJson(Map<String, dynamic> json) = _$OptionImpl.fromJson;
 
   @override
   String get name;
   @override
-  double? get price;
+  int? get canBeMultipleLimit;
   @override
   bool get isExclusive;
   @override
-  List<SubOption>? get subOptions;
-  @override
-  double? get calories;
-  @override
-  bool get canBeMultiple;
-  @override
-  int? get canBeMultipleLimit;
+  List<SubOption> get subOptions;
 
   /// Create a copy of Option
   /// with the given fields replaced by the non-null parameter values.
@@ -2799,9 +2731,10 @@ SubOption _$SubOptionFromJson(Map<String, dynamic> json) {
 mixin _$SubOption {
   String get name => throw _privateConstructorUsedError;
   bool get canBeMultiple => throw _privateConstructorUsedError;
+  bool get isExclusive => throw _privateConstructorUsedError;
   double? get calories => throw _privateConstructorUsedError;
   double? get price => throw _privateConstructorUsedError;
-  int? get canBeMultipleLimit => throw _privateConstructorUsedError;
+  List<Option> get options => throw _privateConstructorUsedError;
 
   /// Serializes this SubOption to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2821,9 +2754,10 @@ abstract class $SubOptionCopyWith<$Res> {
   $Res call(
       {String name,
       bool canBeMultiple,
+      bool isExclusive,
       double? calories,
       double? price,
-      int? canBeMultipleLimit});
+      List<Option> options});
 }
 
 /// @nodoc
@@ -2843,9 +2777,10 @@ class _$SubOptionCopyWithImpl<$Res, $Val extends SubOption>
   $Res call({
     Object? name = null,
     Object? canBeMultiple = null,
+    Object? isExclusive = null,
     Object? calories = freezed,
     Object? price = freezed,
-    Object? canBeMultipleLimit = freezed,
+    Object? options = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -2856,6 +2791,10 @@ class _$SubOptionCopyWithImpl<$Res, $Val extends SubOption>
           ? _value.canBeMultiple
           : canBeMultiple // ignore: cast_nullable_to_non_nullable
               as bool,
+      isExclusive: null == isExclusive
+          ? _value.isExclusive
+          : isExclusive // ignore: cast_nullable_to_non_nullable
+              as bool,
       calories: freezed == calories
           ? _value.calories
           : calories // ignore: cast_nullable_to_non_nullable
@@ -2864,10 +2803,10 @@ class _$SubOptionCopyWithImpl<$Res, $Val extends SubOption>
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as double?,
-      canBeMultipleLimit: freezed == canBeMultipleLimit
-          ? _value.canBeMultipleLimit
-          : canBeMultipleLimit // ignore: cast_nullable_to_non_nullable
-              as int?,
+      options: null == options
+          ? _value.options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<Option>,
     ) as $Val);
   }
 }
@@ -2883,9 +2822,10 @@ abstract class _$$SubOptionImplCopyWith<$Res>
   $Res call(
       {String name,
       bool canBeMultiple,
+      bool isExclusive,
       double? calories,
       double? price,
-      int? canBeMultipleLimit});
+      List<Option> options});
 }
 
 /// @nodoc
@@ -2903,9 +2843,10 @@ class __$$SubOptionImplCopyWithImpl<$Res>
   $Res call({
     Object? name = null,
     Object? canBeMultiple = null,
+    Object? isExclusive = null,
     Object? calories = freezed,
     Object? price = freezed,
-    Object? canBeMultipleLimit = freezed,
+    Object? options = null,
   }) {
     return _then(_$SubOptionImpl(
       name: null == name
@@ -2916,6 +2857,10 @@ class __$$SubOptionImplCopyWithImpl<$Res>
           ? _value.canBeMultiple
           : canBeMultiple // ignore: cast_nullable_to_non_nullable
               as bool,
+      isExclusive: null == isExclusive
+          ? _value.isExclusive
+          : isExclusive // ignore: cast_nullable_to_non_nullable
+              as bool,
       calories: freezed == calories
           ? _value.calories
           : calories // ignore: cast_nullable_to_non_nullable
@@ -2924,10 +2869,10 @@ class __$$SubOptionImplCopyWithImpl<$Res>
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as double?,
-      canBeMultipleLimit: freezed == canBeMultipleLimit
-          ? _value.canBeMultipleLimit
-          : canBeMultipleLimit // ignore: cast_nullable_to_non_nullable
-              as int?,
+      options: null == options
+          ? _value._options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<Option>,
     ));
   }
 }
@@ -2938,9 +2883,11 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
   _$SubOptionImpl(
       {required this.name,
       required this.canBeMultiple,
+      this.isExclusive = true,
       this.calories,
       this.price,
-      this.canBeMultipleLimit});
+      final List<Option> options = const []})
+      : _options = options;
 
   factory _$SubOptionImpl.fromJson(Map<String, dynamic> json) =>
       _$$SubOptionImplFromJson(json);
@@ -2950,15 +2897,24 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
   @override
   final bool canBeMultiple;
   @override
+  @JsonKey()
+  final bool isExclusive;
+  @override
   final double? calories;
   @override
   final double? price;
+  final List<Option> _options;
   @override
-  final int? canBeMultipleLimit;
+  @JsonKey()
+  List<Option> get options {
+    if (_options is EqualUnmodifiableListView) return _options;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_options);
+  }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'SubOption(name: $name, canBeMultiple: $canBeMultiple, calories: $calories, price: $price, canBeMultipleLimit: $canBeMultipleLimit)';
+    return 'SubOption(name: $name, canBeMultiple: $canBeMultiple, isExclusive: $isExclusive, calories: $calories, price: $price, options: $options)';
   }
 
   @override
@@ -2968,9 +2924,10 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
       ..add(DiagnosticsProperty('type', 'SubOption'))
       ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('canBeMultiple', canBeMultiple))
+      ..add(DiagnosticsProperty('isExclusive', isExclusive))
       ..add(DiagnosticsProperty('calories', calories))
       ..add(DiagnosticsProperty('price', price))
-      ..add(DiagnosticsProperty('canBeMultipleLimit', canBeMultipleLimit));
+      ..add(DiagnosticsProperty('options', options));
   }
 
   @override
@@ -2981,17 +2938,18 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.canBeMultiple, canBeMultiple) ||
                 other.canBeMultiple == canBeMultiple) &&
+            (identical(other.isExclusive, isExclusive) ||
+                other.isExclusive == isExclusive) &&
             (identical(other.calories, calories) ||
                 other.calories == calories) &&
             (identical(other.price, price) || other.price == price) &&
-            (identical(other.canBeMultipleLimit, canBeMultipleLimit) ||
-                other.canBeMultipleLimit == canBeMultipleLimit));
+            const DeepCollectionEquality().equals(other._options, _options));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, name, canBeMultiple, calories, price, canBeMultipleLimit);
+  int get hashCode => Object.hash(runtimeType, name, canBeMultiple, isExclusive,
+      calories, price, const DeepCollectionEquality().hash(_options));
 
   /// Create a copy of SubOption
   /// with the given fields replaced by the non-null parameter values.
@@ -3013,9 +2971,10 @@ abstract class _SubOption implements SubOption {
   factory _SubOption(
       {required final String name,
       required final bool canBeMultiple,
+      final bool isExclusive,
       final double? calories,
       final double? price,
-      final int? canBeMultipleLimit}) = _$SubOptionImpl;
+      final List<Option> options}) = _$SubOptionImpl;
 
   factory _SubOption.fromJson(Map<String, dynamic> json) =
       _$SubOptionImpl.fromJson;
@@ -3025,11 +2984,13 @@ abstract class _SubOption implements SubOption {
   @override
   bool get canBeMultiple;
   @override
+  bool get isExclusive;
+  @override
   double? get calories;
   @override
   double? get price;
   @override
-  int? get canBeMultipleLimit;
+  List<Option> get options;
 
   /// Create a copy of SubOption
   /// with the given fields replaced by the non-null parameter values.

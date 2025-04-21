@@ -22,7 +22,6 @@ PaymentMethod _$PaymentMethodFromJson(Map<String, dynamic> json) {
 mixin _$PaymentMethod {
   String get name => throw _privateConstructorUsedError;
   String get assetImage => throw _privateConstructorUsedError;
-  String? get cardNumber => throw _privateConstructorUsedError;
 
   /// Serializes this PaymentMethod to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -40,7 +39,7 @@ abstract class $PaymentMethodCopyWith<$Res> {
           PaymentMethod value, $Res Function(PaymentMethod) then) =
       _$PaymentMethodCopyWithImpl<$Res, PaymentMethod>;
   @useResult
-  $Res call({String name, String assetImage, String? cardNumber});
+  $Res call({String name, String assetImage});
 }
 
 /// @nodoc
@@ -60,7 +59,6 @@ class _$PaymentMethodCopyWithImpl<$Res, $Val extends PaymentMethod>
   $Res call({
     Object? name = null,
     Object? assetImage = null,
-    Object? cardNumber = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -71,10 +69,6 @@ class _$PaymentMethodCopyWithImpl<$Res, $Val extends PaymentMethod>
           ? _value.assetImage
           : assetImage // ignore: cast_nullable_to_non_nullable
               as String,
-      cardNumber: freezed == cardNumber
-          ? _value.cardNumber
-          : cardNumber // ignore: cast_nullable_to_non_nullable
-              as String?,
     ) as $Val);
   }
 }
@@ -87,7 +81,7 @@ abstract class _$$PaymentMethodImplCopyWith<$Res>
       __$$PaymentMethodImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, String assetImage, String? cardNumber});
+  $Res call({String name, String assetImage});
 }
 
 /// @nodoc
@@ -105,7 +99,6 @@ class __$$PaymentMethodImplCopyWithImpl<$Res>
   $Res call({
     Object? name = null,
     Object? assetImage = null,
-    Object? cardNumber = freezed,
   }) {
     return _then(_$PaymentMethodImpl(
       name: null == name
@@ -116,10 +109,6 @@ class __$$PaymentMethodImplCopyWithImpl<$Res>
           ? _value.assetImage
           : assetImage // ignore: cast_nullable_to_non_nullable
               as String,
-      cardNumber: freezed == cardNumber
-          ? _value.cardNumber
-          : cardNumber // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -127,8 +116,7 @@ class __$$PaymentMethodImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$PaymentMethodImpl implements _PaymentMethod {
-  const _$PaymentMethodImpl(
-      {required this.name, required this.assetImage, this.cardNumber});
+  const _$PaymentMethodImpl({required this.name, required this.assetImage});
 
   factory _$PaymentMethodImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaymentMethodImplFromJson(json);
@@ -137,12 +125,10 @@ class _$PaymentMethodImpl implements _PaymentMethod {
   final String name;
   @override
   final String assetImage;
-  @override
-  final String? cardNumber;
 
   @override
   String toString() {
-    return 'PaymentMethod(name: $name, assetImage: $assetImage, cardNumber: $cardNumber)';
+    return 'PaymentMethod(name: $name, assetImage: $assetImage)';
   }
 
   @override
@@ -152,14 +138,12 @@ class _$PaymentMethodImpl implements _PaymentMethod {
             other is _$PaymentMethodImpl &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.assetImage, assetImage) ||
-                other.assetImage == assetImage) &&
-            (identical(other.cardNumber, cardNumber) ||
-                other.cardNumber == cardNumber));
+                other.assetImage == assetImage));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, name, assetImage, cardNumber);
+  int get hashCode => Object.hash(runtimeType, name, assetImage);
 
   /// Create a copy of PaymentMethod
   /// with the given fields replaced by the non-null parameter values.
@@ -180,8 +164,7 @@ class _$PaymentMethodImpl implements _PaymentMethod {
 abstract class _PaymentMethod implements PaymentMethod {
   const factory _PaymentMethod(
       {required final String name,
-      required final String assetImage,
-      final String? cardNumber}) = _$PaymentMethodImpl;
+      required final String assetImage}) = _$PaymentMethodImpl;
 
   factory _PaymentMethod.fromJson(Map<String, dynamic> json) =
       _$PaymentMethodImpl.fromJson;
@@ -190,8 +173,6 @@ abstract class _PaymentMethod implements PaymentMethod {
   String get name;
   @override
   String get assetImage;
-  @override
-  String? get cardNumber;
 
   /// Create a copy of PaymentMethod
   /// with the given fields replaced by the non-null parameter values.

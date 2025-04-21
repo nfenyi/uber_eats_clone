@@ -1,29 +1,36 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
+import 'package:uber_eats_clone/hive_adapters/cart_item/cart_item_model.dart';
 import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/carts/screens/checkouts/reg_checkout_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/orders_screen.dart';
+import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
+import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen.dart';
+import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
+import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../../main.dart';
 import '../../../../models/group_order/group_order_model.dart';
 import '../../../../models/order/order_model.dart';
-import '../../../../models/payment/payment_model.dart';
-import '../../../../models/payment_method_model.dart';
 import '../../../../models/store/store_model.dart';
 import '../../../constants/app_sizes.dart';
+import '../../address/screens/addresses_screen.dart';
 import '../../group_order/group_order_screen.dart';
 import '../../group_order/group_orders_by_user_screen.dart';
 
@@ -36,36 +43,37 @@ class CartsScreen extends ConsumerStatefulWidget {
 
 class _CartsScreenState extends ConsumerState<CartsScreen> {
   late final GeoPoint _storedUserLocation;
-  final List<IndividualOrder> _individualOrders = [
-    IndividualOrder(
-        placeDescription: 'Adenta',
-        orderNumber: '372932',
-        status: 'Completed',
-        totalFee: 58.6,
-        storeRef: FirebaseFirestore.instance
-            .collection(FirestoreCollections.stores)
-            .doc('NazJMIA9yaUsLRjLxBGa'),
-        productsAndQuantities: {},
-        deliveryDate: DateTime.now().add(const Duration(days: 1)),
-        tip: 0.5,
-        courier: 'Sally',
-        promoApplied: FirebaseFirestore.instance
-            .collection(FirestoreCollections.promotions)
-            .doc('01959946-9bb6-750c-ab40-906312145b51'),
-        serviceFee: 2.4,
-        tax: 0.4,
-        caDriverBenefits: 0.2,
-        deliveryFee: 5,
-        membershipBenefit: 4.3,
-        payments: [
-          Payment(
-              datePaid: DateTime.now(),
-              cardNumber: '383934',
-              paymentMethodId: const PaymentMethod(
-                  name: 'Mastercard', assetImage: AssetNames.masterCardLogo),
-              amountPaid: 50)
-        ])
-  ];
+
+  // final List<IndividualOrder> _individualOrders = [
+  //   IndividualOrder(
+  //       placeDescription: 'Adenta',
+  //       orderNumber: '372932',
+  //       status: 'Completed',
+  //       totalFee: 58.6,
+  //       storeRef: FirebaseFirestore.instance
+  //           .collection(FirestoreCollections.stores)
+  //           .doc('NazJMIA9yaUsLRjLxBGa'),
+  //       productsAndQuantities: {},
+  //       deliveryDate: DateTime.now().add(const Duration(days: 1)),
+  //       tip: 0.5,
+  //       courier: 'Sally',
+  //       promoApplied: FirebaseFirestore.instance
+  //           .collection(FirestoreCollections.promotions)
+  //           .doc('01959946-9bb6-750c-ab40-906312145b51'),
+  //       serviceFee: 2.4,
+  //       tax: 0.4,
+  //       caDriverBenefits: 0.2,
+  //       deliveryFee: 5,
+  //       membershipBenefit: 4.3,
+  //       payments: [
+  //         Payment(
+  //             datePaid: DateTime.now(),
+  //             cardNumber: '383934',
+  //             paymentMethodId: const PaymentMethod(
+  //                 name: 'Mastercard', assetImage: AssetNames.masterCardLogo),
+  //             amountPaid: 50)
+  //       ])
+  // ];
 
   // GroupOrder(
   //     repeat: 'Monthly',
@@ -121,8 +129,9 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
   @override
   void initState() {
     super.initState();
-    HiveGeoPoint temp = Hive.box(AppBoxes.appState)
-        .get(BoxKeys.userInfo)['selectedAddress']['latlng'];
+    Map<dynamic, dynamic> userInfo =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    HiveGeoPoint temp = userInfo['selectedAddress']['latlng'];
     _storedUserLocation = GeoPoint(temp.latitude, temp.longitude);
   }
 
@@ -132,7 +141,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
         body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
                   SliverAppBar.medium(
-                    scrolledUnderElevation: 1,
+                    scrolledUnderElevation: 0.2,
                     shadowColor: AppColors.neutral500,
                     expandedHeight: 70,
                     pinned: true,
@@ -162,9 +171,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                 InkWell(
                                   onTap: () => navigatorKey.currentState!
                                       .push(MaterialPageRoute(
-                                    builder: (context) => OrdersScreen(
-                                      storedUserLocation: _storedUserLocation,
-                                    ),
+                                    builder: (context) => const OrdersScreen(),
                                   )),
                                   child: Container(
                                     padding: const EdgeInsets.all(10),
@@ -193,563 +200,222 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
             body: Padding(
               padding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.horizontalPaddingSmall),
-              child: CustomScrollView(
-                slivers: [
-                  FutureBuilder<List>(
-                      future: _getIndividualOrders(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          final individualOrders =
-                              snapshot.data!.first as List<IndividualOrder>;
-                          final stores = snapshot.data!.last as List<Store>;
-                          return SliverList.separated(
-                            itemCount: individualOrders.length,
-                            itemBuilder: (context, index) {
-                              final order = individualOrders[index];
-                              final store = stores[index];
-                              return Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        color: AppColors.neutral300)),
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      title: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          AppText(
-                                            text: store.name,
-                                            weight: FontWeight.w600,
-                                            size: AppSizes.bodySmall,
-                                          ),
-                                          GestureDetector(
-                                              onTap: () {},
-                                              child: const Icon(
-                                                Icons.more_horiz,
-                                                color: AppColors.neutral500,
-                                              ))
-                                        ],
-                                      ),
-                                      leading: ClipRRect(
-                                        borderRadius: BorderRadius.circular(50),
-                                        child: SizedBox(
-                                          width: 60,
-                                          height: 60,
-                                          child: CachedNetworkImage(
-                                            imageUrl: store.cardImage,
-                                            fit: BoxFit.cover,
-                                          ),
+              child: ValueListenableBuilder(
+                  valueListenable:
+                      Hive.box<HiveCartItem>(AppBoxes.carts).listenable(),
+                  builder: (context, cartsBox, child) {
+                    final cartItems = cartsBox.values;
+
+                    return CustomScrollView(
+                      slivers: [
+                        SliverList.separated(
+                          itemCount: cartItems.length,
+                          itemBuilder: (context, index) {
+                            final cartItem = cartItems.elementAt(index);
+                            final store = allStores.firstWhereOrNull(
+                              (store) => store.id == cartItem.storeId,
+                            );
+                            if (store == null) {
+                              return const AppText(
+                                  text: 'Seems store no longer exists');
+                            }
+
+                            return Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border:
+                                      Border.all(color: AppColors.neutral300)),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    title: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        AppText(
+                                          text: store.name,
+                                          weight: FontWeight.w600,
+                                          size: AppSizes.bodySmall,
+                                        ),
+                                        GestureDetector(
+                                            onTap: () {
+                                              showModalBottomSheet(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Container(
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5)),
+                                                    child: ListTile(
+                                                      onTap: () async {
+                                                        navigatorKey
+                                                            .currentState!
+                                                            .pop();
+                                                        for (var product
+                                                            in cartItem
+                                                                .products) {
+                                                          await product
+                                                              .delete();
+                                                        }
+                                                        await cartItem.delete();
+                                                      },
+                                                      leading: Icon(
+                                                        Icons.delete,
+                                                        color:
+                                                            Colors.red.shade900,
+                                                      ),
+                                                      title: const AppText(
+                                                        text: 'Clear cart',
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: const Icon(
+                                              Icons.more_horiz,
+                                              color: AppColors.neutral500,
+                                            ))
+                                      ],
+                                    ),
+                                    leading: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: SizedBox(
+                                        width: 60,
+                                        height: 60,
+                                        child: AppFunctions.displayNetworkImage(
+                                          placeholderAssetImage:
+                                              AssetNames.storeBNW,
+                                          store.cardImage,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                      subtitle: AppText(
-                                          color: AppColors.neutral500,
-                                          size: AppSizes.bodySmallest,
-                                          text:
-                                              '${order.productsAndQuantities.length} items • \$${order.totalFee}\n Deliver by ${AppFunctions.formatDate(order.deliveryDate.toString(), format: r'g:i A')} to ${order.placeDescription}'),
                                     ),
-                                    const Gap(10),
-                                    AppButton(
-                                      text: 'View cart',
-                                      callback: () {
-                                        showModalBottomSheet(
-                                          backgroundColor: Colors.transparent,
-                                          isScrollControlled: true,
-                                          useSafeArea: true,
-                                          context: context,
-                                          builder: (context) {
+                                    subtitle: AppText(
+                                        color: AppColors.neutral500,
+                                        size: AppSizes.bodySmallest,
+                                        text: cartItem.deliveryDate != null
+                                            ? '${cartItem.products.length} items • \$${cartItem.subtotal.toStringAsFixed(2)}\n Deliver by ${AppFunctions.formatDate(cartItem.deliveryDate.toString(), format: r'g:i A')} to ${AppFunctions.formatPlaceDescription(cartItem.placeDescription)}'
+                                            : '${cartItem.products.length} items • \$${cartItem.subtotal.toStringAsFixed(2)}\n Deliver to ${AppFunctions.formatPlaceDescription(cartItem.placeDescription)}'),
+                                  ),
+                                  const Gap(10),
+                                  AppButton(
+                                    text: 'View cart',
+                                    callback: () {
+                                      showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        useSafeArea: true,
+                                        barrierColor: Colors.transparent,
+                                        context: context,
+                                        builder: (context) {
+                                          return CartSheet(
+                                            store: store,
+                                            cartItem: cartItem,
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                  const Gap(10),
+                                  AppButton(
+                                    callback: () async {
+                                      await AppFunctions.navigateToStoreScreen(
+                                          increaseVisitCount: false, store);
+                                    },
+                                    text: 'View store',
+                                    isSecondary: true,
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                          separatorBuilder: (context, index) => const Gap(15),
+                        ),
+                        const SliverGap(15),
+                        FutureBuilder<Map<String, List<GroupOrder>>>(
+                            future: _prepareGroupOrders(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                final groupOrdersByUser = snapshot.data!;
+                                if (groupOrdersByUser.values.isEmpty &&
+                                    cartItems.isEmpty) {
+                                  return SliverToBoxAdapter(
+                                      child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Gap(30),
+                                      Image.asset(
+                                        AssetNames.noCarts,
+                                        width: 220,
+                                      ),
+                                      const Gap(20),
+                                      SizedBox(
+                                        width: Adaptive.w(80),
+                                        child: const AppText(
+                                            textAlign: TextAlign.center,
+                                            text:
+                                                'Once you add items from a restaurant or store, your cart will appear here'),
+                                      ),
+                                      const Gap(10),
+                                      AppButton2(
+                                        backgroundColor: Colors.black,
+                                        callback: () {
+                                          ref
+                                              .read(bottomNavIndexProvider
+                                                  .notifier)
+                                              .updateIndex(0);
+                                        },
+                                        text: 'Start shopping',
+                                        textColor: Colors.white,
+                                      )
+                                    ],
+                                  ));
+                                }
+                                return SliverList.separated(
+                                  itemCount: groupOrdersByUser.length,
+                                  itemBuilder: (context, index) {
+                                    final groupOrders = groupOrdersByUser.values
+                                        .elementAt(index);
+
+                                    return FutureBuilder<List>(
+                                        future: _getOrderSchedulesAndStores(
+                                            groupOrders),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            final futureOrderSchedules =
+                                                snapshot.data![0]
+                                                    as List<OrderSchedule>;
+                                            final stores = snapshot.data![1]
+                                                as List<Store>;
+
                                             return Container(
-                                              height: double.infinity,
-                                              decoration: const BoxDecoration(
-                                                  color: Colors.white,
+                                              padding: const EdgeInsets.all(20),
+                                              decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.only(
-                                                          topLeft:
-                                                              Radius.circular(
-                                                                  10),
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  10))),
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                      color: AppColors
+                                                          .neutral300)),
                                               child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  AppBar(
-                                                    leading: GestureDetector(
-                                                        onTap: () =>
-                                                            navigatorKey
-                                                                .currentState!
-                                                                .pop(),
-                                                        child: const Icon(
-                                                            Icons.clear)),
-                                                    actions: [
-                                                      Padding(
-                                                        padding: const EdgeInsets
-                                                            .only(
-                                                            right: AppSizes
-                                                                .horizontalPaddingSmall),
-                                                        child: InkWell(
-                                                            child: Ink(
-                                                                child: const Icon(
-                                                                    Icons
-                                                                        .person_add_outlined))),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        SingleChildScrollView(
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Padding(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        AppSizes
-                                                                            .horizontalPaddingSmall),
-                                                                child: AppText(
-                                                                  text: store
-                                                                      .name,
-                                                                  weight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  size: AppSizes
-                                                                      .bodySmall,
-                                                                ),
-                                                              ),
-                                                              ListView
-                                                                  .separated(
-                                                                      physics:
-                                                                          const NeverScrollableScrollPhysics(),
-                                                                      shrinkWrap:
-                                                                          true,
-                                                                      itemBuilder:
-                                                                          (context,
-                                                                              index) {
-                                                                        final product = store
-                                                                            .productCategories!
-                                                                            .first
-                                                                            .productsAndQuantities[index];
-                                                                        return ListTile(
-                                                                          trailing:
-                                                                              Container(
-                                                                            padding:
-                                                                                const EdgeInsets.all(5),
-                                                                            decoration:
-                                                                                BoxDecoration(color: AppColors.neutral100, borderRadius: BorderRadius.circular(50)),
-                                                                            child:
-                                                                                Row(
-                                                                              mainAxisSize: MainAxisSize.min,
-                                                                              children: [
-                                                                                InkWell(
-                                                                                    child: Ink(
-                                                                                  child: const Icon(
-                                                                                    Icons.delete_outline,
-                                                                                    size: 15,
-                                                                                  ),
-                                                                                )),
-                                                                                const Gap(10),
-                                                                                const AppText(text: '1'),
-                                                                                const Gap(10),
-                                                                                InkWell(
-                                                                                    child: Ink(
-                                                                                  child: const Icon(
-                                                                                    Icons.add,
-                                                                                    size: 15,
-                                                                                  ),
-                                                                                )),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                          contentPadding:
-                                                                              EdgeInsets.zero,
-                                                                          leading:
-                                                                              SizedBox(
-                                                                            width:
-                                                                                60,
-                                                                            height:
-                                                                                60,
-                                                                            child:
-                                                                                CachedNetworkImage(imageUrl: product['imageUrls'].imageUrls.first),
-                                                                          ),
-                                                                          // title: AppText(
-                                                                          //   text: product
-                                                                          //       .name,
-                                                                          //   weight:
-                                                                          //       FontWeight
-                                                                          //           .w600,
-                                                                          //   size: AppSizes
-                                                                          //       .bodySmall,
-                                                                          // ),
-                                                                          subtitle:
-                                                                              const Column(
-                                                                            children: [
-                                                                              Row(
-                                                                                children: [
-                                                                                  AppText(
-                                                                                    text: 'Selected Option: ',
-                                                                                    weight: FontWeight.w600,
-                                                                                  ),
-                                                                                  AppText(
-                                                                                    text: 'njajnasaojoajkaj ',
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              Row(
-                                                                                children: [
-                                                                                  AppText(
-                                                                                    text: 'Selected Drink: ',
-                                                                                    weight: FontWeight.w600,
-                                                                                  ),
-                                                                                  AppText(
-                                                                                    text: 'njajnasaojoajkaj ',
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                              // if (product
-                                                                              //         .options !=
-                                                                              //     null)
-                                                                              //   const Row(
-                                                                              //     children: [
-                                                                              //       AppText(
-                                                                              //         text:
-                                                                              //             'nkanknasjn Comes With ',
-                                                                              //         weight:
-                                                                              //             FontWeight.w600,
-                                                                              //       ),
-                                                                              //       AppText(
-                                                                              //         text:
-                                                                              //             'Ice',
-                                                                              //       ),
-                                                                              //     ],
-                                                                              //   ),
-                                                                            ],
-                                                                          ),
-                                                                        );
-                                                                      },
-                                                                      separatorBuilder: (context,
-                                                                              index) =>
-                                                                          const Gap(
-                                                                              10),
-                                                                      itemCount: store
-                                                                          .productCategories!
-                                                                          .first
-                                                                          .productsAndQuantities
-                                                                          .length),
-                                                              const Gap(10),
-                                                              Padding(
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        AppSizes
-                                                                            .horizontalPaddingSmall),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .end,
-                                                                  children: [
-                                                                    InkWell(
-                                                                      onTap:
-                                                                          () {},
-                                                                      child:
-                                                                          Ink(
-                                                                        padding: const EdgeInsets
-                                                                            .all(
-                                                                            5),
-                                                                        decoration: BoxDecoration(
-                                                                            color:
-                                                                                AppColors.neutral100,
-                                                                            borderRadius: BorderRadius.circular(50)),
-                                                                        child:
-                                                                            const Row(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.min,
-                                                                          children: [
-                                                                            Icon(
-                                                                              Icons.add,
-                                                                              size: 15,
-                                                                            ),
-                                                                            Gap(10),
-                                                                            AppText(text: 'Add items'),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .symmetric(
-                                                                        vertical:
-                                                                            2),
-                                                                decoration: const BoxDecoration(
-                                                                    border: Border.symmetric(
-                                                                        vertical: BorderSide(
-                                                                            width:
-                                                                                2,
-                                                                            color:
-                                                                                AppColors.neutral200))),
-                                                                child: ListTile(
-                                                                  onTap: () {},
-                                                                  leading:
-                                                                      const Iconify(
-                                                                          Ph.gift),
-                                                                  title: const AppText(
-                                                                      text:
-                                                                          'Send as a gift'),
-                                                                  subtitle:
-                                                                      const AppText(
-                                                                    text:
-                                                                        'And customize a digital card',
-                                                                    color: AppColors
-                                                                        .neutral500,
-                                                                  ),
-                                                                  trailing:
-                                                                      const Icon(
-                                                                          Icons
-                                                                              .keyboard_arrow_right),
-                                                                ),
-                                                              ),
-                                                              const ListTile(
-                                                                title: AppText(
-                                                                  text:
-                                                                      'Subtotal',
-                                                                  weight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  size: AppSizes
-                                                                      .bodySmall,
-                                                                ),
-                                                                trailing: AppText(
-                                                                    size: AppSizes
-                                                                        .bodySmall,
-                                                                    weight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    text:
-                                                                        'US\$ 24.13'),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            Container(
-                                                              width: double
-                                                                  .infinity,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                      color: Colors
-                                                                          .amber
-                                                                          .shade100),
-                                                              child: ListTile(
-                                                                leading:
-                                                                    Image.asset(
-                                                                  AssetNames
-                                                                      .uberOneSmall,
-                                                                  width: 20,
-                                                                  color: Colors
-                                                                      .brown,
-                                                                ),
-                                                                subtitle:
-                                                                    AppText(
-                                                                  color: Colors
-                                                                      .brown
-                                                                      .shade500,
-                                                                  text:
-                                                                      'Add \$20.99 to save more with Uber One',
-                                                                  size: AppSizes
-                                                                      .bodySmallest,
-                                                                ),
-                                                                title: AppText(
-                                                                    color: Colors
-                                                                        .brown
-                                                                        .shade500,
-                                                                    text:
-                                                                        'Saving \$0.14 with Uber One'),
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              width: double
-                                                                  .infinity,
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                      color: Colors
-                                                                          .brown),
-                                                              child: ListTile(
-                                                                leading:
-                                                                    Image.asset(
-                                                                  AssetNames
-                                                                      .uberOneSmall,
-                                                                  width: 20,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                                title: const AppText(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    text:
-                                                                        'Saving \$0.14 with Uber One'),
-                                                              ),
-                                                            ),
-                                                            const Gap(10),
-                                                            Padding(
-                                                              padding: const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      AppSizes
-                                                                          .horizontalPaddingSmall),
-                                                              child: AppButton(
-                                                                text:
-                                                                    'Go to checkout',
-                                                                callback: () {},
-                                                              ),
-                                                            ),
-                                                            const Gap(10),
-                                                          ],
-                                                        )
-                                                      ],
+                                                  ListTile(
+                                                    contentPadding:
+                                                        EdgeInsets.zero,
+                                                    minLeadingWidth: 45,
+                                                    title: AppText(
+                                                      text: stores.length == 1
+                                                          ? stores.first.name
+                                                          : '${groupOrders.first.placeDescription} Group Orders',
+                                                      weight: FontWeight.w600,
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                    const Gap(10),
-                                    AppButton(
-                                      callback: () async {
-                                        await AppFunctions
-                                            .navigateToStoreScreen(
-                                                increaseVisitCount: false,
-                                                store);
-                                      },
-                                      text: 'View store',
-                                      isSecondary: true,
-                                    )
-                                  ],
-                                ),
-                              );
-                            },
-                            separatorBuilder: (context, index) => const Gap(15),
-                          );
-                        } else if (snapshot.hasError) {
-                          return SliverToBoxAdapter(
-                            child: AppText(
-                              text: snapshot.error.toString(),
-                            ),
-                          );
-                        } else {
-                          return const SliverToBoxAdapter(
-                              child: SizedBox.shrink());
-                        }
-                      }),
-                  const SliverGap(15),
-                  FutureBuilder<Map<String, List<GroupOrder>>>(
-                      future: _prepareGroupOrders(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          final groupOrdersByUser = snapshot.data!;
-                          return SliverList.separated(
-                            itemCount: groupOrdersByUser.length,
-                            itemBuilder: (context, index) {
-                              final groupOrders =
-                                  groupOrdersByUser.values.elementAt(index);
-
-                              return FutureBuilder<List>(
-                                  future:
-                                      _getOrderSchedulesAndStores(groupOrders),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      final futureOrderSchedules = snapshot
-                                          .data![0] as List<OrderSchedule>;
-                                      final stores =
-                                          snapshot.data![1] as List<Store>;
-
-                                      return Container(
-                                        padding: const EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                                color: AppColors.neutral300)),
-                                        child: Column(
-                                          children: [
-                                            ListTile(
-                                              minLeadingWidth: 45,
-                                              contentPadding: EdgeInsets.zero,
-                                              title: AppText(
-                                                text: stores.length == 1
-                                                    ? stores.first.name
-                                                    : groupOrders
-                                                        .first.placeDescription,
-                                                weight: FontWeight.w600,
-                                                size: AppSizes.bodySmall,
-                                              ),
-                                              leading: stores.length > 1
-                                                  ? Stack(
-                                                      children: [
-                                                        ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(50),
-                                                          child: Stack(
+                                                    leading: stores.length > 1
+                                                        ? Stack(
                                                             children: [
-                                                              AppFunctions
-                                                                  .displayNetworkImage(
-                                                                stores[1]
-                                                                    .cardImage,
-                                                                width: 30,
-                                                                height: 30,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              ),
-                                                              Container(
-                                                                color: Colors
-                                                                    .black38,
-                                                                width: 30,
-                                                                height: 30,
-                                                                child:
-                                                                    const Icon(
-                                                                  Icons
-                                                                      .group_outlined,
-                                                                  size: 15,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Transform.translate(
-                                                            offset:
-                                                                const Offset(
-                                                                    15, 15),
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              50),
-                                                                  border: Border.all(
-                                                                      width: 4,
-                                                                      color: Colors
-                                                                          .white)),
-                                                              child: ClipRRect(
+                                                              ClipRRect(
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
@@ -758,7 +424,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                                                   children: [
                                                                     AppFunctions
                                                                         .displayNetworkImage(
-                                                                      stores[0]
+                                                                      stores[1]
                                                                           .cardImage,
                                                                       width: 30,
                                                                       height:
@@ -785,258 +451,327 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                                                   ],
                                                                 ),
                                                               ),
-                                                            )),
+                                                              Transform
+                                                                  .translate(
+                                                                      offset:
+                                                                          const Offset(
+                                                                              15,
+                                                                              15),
+                                                                      child:
+                                                                          Container(
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(50),
+                                                                            border: Border.all(width: 4, color: Colors.white)),
+                                                                        child:
+                                                                            ClipRRect(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(50),
+                                                                          child:
+                                                                              Stack(
+                                                                            children: [
+                                                                              AppFunctions.displayNetworkImage(
+                                                                                stores[0].cardImage,
+                                                                                width: 30,
+                                                                                height: 30,
+                                                                                fit: BoxFit.cover,
+                                                                              ),
+                                                                              Container(
+                                                                                color: Colors.black38,
+                                                                                width: 30,
+                                                                                height: 30,
+                                                                                child: const Icon(
+                                                                                  Icons.group_outlined,
+                                                                                  size: 15,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      )),
+                                                            ],
+                                                          )
+                                                        : ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50),
+                                                            child: Stack(
+                                                              children: [
+                                                                AppFunctions
+                                                                    .displayNetworkImage(
+                                                                  stores.first
+                                                                      .cardImage,
+                                                                  width: 50,
+                                                                  height: 50,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                                Container(
+                                                                  color: Colors
+                                                                      .black38,
+                                                                  width: 50,
+                                                                  height: 50,
+                                                                  child:
+                                                                      const Icon(
+                                                                    Icons
+                                                                        .group_outlined,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                    subtitle: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Builder(
+                                                            builder: (context) {
+                                                          final repeatingGroupOrders =
+                                                              groupOrders.where(
+                                                            (groupOrder) =>
+                                                                groupOrder
+                                                                    .frequency !=
+                                                                null,
+                                                          );
+
+                                                          return Row(
+                                                            children: [
+                                                              if (repeatingGroupOrders
+                                                                  .isNotEmpty)
+                                                                Row(children: [
+                                                                  const Icon(
+                                                                    Icons
+                                                                        .refresh,
+                                                                    size: 15,
+                                                                  ),
+                                                                  AppText(
+                                                                    text:
+                                                                        ' ${repeatingGroupOrders.first.frequency}',
+                                                                    size: AppSizes
+                                                                        .bodySmallest,
+                                                                  ),
+                                                                  const AppText(
+                                                                    text: ' • ',
+                                                                  ),
+                                                                ]),
+                                                              groupOrders.length ==
+                                                                      1
+                                                                  ? AppText(
+                                                                      text: groupOrders
+                                                                          .first
+                                                                          .name)
+                                                                  : FutureBuilder<
+                                                                          String>(
+                                                                      future: _getOwnerName(
+                                                                          groupOrders
+                                                                              .first),
+                                                                      builder:
+                                                                          (context,
+                                                                              snapshot) {
+                                                                        if (snapshot
+                                                                            .hasData) {
+                                                                          return AppText(
+                                                                              text: 'Created by ${snapshot.data}');
+                                                                        } else {
+                                                                          return const AppText(
+                                                                              text: '...');
+                                                                        }
+                                                                      })
+                                                            ],
+                                                          );
+                                                        }),
+                                                        if (futureOrderSchedules
+                                                            .isNotEmpty)
+                                                          futureOrderSchedules
+                                                                      .length ==
+                                                                  1
+                                                              ? Row(
+                                                                  children: [
+                                                                    const AppText(
+                                                                      text:
+                                                                          'Next order: ',
+                                                                      color: Colors
+                                                                          .green,
+                                                                      size: AppSizes
+                                                                          .bodySmallest,
+                                                                    ),
+                                                                    AppText(
+                                                                      text: AppFunctions.formatDate(
+                                                                          futureOrderSchedules
+                                                                              .first
+                                                                              .orderDate
+                                                                              .toString(),
+                                                                          format:
+                                                                              'M j'),
+                                                                      size: AppSizes
+                                                                          .bodySmallest,
+                                                                    ),
+                                                                    const AppText(
+                                                                      text:
+                                                                          ' by ',
+                                                                      size: AppSizes
+                                                                          .bodySmallest,
+                                                                    ),
+                                                                    AppText(
+                                                                      text: AppFunctions.formatDate(
+                                                                          futureOrderSchedules
+                                                                              .first
+                                                                              .orderDate
+                                                                              .toString(),
+                                                                          format:
+                                                                              'g:i A'),
+                                                                      size: AppSizes
+                                                                          .bodySmallest,
+                                                                    ),
+                                                                  ],
+                                                                )
+                                                              : AppText(
+                                                                  text:
+                                                                      '${futureOrderSchedules.length} upcoming orders',
+                                                                  color: Colors
+                                                                      .green,
+                                                                  size: AppSizes
+                                                                      .bodySmallest,
+                                                                ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  const Gap(10),
+                                                  groupOrders.length == 1
+                                                      ? AppButton(
+                                                          text: 'View order',
+                                                          callback: () {
+                                                            navigatorKey
+                                                                .currentState!
+                                                                .push(
+                                                                    MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  GroupOrderScreen(
+                                                                      store: stores
+                                                                          .first,
+                                                                      groupOrder:
+                                                                          groupOrders
+                                                                              .first),
+                                                            ));
+                                                          },
+                                                        )
+                                                      : AppButton(
+                                                          text: 'View orders',
+                                                          callback: () {
+                                                            navigatorKey
+                                                                .currentState!
+                                                                .push(
+                                                                    MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  GroupOrdersByUserScreen(
+                                                                      groupOrders:
+                                                                          groupOrders),
+                                                            ));
+                                                          },
+                                                        ),
+                                                  if (groupOrders.length == 1)
+                                                    Column(
+                                                      children: [
+                                                        const Gap(10),
+                                                        AppButton(
+                                                          callback: () async {
+                                                            await AppFunctions
+                                                                .navigateToStoreScreen(
+                                                                    stores
+                                                                        .first);
+                                                          },
+                                                          text: 'View store',
+                                                          isSecondary: true,
+                                                        ),
                                                       ],
                                                     )
-                                                  : ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                      child: Stack(
+                                                ],
+                                              ),
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return AppText(
+                                                text:
+                                                    snapshot.error.toString());
+                                          } else {
+                                            return Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                      color: AppColors
+                                                          .neutral300)),
+                                              child: Skeletonizer(
+                                                enabled: true,
+                                                child: Column(
+                                                  children: [
+                                                    ListTile(
+                                                      minLeadingWidth: 45,
+                                                      title: const AppText(
+                                                          text:
+                                                              'njajklasklasl'),
+                                                      leading: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        child: Stack(
+                                                          children: [
+                                                            Container(
+                                                              color: Colors
+                                                                  .black38,
+                                                              width: 50,
+                                                              height: 50,
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      subtitle: const Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
                                                         children: [
-                                                          AppFunctions
-                                                              .displayNetworkImage(
-                                                            stores.first
-                                                                .cardImage,
-                                                            width: 50,
-                                                            height: 50,
-                                                            fit: BoxFit.cover,
+                                                          AppText(
+                                                            text:
+                                                                ' njkjnkjnlllnljllkklnlnlnl',
                                                           ),
-                                                          Container(
-                                                            color:
-                                                                Colors.black38,
-                                                            width: 50,
-                                                            height: 50,
-                                                            child: const Icon(
-                                                              Icons
-                                                                  .group_outlined,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                          )
                                                         ],
                                                       ),
                                                     ),
-                                              subtitle: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Builder(builder: (context) {
-                                                    final repeatingGroupOrders =
-                                                        groupOrders.where(
-                                                      (groupOrder) =>
-                                                          groupOrder
-                                                              .frequency !=
-                                                          null,
-                                                    );
 
-                                                    return Row(
-                                                      children: [
-                                                        if (repeatingGroupOrders
-                                                            .isNotEmpty)
-                                                          Row(children: [
-                                                            const Icon(
-                                                              Icons.refresh,
-                                                              size: 15,
-                                                            ),
-                                                            AppText(
-                                                              text:
-                                                                  ' ${repeatingGroupOrders.first.frequency}',
-                                                            ),
-                                                            const AppText(
-                                                              text: ' • ',
-                                                            ),
-                                                          ]),
-                                                        stores.length == 1
-                                                            ? AppText(
-                                                                text:
-                                                                    groupOrders
-                                                                        .first
-                                                                        .name)
-                                                            : FutureBuilder<
-                                                                    String>(
-                                                                future: _getOwnerName(
-                                                                    groupOrders
-                                                                        .first),
-                                                                builder: (context,
-                                                                    snapshot) {
-                                                                  if (snapshot
-                                                                      .hasData) {
-                                                                    return AppText(
-                                                                        text:
-                                                                            'Created by ${snapshot.data}');
-                                                                  } else {
-                                                                    return const AppText(
-                                                                        text:
-                                                                            '...');
-                                                                  }
-                                                                })
-                                                      ],
-                                                    );
-                                                  }),
-                                                  if (futureOrderSchedules
-                                                      .isNotEmpty)
-                                                    Row(
-                                                      children: [
-                                                        const AppText(
-                                                          text: 'Next order: ',
-                                                          color: Colors.green,
-                                                          size: AppSizes
-                                                              .bodySmallest,
-                                                        ),
-                                                        AppText(
-                                                          text: AppFunctions.formatDate(
-                                                              futureOrderSchedules
-                                                                  .first
-                                                                  .deliveryDate
-                                                                  .toString(),
-                                                              format: 'M j'),
-                                                          size: AppSizes
-                                                              .bodySmallest,
-                                                        ),
-                                                        const AppText(
-                                                          text: ' by ',
-                                                          size: AppSizes
-                                                              .bodySmallest,
-                                                        ),
-                                                        AppText(
-                                                          text: AppFunctions.formatDate(
-                                                              futureOrderSchedules
-                                                                  .first
-                                                                  .deliveryDate
-                                                                  .toString(),
-                                                              format: 'g:i A'),
-                                                          size: AppSizes
-                                                              .bodySmallest,
-                                                        ),
-                                                      ],
-                                                    ),
+                                                    // const Gap(10),
+                                                    // const AppButton(
+                                                    //   text:
+                                                    //        'njnknknknk',
 
-                                                  //deadline == null ?AppText(text: '')
-                                                ],
-                                              ),
-                                            ),
-                                            const Gap(10),
-                                            groupOrders.length == 1
-                                                ? AppButton(
-                                                    text: 'View order',
-                                                    callback: () {
-                                                      navigatorKey.currentState!
-                                                          .push(
-                                                              MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            GroupOrderScreen(
-                                                                store: stores
-                                                                    .first,
-                                                                groupOrder:
-                                                                    groupOrders
-                                                                        .first),
-                                                      ));
-                                                    },
-                                                  )
-                                                : AppButton(
-                                                    text: 'View orders',
-                                                    callback: () {
-                                                      navigatorKey.currentState!
-                                                          .push(
-                                                              MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            GroupOrdersByUserScreen(
-                                                                groupOrders:
-                                                                    groupOrders),
-                                                      ));
-                                                    },
-                                                  ),
-                                            if (groupOrders.length == 1)
-                                              Column(
-                                                children: [
-                                                  const Gap(10),
-                                                  AppButton(
-                                                    callback: () async {
-                                                      await AppFunctions
-                                                          .navigateToStoreScreen(
-                                                              stores.first);
-                                                    },
-                                                    text: 'View store',
-                                                    isSecondary: true,
-                                                  ),
-                                                ],
-                                              )
-                                          ],
-                                        ),
-                                      );
-                                    } else if (snapshot.hasError) {
-                                      return AppText(
-                                          text: snapshot.error.toString());
-                                    } else {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                                color: AppColors.neutral300)),
-                                        child: Skeletonizer(
-                                          enabled: true,
-                                          child: Column(
-                                            children: [
-                                              ListTile(
-                                                minLeadingWidth: 45,
-                                                contentPadding: EdgeInsets.zero,
-                                                title: const AppText(
-                                                    text: 'njajklasklasl'),
-                                                leading: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  child: Stack(
-                                                    children: [
-                                                      Container(
-                                                        color: Colors.black38,
-                                                        width: 50,
-                                                        height: 50,
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                subtitle: const Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    AppText(
-                                                      text:
-                                                          ' njkjnkjnlllnljllkklnlnlnl',
-                                                    ),
+                                                    // ),
                                                   ],
                                                 ),
                                               ),
-
-                                              // const Gap(10),
-                                              // const AppButton(
-                                              //   text:
-                                              //        'njnknknknk',
-
-                                              // ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  });
-                            },
-                            separatorBuilder: (context, index) => const Gap(15),
-                          );
-                        } else if (snapshot.hasError) {
-                          return SliverToBoxAdapter(
-                            child: AppText(
-                              text: snapshot.error.toString(),
-                            ),
-                          );
-                        } else {
-                          return const SliverToBoxAdapter(
-                              child: SizedBox.shrink());
-                        }
-                      })
-                ],
-              ),
+                                            );
+                                          }
+                                        });
+                                  },
+                                  separatorBuilder: (context, index) =>
+                                      const Gap(15),
+                                );
+                              } else if (snapshot.hasError) {
+                                return SliverToBoxAdapter(
+                                  child: AppText(
+                                    text: snapshot.error.toString(),
+                                  ),
+                                );
+                              } else {
+                                return const SliverToBoxAdapter(
+                                    child: SizedBox.shrink());
+                              }
+                            })
+                      ],
+                    );
+                  }),
             )));
   }
 
@@ -1051,10 +786,14 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
           FirebaseFirestore.instance
               .collection(FirestoreCollections.groupOrders)
               .doc(id));
-      if (sortedGroupOrders[groupOrder.ownerId] != null) {
-        sortedGroupOrders[groupOrder.ownerId]!.add(groupOrder);
-      } else {
-        sortedGroupOrders[groupOrder.ownerId] = [groupOrder];
+      if ((groupOrder.endDate != null &&
+              groupOrder.endDate!.isAfter(DateTime.now())) ||
+          groupOrder.frequency != null) {
+        if (sortedGroupOrders[groupOrder.ownerId] != null) {
+          sortedGroupOrders[groupOrder.ownerId]!.add(groupOrder);
+        } else {
+          sortedGroupOrders[groupOrder.ownerId] = [groupOrder];
+        }
       }
     }
 
@@ -1069,13 +808,15 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
       for (var scheduleRef in scheduleRefs) {
         final orderSchedule = await AppFunctions.loadOrderScheduleReference(
             scheduleRef as DocumentReference);
-        if (orderSchedule.deliveryDate.isAfter(DateTime.now())) {
+
+        if (orderSchedule.orderDate.isAfter(DateTime.now())) {
           futureOrderSchedules.add(orderSchedule);
           break;
         }
       }
 
       //geting stores
+      // logger.d(groupOrder.storeRef);
       stores.add(await AppFunctions.loadStoreReference(
           groupOrder.storeRef as DocumentReference));
     }
@@ -1090,25 +831,539 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
         .get();
     return snapshot.data()!['displayName'];
   }
+}
 
-  Future<List> _getIndividualOrders() async {
-    List<IndividualOrder> individualOrders = [];
-    List<Store> stores = [];
-    final individualOrderSnapshot = await FirebaseFirestore.instance
-        .collection(FirestoreCollections.individualOrders)
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get();
-    if (individualOrderSnapshot.exists) {
-      final allIndividualOrders = individualOrderSnapshot.data()!;
-      for (var individualOrderJson in allIndividualOrders.values) {
-        final individualOrder = IndividualOrder.fromJson(individualOrderJson);
-        individualOrders.add(individualOrder);
+class CartSheet extends StatelessWidget {
+  const CartSheet({
+    super.key,
+    required this.store,
+    required this.cartItem,
+  });
 
-        final store = await AppFunctions.loadStoreReference(
-            individualOrder.storeRef as DocumentReference);
-        stores.add(store);
-      }
-    }
-    return [individualOrders, stores];
+  final Store store;
+  final HiveCartItem cartItem;
+
+  @override
+  Widget build(BuildContext context) {
+    String? activatedPromo =
+        Hive.box(AppBoxes.appState).get(BoxKeys.activatedPromoPath);
+    Map<dynamic, dynamic> userInfo =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    late bool hasUberOne = userInfo['hasUberOne'] ?? false;
+    return ValueListenableBuilder(
+        valueListenable:
+            Hive.box<HiveCartProduct>(AppBoxes.storedProducts).listenable(),
+        builder: (context, productsBox, child) {
+          return Scaffold(
+            body: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                SliverAppBar.medium(
+                  leading: GestureDetector(
+                      onTap: () => navigatorKey.currentState!.pop(),
+                      child: const Icon(Icons.clear)),
+                  title: AppText(
+                    text: store.name,
+                    weight: FontWeight.w600,
+                  ),
+                  expandedHeight: 110,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPaddingSmall),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          AppText(
+                            text: store.name,
+                            weight: FontWeight.w600,
+                            size: AppSizes.heading6,
+                          ),
+                          const Gap(15)
+                        ],
+                      ),
+                    ),
+                  ),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          right: AppSizes.horizontalPaddingSmall),
+                      child: InkWell(
+                          onTap: () async =>
+                              await AppFunctions.createGroupOrder(store),
+                          child: Ink(
+                              child: const Icon(Icons.person_add_outlined))),
+                    )
+                  ],
+                ),
+              ],
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListView.separated(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              final cartProduct = cartItem.products[index];
+
+                              return FutureBuilder(
+                                  future: AppFunctions.loadProductReference(
+                                      FirebaseFirestore.instance
+                                          .collection(
+                                              FirestoreCollections.products)
+                                          .doc(cartProduct.id)),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      final product = snapshot.data!;
+
+                                      return ListTile(
+                                        onTap: () => navigatorKey.currentState!
+                                            .push(MaterialPageRoute(
+                                          builder: (context) => ProductScreen(
+                                              product: product, store: store),
+                                        )),
+                                        trailing: AddToCartButton(
+                                            removeShadow: true,
+                                            backgroundColor:
+                                                AppColors.neutral100,
+                                            product: product,
+                                            store: store),
+                                        leading: SizedBox(
+                                          width: 60,
+                                          height: 60,
+                                          child:
+                                              AppFunctions.displayNetworkImage(
+                                                  product.imageUrls.first),
+                                        ),
+                                        title: AppText(
+                                          text: product.name,
+                                          weight: FontWeight.w600,
+                                        ),
+                                        subtitle: Column(
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children:
+                                                  cartProduct.requiredOptions
+                                                      .map(
+                                                        (e) => Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                AppText(
+                                                                  text:
+                                                                      '${e.name}:',
+                                                                  weight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                                if (e.options
+                                                                    .isNotEmpty)
+                                                                  Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: e
+                                                                        .options
+                                                                        .map(
+                                                                          (e) =>
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              AppText(
+                                                                                text: e.name,
+                                                                              ),
+                                                                              Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: e.options
+                                                                                      .map(
+                                                                                        (e) => AppText(
+                                                                                          text: e.name,
+                                                                                        ),
+                                                                                      )
+                                                                                      .toList()),
+                                                                            ],
+                                                                          ),
+                                                                        )
+                                                                        .toList(),
+                                                                  ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children:
+                                                  cartProduct.optionalOptions
+                                                      .map(
+                                                        (e) => Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                AppText(
+                                                                  text:
+                                                                      '${e.name}:',
+                                                                  weight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                                if (e.options
+                                                                    .isNotEmpty)
+                                                                  Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: e
+                                                                        .options
+                                                                        .map(
+                                                                          (e) =>
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              AppText(
+                                                                                text: e.name,
+                                                                              ),
+                                                                              Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: e.options
+                                                                                      .map(
+                                                                                        (e) => AppText(
+                                                                                          text: e.name,
+                                                                                        ),
+                                                                                      )
+                                                                                      .toList()),
+                                                                            ],
+                                                                          ),
+                                                                        )
+                                                                        .toList(),
+                                                                  ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                            ),
+                                            if (product
+                                                .similarProducts.isNotEmpty)
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.loop,
+                                                    color: AppColors.neutral500,
+                                                    size: 15,
+                                                  ),
+                                                  const Gap(5),
+                                                  AppText(
+                                                      text: cartProduct
+                                                              .backupInstruction ??
+                                                          'Best match'),
+                                                ],
+                                              ),
+                                            Row(
+                                              children: [
+                                                AppText(
+                                                    text:
+                                                        '\$${(product.promoPrice ?? product.initialPrice).toStringAsFixed(2)}',
+                                                    color: product.promoPrice !=
+                                                            null
+                                                        ? Colors.green
+                                                        : null),
+                                                if (product.promoPrice != null)
+                                                  AppText(
+                                                    text:
+                                                        ' ${product.initialPrice.toStringAsFixed(2)}',
+                                                  )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return AppText(
+                                        text: snapshot.error.toString(),
+                                      );
+                                    } else {
+                                      return Skeletonizer(
+                                          enabled: true,
+                                          child: ListTile(
+                                            leading: Container(
+                                                width: 60,
+                                                height: 60,
+                                                color: AppColors.neutral100),
+                                            title: const AppText(
+                                              text: 'hdsjnjnadfks',
+                                              weight: FontWeight.w600,
+                                            ),
+                                            subtitle: const AppText(
+                                              text: 'hdsjnjnadfkdkdkddkkdks',
+                                              weight: FontWeight.w600,
+                                            ),
+                                          ));
+                                    }
+                                  });
+                            },
+                            separatorBuilder: (context, index) =>
+                                const Divider(),
+                            itemCount: cartItem.products.length),
+                        const Gap(10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPadding),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              InkWell(
+                                onTap: () async {
+                                  await AppFunctions.navigateToStoreScreen(
+                                      store);
+                                },
+                                child: Ink(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                      color: AppColors.neutral100,
+                                      borderRadius: BorderRadius.circular(50)),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.add,
+                                        size: 15,
+                                      ),
+                                      Gap(10),
+                                      AppText(text: 'Add items'),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (store.offers != null)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Divider(),
+                              const AppText(
+                                text: 'Offers for you',
+                                weight: FontWeight.bold,
+                                size: AppSizes.body,
+                              ),
+                              ListView.builder(
+                                itemBuilder: (context, index) {
+                                  final offer = store.offers![index];
+                                  return FutureBuilder(
+                                      future: AppFunctions.loadProductReference(
+                                          offer.product as DocumentReference),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          return ProductGridTilePriceFirst(
+                                              product: snapshot.data!,
+                                              store: store);
+                                        } else if (snapshot.hasError) {
+                                          return AppText(
+                                            text: snapshot.error.toString(),
+                                          );
+                                        } else {
+                                          return Skeletonizer(
+                                              enabled: true,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    color: AppColors.neutral100,
+                                                  ),
+                                                  const AppText(
+                                                      text: 'lkajlskj'),
+                                                  const AppText(
+                                                      text: 'nlanjsklaf')
+                                                ],
+                                              ));
+                                        }
+                                      });
+                                },
+                                itemCount: store.offers!.length,
+                                scrollDirection: Axis.horizontal,
+                              )
+                            ],
+                          ),
+                        const Divider(),
+                        ListTile(
+                          onTap: () {
+                            // navigatorKey.currentState!.push(MaterialPageRoute(
+                            //   builder: (context) => const CustomizeGiftScreen(),
+                            // ));
+                          },
+                          dense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
+                          leading: const Iconify(Ph.gift),
+                          title: const AppText(text: 'Send as a gift'),
+                          subtitle: const AppText(
+                            text: 'And customize a digital card',
+                            color: AppColors.neutral500,
+                          ),
+                          trailing: const Icon(Icons.keyboard_arrow_right),
+                        ),
+                        const Divider(),
+                        ListTile(
+                          title: const AppText(
+                            text: 'Subtotal',
+                            weight: FontWeight.w600,
+                            size: AppSizes.bodySmall,
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (cartItem.subtotal <
+                                  cartItem.initialPricesTotal)
+                                AppText(
+                                    size: AppSizes.bodySmall,
+                                    decoration: TextDecoration.lineThrough,
+                                    text:
+                                        '\$${cartItem.initialPricesTotal.toStringAsFixed(2)}'),
+                              AppText(
+                                  size: AppSizes.bodySmall,
+                                  weight: FontWeight.w600,
+                                  text:
+                                      ' \$${cartItem.subtotal.toStringAsFixed(2)}'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (activatedPromo != null)
+                        FutureBuilder(
+                            future: AppFunctions.loadPromoReference(
+                                FirebaseFirestore.instance.doc(activatedPromo)),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                      color: Colors.amberAccent.shade100),
+                                  child: ListTile(
+                                    dense: true,
+                                    leading: Image.asset(
+                                      AssetNames.uberOneSmall,
+                                      width: 20,
+                                      color: Colors.brown,
+                                    ),
+                                    subtitle:
+                                        cartItem.subtotal < 30 && hasUberOne
+                                            ? AppText(
+                                                color: Colors.brown.shade500,
+                                                text:
+                                                    'Add \$${30 - cartItem.subtotal} to save more with Uber One',
+                                                size: AppSizes.bodySmallest,
+                                              )
+                                            : null,
+                                    title: AppText(
+                                        color: Colors.brown.shade500,
+                                        text:
+                                            'Saving ${(snapshot.data!.discount / 100) * cartItem.subtotal} with promotions'),
+                                  ),
+                                );
+                              } else if (snapshot.hasData) {
+                                return AppText(
+                                  text: snapshot.error.toString(),
+                                );
+                              } else {
+                                return Skeletonizer(
+                                  enabled: true,
+                                  child: Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                        color: Colors.amberAccent.shade100),
+                                    child: ListTile(
+                                      leading: Image.asset(
+                                        AssetNames.uberOneSmall,
+                                        width: 20,
+                                        color: Colors.brown,
+                                      ),
+                                      subtitle: AppText(
+                                        color: Colors.brown.shade500,
+                                        text: 'Add  to save more with Uber One',
+                                        size: AppSizes.bodySmallest,
+                                      ),
+                                      title: AppText(
+                                          color: Colors.brown.shade500,
+                                          text: 'Saving  with promotions'),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }),
+                      if (hasUberOne && cartItem.subtotal >= 30)
+                        Container(
+                          width: double.infinity,
+                          decoration: const BoxDecoration(color: Colors.brown),
+                          child: ListTile(
+                            leading: Image.asset(
+                              AssetNames.uberOneSmall,
+                              width: 20,
+                              color: Colors.white,
+                            ),
+                            title: const AppText(
+                                color: Colors.white,
+                                text: 'Saving \$0.14 with Uber One'),
+                          ),
+                        ),
+                      const Gap(10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.horizontalPaddingSmall),
+                        child: AppButton(
+                          text: 'Go to checkout',
+                          callback: () async {
+                            final BitmapDescriptor bitmapDescriptor =
+                                await BitmapDescriptor.asset(
+                              const ImageConfiguration(
+                                  size: Size(30, 46)), // Adjust size as needed
+                              AssetNames.mapMarker2, // Path to your asset
+                            );
+                            final phoneNumber =
+                                FirebaseAuth.instance.currentUser!.phoneNumber;
+
+                            await navigatorKey.currentState!
+                                .push(MaterialPageRoute(
+                              builder: (context) => CheckoutScreen(
+                                  markerIcon: bitmapDescriptor,
+                                  phoneNumber: phoneNumber,
+                                  store: store),
+                            ));
+                          },
+                        ),
+                      ),
+                      const Gap(10),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

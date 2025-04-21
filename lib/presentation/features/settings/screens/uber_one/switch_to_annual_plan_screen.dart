@@ -157,10 +157,10 @@ class _SwitchToAnnualPlanScreenState extends State<SwitchToAnnualPlanScreen> {
                             color: Colors.white,
                           ),
                           trailing: AppButton2(text: 'Switch', callback: () {}),
-                          title: AppText(
-                              color: Colors.white,
-                              text:
-                                  '•••• ${widget.membershipDetails.paymentMethod.cardNumber!.substring(5)}'),
+                          // title: AppText(
+                          //     color: Colors.white,
+                          //     text:
+                          //         '•••• ${widget.membershipDetails.paymentMethod.cardNumber!.substring(5)}'),
                         ),
                         AppButton(
                           buttonColor: AppColors.uberOneGold,

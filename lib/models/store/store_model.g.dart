@@ -170,10 +170,14 @@ _$ProductImpl _$$ProductImplFromJson(Map<String, dynamic> json) =>
       directions: json['directions'] as String?,
       quantity: json['quantity'] as String?,
       description: json['description'] as String?,
-      options: (json['options'] as List<dynamic>?)
-          ?.map((e) => Option.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      selectOptionRequired: json['selectOptionRequired'] as bool? ?? false,
+      optionalOptions: (json['optionalOptions'] as List<dynamic>?)
+              ?.map((e) => Option.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      requiredOptions: (json['requiredOptions'] as List<dynamic>?)
+              ?.map((e) => Option.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       calories: (json['calories'] as num?)?.toDouble(),
       isSoldOut: json['isSoldOut'] as bool?,
       isSponsored: json['isSponsored'] as bool?,
@@ -199,8 +203,10 @@ Map<String, dynamic> _$$ProductImplToJson(_$ProductImpl instance) =>
       'directions': instance.directions,
       'quantity': instance.quantity,
       'description': instance.description,
-      'options': instance.options?.map((e) => e.toJson()).toList(),
-      'selectOptionRequired': instance.selectOptionRequired,
+      'optionalOptions':
+          instance.optionalOptions.map((e) => e.toJson()).toList(),
+      'requiredOptions':
+          instance.requiredOptions.map((e) => e.toJson()).toList(),
       'calories': instance.calories,
       'isSoldOut': instance.isSoldOut,
       'isSponsored': instance.isSponsored,
@@ -211,43 +217,43 @@ Map<String, dynamic> _$$ProductImplToJson(_$ProductImpl instance) =>
 
 _$OptionImpl _$$OptionImplFromJson(Map<String, dynamic> json) => _$OptionImpl(
       name: json['name'] as String,
-      price: (json['price'] as num?)?.toDouble(),
+      canBeMultipleLimit: (json['canBeMultipleLimit'] as num?)?.toInt(),
       isExclusive: json['isExclusive'] as bool? ?? true,
       subOptions: (json['subOptions'] as List<dynamic>?)
-          ?.map((e) => SubOption.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      calories: (json['calories'] as num?)?.toDouble(),
-      canBeMultiple: json['canBeMultiple'] as bool? ?? false,
-      canBeMultipleLimit: (json['canBeMultipleLimit'] as num?)?.toInt(),
+              ?.map((e) => SubOption.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$OptionImplToJson(_$OptionImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
-      'price': instance.price,
-      'isExclusive': instance.isExclusive,
-      'subOptions': instance.subOptions?.map((e) => e.toJson()).toList(),
-      'calories': instance.calories,
-      'canBeMultiple': instance.canBeMultiple,
       'canBeMultipleLimit': instance.canBeMultipleLimit,
+      'isExclusive': instance.isExclusive,
+      'subOptions': instance.subOptions.map((e) => e.toJson()).toList(),
     };
 
 _$SubOptionImpl _$$SubOptionImplFromJson(Map<String, dynamic> json) =>
     _$SubOptionImpl(
       name: json['name'] as String,
       canBeMultiple: json['canBeMultiple'] as bool,
+      isExclusive: json['isExclusive'] as bool? ?? true,
       calories: (json['calories'] as num?)?.toDouble(),
       price: (json['price'] as num?)?.toDouble(),
-      canBeMultipleLimit: (json['canBeMultipleLimit'] as num?)?.toInt(),
+      options: (json['options'] as List<dynamic>?)
+              ?.map((e) => Option.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$SubOptionImplToJson(_$SubOptionImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
       'canBeMultiple': instance.canBeMultiple,
+      'isExclusive': instance.isExclusive,
       'calories': instance.calories,
       'price': instance.price,
-      'canBeMultipleLimit': instance.canBeMultipleLimit,
+      'options': instance.options.map((e) => e.toJson()).toList(),
     };
 
 _$FoodCategoryImpl _$$FoodCategoryImplFromJson(Map<String, dynamic> json) =>

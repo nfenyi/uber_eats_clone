@@ -10,6 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:location/location.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/models/gift_card_category_model.dart';
 import 'package:uber_eats_clone/models/group_order/group_order_model.dart';
@@ -26,6 +28,8 @@ import 'models/advert/advert_model.dart';
 import 'models/store/store_model.dart';
 import 'presentation/constants/other_constants.dart';
 import 'presentation/features/grocery_store/screens/screens/grocery_store_main_screen.dart';
+import 'presentation/features/group_order/group_order_screen.dart';
+import 'presentation/features/group_order/group_order_settings_screen.dart';
 import 'presentation/features/store/store_screen.dart';
 import 'presentation/services/sign_in_view_model.dart';
 
@@ -51,6 +55,27 @@ class AppFunctions {
     final snapshot = await reference.get();
 
     return snapshot.data() as Map<String, dynamic>;
+  }
+
+  static Future<LocationData?> getUserCurrentLocation() async {
+    final Location location = Location();
+
+    var serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        return null;
+      }
+    }
+    PermissionStatus permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return null;
+      }
+    }
+
+    return await location.getLocation();
   }
 
   // static DateTime? timestampToDateTime(dynamic value) {
@@ -81,6 +106,43 @@ class AppFunctions {
     giftAdverts.shuffle();
 
     return giftAdverts;
+  }
+
+  static Future<void> createGroupOrder(Store store) async {
+    List<String> groupOrderIds =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo)['groupOrders'];
+    var matchingGroupOrderIds = groupOrderIds.where(
+      (element) => element.contains(store.id),
+    );
+
+    GroupOrder? orderCreatedByUser;
+    for (var matchingOrder in matchingGroupOrderIds) {
+      final ref = FirebaseFirestore.instance
+          .collection(FirestoreCollections.groupOrders)
+          .doc(matchingOrder);
+      final groupOrder = await AppFunctions.loadGroupOrderReference(ref);
+      if (groupOrder.ownerId == FirebaseAuth.instance.currentUser!.uid) {
+        orderCreatedByUser = groupOrder;
+        break;
+      }
+    }
+
+    if (orderCreatedByUser == null) {
+      await showModalBottomSheet(
+          isScrollControlled: true,
+          useSafeArea: true,
+          barrierColor: Colors.transparent,
+          context: navigatorKey.currentContext!,
+          builder: (context) => ShowCaseWidget(builder: (context) {
+                return GroupOrderSettingsScreen(store: store);
+              }));
+    } else {
+      await navigatorKey.currentState!.push(MaterialPageRoute(
+          builder: (context) => ShowCaseWidget(builder: (context) {
+                return GroupOrderScreen(
+                    store: store, groupOrder: orderCreatedByUser!);
+              })));
+    }
   }
 
   static Future<void> navigateToStoreScreen(Store store,
@@ -219,26 +281,30 @@ class AppFunctions {
       {double? width,
       double? height,
       BoxFit? fit,
-      String placeholderAssetImage = AssetNames.aisleImage}) {
+      String? placeholderAssetImage}) {
     if (image.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: image,
-        errorWidget: (context, url, error) {
-          logger.d(error.toString());
-          return Image.asset(
-            placeholderAssetImage,
-            width: width,
-            height: height,
-            fit: fit,
-          );
-        },
+        errorWidget: placeholderAssetImage == null
+            ? null
+            : (context, url, error) {
+                logger.d(error.toString());
+                return Image.asset(
+                  placeholderAssetImage,
+                  width: width,
+                  height: height,
+                  fit: fit,
+                );
+              },
         width: width,
-        placeholder: (context, url) => Image.asset(
-          placeholderAssetImage,
-          width: width,
-          height: height,
-          fit: fit,
-        ),
+        placeholder: placeholderAssetImage == null
+            ? null
+            : (context, url) => Image.asset(
+                  placeholderAssetImage,
+                  width: width,
+                  height: height,
+                  fit: fit,
+                ),
         height: height,
         fit: fit,
       );
@@ -250,14 +316,16 @@ class AppFunctions {
         return Image.memory(
           width: width,
           height: height,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              placeholderAssetImage,
-              width: width,
-              height: height,
-              fit: fit,
-            );
-          },
+          errorBuilder: placeholderAssetImage == null
+              ? null
+              : (context, error, stackTrace) {
+                  return Image.asset(
+                    placeholderAssetImage,
+                    width: width,
+                    height: height,
+                    fit: fit,
+                  );
+                },
           fit: fit,
           bytes,
         );
@@ -266,12 +334,10 @@ class AppFunctions {
         return const AppText(text: 'Error loading image');
       }
     } else {
-      logger.d('Invalid image source');
-      return Image.asset(
-        placeholderAssetImage,
+      return SizedBox(
         width: width,
         height: height,
-        fit: fit,
+        child: const AppText(text: 'Invalid image source'),
       );
       // // Handle invalid image source (neither URL nor base64)
     }
@@ -284,7 +350,7 @@ class AppFunctions {
     return Promotion.fromJson(promoJson);
   }
 
-  static Future<Map<dynamic, dynamic>> getUserInfo() async {
+  static Future<Map<dynamic, dynamic>> getOnlineUserInfo() async {
     final userInfoSnapshot = await FirebaseFirestore.instance
         .collection(FirestoreCollections.users)
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -323,7 +389,6 @@ class AppFunctions {
     //adding display name
     userInfoForHiveBox['displayName'] =
         FirebaseAuth.instance.currentUser!.displayName;
-
     await Hive.box(AppBoxes.appState).put(BoxKeys.userInfo, userInfoForHiveBox);
     // logger.d(userInfo);
     return userInfo;
@@ -331,13 +396,16 @@ class AppFunctions {
 
   static Future<void> addCreditCard(CreditCardDetails creditCardDetails) async {
     const storage = FlutterSecureStorage();
+
     Map<String, dynamic> creditCardJson = creditCardDetails.toJson();
-    late final List<Map<String, dynamic>> newListToBeStored;
+    late final List<Map> newListToBeStored;
     String? anyOldExistingList = await storage.read(key: 'creditCard');
     if (anyOldExistingList == null) {
       newListToBeStored = [creditCardJson];
     } else {
-      List<Map<String, dynamic>> oldList = json.decode(anyOldExistingList);
+      logger.d(json.decode(anyOldExistingList));
+      List oldList = json.decode(anyOldExistingList);
+      // logger.d(oldList);
       newListToBeStored = [creditCardJson, ...oldList];
     }
     String newEncodedList = json.encode(newListToBeStored);
@@ -387,7 +455,27 @@ class AppFunctions {
     }
   }
 
-  // static Future<List<Store>> getStores()async {
-  //   if(ref.rea)
-  // }
+  static Future<List<IndividualOrder>> getAllIndividualOrders() async {
+    List<IndividualOrder> individualOrders = [];
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.individualOrders)
+        .where('userUid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    for (var element in querySnapshot.docs) {
+      individualOrders.add(IndividualOrder.fromJson(element.data()));
+    }
+    return individualOrders;
+  }
+
+  static Future<IndividualOrder> getIndividualOrder(String id) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.individualOrders)
+        .where('orderNumber', isEqualTo: id)
+        .get();
+
+    final docSnapshot = querySnapshot.docs.first;
+
+    return IndividualOrder.fromJson(docSnapshot.data());
+  }
 }

@@ -20,9 +20,9 @@ Payment _$PaymentFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Payment {
-  PaymentMethod get paymentMethodId => throw _privateConstructorUsedError;
-  int get amountPaid => throw _privateConstructorUsedError;
-  String get cardNumber => throw _privateConstructorUsedError;
+  String get paymentMethodName => throw _privateConstructorUsedError;
+  double get amountPaid => throw _privateConstructorUsedError;
+  String? get cardNumber => throw _privateConstructorUsedError;
   DateTime get datePaid => throw _privateConstructorUsedError;
 
   /// Serializes this Payment to a JSON map.
@@ -40,12 +40,10 @@ abstract class $PaymentCopyWith<$Res> {
       _$PaymentCopyWithImpl<$Res, Payment>;
   @useResult
   $Res call(
-      {PaymentMethod paymentMethodId,
-      int amountPaid,
-      String cardNumber,
+      {String paymentMethodName,
+      double amountPaid,
+      String? cardNumber,
       DateTime datePaid});
-
-  $PaymentMethodCopyWith<$Res> get paymentMethodId;
 }
 
 /// @nodoc
@@ -63,39 +61,29 @@ class _$PaymentCopyWithImpl<$Res, $Val extends Payment>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? paymentMethodId = null,
+    Object? paymentMethodName = null,
     Object? amountPaid = null,
-    Object? cardNumber = null,
+    Object? cardNumber = freezed,
     Object? datePaid = null,
   }) {
     return _then(_value.copyWith(
-      paymentMethodId: null == paymentMethodId
-          ? _value.paymentMethodId
-          : paymentMethodId // ignore: cast_nullable_to_non_nullable
-              as PaymentMethod,
+      paymentMethodName: null == paymentMethodName
+          ? _value.paymentMethodName
+          : paymentMethodName // ignore: cast_nullable_to_non_nullable
+              as String,
       amountPaid: null == amountPaid
           ? _value.amountPaid
           : amountPaid // ignore: cast_nullable_to_non_nullable
-              as int,
-      cardNumber: null == cardNumber
+              as double,
+      cardNumber: freezed == cardNumber
           ? _value.cardNumber
           : cardNumber // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       datePaid: null == datePaid
           ? _value.datePaid
           : datePaid // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ) as $Val);
-  }
-
-  /// Create a copy of Payment
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $PaymentMethodCopyWith<$Res> get paymentMethodId {
-    return $PaymentMethodCopyWith<$Res>(_value.paymentMethodId, (value) {
-      return _then(_value.copyWith(paymentMethodId: value) as $Val);
-    });
   }
 }
 
@@ -107,13 +95,10 @@ abstract class _$$PaymentImplCopyWith<$Res> implements $PaymentCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {PaymentMethod paymentMethodId,
-      int amountPaid,
-      String cardNumber,
+      {String paymentMethodName,
+      double amountPaid,
+      String? cardNumber,
       DateTime datePaid});
-
-  @override
-  $PaymentMethodCopyWith<$Res> get paymentMethodId;
 }
 
 /// @nodoc
@@ -129,24 +114,24 @@ class __$$PaymentImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? paymentMethodId = null,
+    Object? paymentMethodName = null,
     Object? amountPaid = null,
-    Object? cardNumber = null,
+    Object? cardNumber = freezed,
     Object? datePaid = null,
   }) {
     return _then(_$PaymentImpl(
-      paymentMethodId: null == paymentMethodId
-          ? _value.paymentMethodId
-          : paymentMethodId // ignore: cast_nullable_to_non_nullable
-              as PaymentMethod,
+      paymentMethodName: null == paymentMethodName
+          ? _value.paymentMethodName
+          : paymentMethodName // ignore: cast_nullable_to_non_nullable
+              as String,
       amountPaid: null == amountPaid
           ? _value.amountPaid
           : amountPaid // ignore: cast_nullable_to_non_nullable
-              as int,
-      cardNumber: null == cardNumber
+              as double,
+      cardNumber: freezed == cardNumber
           ? _value.cardNumber
           : cardNumber // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       datePaid: null == datePaid
           ? _value.datePaid
           : datePaid // ignore: cast_nullable_to_non_nullable
@@ -159,7 +144,7 @@ class __$$PaymentImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
   const _$PaymentImpl(
-      {required this.paymentMethodId,
+      {required this.paymentMethodName,
       required this.amountPaid,
       required this.cardNumber,
       required this.datePaid});
@@ -168,17 +153,17 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
       _$$PaymentImplFromJson(json);
 
   @override
-  final PaymentMethod paymentMethodId;
+  final String paymentMethodName;
   @override
-  final int amountPaid;
+  final double amountPaid;
   @override
-  final String cardNumber;
+  final String? cardNumber;
   @override
   final DateTime datePaid;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Payment(paymentMethodId: $paymentMethodId, amountPaid: $amountPaid, cardNumber: $cardNumber, datePaid: $datePaid)';
+    return 'Payment(paymentMethodName: $paymentMethodName, amountPaid: $amountPaid, cardNumber: $cardNumber, datePaid: $datePaid)';
   }
 
   @override
@@ -186,7 +171,7 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'Payment'))
-      ..add(DiagnosticsProperty('paymentMethodId', paymentMethodId))
+      ..add(DiagnosticsProperty('paymentMethodName', paymentMethodName))
       ..add(DiagnosticsProperty('amountPaid', amountPaid))
       ..add(DiagnosticsProperty('cardNumber', cardNumber))
       ..add(DiagnosticsProperty('datePaid', datePaid));
@@ -197,8 +182,8 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PaymentImpl &&
-            (identical(other.paymentMethodId, paymentMethodId) ||
-                other.paymentMethodId == paymentMethodId) &&
+            (identical(other.paymentMethodName, paymentMethodName) ||
+                other.paymentMethodName == paymentMethodName) &&
             (identical(other.amountPaid, amountPaid) ||
                 other.amountPaid == amountPaid) &&
             (identical(other.cardNumber, cardNumber) ||
@@ -210,7 +195,7 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, paymentMethodId, amountPaid, cardNumber, datePaid);
+      runtimeType, paymentMethodName, amountPaid, cardNumber, datePaid);
 
   /// Create a copy of Payment
   /// with the given fields replaced by the non-null parameter values.
@@ -230,19 +215,19 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
 
 abstract class _Payment implements Payment {
   const factory _Payment(
-      {required final PaymentMethod paymentMethodId,
-      required final int amountPaid,
-      required final String cardNumber,
+      {required final String paymentMethodName,
+      required final double amountPaid,
+      required final String? cardNumber,
       required final DateTime datePaid}) = _$PaymentImpl;
 
   factory _Payment.fromJson(Map<String, dynamic> json) = _$PaymentImpl.fromJson;
 
   @override
-  PaymentMethod get paymentMethodId;
+  String get paymentMethodName;
   @override
-  int get amountPaid;
+  double get amountPaid;
   @override
-  String get cardNumber;
+  String? get cardNumber;
   @override
   DateTime get datePaid;
 

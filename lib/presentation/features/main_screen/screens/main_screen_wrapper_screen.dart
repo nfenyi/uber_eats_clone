@@ -23,7 +23,7 @@ class MainScreenWrapperScreen extends ConsumerStatefulWidget {
 class _MainScreenWrapperScreenState
     extends ConsumerState<MainScreenWrapperScreen> {
   Future<bool> _fetchStoredUserLocation() async {
-    Map userInfo = await AppFunctions.getUserInfo();
+    Map userInfo = await AppFunctions.getOnlineUserInfo();
     ref.read(selectedLocationDescription.notifier).state =
         userInfo['selectedAddress']['placeDescription'];
 

@@ -23,13 +23,10 @@ import '../../core/app_text.dart';
 import '../../core/widgets.dart';
 import '../../services/sign_in_view_model.dart';
 import '../address/screens/addresses_screen.dart';
-import '../address/screens/payment_options_screen.dart';
 import '../home/home_screen.dart';
-import '../home/map/map_screen.dart';
 import '../home/screens/search_screen.dart';
 import '../main_screen/screens/main_screen.dart';
 import '../some_kind_of_section/advert_screen.dart';
-import '../store/store_screen.dart';
 import '../webview/webview_screen.dart';
 
 class AlcoholScreen extends ConsumerStatefulWidget {
@@ -40,7 +37,6 @@ class AlcoholScreen extends ConsumerStatefulWidget {
 }
 
 class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
-  late final List<Color> _featuredStoresColors = [];
   final webViewcontroller = WebViewControllerPlus();
 
   final List<Store> _alcoholStores = allStores
@@ -50,7 +46,6 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
       .toList();
 
   bool _onFilterScreen = false;
-  final List<Store> _filteredStores = [];
   Future<List<DocumentReference>> _getFeaturedStoreRefs() async {
     final featuredGroceryStoresSnapshot = await FirebaseFirestore.instance
         .collection(FirestoreCollections.featuredStores)

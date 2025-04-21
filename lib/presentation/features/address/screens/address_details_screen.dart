@@ -108,57 +108,58 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
           Expanded(
             child: ListView(
               children: [
-                InkWell(
-                  onTap: () async {
-                    final List? setLocationDetails =
-                        await navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => ConfirmLocationScreen(
-                          markerIcon: widget.markerIcon,
-                          initialLocation: _setLocation),
-                    ));
-                    if (setLocationDetails != null) {
-                      setState(() {
-                        _setLocation = setLocationDetails.first;
-                        _placeDescription = setLocationDetails.last;
-                      });
-                    }
-                  },
-                  child: Ink(
-                    child: Stack(
-                      alignment: Alignment.bottomCenter,
+                Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 200,
+                      child: GoogleMap(
+                        zoomControlsEnabled: false,
+                        zoomGesturesEnabled: false,
+                        tiltGesturesEnabled: false,
+                        markers: {
+                          Marker(
+                              markerId: const MarkerId('set_location'),
+                              icon: widget.markerIcon,
+                              position: _setLocation)
+                        },
+                        initialCameraPosition:
+                            CameraPosition(target: _setLocation, zoom: 15),
+                      ),
+                    ),
+                    Column(
                       children: [
-                        SizedBox(
-                          width: double.infinity,
-                          height: 200,
-                          child: GoogleMap(
-                            zoomControlsEnabled: false,
-                            zoomGesturesEnabled: false,
-                            tiltGesturesEnabled: false,
-                            markers: {
-                              Marker(
-                                  markerId: const MarkerId('set_location'),
-                                  icon: widget.markerIcon,
-                                  position: _setLocation)
-                            },
-                            initialCameraPosition:
-                                CameraPosition(target: _setLocation, zoom: 15),
-                          ),
-                        ),
-                        Column(
-                          children: [
-                            Container(
+                        InkWell(
+                          onTap: () async {
+                            final List? setLocationDetails = await navigatorKey
+                                .currentState!
+                                .push(MaterialPageRoute(
+                              builder: (context) => ConfirmLocationScreen(
+                                  markerIcon: widget.markerIcon,
+                                  initialLocation: _setLocation),
+                            ));
+                            if (setLocationDetails != null) {
+                              setState(() {
+                                _setLocation = setLocationDetails.first;
+                                _placeDescription = setLocationDetails.last;
+                              });
+                            }
+                          },
+                          child: Ink(
+                            child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 7),
                                 decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(50)),
                                 child: const AppText(text: 'Edit pin')),
-                            const Gap(10)
-                          ],
-                        )
+                          ),
+                        ),
+                        const Gap(10)
                       ],
-                    ),
-                  ),
+                    )
+                  ],
                 ),
                 const Gap(15),
                 Padding(
@@ -376,7 +377,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
                               FieldValue.arrayUnion([addressDetails.toJson()])
                         });
                       }
-                      await AppFunctions.getUserInfo();
+                      await AppFunctions.getOnlineUserInfo();
                       navigatorKey.currentState!.pop();
                     } else {
                       await FirebaseFirestore.instance

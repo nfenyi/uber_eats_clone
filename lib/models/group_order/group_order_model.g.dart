@@ -8,7 +8,7 @@ part of 'group_order_model.dart';
 
 _$GroupOrderImpl _$$GroupOrderImplFromJson(Map<String, dynamic> json) =>
     _$GroupOrderImpl(
-      id: json['id'] as String?,
+      id: json['id'] as String,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),

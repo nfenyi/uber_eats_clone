@@ -10,12 +10,10 @@ _$PaymentMethodImpl _$$PaymentMethodImplFromJson(Map<String, dynamic> json) =>
     _$PaymentMethodImpl(
       name: json['name'] as String,
       assetImage: json['assetImage'] as String,
-      cardNumber: json['cardNumber'] as String?,
     );
 
 Map<String, dynamic> _$$PaymentMethodImplToJson(_$PaymentMethodImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
       'assetImage': instance.assetImage,
-      'cardNumber': instance.cardNumber,
     };

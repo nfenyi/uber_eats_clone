@@ -203,7 +203,8 @@ class _PromoScreenState extends State<PromoScreen> {
                                                 FieldValue.arrayUnion(
                                                     [_searchedPromoRef])
                                           });
-                                          await AppFunctions.getUserInfo();
+                                          await AppFunctions
+                                              .getOnlineUserInfo();
                                           showInfoToast('Promo claimed',
                                               context:
                                                   navigatorKey.currentContext);

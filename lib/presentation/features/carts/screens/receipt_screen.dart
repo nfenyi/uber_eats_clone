@@ -454,11 +454,11 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 final payment = widget.order.payments[index];
                                 return ListTile(
                                   contentPadding: EdgeInsets.zero,
-                                  leading: Image.asset(
-                                    payment.paymentMethodId.assetImage,
-                                    width: 20,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  // leading: Image.asset(
+                                  //   payment.paymentMethodId.assetImage,
+                                  //   width: 20,
+                                  //   fit: BoxFit.cover,
+                                  // ),
                                   subtitle: AppText(
                                       text: AppFunctions.formatDate(
                                           payment.datePaid.toString(),
@@ -467,10 +467,10 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                       weight: FontWeight.w600,
                                       text:
                                           'US\$${payment.amountPaid.toStringAsFixed(2)}'),
-                                  title: AppText(
-                                      weight: FontWeight.w600,
-                                      text:
-                                          '${payment.paymentMethodId.name} ••••${payment.cardNumber.substring(4)}'),
+                                  // title: AppText(
+                                  //     weight: FontWeight.w600,
+                                  //     text:
+                                  //         '${payment.paymentMethodId.name} ••••${payment.cardNumber.substring(4)}'),
                                 );
                               },
                             ),

@@ -4,7 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/add_a_credit_card/add_a_credit_card.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
 
 import '../../../../main.dart';
 import '../../../../models/payment_method_model.dart';
@@ -90,9 +90,11 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
                     return ListTile(
                       onTap: () async {
                         if (paymentMethod.name == 'Credit or Debit') {
-                          await navigatorKey.currentState!.push(
-                              MaterialPageRoute(
-                                  builder: (context) => const AddCardScreen()));
+                          await navigatorKey.currentState!
+                              .push(MaterialPageRoute(
+                                  builder: (context) => AddCardScreen(
+                                        isOnboarding: widget.isOnboarding,
+                                      )));
                         } else if (paymentMethod.name == 'Gift Card') {
                           await showModalBottomSheet(
                             useSafeArea: true,
