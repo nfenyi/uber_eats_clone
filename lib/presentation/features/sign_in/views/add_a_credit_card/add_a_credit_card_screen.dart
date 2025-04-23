@@ -555,6 +555,8 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                 if (_formKey.currentState!.validate() &&
                     _countryController.text.isNotEmpty) {
                   var creditCardDetails = CreditCardDetails(
+                      creditCardType: AppFunctions.getCreditCardName(
+                          detectCCType(_cardNumberController.text)),
                       cardNumber: _cardNumberController.text,
                       expDate: _expController.text.trim(),
                       cvv: _cvvController.text,

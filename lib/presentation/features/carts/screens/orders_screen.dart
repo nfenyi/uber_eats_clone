@@ -34,7 +34,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     AppFunctions.getAllIndividualOrders();
-    final timeOfDayNow = TimeOfDay.now();
+    final dateTimeNow = DateTime.now();
     return Scaffold(
       body: DefaultTabController(
         length: 2,
@@ -86,8 +86,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final allOrders = snapshot.data!;
-                  final partitionedOrderItems =
-                      groupBy(allOrders, (order) => order.status == 'Ongoing');
+                  final partitionedOrderItems = groupBy(allOrders,
+                      (order) => order.deliveryDate.isAfter(dateTimeNow));
                   _ongoingOrders = partitionedOrderItems[true] ?? [];
                   _pastOrders = partitionedOrderItems[false] ?? [];
                   return Column(
@@ -177,6 +177,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                       'Associated store seems to be removed from Uber Eats');
                                             }
                                             return ListTile(
+                                              onTap: () => showInfoToast(
+                                                  'Map UI for delivery not provided. Will figure out something',
+                                                  context: context),
                                               titleAlignment:
                                                   ListTileTitleAlignment.top,
                                               title: AppText(
@@ -195,7 +198,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                               subtitle: AppText(
                                                   color: AppColors.neutral500,
                                                   text:
-                                                      '${ongoingOrder.products.length} items • US\$${ongoingOrder.totalFee}\n${AppFunctions.formatDate(ongoingOrder.deliveryDate.toString(), format: 'M j')} • ${ongoingOrder.status}'),
+                                                      '${ongoingOrder.products.length} items • US\$${ongoingOrder.totalFee}\n${AppFunctions.formatDate(ongoingOrder.deliveryDate.toString(), format: ongoingOrder.deliveryDate.difference(dateTimeNow) < const Duration(days: 1) ? 'G:i A' : 'M j')} • ${ongoingOrder.status}'),
                                               leading: ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(50),
@@ -247,6 +250,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                       'Associated store seems to be removed from Uber Eats');
                                             }
                                             return ListTile(
+                                              onTap: () => navigatorKey
+                                                  .currentState!
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    OrderScreen(
+                                                        order: pastOrder),
+                                              )),
                                               titleAlignment:
                                                   ListTileTitleAlignment.top,
                                               title: AppText(
@@ -345,26 +355,23 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                   text:
                                                       'Associated store seems to be removed from Uber Eats');
                                             }
-                                            final bool isClosed = timeOfDayNow
+                                            final bool isClosed = dateTimeNow
                                                         .hour <
                                                     store.openingTime.hour ||
-                                                (timeOfDayNow.hour >=
+                                                (dateTimeNow.hour >=
                                                         store
                                                             .closingTime.hour &&
-                                                    timeOfDayNow.minute >=
+                                                    dateTimeNow.minute >=
                                                         store.closingTime
                                                             .minute);
                                             return Column(
                                               children: [
                                                 ListTile(
-                                                  onTap: () => navigatorKey
-                                                      .currentState!
-                                                      .push(MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        OrderScreen(
-                                                            isClosed: isClosed,
-                                                            order: order),
-                                                  )),
+                                                  onTap: () async {
+                                                    await AppFunctions
+                                                        .navigateToStoreScreen(
+                                                            store);
+                                                  },
                                                   trailing: const Icon(
                                                     Icons.keyboard_arrow_right,
                                                     color: AppColors.neutral500,
@@ -396,7 +403,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                       scrollbarOrientation:
                                                           ScrollbarOrientation
                                                               .bottom,
-                                                      child: ListView.builder(
+                                                      child: ListView.separated(
+                                                        separatorBuilder:
+                                                            (context, index) =>
+                                                                const Gap(5),
                                                         padding: const EdgeInsets
                                                             .symmetric(
                                                             horizontal: AppSizes

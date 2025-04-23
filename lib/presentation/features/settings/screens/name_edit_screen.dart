@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_udid/flutter_udid.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../constants/app_sizes.dart';
-import '../../../constants/asset_names.dart';
-import '../../../core/app_colors.dart';
+import '../../../services/sign_in_view_model.dart';
 
 class NameEditScreen extends StatefulWidget {
   const NameEditScreen({super.key});
@@ -18,13 +21,20 @@ class NameEditScreen extends StatefulWidget {
 class _NameEditScreenState extends State<NameEditScreen> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  final bool _isVerified = true;
+  late final String _initialFirstName;
+  late final String _initialLastName;
 
   @override
   void initState() {
     super.initState();
-    _firstNameController.text = 'Nana';
-    _lastNameController.text = 'Fenyi';
+    final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    final String displayName = userInfo['displayName'];
+    final names = displayName.split(' ');
+    _firstNameController.text =
+        names.length == 2 ? names.first : "${names.first} ${names[1]}";
+    _lastNameController.text = displayName.split(' ').last;
+    _initialFirstName = _firstNameController.text;
+    _initialLastName = _lastNameController.text;
   }
 
   @override
@@ -68,15 +78,17 @@ class _NameEditScreenState extends State<NameEditScreen> {
               const Gap(10),
               AppTextFormField(
                 controller: _firstNameController,
-                suffixIcon: GestureDetector(
-                    onTap: () {
-                      if (_firstNameController.text.isNotEmpty) {
-                        setState(() {
-                          _firstNameController.clear();
-                        });
-                      }
-                    },
-                    child: const Icon(Icons.cancel)),
+                suffixIcon: _firstNameController.text.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () {
+                          if (_firstNameController.text.isNotEmpty) {
+                            setState(() {
+                              _firstNameController.clear();
+                            });
+                          }
+                        },
+                        child: const Icon(Icons.cancel))
+                    : null,
               ),
               const Gap(15),
               const AppText(
@@ -87,34 +99,81 @@ class _NameEditScreenState extends State<NameEditScreen> {
               const Gap(10),
               AppTextFormField(
                 controller: _lastNameController,
-                suffixIcon: GestureDetector(
-                    onTap: () {
-                      if (_lastNameController.text.isNotEmpty) {
-                        setState(() {
-                          _lastNameController.clear();
-                        });
-                      }
-                    },
-                    child: const Icon(Icons.cancel)),
+                suffixIcon: _lastNameController.text.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () {
+                          if (_lastNameController.text.isNotEmpty) {
+                            setState(() {
+                              _lastNameController.clear();
+                            });
+                          }
+                        },
+                        child: const Icon(Icons.cancel))
+                    : null,
               ),
               const Gap(100),
               AppButton(
                 text: 'Update',
-                callback: () {
-                  navigatorKey.currentState!.pop();
-                  //TODO: add circularprogressindicator
-                  showInfoToast('Updating name..',
-                      context: context,
-                      icon: const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator.adaptive(
-                          backgroundColor: Colors.white,
-                        ),
-                      ));
-                  //TODO: add tick
-                  showInfoToast('Name updated', context: context);
-                },
+                callback: ((_firstNameController.text == _initialFirstName &&
+                            _lastNameController.text == _initialLastName) ||
+                        _firstNameController.text.isEmpty ||
+                        _lastNameController.text.isEmpty)
+                    ? null
+                    : () async {
+                        try {
+                          showInfoToast('Updating name..',
+                              context: context,
+                              icon: const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator.adaptive(
+                                  backgroundColor: Colors.white,
+                                ),
+                              ));
+                          final newDisplayName =
+                              '${_firstNameController.text} ${_lastNameController.text}';
+
+                          final userCredential =
+                              FirebaseAuth.instance.currentUser!;
+                          await userCredential
+                              .updateDisplayName(newDisplayName);
+
+                          await FirebaseFirestore.instance
+                              .collection(FirestoreCollections.users)
+                              .doc(userCredential.uid)
+                              .update({
+                            'displayName': newDisplayName,
+                          });
+                          String udid = await FlutterUdid.consistentUdid;
+                          final deviceUsersDetails = await FirebaseFirestore
+                              .instance
+                              .collection(FirestoreCollections.devices)
+                              .doc(udid)
+                              .get();
+                          final deviceUserDetails =
+                              deviceUsersDetails.data()![userCredential.uid];
+                          deviceUserDetails['name'] = newDisplayName;
+                          await FirebaseFirestore.instance
+                              .collection(FirestoreCollections.devices)
+                              .doc(udid)
+                              .update({
+                            userCredential.uid: deviceUserDetails,
+                          });
+                          showInfoToast(
+                              icon: const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                              ),
+                              'Name updated',
+                              context: navigatorKey.currentContext);
+                          if (context.mounted) Navigator.pop(context);
+                        } on Exception catch (e) {
+                          if (context.mounted) {
+                            await showAppInfoDialog(
+                                description: e.toString(), context);
+                          }
+                        }
+                      },
               )
             ],
           ),

@@ -25,6 +25,7 @@ mixin _$CreditCardDetails {
   String get cvv => throw _privateConstructorUsedError;
   String get country => throw _privateConstructorUsedError;
   String get zipCode => throw _privateConstructorUsedError;
+  String? get creditCardType => throw _privateConstructorUsedError;
   String get nickName => throw _privateConstructorUsedError;
 
   /// Serializes this CreditCardDetails to a JSON map.
@@ -49,6 +50,7 @@ abstract class $CreditCardDetailsCopyWith<$Res> {
       String cvv,
       String country,
       String zipCode,
+      String? creditCardType,
       String nickName});
 }
 
@@ -72,6 +74,7 @@ class _$CreditCardDetailsCopyWithImpl<$Res, $Val extends CreditCardDetails>
     Object? cvv = null,
     Object? country = null,
     Object? zipCode = null,
+    Object? creditCardType = freezed,
     Object? nickName = null,
   }) {
     return _then(_value.copyWith(
@@ -95,6 +98,10 @@ class _$CreditCardDetailsCopyWithImpl<$Res, $Val extends CreditCardDetails>
           ? _value.zipCode
           : zipCode // ignore: cast_nullable_to_non_nullable
               as String,
+      creditCardType: freezed == creditCardType
+          ? _value.creditCardType
+          : creditCardType // ignore: cast_nullable_to_non_nullable
+              as String?,
       nickName: null == nickName
           ? _value.nickName
           : nickName // ignore: cast_nullable_to_non_nullable
@@ -117,6 +124,7 @@ abstract class _$$CreditCardDetailsImplCopyWith<$Res>
       String cvv,
       String country,
       String zipCode,
+      String? creditCardType,
       String nickName});
 }
 
@@ -138,6 +146,7 @@ class __$$CreditCardDetailsImplCopyWithImpl<$Res>
     Object? cvv = null,
     Object? country = null,
     Object? zipCode = null,
+    Object? creditCardType = freezed,
     Object? nickName = null,
   }) {
     return _then(_$CreditCardDetailsImpl(
@@ -161,6 +170,10 @@ class __$$CreditCardDetailsImplCopyWithImpl<$Res>
           ? _value.zipCode
           : zipCode // ignore: cast_nullable_to_non_nullable
               as String,
+      creditCardType: freezed == creditCardType
+          ? _value.creditCardType
+          : creditCardType // ignore: cast_nullable_to_non_nullable
+              as String?,
       nickName: null == nickName
           ? _value.nickName
           : nickName // ignore: cast_nullable_to_non_nullable
@@ -180,6 +193,7 @@ class _$CreditCardDetailsImpl
       required this.cvv,
       required this.country,
       required this.zipCode,
+      required this.creditCardType,
       required this.nickName});
 
   factory _$CreditCardDetailsImpl.fromJson(Map<String, dynamic> json) =>
@@ -196,11 +210,13 @@ class _$CreditCardDetailsImpl
   @override
   final String zipCode;
   @override
+  final String? creditCardType;
+  @override
   final String nickName;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CreditCardDetails(cardNumber: $cardNumber, expDate: $expDate, cvv: $cvv, country: $country, zipCode: $zipCode, nickName: $nickName)';
+    return 'CreditCardDetails(cardNumber: $cardNumber, expDate: $expDate, cvv: $cvv, country: $country, zipCode: $zipCode, creditCardType: $creditCardType, nickName: $nickName)';
   }
 
   @override
@@ -213,6 +229,7 @@ class _$CreditCardDetailsImpl
       ..add(DiagnosticsProperty('cvv', cvv))
       ..add(DiagnosticsProperty('country', country))
       ..add(DiagnosticsProperty('zipCode', zipCode))
+      ..add(DiagnosticsProperty('creditCardType', creditCardType))
       ..add(DiagnosticsProperty('nickName', nickName));
   }
 
@@ -227,14 +244,16 @@ class _$CreditCardDetailsImpl
             (identical(other.cvv, cvv) || other.cvv == cvv) &&
             (identical(other.country, country) || other.country == country) &&
             (identical(other.zipCode, zipCode) || other.zipCode == zipCode) &&
+            (identical(other.creditCardType, creditCardType) ||
+                other.creditCardType == creditCardType) &&
             (identical(other.nickName, nickName) ||
                 other.nickName == nickName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, cardNumber, expDate, cvv, country, zipCode, nickName);
+  int get hashCode => Object.hash(runtimeType, cardNumber, expDate, cvv,
+      country, zipCode, creditCardType, nickName);
 
   /// Create a copy of CreditCardDetails
   /// with the given fields replaced by the non-null parameter values.
@@ -260,6 +279,7 @@ abstract class _CreditCardDetails implements CreditCardDetails {
       required final String cvv,
       required final String country,
       required final String zipCode,
+      required final String? creditCardType,
       required final String nickName}) = _$CreditCardDetailsImpl;
 
   factory _CreditCardDetails.fromJson(Map<String, dynamic> json) =
@@ -275,6 +295,8 @@ abstract class _CreditCardDetails implements CreditCardDetails {
   String get country;
   @override
   String get zipCode;
+  @override
+  String? get creditCardType;
   @override
   String get nickName;
 

@@ -18,6 +18,7 @@ class IndividualOrder with _$IndividualOrder {
     @Default('Jonathan') String courier,
     Object? promoApplied,
     required double serviceFee,
+    double? promoDiscount,
     required double tax,
     @Default(0) double caDriverBenefits,
     required double deliveryFee,
@@ -80,6 +81,8 @@ class CartProduct with _$CartProduct {
   const factory CartProduct({
     required List<CartProductOption> optionalOptions,
     required List<CartProductOption> requiredOptions,
+    required double purchasePrice,
+    required String name,
     required String id,
     required int quantity,
     required String note,

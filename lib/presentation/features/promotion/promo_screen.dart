@@ -31,7 +31,8 @@ class PromoScreen extends StatefulWidget {
 
 class _PromoScreenState extends State<PromoScreen> {
   final _searchController = TextEditingController();
-  late List _redeemedPromoPaths;
+  List _redeemedPromoPaths = [];
+  List _usedPromos = [];
 
   bool _showSearchArea = false;
 
@@ -39,8 +40,8 @@ class _PromoScreenState extends State<PromoScreen> {
 
   bool _isLoading = false;
 
-  DocumentReference<Map<String, Object?>>? _searchedPromoRef;
-  String? _activatedPromoPath;
+  String? _searchedPromoId;
+  String? _activatedPromoId;
 
   @override
   void dispose() {
@@ -67,13 +68,12 @@ class _PromoScreenState extends State<PromoScreen> {
               controller: _searchController,
               radius: 20,
               textInputAction: TextInputAction.search,
-              // onChanged: (value) => setState(() {}),
               onFieldSubmitted: (value) async {
-                _searchedPromoRef = FirebaseFirestore.instance
+                final searchedPromoRef = FirebaseFirestore.instance
                     .collection(FirestoreCollections.promotions)
                     .doc(value);
-                final promoSnapshot = await _searchedPromoRef!.get();
-                // logger.d(promoSnapshot.exists);
+                final promoSnapshot = await searchedPromoRef.get();
+
                 if (!promoSnapshot.exists) {
                   setState(() {
                     _searchedPromo = null;
@@ -87,6 +87,13 @@ class _PromoScreenState extends State<PromoScreen> {
                       context: navigatorKey.currentContext!);
                   return;
                 }
+                if (_usedPromos.any(
+                  (element) => element.contains(value),
+                )) {
+                  showInfoToast('Promo already used',
+                      context: navigatorKey.currentContext!);
+                  return;
+                }
                 var temp = Promotion.fromJson(promoSnapshot.data()!);
                 //TODO: improve this 🙃
                 if (temp.applicableLocation != 'Accra') {
@@ -94,6 +101,12 @@ class _PromoScreenState extends State<PromoScreen> {
                       context: navigatorKey.currentContext);
                   return;
                 }
+                if (temp.expirationDate.isAfter(DateTime.now())) {
+                  showInfoToast('This promo is expired',
+                      context: navigatorKey.currentContext);
+                  return;
+                }
+                _searchedPromoId = value;
                 setState(() {
                   _showSearchArea = true;
                   _searchedPromo = temp;
@@ -189,7 +202,7 @@ class _PromoScreenState extends State<PromoScreen> {
                                     text: 'Claim promo',
                                     callback: () async {
                                       try {
-                                        if (_searchedPromoRef != null) {
+                                        if (_searchedPromoId != null) {
                                           setState(() {
                                             _isLoading = true;
                                           });
@@ -201,7 +214,7 @@ class _PromoScreenState extends State<PromoScreen> {
                                               .update({
                                             'redeemedPromos':
                                                 FieldValue.arrayUnion(
-                                                    [_searchedPromoRef])
+                                                    [_searchedPromoId])
                                           });
                                           await AppFunctions
                                               .getOnlineUserInfo();
@@ -233,41 +246,44 @@ class _PromoScreenState extends State<PromoScreen> {
                   : Builder(builder: (context) {
                       _redeemedPromoPaths = Hive.box(AppBoxes.appState)
                           .get(BoxKeys.userInfo)['redeemedPromos'];
-                      _activatedPromoPath = Hive.box(AppBoxes.appState)
-                          .get(BoxKeys.activatedPromoPath);
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            const Gap(40),
-                            (_redeemedPromoPaths.isNotEmpty)
-                                ? const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal:
-                                            AppSizes.horizontalPaddingSmall),
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          AppText(
-                                            text: 'Your available promotions',
-                                            weight: FontWeight.bold,
-                                            size: AppSizes.heading6,
-                                          ),
-                                          AppText(text: 'Limit one per order'),
-                                          Gap(15),
-                                        ],
-                                      ),
+                      _usedPromos = Hive.box(AppBoxes.appState)
+                          .get(BoxKeys.userInfo)['usedPromos'];
+
+                      _activatedPromoId = Hive.box(AppBoxes.appState)
+                          .get(BoxKeys.activatedPromoId);
+                      return Column(
+                        children: [
+                          const Gap(40),
+                          (_redeemedPromoPaths.isNotEmpty)
+                              ? const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          AppSizes.horizontalPaddingSmall),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AppText(
+                                          text: 'Your available promotions',
+                                          weight: FontWeight.bold,
+                                          size: AppSizes.heading6,
+                                        ),
+                                        AppText(text: 'Limit one per order'),
+                                        Gap(15),
+                                      ],
                                     ),
-                                  )
-                                : AppText(
-                                    text: _searchController.text.isEmpty
-                                        ? 'Your redeemed promotions will show here'
-                                        : 'This code does not exist',
-                                    color: AppColors.neutral500,
                                   ),
-                            ListView.separated(
+                                )
+                              : AppText(
+                                  text: _searchController.text.isEmpty
+                                      ? 'Your redeemed promotions will show here'
+                                      : 'This code does not exist',
+                                  color: AppColors.neutral500,
+                                ),
+                          Expanded(
+                            child: ListView.separated(
                               separatorBuilder: (context, index) =>
                                   const Gap(10),
                               padding: const EdgeInsets.symmetric(
@@ -276,10 +292,11 @@ class _PromoScreenState extends State<PromoScreen> {
                               shrinkWrap: true,
                               itemCount: _redeemedPromoPaths.length,
                               itemBuilder: (context, index) {
-                                final String promoPath =
+                                final String promoId =
                                     _redeemedPromoPaths[index];
-                                final promoRef =
-                                    FirebaseFirestore.instance.doc(promoPath);
+                                final promoRef = FirebaseFirestore.instance
+                                    .collection(FirestoreCollections.promotions)
+                                    .doc(promoId);
                                 return FutureBuilder(
                                     future: AppFunctions.loadPromotionReference(
                                         promoRef),
@@ -347,12 +364,12 @@ class _PromoScreenState extends State<PromoScreen> {
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               border: Border.all(
-                                                  width: _activatedPromoPath ==
-                                                          promoPath
+                                                  width: _activatedPromoId ==
+                                                          promoId
                                                       ? 2
                                                       : 1,
-                                                  color: _activatedPromoPath ==
-                                                          promoPath
+                                                  color: _activatedPromoId ==
+                                                          promoId
                                                       ? Colors.black
                                                       : AppColors.neutral300)),
                                           child: Row(
@@ -383,8 +400,8 @@ class _PromoScreenState extends State<PromoScreen> {
                                                             AppButton2(
                                                               callback:
                                                                   () async {
-                                                                if (_activatedPromoPath ==
-                                                                    promoPath) {
+                                                                if (_activatedPromoId ==
+                                                                    promoId) {
                                                                   showInfoToast(
                                                                       'Promo already activated',
                                                                       context:
@@ -394,20 +411,20 @@ class _PromoScreenState extends State<PromoScreen> {
                                                                 }
                                                                 //holding  former value of activatedPromoPath
                                                                 var formerPath =
-                                                                    _activatedPromoPath;
+                                                                    _activatedPromoId;
                                                                 await Hive.box(
                                                                         AppBoxes
                                                                             .appState)
                                                                     .put(
                                                                         BoxKeys
-                                                                            .activatedPromoPath,
-                                                                        promoPath);
+                                                                            .activatedPromoId,
+                                                                        promoId);
                                                                 setState(() {});
                                                                 showInfoToast(
                                                                     formerPath !=
                                                                                 null &&
                                                                             formerPath ==
-                                                                                promoPath
+                                                                                promoId
                                                                         ? 'Active promo switched'
                                                                         : 'Promo activated',
                                                                     context:
@@ -432,8 +449,7 @@ class _PromoScreenState extends State<PromoScreen> {
                                                                           promo
                                                                               .description
                                                                               .split('. ');
-                                                                      late String
-                                                                          detailThatContainsMinimumOrder;
+
                                                                       return Container(
                                                                         decoration: const BoxDecoration(
                                                                             color:
@@ -486,28 +502,22 @@ class _PromoScreenState extends State<PromoScreen> {
                                                                                       )
                                                                                       .toList()),
                                                                               const Gap(15),
-                                                                              AppText(
-                                                                                  text: "\$${promo.discount.toInt()} off your first order with uber Eats ${splitDetails.any(
-                                                                                (detail) {
-                                                                                  detailThatContainsMinimumOrder = detail;
-                                                                                  return detail.contains('minimum order');
-                                                                                },
-                                                                              ) ? 'when you spend at least ${detailThatContainsMinimumOrder.split(' ').first}' : ''}. Terms and fees apply."),
+                                                                              AppText(text: "${promo.title} Terms and fees apply."),
                                                                               const Gap(15),
                                                                               AppButton(
                                                                                 text: 'Shop Now',
                                                                                 callback: () async {
-                                                                                  if (_activatedPromoPath == promoPath) {
+                                                                                  if (_activatedPromoId == promoId) {
                                                                                     showInfoToast('Promo already activated', context: navigatorKey.currentContext!);
                                                                                     return;
                                                                                   }
                                                                                   //holding former value of activatedPromoPath
-                                                                                  var formerPath = _activatedPromoPath;
+                                                                                  var formerId = _activatedPromoId;
 
-                                                                                  await Hive.box(AppBoxes.appState).put(BoxKeys.activatedPromoPath, promoPath);
+                                                                                  await Hive.box(AppBoxes.appState).put(BoxKeys.activatedPromoId, promoId);
                                                                                   navigatorKey.currentState!.pop();
                                                                                   setState(() {});
-                                                                                  showInfoToast(formerPath != null && formerPath == promoPath ? 'Active promo switched' : 'Promo activated', context: navigatorKey.currentContext);
+                                                                                  showInfoToast(formerId != null && formerId == promoId ? 'Active promo switched' : 'Promo activated', context: navigatorKey.currentContext);
                                                                                 },
                                                                               ),
                                                                               const Gap(10),
@@ -541,10 +551,11 @@ class _PromoScreenState extends State<PromoScreen> {
                                     });
                               },
                             ),
-                            Gap(_redeemedPromoPaths.isEmpty ? 150 : 30),
-                            const BannerCarousel(),
-                          ],
-                        ),
+                          ),
+                          // const Spacer(),
+                          // Gap(_redeemedPromoPaths.isEmpty ? 150 : 30),
+                          const BannerCarousel(),
+                        ],
                       );
                     })),
         ],
@@ -560,6 +571,9 @@ class BannerCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<dynamic, dynamic> userInfo =
+        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    bool hasUberOne = userInfo['hasUberOne'] ?? false;
     return SizedBox(
       height: 142,
       child: CarouselSlider(
@@ -572,68 +586,69 @@ class BannerCarousel extends StatelessWidget {
             enableInfiniteScroll: false,
             scrollDirection: Axis.horizontal),
         items: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Container(
-                width: Adaptive.w(80),
-                // height: 150,
-                decoration: BoxDecoration(
-                  color: Colors.brown,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15.0, vertical: 7),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AppText(
-                                    color: Colors.white,
-                                    text:
-                                        '\$0 Delivery Fee + up to 10% off with Uber One',
-                                  ),
-                                  Gap(10),
-                                  AppText(
-                                    color: Colors.white,
-                                    text: 'Save on your next ride',
-                                  ),
-                                ]),
-                            AppButton2(
-                                text: 'Try free for 4 weeks',
-                                callback: () {
-                                  navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const JoinUberOneScreen(),
-                                  ));
-                                }),
-                          ],
+          if (!hasUberOne)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Container(
+                  width: Adaptive.w(80),
+                  // height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.brown,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15.0, vertical: 7),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    AppText(
+                                      color: Colors.white,
+                                      text:
+                                          '\$0 Delivery Fee + up to 10% off with Uber One',
+                                    ),
+                                    Gap(10),
+                                    AppText(
+                                      color: Colors.white,
+                                      text: 'Save on your next ride',
+                                    ),
+                                  ]),
+                              AppButton2(
+                                  text: 'Try free for 4 weeks',
+                                  callback: () {
+                                    navigatorKey.currentState!
+                                        .push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const JoinUberOneScreen(),
+                                    ));
+                                  }),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                        flex: 1,
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(10),
-                              bottomRight: Radius.circular(10)),
-                          child: Image.asset(
-                            height: double.infinity,
-                            AssetNames.hamburger,
-                            fit: BoxFit.cover,
-                          ),
-                        ))
-                  ],
-                )),
-          ),
+                      Expanded(
+                          flex: 1,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(10),
+                                bottomRight: Radius.circular(10)),
+                            child: Image.asset(
+                              height: double.infinity,
+                              AssetNames.hamburger,
+                              fit: BoxFit.cover,
+                            ),
+                          ))
+                    ],
+                  )),
+            ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Container(

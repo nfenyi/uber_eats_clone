@@ -10,6 +10,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconify_flutter/icons/mdi.dart';
 // import 'package:google_places_autocomplete/google_places_autocomplete.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
@@ -36,8 +37,12 @@ import 'address_details_screen.dart';
 class AddressesScreen extends ConsumerStatefulWidget {
   final bool isFromGiftScreen;
   final String? recipientAddressLabel;
+  final String? newLabel;
   const AddressesScreen(
-      {super.key, this.isFromGiftScreen = false, this.recipientAddressLabel});
+      {super.key,
+      this.isFromGiftScreen = false,
+      this.recipientAddressLabel,
+      this.newLabel});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -362,6 +367,9 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                                                   MaterialPageRoute(
                                                             builder: (context) {
                                                               return AddressDetailsScreen(
+                                                                  addressLabel:
+                                                                      widget
+                                                                          .newLabel,
                                                                   addressesAlreadyExist:
                                                                       recentAddresses
                                                                           .isNotEmpty,
@@ -428,6 +436,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                             .push(MaterialPageRoute(
                                           builder: (context) {
                                             return AddressDetailsScreen(
+                                                addressLabel: widget.newLabel,
                                                 addressesAlreadyExist:
                                                     recentAddresses.isNotEmpty,
                                                 placeDescription: result
@@ -469,6 +478,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                           .push(MaterialPageRoute(
                                         builder: (context) {
                                           return AddressDetailsScreen(
+                                              addressLabel: widget.newLabel,
                                               addressesAlreadyExist:
                                                   recentAddresses.isNotEmpty,
                                               placeDescription:
@@ -508,7 +518,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                     ],
                   ),
                 ),
-                if (recentAddresses.isNotEmpty)
+                if (recentAddresses.isNotEmpty && widget.newLabel == null)
                   Form(
                     canPop: recentAddresses.any(
                       (element) =>
@@ -584,9 +594,14 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                       description:
                                           'Are you sure you want to delete \'${address.addressLabel}\' address?');
                                 },
-                                leading: const Icon(
-                                  Icons.pin_drop,
-                                ),
+                                leading: address.addressLabel == 'Home'
+                                    ? const Icon(Icons.home)
+                                    : (address.addressLabel == 'Work' ||
+                                            address.addressLabel == 'Office')
+                                        ? const Iconify(Mdi.briefcase)
+                                        : const Icon(
+                                            Icons.pin_drop,
+                                          ),
                                 tileColor: _selectedAddressLabel ==
                                         address.addressLabel
                                     ? AppColors.neutral100
@@ -716,6 +731,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                     showModalBottomSheet(
                                         isScrollControlled: true,
                                         useSafeArea: true,
+                                        backgroundColor: Colors.transparent,
                                         context: context,
                                         builder: (context) {
                                           return const PaymentOptionsScreen();

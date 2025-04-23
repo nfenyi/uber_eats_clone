@@ -337,7 +337,7 @@ class BoxKeys {
   static const String onboarded = 'onboarded';
   static const String country = 'country';
   static const String userInfo = 'userInfo';
-  static const String activatedPromoPath = 'activatedPromoPath';
+  static const String activatedPromoId = 'activatedPromoPath';
   static const String recentlyViewed = 'recentlyViewed';
   static const String firstTimeSendingGift = 'firstTimeSendingGift';
   static const String isOnboardedToUberGifts = 'isOnboardedToUberGifts';

@@ -11,24 +11,22 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ant_design.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
-import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:latlong2/latlong.dart' as lt;
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/hive_adapters/cart_item/cart_item_model.dart';
-import 'package:uber_eats_clone/hive_adapters/hive_credit_card/hive_credit_card_model.dart';
 import 'package:uber_eats_clone/models/order/order_model.dart';
 import 'package:uber_eats_clone/models/payment/payment_model.dart';
-import 'package:uber_eats_clone/models/payment_method_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
+import 'package:uber_eats_clone/presentation/constants/other_constants.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/orders_screen.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../../hive_adapters/geopoint/geopoint_adapter.dart';
 import '../../../../../main.dart';
-import '../../../../../models/credit_card_details/credit_card_details_model.dart';
+import '../../../../../models/promotion/promotion_model.dart';
 import '../../../../../models/store/store_model.dart';
 import '../../../../../state/user_location_providers.dart';
 import '../../../../core/app_colors.dart';
@@ -40,12 +38,14 @@ import '../../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
 import '../../../sign_in/views/confirm_location.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
+  final Promotion? promotion;
   final String? phoneNumber;
   final BitmapDescriptor markerIcon;
   final Store store;
   const CheckoutScreen(
       {super.key,
       required this.markerIcon,
+      required this.promotion,
       required this.phoneNumber,
       required this.store});
 
@@ -63,24 +63,29 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   late HiveCartItem _cartItem;
   late int _redeemedPromosCount;
   late bool _isClosed;
+  late bool _hasUberOne;
 
   late String _dropOffOption;
 
   late double _deliveryFee;
 
   late double _serviceFee;
-  final double _taxes = 0.99;
+  late final double _taxes;
   // late final DocumentReference _storeRef ;
 
   bool _isLoading = false;
 
   bool _isPriority = false;
+  Promotion? _activatedPromo;
+
+  String? _activatedPromoId;
 
   @override
   void initState() {
     super.initState();
     Map<dynamic, dynamic> userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    _hasUberOne = userInfo['hasUberOne'] ?? false;
     Map<dynamic, dynamic> selectedAddress = userInfo['selectedAddress'];
     HiveGeoPoint temp = selectedAddress['latlng'];
     _placeDescription = selectedAddress['placeDescription'];
@@ -103,13 +108,23 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         lt.LatLng(_setLocation.latitude, _setLocation.longitude));
     _deliveryFee = distanceBetweenShopAndSetLocationResult * 1;
     _serviceFee = 2 + (0.4 * _cartItem.products.length);
+    _activatedPromo = widget.promotion;
+    _taxes = OtherConstants.tax * _cartItem.subtotal;
   }
 
   @override
   Widget build(BuildContext context) {
     final currentLocation = ref.read(userCurrentGeoLocationProvider);
     final schedule = ref.watch(deliveryScheduleProvider);
-    double total = _cartItem.subtotal + _serviceFee + _deliveryFee;
+
+    double total = _cartItem.subtotal +
+        _serviceFee +
+        _taxes +
+        _deliveryFee -
+        (_activatedPromo?.discount ?? 0) -
+        (_hasUberOne
+            ? (OtherConstants.uberOneDiscount * _cartItem.subtotal)
+            : 0);
     if (_isPriority) {
       total += 1.99;
     }
@@ -477,212 +492,279 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 const Divider(
                   thickness: 3,
                 ),
-                if (Hive.box(AppBoxes.appState)
-                        .get(BoxKeys.activatedPromoPath) ==
-                    null)
-                  ListTile(
-                    dense: true,
-                    leading: const Iconify(
-                      AntDesign.tag_outline,
-                      color: AppColors.neutral500,
-                    ),
-                    title: AppText(
-                      text: _redeemedPromosCount == 0
-                          ? 'Apply a promotion'
-                          : '$_redeemedPromosCount ${_redeemedPromosCount == 1 ? 'promotion' : 'promotions'} available',
-                      weight: FontWeight.bold,
-                    ),
-                    onTap: () =>
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => const PromoScreen(),
-                    )),
-                    trailing: const Icon(
-                      Icons.keyboard_arrow_right,
-                      color: AppColors.neutral500,
-                    ),
-                  ),
-                ListTile(
-                  dense: true,
-                  title: const AppText(
-                    text: 'Subtotal',
-                    color: AppColors.neutral500,
-                  ),
-                  trailing: AppText(
-                    text: 'US\$${_cartItem.subtotal.toStringAsFixed(2)}',
-                    color: AppColors.neutral500,
-                  ),
-                ),
-                ListTile(
-                  dense: true,
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (context) => Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Gap(10),
-                            const AppText(
-                              text: 'What\'s a delivery fee?',
-                              weight: FontWeight.bold,
-                              size: AppSizes.body,
-                            ),
-                            const Gap(5),
-                            const Divider(),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSizes.horizontalPaddingSmall,
-                                  vertical: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const AppText(
-                                      text:
-                                          'This fee helps cover delivery costs. The amount varies for each store based on things like your location and availability of nearby couriers.'),
-                                  const Gap(15),
-                                  AppButton(
-                                    text: 'Close',
-                                    callback: () =>
-                                        navigatorKey.currentState!.pop(),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  title: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AppText(
-                        text: 'Delivery fee',
-                        color: AppColors.neutral500,
-                      ),
-                      Gap(5),
-                      Icon(
-                        Icons.info_outline,
-                        size: 15,
-                        color: Colors.grey,
-                      )
-                    ],
-                  ),
-                  trailing: AppText(
-                    text: 'US\$${_deliveryFee.toStringAsFixed(2)}',
-                    color: AppColors.neutral500,
-                  ),
-                ),
-                ListTile(
-                  dense: true,
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (context) => Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Gap(10),
-                            const AppText(
-                              text: 'What\'s included?',
-                              weight: FontWeight.bold,
-                              size: AppSizes.body,
-                            ),
-                            const Gap(5),
-                            const Divider(),
-                            const Gap(5),
-                            ListTile(
-                              dense: true,
-                              title: const AppText(
-                                text: 'Service Fee and Other Fees',
-                                weight: FontWeight.bold,
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  AppText(
-                                    text:
-                                        'US\$${_serviceFee.toStringAsFixed(2)}',
+                ValueListenableBuilder(
+                    valueListenable: Hive.box(AppBoxes.appState)
+                        .listenable(keys: [BoxKeys.activatedPromoId]),
+                    builder: (context, appState, child) {
+                      _activatedPromoId =
+                          appState.get(BoxKeys.activatedPromoId);
+                      return Column(
+                        children: [
+                          _activatedPromoId == null
+                              ? ListTile(
+                                  dense: true,
+                                  leading: const Iconify(
+                                    AntDesign.tag_outline,
+                                    color: AppColors.neutral500,
+                                  ),
+                                  title: AppText(
+                                    text: _activatedPromoId == null
+                                        ? 'Apply a promotion'
+                                        : '$_redeemedPromosCount ${_redeemedPromosCount == 1 ? 'promotion' : 'promotions'} available',
                                     weight: FontWeight.bold,
                                   ),
-                                ],
-                              ),
-                              subtitle: const AppText(
+                                  onTap: () => navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) => const PromoScreen(),
+                                  )),
+                                  trailing: const Icon(
+                                    Icons.keyboard_arrow_right,
+                                    color: AppColors.neutral500,
+                                  ),
+                                )
+                              : FutureBuilder(
+                                  future: AppFunctions.loadPromoReference(
+                                      FirebaseFirestore.instance
+                                          .collection(
+                                              FirestoreCollections.promotions)
+                                          .doc(_activatedPromoId!)),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      _activatedPromo = snapshot.data!;
+
+                                      return ListTile(
+                                        // titleAlignment: ListTileTitleAlignment.top,
+                                        dense: true,
+                                        leading: Iconify(
+                                          AntDesign.tag_outline,
+                                          color: Colors.green.shade900,
+                                        ),
+                                        title: AppText(
+                                          text: _activatedPromo!.title,
+                                          color: Colors.green.shade900,
+                                        ),
+                                        onTap: () => navigatorKey.currentState!
+                                            .push(MaterialPageRoute(
+                                          builder: (context) =>
+                                              const PromoScreen(),
+                                        )),
+                                        trailing: const Icon(
+                                          Icons.keyboard_arrow_right,
+                                          color: AppColors.neutral500,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return AppText(
+                                        text: snapshot.error.toString(),
+                                      );
+                                    } else {
+                                      return const Skeletonizer(
+                                        enabled: true,
+                                        child: ListTile(
+                                          dense: true,
+                                          leading: Iconify(
+                                            AntDesign.tag_outline,
+                                            color: AppColors.neutral500,
+                                          ),
+                                          title: AppText(
+                                            text:
+                                                'njajasjkljakljjlksafjjlkajskljafsljlkafjkjlafkjslfs',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }),
+                          ListTile(
+                            dense: true,
+                            title: const AppText(
+                              text: 'Subtotal',
+                              color: AppColors.neutral500,
+                            ),
+                            trailing: AppText(
+                              text:
+                                  'US\$${(_cartItem.subtotal - (_activatedPromo?.discount ?? 0) - (_hasUberOne ? (OtherConstants.uberOneDiscount * _cartItem.subtotal) : 0)).toStringAsFixed(2)}',
+                              color: AppColors.neutral500,
+                            ),
+                          ),
+                          ListTile(
+                            dense: true,
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) => Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Gap(10),
+                                      const AppText(
+                                        text: 'What\'s a delivery fee?',
+                                        weight: FontWeight.bold,
+                                        size: AppSizes.body,
+                                      ),
+                                      const Gap(5),
+                                      const Divider(),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal:
+                                                AppSizes.horizontalPaddingSmall,
+                                            vertical: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const AppText(
+                                                text:
+                                                    'This fee helps cover delivery costs. The amount varies for each store based on things like your location and availability of nearby couriers.'),
+                                            const Gap(15),
+                                            AppButton(
+                                              text: 'Close',
+                                              callback: () => navigatorKey
+                                                  .currentState!
+                                                  .pop(),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            title: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AppText(
+                                  text: 'Delivery fee',
+                                  color: AppColors.neutral500,
+                                ),
+                                Gap(5),
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 15,
+                                  color: Colors.grey,
+                                )
+                              ],
+                            ),
+                            trailing: AppText(
+                              text: 'US\$${_deliveryFee.toStringAsFixed(2)}',
+                              color: AppColors.neutral500,
+                            ),
+                          ),
+                          ListTile(
+                            dense: true,
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) => Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Gap(10),
+                                      const AppText(
+                                        text: 'What\'s included?',
+                                        weight: FontWeight.bold,
+                                        size: AppSizes.body,
+                                      ),
+                                      const Gap(5),
+                                      const Divider(),
+                                      const Gap(5),
+                                      ListTile(
+                                        dense: true,
+                                        title: const AppText(
+                                          text: 'Service Fee and Other Fees',
+                                          weight: FontWeight.bold,
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            AppText(
+                                              text:
+                                                  'US\$${_serviceFee.toStringAsFixed(2)}',
+                                              weight: FontWeight.bold,
+                                            ),
+                                          ],
+                                        ),
+                                        subtitle: const AppText(
+                                            text:
+                                                'These fees vary based on factors like cart size and help cover costs related to your order including marketplace services and delivery services'),
+                                      ),
+                                      ListTile(
+                                        dense: true,
+                                        title: const AppText(
+                                          text: 'Taxes',
+                                          weight: FontWeight.bold,
+                                        ),
+                                        trailing: AppText(
+                                          text:
+                                              'US\$${_taxes.toStringAsFixed(2)}',
+                                          weight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const Gap(5),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10,
+                                            horizontal: AppSizes
+                                                .horizontalPaddingSmall),
+                                        child: AppButton(
+                                          text: 'Got it',
+                                          callback: () =>
+                                              navigatorKey.currentState!.pop(),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            title: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AppText(
+                                  text: 'Taxes & Other Fees',
+                                  color: AppColors.neutral500,
+                                ),
+                                Gap(5),
+                                Icon(
+                                  size: 15,
+                                  Icons.info_outline,
+                                  color: Colors.grey,
+                                )
+                              ],
+                            ),
+                            titleAlignment: ListTileTitleAlignment.top,
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AppText(
                                   text:
-                                      'These fees vary based on factors like cart size and help cover costs related to your order including marketplace services and delivery services'),
+                                      'US\$${(_serviceFee + _taxes).toStringAsFixed(2)}',
+                                  color: AppColors.neutral500,
+                                ),
+                              ],
                             ),
-                            ListTile(
-                              dense: true,
-                              title: const AppText(
-                                text: 'Taxes',
-                                weight: FontWeight.bold,
-                              ),
-                              trailing: AppText(
-                                text: 'US\$${_taxes.toStringAsFixed(2)}',
-                                weight: FontWeight.bold,
-                              ),
+                          ),
+                          ListTile(
+                            dense: true,
+                            title: const AppText(
+                              text: 'Total',
+                              weight: FontWeight.bold,
                             ),
-                            const Gap(5),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: AppSizes.horizontalPaddingSmall),
-                              child: AppButton(
-                                text: 'Got it',
-                                callback: () =>
-                                    navigatorKey.currentState!.pop(),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  title: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AppText(
-                        text: 'Taxes & Other Fees',
-                        color: AppColors.neutral500,
-                      ),
-                      Gap(5),
-                      Icon(
-                        size: 15,
-                        Icons.info_outline,
-                        color: Colors.grey,
-                      )
-                    ],
-                  ),
-                  titleAlignment: ListTileTitleAlignment.top,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AppText(
-                        text:
-                            'US\$${(_serviceFee + _taxes).toStringAsFixed(2)}',
-                        color: AppColors.neutral500,
-                      ),
-                    ],
-                  ),
-                ),
-                ListTile(
-                  dense: true,
-                  title: const AppText(
-                    text: 'Total',
-                    weight: FontWeight.bold,
-                  ),
-                  trailing: AppText(
-                    text: 'US\$$total',
-                  ),
-                ),
+                            trailing: AppText(
+                              text: 'US\$$total',
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
                 const Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: AppSizes.horizontalPaddingSmall),
@@ -783,6 +865,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               }
 
               cartProducts.add(CartProduct(
+                  name: product.name,
+                  purchasePrice: product.purchasePrice,
                   backupInstruction: product.backupInstruction ?? '',
                   id: product.id,
                   note: product.note,
@@ -791,6 +875,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   productReplacementId: product.productReplacementId ?? '',
                   quantity: product.quantity));
             }
+
             final order = IndividualOrder(
                 userUid: FirebaseAuth.instance.currentUser!.uid,
                 isPriority: _isPriority,
@@ -800,19 +885,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 placeDescription: _placeDescription,
                 serviceFee: _serviceFee,
                 tax: _taxes,
+                status: schedule == null ? 'Completed' : 'Ongoing',
                 deliveryFee: _deliveryFee,
                 totalFee: total,
-                promoApplied:
-                    Hive.box(AppBoxes.appState).get(BoxKeys.activatedPromoPath),
+                promoApplied: _activatedPromoId == null
+                    ? null
+                    : FirebaseFirestore.instance
+                        .collection(FirestoreCollections.promotions)
+                        .doc(_activatedPromoId),
                 payments: [
                   Payment(
+                      creditCardType: paymentOption!.creditCardType!,
                       paymentMethodName: 'Debit or Credit Card',
                       amountPaid: total,
                       cardNumber:
-                          '••••${paymentOption!.cardNumber.substring(6)}',
+                          '••••${paymentOption.cardNumber.substring(6)}',
                       datePaid: DateTime.now())
                 ],
-                storeId: widget.store.id);
+                promoDiscount: _activatedPromo?.discount,
+                storeId: widget.store.id,
+                membershipBenefit: _hasUberOne
+                    ? OtherConstants.uberOneDiscount * _cartItem.subtotal
+                    : null);
             await FirebaseFirestore.instance
                 .collection(FirestoreCollections.individualOrders)
                 .doc(order.orderNumber)
@@ -821,6 +915,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               await product.delete();
             }
             await _cartItem.delete();
+            if (_activatedPromoId != null) {
+              await FirebaseFirestore.instance
+                  .collection(FirestoreCollections.users)
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({
+                'redeemedPromos': FieldValue.arrayRemove([_activatedPromoId]),
+                'usedPromos': FieldValue.arrayUnion([_activatedPromoId])
+              });
+
+              await AppFunctions.getOnlineUserInfo();
+            }
 
             setState(() {
               _isLoading = false;
@@ -862,14 +967,6 @@ class PaymentOptionWidget extends ConsumerWidget {
             );
           },
         );
-        // if (result != null) {
-        //   await appStateBox.put(
-        //       BoxKeys.creditCardInUse,
-        //       HiveCreditCard(
-        //           obscuredNumber:
-        //               '•••••${(result.cardNumber).substring(7)}',
-        //           cardType: detectCCType(result.cardNumber)));
-        // }
       },
       leading:
           selectedPaymentMethod == null ? null : CreditCardLogo(types: types!),
@@ -878,7 +975,7 @@ class PaymentOptionWidget extends ConsumerWidget {
       title: AppText(
         text: selectedPaymentMethod == null
             ? 'Select Payment'
-            : '${AppFunctions.getCreditCardName(types!)}••••${selectedPaymentMethod.cardNumber.substring(6)}',
+            : '${selectedPaymentMethod.creditCardType!}••••${selectedPaymentMethod.cardNumber.substring(6)}',
         weight: FontWeight.w600,
       ),
       trailing: const Icon(

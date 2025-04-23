@@ -22,6 +22,7 @@ Payment _$PaymentFromJson(Map<String, dynamic> json) {
 mixin _$Payment {
   String get paymentMethodName => throw _privateConstructorUsedError;
   double get amountPaid => throw _privateConstructorUsedError;
+  String get creditCardType => throw _privateConstructorUsedError;
   String? get cardNumber => throw _privateConstructorUsedError;
   DateTime get datePaid => throw _privateConstructorUsedError;
 
@@ -42,6 +43,7 @@ abstract class $PaymentCopyWith<$Res> {
   $Res call(
       {String paymentMethodName,
       double amountPaid,
+      String creditCardType,
       String? cardNumber,
       DateTime datePaid});
 }
@@ -63,6 +65,7 @@ class _$PaymentCopyWithImpl<$Res, $Val extends Payment>
   $Res call({
     Object? paymentMethodName = null,
     Object? amountPaid = null,
+    Object? creditCardType = null,
     Object? cardNumber = freezed,
     Object? datePaid = null,
   }) {
@@ -75,6 +78,10 @@ class _$PaymentCopyWithImpl<$Res, $Val extends Payment>
           ? _value.amountPaid
           : amountPaid // ignore: cast_nullable_to_non_nullable
               as double,
+      creditCardType: null == creditCardType
+          ? _value.creditCardType
+          : creditCardType // ignore: cast_nullable_to_non_nullable
+              as String,
       cardNumber: freezed == cardNumber
           ? _value.cardNumber
           : cardNumber // ignore: cast_nullable_to_non_nullable
@@ -97,6 +104,7 @@ abstract class _$$PaymentImplCopyWith<$Res> implements $PaymentCopyWith<$Res> {
   $Res call(
       {String paymentMethodName,
       double amountPaid,
+      String creditCardType,
       String? cardNumber,
       DateTime datePaid});
 }
@@ -116,6 +124,7 @@ class __$$PaymentImplCopyWithImpl<$Res>
   $Res call({
     Object? paymentMethodName = null,
     Object? amountPaid = null,
+    Object? creditCardType = null,
     Object? cardNumber = freezed,
     Object? datePaid = null,
   }) {
@@ -128,6 +137,10 @@ class __$$PaymentImplCopyWithImpl<$Res>
           ? _value.amountPaid
           : amountPaid // ignore: cast_nullable_to_non_nullable
               as double,
+      creditCardType: null == creditCardType
+          ? _value.creditCardType
+          : creditCardType // ignore: cast_nullable_to_non_nullable
+              as String,
       cardNumber: freezed == cardNumber
           ? _value.cardNumber
           : cardNumber // ignore: cast_nullable_to_non_nullable
@@ -146,6 +159,7 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
   const _$PaymentImpl(
       {required this.paymentMethodName,
       required this.amountPaid,
+      required this.creditCardType,
       required this.cardNumber,
       required this.datePaid});
 
@@ -157,13 +171,15 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
   @override
   final double amountPaid;
   @override
+  final String creditCardType;
+  @override
   final String? cardNumber;
   @override
   final DateTime datePaid;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Payment(paymentMethodName: $paymentMethodName, amountPaid: $amountPaid, cardNumber: $cardNumber, datePaid: $datePaid)';
+    return 'Payment(paymentMethodName: $paymentMethodName, amountPaid: $amountPaid, creditCardType: $creditCardType, cardNumber: $cardNumber, datePaid: $datePaid)';
   }
 
   @override
@@ -173,6 +189,7 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
       ..add(DiagnosticsProperty('type', 'Payment'))
       ..add(DiagnosticsProperty('paymentMethodName', paymentMethodName))
       ..add(DiagnosticsProperty('amountPaid', amountPaid))
+      ..add(DiagnosticsProperty('creditCardType', creditCardType))
       ..add(DiagnosticsProperty('cardNumber', cardNumber))
       ..add(DiagnosticsProperty('datePaid', datePaid));
   }
@@ -186,6 +203,8 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
                 other.paymentMethodName == paymentMethodName) &&
             (identical(other.amountPaid, amountPaid) ||
                 other.amountPaid == amountPaid) &&
+            (identical(other.creditCardType, creditCardType) ||
+                other.creditCardType == creditCardType) &&
             (identical(other.cardNumber, cardNumber) ||
                 other.cardNumber == cardNumber) &&
             (identical(other.datePaid, datePaid) ||
@@ -194,8 +213,8 @@ class _$PaymentImpl with DiagnosticableTreeMixin implements _Payment {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, paymentMethodName, amountPaid, cardNumber, datePaid);
+  int get hashCode => Object.hash(runtimeType, paymentMethodName, amountPaid,
+      creditCardType, cardNumber, datePaid);
 
   /// Create a copy of Payment
   /// with the given fields replaced by the non-null parameter values.
@@ -217,6 +236,7 @@ abstract class _Payment implements Payment {
   const factory _Payment(
       {required final String paymentMethodName,
       required final double amountPaid,
+      required final String creditCardType,
       required final String? cardNumber,
       required final DateTime datePaid}) = _$PaymentImpl;
 
@@ -226,6 +246,8 @@ abstract class _Payment implements Payment {
   String get paymentMethodName;
   @override
   double get amountPaid;
+  @override
+  String get creditCardType;
   @override
   String? get cardNumber;
   @override

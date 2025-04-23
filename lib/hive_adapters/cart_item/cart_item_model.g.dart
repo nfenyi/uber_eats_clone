@@ -22,14 +22,13 @@ class CartItemAdapter extends TypeAdapter<HiveCartItem> {
       placeDescription: fields[2] as String,
       deliveryDate: fields[3] as DateTime?,
       subtotal: fields[4] as double,
-      initialPricesTotal: fields[5] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, HiveCartItem obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.storeId)
       ..writeByte(1)
@@ -39,9 +38,7 @@ class CartItemAdapter extends TypeAdapter<HiveCartItem> {
       ..writeByte(3)
       ..write(obj.deliveryDate)
       ..writeByte(4)
-      ..write(obj.subtotal)
-      ..writeByte(5)
-      ..write(obj.initialPricesTotal);
+      ..write(obj.subtotal);
   }
 
   @override
@@ -113,6 +110,8 @@ class CartProductAdapter extends TypeAdapter<HiveCartProduct> {
       requiredOptions: (fields[6] as List).cast<HiveOption>(),
       id: fields[0] as String,
       quantity: fields[1] as int,
+      purchasePrice: fields[7] as double,
+      name: fields[8] as String,
       note: fields[2] as String,
       productReplacementId: fields[3] as String?,
       backupInstruction: fields[4] as String?,
@@ -122,7 +121,7 @@ class CartProductAdapter extends TypeAdapter<HiveCartProduct> {
   @override
   void write(BinaryWriter writer, HiveCartProduct obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -136,7 +135,11 @@ class CartProductAdapter extends TypeAdapter<HiveCartProduct> {
       ..writeByte(5)
       ..write(obj.optionalOptions)
       ..writeByte(6)
-      ..write(obj.requiredOptions);
+      ..write(obj.requiredOptions)
+      ..writeByte(7)
+      ..write(obj.purchasePrice)
+      ..writeByte(8)
+      ..write(obj.name);
   }
 
   @override

@@ -164,6 +164,7 @@ class UberOneScreen extends StatelessWidget {
       'type': "Personal",
       "onboarded": true,
       "redeemedPromos": <String>[],
+      "usedPromos": <String>[],
       "groupOrders": <Object>[],
       "totalGiftCardAmount": 0,
       'displayName': userCredential.displayName,

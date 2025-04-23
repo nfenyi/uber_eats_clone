@@ -378,13 +378,13 @@ class AppFunctions {
 
       userInfoForHiveBox['groupOrders'] = groupOrdersPaths;
     }
-    List<String> redeemedPromoPaths = [];
+    List<String> redeemedPromoIds = [];
     if (userInfo['redeemedPromos'] != null) {
-      for (DocumentReference redeemedPromo in userInfo['redeemedPromos']) {
-        redeemedPromoPaths.add(redeemedPromo.path);
+      for (String redeemedPromoId in userInfo['redeemedPromos']) {
+        redeemedPromoIds.add(redeemedPromoId);
       }
 
-      userInfoForHiveBox['redeemedPromos'] = redeemedPromoPaths;
+      userInfoForHiveBox['redeemedPromos'] = redeemedPromoIds;
     }
     //adding display name
     userInfoForHiveBox['displayName'] =

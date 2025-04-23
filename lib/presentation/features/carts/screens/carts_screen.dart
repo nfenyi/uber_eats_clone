@@ -12,7 +12,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/hive_adapters/cart_item/cart_item_model.dart';
-import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -28,8 +27,10 @@ import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 import '../../../../main.dart';
 import '../../../../models/group_order/group_order_model.dart';
 import '../../../../models/order/order_model.dart';
+import '../../../../models/promotion/promotion_model.dart';
 import '../../../../models/store/store_model.dart';
 import '../../../constants/app_sizes.dart';
+import '../../../constants/other_constants.dart';
 import '../../address/screens/addresses_screen.dart';
 import '../../group_order/group_order_screen.dart';
 import '../../group_order/group_orders_by_user_screen.dart';
@@ -42,39 +43,6 @@ class CartsScreen extends ConsumerStatefulWidget {
 }
 
 class _CartsScreenState extends ConsumerState<CartsScreen> {
-  late final GeoPoint _storedUserLocation;
-
-  // final List<IndividualOrder> _individualOrders = [
-  //   IndividualOrder(
-  //       placeDescription: 'Adenta',
-  //       orderNumber: '372932',
-  //       status: 'Completed',
-  //       totalFee: 58.6,
-  //       storeRef: FirebaseFirestore.instance
-  //           .collection(FirestoreCollections.stores)
-  //           .doc('NazJMIA9yaUsLRjLxBGa'),
-  //       productsAndQuantities: {},
-  //       deliveryDate: DateTime.now().add(const Duration(days: 1)),
-  //       tip: 0.5,
-  //       courier: 'Sally',
-  //       promoApplied: FirebaseFirestore.instance
-  //           .collection(FirestoreCollections.promotions)
-  //           .doc('01959946-9bb6-750c-ab40-906312145b51'),
-  //       serviceFee: 2.4,
-  //       tax: 0.4,
-  //       caDriverBenefits: 0.2,
-  //       deliveryFee: 5,
-  //       membershipBenefit: 4.3,
-  //       payments: [
-  //         Payment(
-  //             datePaid: DateTime.now(),
-  //             cardNumber: '383934',
-  //             paymentMethodId: const PaymentMethod(
-  //                 name: 'Mastercard', assetImage: AssetNames.masterCardLogo),
-  //             amountPaid: 50)
-  //       ])
-  // ];
-
   // GroupOrder(
   //     repeat: 'Monthly',
   //     name: 'Havanna unana',
@@ -125,15 +93,6 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
   //       'Nana',
   //       'Mark'
   //     ])
-
-  @override
-  void initState() {
-    super.initState();
-    Map<dynamic, dynamic> userInfo =
-        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    HiveGeoPoint temp = userInfo['selectedAddress']['latlng'];
-    _storedUserLocation = GeoPoint(temp.latitude, temp.longitude);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -845,525 +804,531 @@ class CartSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String? activatedPromo =
-        Hive.box(AppBoxes.appState).get(BoxKeys.activatedPromoPath);
     Map<dynamic, dynamic> userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    late bool hasUberOne = userInfo['hasUberOne'] ?? false;
-    return ValueListenableBuilder(
-        valueListenable:
-            Hive.box<HiveCartProduct>(AppBoxes.storedProducts).listenable(),
-        builder: (context, productsBox, child) {
-          return Scaffold(
-            body: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                SliverAppBar.medium(
-                  leading: GestureDetector(
-                      onTap: () => navigatorKey.currentState!.pop(),
-                      child: const Icon(Icons.clear)),
-                  title: AppText(
-                    text: store.name,
-                    weight: FontWeight.w600,
-                  ),
-                  expandedHeight: 110,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.horizontalPaddingSmall),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          AppText(
-                            text: store.name,
-                            weight: FontWeight.w600,
-                            size: AppSizes.heading6,
+    bool hasUberOne = userInfo['hasUberOne'] ?? false;
+    final String? activatedPromoId =
+        Hive.box(AppBoxes.appState).get(BoxKeys.activatedPromoId);
+    Promotion? promo;
+    Future<void> getActivatedPromo(String? promoId) async {
+      if (promoId == null) {
+        return;
+      }
+      promo = await AppFunctions.loadPromoReference(FirebaseFirestore.instance
+          .collection(FirestoreCollections.promotions)
+          .doc(promoId));
+    }
+
+    return FutureBuilder(
+        future: getActivatedPromo(activatedPromoId),
+        builder: (context, snapshot) {
+          return ValueListenableBuilder(
+              valueListenable:
+                  Hive.box<HiveCartProduct>(AppBoxes.storedProducts)
+                      .listenable(),
+              builder: (context, productsBox, child) {
+                return Scaffold(
+                  body: NestedScrollView(
+                    headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                      SliverAppBar.medium(
+                        leading: GestureDetector(
+                            onTap: () => navigatorKey.currentState!.pop(),
+                            child: const Icon(Icons.clear)),
+                        title: AppText(
+                          text: store.name,
+                          weight: FontWeight.w600,
+                        ),
+                        expandedHeight: 110,
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AppSizes.horizontalPaddingSmall),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                AppText(
+                                  text: store.name,
+                                  weight: FontWeight.w600,
+                                  size: AppSizes.heading6,
+                                ),
+                                const Gap(15)
+                              ],
+                            ),
                           ),
-                          const Gap(15)
+                        ),
+                        actions: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                right: AppSizes.horizontalPaddingSmall),
+                            child: InkWell(
+                                onTap: () async =>
+                                    await AppFunctions.createGroupOrder(store),
+                                child: Ink(
+                                    child:
+                                        const Icon(Icons.person_add_outlined))),
+                          )
                         ],
                       ),
-                    ),
-                  ),
-                  actions: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          right: AppSizes.horizontalPaddingSmall),
-                      child: InkWell(
-                          onTap: () async =>
-                              await AppFunctions.createGroupOrder(store),
-                          child: Ink(
-                              child: const Icon(Icons.person_add_outlined))),
-                    )
-                  ],
-                ),
-              ],
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                    body: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ListView.separated(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              final cartProduct = cartItem.products[index];
+                        SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListView.separated(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) {
+                                    final cartProduct =
+                                        cartItem.products[index];
 
-                              return FutureBuilder(
-                                  future: AppFunctions.loadProductReference(
-                                      FirebaseFirestore.instance
-                                          .collection(
-                                              FirestoreCollections.products)
-                                          .doc(cartProduct.id)),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      final product = snapshot.data!;
+                                    return FutureBuilder(
+                                        future:
+                                            AppFunctions.loadProductReference(
+                                                FirebaseFirestore.instance
+                                                    .collection(
+                                                        FirestoreCollections
+                                                            .products)
+                                                    .doc(cartProduct.id)),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            final product = snapshot.data!;
 
-                                      return ListTile(
-                                        onTap: () => navigatorKey.currentState!
-                                            .push(MaterialPageRoute(
-                                          builder: (context) => ProductScreen(
-                                              product: product, store: store),
-                                        )),
-                                        trailing: AddToCartButton(
-                                            removeShadow: true,
-                                            backgroundColor:
-                                                AppColors.neutral100,
-                                            product: product,
-                                            store: store),
-                                        leading: SizedBox(
-                                          width: 60,
-                                          height: 60,
-                                          child:
-                                              AppFunctions.displayNetworkImage(
-                                                  product.imageUrls.first),
-                                        ),
-                                        title: AppText(
-                                          text: product.name,
-                                          weight: FontWeight.w600,
-                                        ),
-                                        subtitle: Column(
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children:
-                                                  cartProduct.requiredOptions
-                                                      .map(
-                                                        (e) => Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                AppText(
-                                                                  text:
-                                                                      '${e.name}:',
-                                                                  weight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                                if (e.options
-                                                                    .isNotEmpty)
-                                                                  Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: e
-                                                                        .options
-                                                                        .map(
-                                                                          (e) =>
-                                                                              Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              AppText(
-                                                                                text: e.name,
-                                                                              ),
-                                                                              Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                  children: e.options
-                                                                                      .map(
-                                                                                        (e) => AppText(
-                                                                                          text: e.name,
-                                                                                        ),
-                                                                                      )
-                                                                                      .toList()),
-                                                                            ],
-                                                                          ),
-                                                                        )
-                                                                        .toList(),
-                                                                  ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      )
-                                                      .toList(),
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children:
-                                                  cartProduct.optionalOptions
-                                                      .map(
-                                                        (e) => Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                AppText(
-                                                                  text:
-                                                                      '${e.name}:',
-                                                                  weight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                                if (e.options
-                                                                    .isNotEmpty)
-                                                                  Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: e
-                                                                        .options
-                                                                        .map(
-                                                                          (e) =>
-                                                                              Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              AppText(
-                                                                                text: e.name,
-                                                                              ),
-                                                                              Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                  children: e.options
-                                                                                      .map(
-                                                                                        (e) => AppText(
-                                                                                          text: e.name,
-                                                                                        ),
-                                                                                      )
-                                                                                      .toList()),
-                                                                            ],
-                                                                          ),
-                                                                        )
-                                                                        .toList(),
-                                                                  ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      )
-                                                      .toList(),
-                                            ),
-                                            if (product
-                                                .similarProducts.isNotEmpty)
-                                              Row(
-                                                children: [
-                                                  const Icon(
-                                                    Icons.loop,
-                                                    color: AppColors.neutral500,
-                                                    size: 15,
-                                                  ),
-                                                  const Gap(5),
-                                                  AppText(
-                                                      text: cartProduct
-                                                              .backupInstruction ??
-                                                          'Best match'),
-                                                ],
-                                              ),
-                                            Row(
-                                              children: [
-                                                AppText(
-                                                    text:
-                                                        '\$${(product.promoPrice ?? product.initialPrice).toStringAsFixed(2)}',
-                                                    color: product.promoPrice !=
-                                                            null
-                                                        ? Colors.green
-                                                        : null),
-                                                if (product.promoPrice != null)
-                                                  AppText(
-                                                    text:
-                                                        ' ${product.initialPrice.toStringAsFixed(2)}',
-                                                  )
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                    } else if (snapshot.hasError) {
-                                      return AppText(
-                                        text: snapshot.error.toString(),
-                                      );
-                                    } else {
-                                      return Skeletonizer(
-                                          enabled: true,
-                                          child: ListTile(
-                                            leading: Container(
+                                            return ListTile(
+                                              onTap: () => navigatorKey
+                                                  .currentState!
+                                                  .push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProductScreen(
+                                                        product: product,
+                                                        store: store),
+                                              )),
+                                              trailing: AddToCartButton(
+                                                  removeShadow: true,
+                                                  backgroundColor:
+                                                      AppColors.neutral100,
+                                                  product: product,
+                                                  store: store),
+                                              leading: SizedBox(
                                                 width: 60,
                                                 height: 60,
-                                                color: AppColors.neutral100),
-                                            title: const AppText(
-                                              text: 'hdsjnjnadfks',
-                                              weight: FontWeight.w600,
+                                                child: AppFunctions
+                                                    .displayNetworkImage(product
+                                                        .imageUrls.first),
+                                              ),
+                                              title: AppText(
+                                                text: product.name,
+                                                weight: FontWeight.w600,
+                                              ),
+                                              subtitle: Column(
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children:
+                                                        cartProduct
+                                                            .requiredOptions
+                                                            .map(
+                                                              (e) => Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      AppText(
+                                                                        text:
+                                                                            '${e.name}:',
+                                                                        weight:
+                                                                            FontWeight.w600,
+                                                                      ),
+                                                                      if (e
+                                                                          .options
+                                                                          .isNotEmpty)
+                                                                        Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: e
+                                                                              .options
+                                                                              .map(
+                                                                                (e) => Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    AppText(
+                                                                                      text: e.name,
+                                                                                    ),
+                                                                                    Column(
+                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                        children: e.options
+                                                                                            .map(
+                                                                                              (e) => AppText(
+                                                                                                text: e.name,
+                                                                                              ),
+                                                                                            )
+                                                                                            .toList()),
+                                                                                  ],
+                                                                                ),
+                                                                              )
+                                                                              .toList(),
+                                                                        ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children:
+                                                        cartProduct
+                                                            .optionalOptions
+                                                            .map(
+                                                              (e) => Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      AppText(
+                                                                        text:
+                                                                            '${e.name}:',
+                                                                        weight:
+                                                                            FontWeight.w600,
+                                                                      ),
+                                                                      if (e
+                                                                          .options
+                                                                          .isNotEmpty)
+                                                                        Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: e
+                                                                              .options
+                                                                              .map(
+                                                                                (e) => Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    AppText(
+                                                                                      text: e.name,
+                                                                                    ),
+                                                                                    Column(
+                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                        children: e.options
+                                                                                            .map(
+                                                                                              (e) => AppText(
+                                                                                                text: e.name,
+                                                                                              ),
+                                                                                            )
+                                                                                            .toList()),
+                                                                                  ],
+                                                                                ),
+                                                                              )
+                                                                              .toList(),
+                                                                        ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                  ),
+                                                  if (product.similarProducts
+                                                      .isNotEmpty)
+                                                    Row(
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.loop,
+                                                          color: AppColors
+                                                              .neutral500,
+                                                          size: 15,
+                                                        ),
+                                                        const Gap(5),
+                                                        AppText(
+                                                            text: cartProduct
+                                                                    .backupInstruction ??
+                                                                'Best match'),
+                                                      ],
+                                                    ),
+                                                  Row(
+                                                    children: [
+                                                      AppText(
+                                                          text:
+                                                              '\$${(product.promoPrice ?? product.initialPrice).toStringAsFixed(2)}',
+                                                          color:
+                                                              product.promoPrice !=
+                                                                      null
+                                                                  ? Colors.green
+                                                                  : null),
+                                                      if (product.promoPrice !=
+                                                          null)
+                                                        AppText(
+                                                          text:
+                                                              ' ${product.initialPrice.toStringAsFixed(2)}',
+                                                        )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return AppText(
+                                              text: snapshot.error.toString(),
+                                            );
+                                          } else {
+                                            return Skeletonizer(
+                                                enabled: true,
+                                                child: ListTile(
+                                                  leading: Container(
+                                                      width: 60,
+                                                      height: 60,
+                                                      color:
+                                                          AppColors.neutral100),
+                                                  title: const AppText(
+                                                    text: 'hdsjnjnadfks',
+                                                    weight: FontWeight.w600,
+                                                  ),
+                                                  subtitle: const AppText(
+                                                    text:
+                                                        'hdsjnjnadfkdkdkddkkdks',
+                                                    weight: FontWeight.w600,
+                                                  ),
+                                                ));
+                                          }
+                                        });
+                                  },
+                                  separatorBuilder: (context, index) =>
+                                      const Divider(),
+                                  itemCount: cartItem.products.length),
+                              const Gap(10),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSizes.horizontalPadding),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    InkWell(
+                                      onTap: () async {
+                                        await AppFunctions
+                                            .navigateToStoreScreen(store);
+                                      },
+                                      child: Ink(
+                                        padding: const EdgeInsets.all(5),
+                                        decoration: BoxDecoration(
+                                            color: AppColors.neutral100,
+                                            borderRadius:
+                                                BorderRadius.circular(50)),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.add,
+                                              size: 15,
                                             ),
-                                            subtitle: const AppText(
-                                              text: 'hdsjnjnadfkdkdkddkkdks',
-                                              weight: FontWeight.w600,
-                                            ),
-                                          ));
-                                    }
-                                  });
-                            },
-                            separatorBuilder: (context, index) =>
-                                const Divider(),
-                            itemCount: cartItem.products.length),
-                        const Gap(10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: AppSizes.horizontalPadding),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              InkWell(
-                                onTap: () async {
-                                  await AppFunctions.navigateToStoreScreen(
-                                      store);
-                                },
-                                child: Ink(
-                                  padding: const EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                      color: AppColors.neutral100,
-                                      borderRadius: BorderRadius.circular(50)),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.add,
-                                        size: 15,
+                                            Gap(10),
+                                            AppText(text: 'Add items'),
+                                          ],
+                                        ),
                                       ),
-                                      Gap(10),
-                                      AppText(text: 'Add items'),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (store.offers != null)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Divider(),
+                                    const AppText(
+                                      text: 'Offers for you',
+                                      weight: FontWeight.bold,
+                                      size: AppSizes.body,
+                                    ),
+                                    ListView.builder(
+                                      itemBuilder: (context, index) {
+                                        final offer = store.offers![index];
+                                        return FutureBuilder(
+                                            future: AppFunctions
+                                                .loadProductReference(
+                                                    offer.product
+                                                        as DocumentReference),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                return ProductGridTilePriceFirst(
+                                                    product: snapshot.data!,
+                                                    store: store);
+                                              } else if (snapshot.hasError) {
+                                                return AppText(
+                                                  text:
+                                                      snapshot.error.toString(),
+                                                );
+                                              } else {
+                                                return Skeletonizer(
+                                                    enabled: true,
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Container(
+                                                          color: AppColors
+                                                              .neutral100,
+                                                        ),
+                                                        const AppText(
+                                                            text: 'lkajlskj'),
+                                                        const AppText(
+                                                            text: 'nlanjsklaf')
+                                                      ],
+                                                    ));
+                                              }
+                                            });
+                                      },
+                                      itemCount: store.offers!.length,
+                                      scrollDirection: Axis.horizontal,
+                                    )
+                                  ],
+                                ),
+                              const Divider(),
+                              ListTile(
+                                onTap: () {
+                                  // navigatorKey.currentState!.push(MaterialPageRoute(
+                                  //   builder: (context) => const CustomizeGiftScreen(),
+                                  // ));
+                                },
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal:
+                                        AppSizes.horizontalPaddingSmall),
+                                leading: const Iconify(Ph.gift),
+                                title: const AppText(text: 'Send as a gift'),
+                                subtitle: const AppText(
+                                  text: 'And customize a digital card',
+                                  color: AppColors.neutral500,
+                                ),
+                                trailing:
+                                    const Icon(Icons.keyboard_arrow_right),
+                              ),
+                              const Divider(),
+                              ListTile(
+                                title: const AppText(
+                                  text: 'Subtotal',
+                                  weight: FontWeight.w600,
+                                  size: AppSizes.bodySmall,
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    AppText(
+                                        size: AppSizes.bodySmall,
+                                        decoration: promo != null
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                        text:
+                                            '\$${cartItem.subtotal.toStringAsFixed(2)}'),
+                                    if (promo != null || hasUberOne)
+                                      AppText(
+                                          size: AppSizes.bodySmall,
+                                          weight: FontWeight.w600,
+                                          text:
+                                              ' \$${(cartItem.subtotal - (promo != null ? promo!.discount : 0) - (hasUberOne ? OtherConstants.uberOneDiscount : 0)).toStringAsFixed(2)}'),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        if (store.offers != null)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Divider(),
-                              const AppText(
-                                text: 'Offers for you',
-                                weight: FontWeight.bold,
-                                size: AppSizes.body,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (promo != null &&
+                                (promo!.minimumOrder == null ||
+                                    promo!.minimumOrder! <= cartItem.subtotal))
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    color: Colors.amberAccent.shade100),
+                                child: ListTile(
+                                  dense: true,
+                                  leading: cartItem.subtotal < 30 && hasUberOne
+                                      ? Image.asset(
+                                          AssetNames.uberOneSmall,
+                                          width: 20,
+                                          color: Colors.brown,
+                                        )
+                                      : null,
+                                  subtitle: cartItem.subtotal < 30 && hasUberOne
+                                      ? AppText(
+                                          color: Colors.brown.shade500,
+                                          text:
+                                              'Add \$${30 - cartItem.subtotal} to save more with Uber One',
+                                          size: AppSizes.bodySmallest,
+                                        )
+                                      : null,
+                                  title: AppText(
+                                      color: Colors.brown.shade500,
+                                      size: AppSizes.bodySmallest,
+                                      text:
+                                          'Saving \$${(promo!.discount).toStringAsFixed(2)} with promotions'),
+                                ),
                               ),
-                              ListView.builder(
-                                itemBuilder: (context, index) {
-                                  final offer = store.offers![index];
-                                  return FutureBuilder(
-                                      future: AppFunctions.loadProductReference(
-                                          offer.product as DocumentReference),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          return ProductGridTilePriceFirst(
-                                              product: snapshot.data!,
-                                              store: store);
-                                        } else if (snapshot.hasError) {
-                                          return AppText(
-                                            text: snapshot.error.toString(),
-                                          );
-                                        } else {
-                                          return Skeletonizer(
-                                              enabled: true,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    color: AppColors.neutral100,
-                                                  ),
-                                                  const AppText(
-                                                      text: 'lkajlskj'),
-                                                  const AppText(
-                                                      text: 'nlanjsklaf')
-                                                ],
-                                              ));
-                                        }
-                                      });
+                            if (hasUberOne && cartItem.subtotal >= 30)
+                              Container(
+                                width: double.infinity,
+                                decoration:
+                                    const BoxDecoration(color: Colors.brown),
+                                child: ListTile(
+                                  leading: Image.asset(
+                                    AssetNames.uberOneSmall,
+                                    width: 20,
+                                    color: Colors.white,
+                                  ),
+                                  title: const AppText(
+                                      color: Colors.white,
+                                      text: 'Saving \$0.14 with Uber One'),
+                                ),
+                              ),
+                            const Gap(10),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSizes.horizontalPaddingSmall),
+                              child: AppButton(
+                                text: 'Go to checkout',
+                                callback: () async {
+                                  final BitmapDescriptor bitmapDescriptor =
+                                      await BitmapDescriptor.asset(
+                                    const ImageConfiguration(
+                                        size: Size(
+                                            30, 46)), // Adjust size as needed
+                                    AssetNames.mapMarker2, // Path to your asset
+                                  );
+                                  final phoneNumber = FirebaseAuth
+                                      .instance.currentUser!.phoneNumber;
+
+                                  await navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) => CheckoutScreen(
+                                        promotion: promo,
+                                        markerIcon: bitmapDescriptor,
+                                        phoneNumber: phoneNumber,
+                                        store: store),
+                                  ));
                                 },
-                                itemCount: store.offers!.length,
-                                scrollDirection: Axis.horizontal,
-                              )
-                            ],
-                          ),
-                        const Divider(),
-                        ListTile(
-                          onTap: () {
-                            // navigatorKey.currentState!.push(MaterialPageRoute(
-                            //   builder: (context) => const CustomizeGiftScreen(),
-                            // ));
-                          },
-                          dense: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: AppSizes.horizontalPaddingSmall),
-                          leading: const Iconify(Ph.gift),
-                          title: const AppText(text: 'Send as a gift'),
-                          subtitle: const AppText(
-                            text: 'And customize a digital card',
-                            color: AppColors.neutral500,
-                          ),
-                          trailing: const Icon(Icons.keyboard_arrow_right),
-                        ),
-                        const Divider(),
-                        ListTile(
-                          title: const AppText(
-                            text: 'Subtotal',
-                            weight: FontWeight.w600,
-                            size: AppSizes.bodySmall,
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (cartItem.subtotal <
-                                  cartItem.initialPricesTotal)
-                                AppText(
-                                    size: AppSizes.bodySmall,
-                                    decoration: TextDecoration.lineThrough,
-                                    text:
-                                        '\$${cartItem.initialPricesTotal.toStringAsFixed(2)}'),
-                              AppText(
-                                  size: AppSizes.bodySmall,
-                                  weight: FontWeight.w600,
-                                  text:
-                                      ' \$${cartItem.subtotal.toStringAsFixed(2)}'),
-                            ],
-                          ),
-                        ),
+                              ),
+                            ),
+                            const Gap(10),
+                          ],
+                        )
                       ],
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (activatedPromo != null)
-                        FutureBuilder(
-                            future: AppFunctions.loadPromoReference(
-                                FirebaseFirestore.instance.doc(activatedPromo)),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      color: Colors.amberAccent.shade100),
-                                  child: ListTile(
-                                    dense: true,
-                                    leading: Image.asset(
-                                      AssetNames.uberOneSmall,
-                                      width: 20,
-                                      color: Colors.brown,
-                                    ),
-                                    subtitle:
-                                        cartItem.subtotal < 30 && hasUberOne
-                                            ? AppText(
-                                                color: Colors.brown.shade500,
-                                                text:
-                                                    'Add \$${30 - cartItem.subtotal} to save more with Uber One',
-                                                size: AppSizes.bodySmallest,
-                                              )
-                                            : null,
-                                    title: AppText(
-                                        color: Colors.brown.shade500,
-                                        text:
-                                            'Saving ${(snapshot.data!.discount / 100) * cartItem.subtotal} with promotions'),
-                                  ),
-                                );
-                              } else if (snapshot.hasData) {
-                                return AppText(
-                                  text: snapshot.error.toString(),
-                                );
-                              } else {
-                                return Skeletonizer(
-                                  enabled: true,
-                                  child: Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                        color: Colors.amberAccent.shade100),
-                                    child: ListTile(
-                                      leading: Image.asset(
-                                        AssetNames.uberOneSmall,
-                                        width: 20,
-                                        color: Colors.brown,
-                                      ),
-                                      subtitle: AppText(
-                                        color: Colors.brown.shade500,
-                                        text: 'Add  to save more with Uber One',
-                                        size: AppSizes.bodySmallest,
-                                      ),
-                                      title: AppText(
-                                          color: Colors.brown.shade500,
-                                          text: 'Saving  with promotions'),
-                                    ),
-                                  ),
-                                );
-                              }
-                            }),
-                      if (hasUberOne && cartItem.subtotal >= 30)
-                        Container(
-                          width: double.infinity,
-                          decoration: const BoxDecoration(color: Colors.brown),
-                          child: ListTile(
-                            leading: Image.asset(
-                              AssetNames.uberOneSmall,
-                              width: 20,
-                              color: Colors.white,
-                            ),
-                            title: const AppText(
-                                color: Colors.white,
-                                text: 'Saving \$0.14 with Uber One'),
-                          ),
-                        ),
-                      const Gap(10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSizes.horizontalPaddingSmall),
-                        child: AppButton(
-                          text: 'Go to checkout',
-                          callback: () async {
-                            final BitmapDescriptor bitmapDescriptor =
-                                await BitmapDescriptor.asset(
-                              const ImageConfiguration(
-                                  size: Size(30, 46)), // Adjust size as needed
-                              AssetNames.mapMarker2, // Path to your asset
-                            );
-                            final phoneNumber =
-                                FirebaseAuth.instance.currentUser!.phoneNumber;
-
-                            await navigatorKey.currentState!
-                                .push(MaterialPageRoute(
-                              builder: (context) => CheckoutScreen(
-                                  markerIcon: bitmapDescriptor,
-                                  phoneNumber: phoneNumber,
-                                  store: store),
-                            ));
-                          },
-                        ),
-                      ),
-                      const Gap(10),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          );
+                );
+              });
         });
   }
 }

@@ -13,6 +13,8 @@ _$PromotionImpl _$$PromotionImplFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String,
       expirationDate: DateTime.parse(json['expirationDate'] as String),
       applicableLocation: json['applicableLocation'] as String,
+      title: json['title'] as String,
+      minimumOrder: (json['minimumOrder'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$$PromotionImplToJson(_$PromotionImpl instance) =>
@@ -22,4 +24,6 @@ Map<String, dynamic> _$$PromotionImplToJson(_$PromotionImpl instance) =>
       'description': instance.description,
       'expirationDate': instance.expirationDate.toIso8601String(),
       'applicableLocation': instance.applicableLocation,
+      'title': instance.title,
+      'minimumOrder': instance.minimumOrder,
     };

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:colorful_iconify_flutter/icons/logos.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/cib.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:uber_eats_clone/app_functions.dart';
@@ -17,7 +19,12 @@ import '../../../core/app_colors.dart';
 
 class ReceiptScreen extends StatefulWidget {
   final IndividualOrder order;
-  const ReceiptScreen({super.key, required this.order});
+  final Store store;
+  const ReceiptScreen({
+    super.key,
+    required this.order,
+    required this.store,
+  });
 
   @override
   State<ReceiptScreen> createState() => _ReceiptScreenState();
@@ -26,17 +33,20 @@ class ReceiptScreen extends StatefulWidget {
 class _ReceiptScreenState extends State<ReceiptScreen> {
   late final List<String> _receiptOptions;
   late String _selectedReceipt;
-  late Store _store;
+
+  late final String displayName;
 
   @override
   void initState() {
     super.initState();
-    if (widget.order.tip != null) {
+    if (widget.order.tip != 0) {
       _receiptOptions = ['Receipt including tip', 'Original receipt'];
     } else {
       _receiptOptions = ['Original receipt'];
     }
     _selectedReceipt = _receiptOptions.first;
+    final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    displayName = userInfo['displayName'].split(' ').first;
   }
 
   @override
@@ -46,16 +56,12 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       body: NestedScrollView(
           floatHeaderSlivers: true,
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                const SliverAppBar(
+                const SliverAppBar.medium(
                   pinned: true,
                   floating: true,
-                  expandedHeight: 80,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: AppText(
-                      text: 'Receipt',
-                      size: AppSizes.heading6,
-                      // weight: FontWeight.w600,
-                    ),
+                  title: AppText(
+                    text: 'Receipt',
+                    size: AppSizes.heading6,
                   ),
                 ),
                 SliverPadding(
@@ -97,11 +103,16 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                               );
                             },
                       minTileHeight: 50,
-                      trailing: const Icon(Icons.keyboard_arrow_down),
+                      trailing: Icon(
+                        Icons.keyboard_arrow_down,
+                        color: _receiptOptions.length == 1
+                            ? AppColors.neutral500
+                            : null,
+                      ),
                       title: AppText(
                         text: _selectedReceipt,
                         color: _receiptOptions.length == 1
-                            ? AppColors.neutral300
+                            ? AppColors.neutral500
                             : null,
                       ),
                       tileColor: AppColors.neutral100,
@@ -116,6 +127,12 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                   child: Column(
                     children: [
                       Container(
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(AssetNames.receiptBackground),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                         height: 500,
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -168,8 +185,8 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 AppText(
                                   text: _selectedReceipt ==
                                           'Receipt including tip'
-                                      ? 'Thanks for tipping, Nana'
-                                      : 'Thanks for being an Uber One member, Nana',
+                                      ? 'Thanks for tipping, $displayName'
+                                      : '${widget.order.membershipBenefit != null ? 'Thanks for being an Uber One member' : 'Thanks for ordering'}, $displayName',
                                   size: AppSizes.heading2,
                                   // weight: FontWeight.w600,
                                 ),
@@ -177,152 +194,261 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 AppText(
                                     size: AppSizes.bodySmall,
                                     text:
-                                        "Here's your updated receipt for ${_store.name} (${_store.location.streetAddress.split(', ')[1]})"),
+                                        "Here's your updated receipt for ${widget.store.name} (${widget.store.location.streetAddress.split(', ')[1]})"),
                               ],
                             ),
-                            //TODO; Implement receipt background
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const AppText(
-                                      text: 'Total',
-                                      size: AppSizes.heading4,
-                                    ),
-                                    AppText(
-                                        size: AppSizes.heading4,
-                                        text:
-                                            'US\$${_selectedReceipt == 'Receipt including tip' ? widget.order.totalFee.toStringAsFixed(2) : _receiptOptions.length == 1 ? widget.order.totalFee : (widget.order.totalFee - widget.order.tip!)}')
-                                  ],
-                                ),
-                                const Gap(10),
-                                if (widget.order.promoApplied != null)
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Image.asset(
-                                        AssetNames.uberOneSmall,
-                                        width: 15,
-                                        height: 20,
-                                      ),
-                                      FutureBuilder(
-                                          future:
-                                              AppFunctions.loadPromoReference(
-                                                  widget.order.promoApplied
-                                                      as DocumentReference),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.hasData) {
-                                              final promo = snapshot.data!;
-                                              return Flexible(
-                                                child: AppText(
-                                                    size: AppSizes.bodySmall,
-                                                    text:
-                                                        ' You saved US\$${(promo.discount / 100) * widget.order.totalFee} on this order with Uber One and promos'),
-                                              );
-                                            } else if (snapshot.hasError) {
-                                              return AppText(
-                                                  text: snapshot.error
-                                                      .toString());
-                                            } else {
-                                              return const SizedBox.shrink();
-                                            }
-                                          })
-                                    ],
-                                  )
-                              ],
-                            )
                           ],
                         ),
                       ),
-                      const Divider(),
-                      // ListView.builder(
-                      //   padding: EdgeInsets.zero,
-                      //   itemCount: widget.order.productsAndQuantities.length,
-                      //   physics: const NeverScrollableScrollPhysics(),
-                      //   shrinkWrap: true,
-                      //   itemBuilder: (context, index) {
-                      //     final productNQuantity = widget
-                      //         .order.productsAndQuantities.entries
-                      //         .elementAt(index);
-                      //     subtotal += (productNQuantity.key.promoPrice ??
-                      //             productNQuantity.key.initialPrice) *
-                      //         productNQuantity.value;
-                      //     logger.d(subtotal);
-                      //     // logger.d(productNQuantity.key.initialPrice);
-                      //     return ListTile(
-                      //       // dense: true,
-                      //       subtitle: productNQuantity.key.options != null
-                      //           ? Column(
-                      //               mainAxisSize: MainAxisSize.min,
-                      //               children: [
-                      //                 ListView.builder(
-                      //                   padding: EdgeInsets.zero,
-                      //                   itemBuilder: (context, index) {
-                      //                     final option =
-                      //                         productNQuantity.key.options![index];
-                      //                     if (option.price != null) {
-                      //                       subtotal += option.price!;
-                      //                       logger.d(subtotal);
-                      //                     }
-                      //                     if (option.subOptions?.first.price !=
-                      //                         null) {
-                      //                       subtotal +=
-                      //                           option.subOptions!.first.price!;
-                      //                       logger.d(subtotal);
-                      //                     }
-                      //                     return Column(
-                      //                       children: [
-                      //                         const AppText(text: 'Select Option'),
-                      //                         AppText(
-                      //                           text:
-                      //                               '${option.name} US\$${option.price ?? 0.00}',
-                      //                           color: AppColors.neutral500,
-                      //                         ),
-                      //                         if (option.subOptions != null)
-                      //                           AppText(
-                      //                             text: '${option.name} Comes With',
-                      //                           ),
-                      //                         AppText(
-                      //                           text:
-                      //                               '${option.subOptions!.first.name} US\$${option.subOptions?.first.price ?? 0.00}',
-                      //                           color: AppColors.neutral500,
-                      //                         ),
-                      //                       ],
-                      //                     );
-                      //                   },
-                      //                   itemCount:
-                      //                       productNQuantity.key.options!.length,
-                      //                 )
-                      //               ],
-                      //             )
-                      //           : null,
-                      //       leading: Container(
-                      //         padding: const EdgeInsets.all(5),
-                      //         color: AppColors.neutral100,
-                      //         child: AppText(text: productNQuantity.value.toString()),
-                      //       ),
-                      //       title: AppText(
-                      //         text: productNQuantity.key.name,
-                      //         weight: FontWeight.w600,
-                      //         size: AppSizes.bodySmaller,
-                      //       ),
-                      //       trailing: Column(
-                      //         mainAxisAlignment: MainAxisAlignment.start,
-                      //         mainAxisSize: MainAxisSize.min,
-                      //         children: [
-                      //           AppText(
-                      //               color: AppColors.neutral600,
-                      //               text:
-                      //                   'US\$${((productNQuantity.key.promoPrice ?? productNQuantity.key.initialPrice) * productNQuantity.value).toStringAsFixed(2)}'),
-                      //         ],
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
+                      const Gap(40),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.horizontalPaddingSmall),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const AppText(
+                                  text: 'Total',
+                                  size: AppSizes.heading4,
+                                ),
+                                AppText(
+                                    size: AppSizes.heading4,
+                                    text:
+                                        'US\$${_selectedReceipt == 'Receipt including tip' ? widget.order.totalFee.toStringAsFixed(2) : _receiptOptions.length == 1 ? widget.order.totalFee : (widget.order.totalFee - widget.order.tip)}')
+                              ],
+                            ),
+                            const Gap(10),
+                            if (widget.order.promoApplied != null ||
+                                widget.order.membershipBenefit != null)
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (widget.order.membershipBenefit != null)
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                          AssetNames.uberOneSmall,
+                                          width: 15,
+                                          height: 20,
+                                        ),
+                                        const Gap(3),
+                                      ],
+                                    ),
+                                  if (widget.order.promoApplied != null)
+                                    FutureBuilder(
+                                        future: AppFunctions.loadPromoReference(
+                                            widget.order.promoApplied
+                                                as DocumentReference),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            final promo = snapshot.data!;
 
+                                            double discountAmount =
+                                                promo.discount;
+                                            if (widget
+                                                    .order.membershipBenefit !=
+                                                null) {
+                                              discountAmount = widget.order
+                                                      .membershipBenefit! +
+                                                  discountAmount;
+                                            }
+                                            return AppText(
+                                                size: AppSizes.bodySmall,
+                                                text:
+                                                    'You saved US\$${discountAmount.toStringAsFixed(2)} on this order with${widget.order.membershipBenefit != null ? ' Uber One and' : ''} promos');
+                                          } else if (snapshot.hasError) {
+                                            return AppText(
+                                                text:
+                                                    snapshot.error.toString());
+                                          } else {
+                                            return const SizedBox.shrink();
+                                          }
+                                        }),
+                                  if (widget.order.promoApplied == null &&
+                                      widget.order.membershipBenefit != null)
+                                    Builder(builder: (context) {
+                                      final double discountAmount =
+                                          widget.order.membershipBenefit!;
+                                      return AppText(
+                                          size: AppSizes.bodySmall,
+                                          text:
+                                              'You saved US\$${discountAmount.toStringAsFixed(2)} on this order with Uber One');
+                                    }),
+                                ],
+                              )
+                          ],
+                        ),
+                      ),
+                      const Gap(30),
+                      const Divider(),
+                      ListView.separated(
+                        padding: EdgeInsets.zero,
+                        itemCount: widget.order.products.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final cartProduct = widget.order.products[index];
+                          subtotal += (cartProduct.purchasePrice) *
+                              cartProduct.quantity;
+
+                          return ListTile(
+                            trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AppText(
+                                    color: AppColors.neutral600,
+                                    text:
+                                        'US\$${((cartProduct.purchasePrice) * cartProduct.quantity).toStringAsFixed(2)}'),
+                              ],
+                            ),
+                            leading: Container(
+                              padding: const EdgeInsets.all(5),
+                              color: AppColors.neutral100,
+                              child: AppText(
+                                  text: cartProduct.quantity.toString()),
+                            ),
+                            title: AppText(
+                              text: cartProduct.name,
+                              weight: FontWeight.w600,
+                            ),
+                            subtitle: Column(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: cartProduct.requiredOptions
+                                      .map(
+                                        (e) => Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                AppText(
+                                                  text: '${e.name}:',
+                                                  weight: FontWeight.w600,
+                                                ),
+                                                if (e.options.isNotEmpty)
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: e.options
+                                                        .map(
+                                                          (e) => Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              AppText(
+                                                                text: e.name,
+                                                              ),
+                                                              Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: e
+                                                                      .options
+                                                                      .map(
+                                                                        (e) =>
+                                                                            AppText(
+                                                                          text:
+                                                                              e.name,
+                                                                        ),
+                                                                      )
+                                                                      .toList()),
+                                                            ],
+                                                          ),
+                                                        )
+                                                        .toList(),
+                                                  ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: cartProduct.optionalOptions
+                                      .map(
+                                        (e) => Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                AppText(
+                                                  text: '${e.name}:',
+                                                  weight: FontWeight.w600,
+                                                ),
+                                                if (e.options.isNotEmpty)
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: e.options
+                                                        .map(
+                                                          (e) => Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              AppText(
+                                                                text: e.name,
+                                                              ),
+                                                              Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: e
+                                                                      .options
+                                                                      .map(
+                                                                        (e) =>
+                                                                            AppText(
+                                                                          text:
+                                                                              e.name,
+                                                                        ),
+                                                                      )
+                                                                      .toList()),
+                                                            ],
+                                                          ),
+                                                        )
+                                                        .toList(),
+                                                  ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                                // if (cartProduct
+                                //     .ba.isNotEmpty)
+                                //   Row(
+                                //     children: [
+                                //       const Icon(
+                                //         Icons.loop,
+                                //         color: AppColors.neutral500,
+                                //         size: 15,
+                                //       ),
+                                //       const Gap(5),
+                                //       AppText(
+                                //           text: cartProduct
+                                //                   .backupInstruction ??
+                                //               'Best match'),
+                                //     ],
+                                //   ),
+                              ],
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, index) => const Divider(),
+                      ),
                       const Divider(),
                       const Gap(10),
                       Padding(
@@ -346,6 +472,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 )
                               ],
                             ),
+                            const Gap(8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -360,6 +487,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 )
                               ],
                             ),
+                            const Gap(8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -369,27 +497,32 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 ),
                                 AppText(
                                   size: AppSizes.bodySmall,
-                                  text:
-                                      'US\$${(widget.order.tax / 100) * subtotal}',
+                                  text: 'US\$${widget.order.tax}',
                                 )
                               ],
                             ),
-                            if (widget.order.caDriverBenefits != null)
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                            if (widget.order.caDriverBenefits != 0)
+                              Column(
                                 children: [
-                                  const AppText(
-                                    size: AppSizes.bodySmall,
-                                    text: 'CA Driver Benefits',
+                                  const Gap(8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const AppText(
+                                        size: AppSizes.bodySmall,
+                                        text: 'CA Driver Benefits',
+                                      ),
+                                      AppText(
+                                        size: AppSizes.bodySmall,
+                                        text:
+                                            'US\$${widget.order.caDriverBenefits.toStringAsFixed(2)}',
+                                      )
+                                    ],
                                   ),
-                                  AppText(
-                                    size: AppSizes.bodySmall,
-                                    text:
-                                        'US\$${widget.order.caDriverBenefits!.toStringAsFixed(2)}',
-                                  )
                                 ],
                               ),
+                            const Gap(8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -404,8 +537,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                 )
                               ],
                             ),
-                            if (widget.order.tip != null &&
-                                _selectedReceipt == 'Receipt including tip')
+                            if (_selectedReceipt == 'Receipt including tip')
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -417,72 +549,111 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                   AppText(
                                     size: AppSizes.bodySmall,
                                     text:
-                                        'US\$${widget.order.tip!.toStringAsFixed(2)}',
+                                        'US\$${widget.order.tip.toStringAsFixed(2)}',
                                   )
+                                ],
+                              ),
+                            if (widget.order.promoDiscount != null)
+                              Column(
+                                children: [
+                                  const Gap(8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const AppText(
+                                        size: AppSizes.bodySmall,
+                                        text: 'Promo Discount',
+                                      ),
+                                      AppText(
+                                        size: AppSizes.bodySmall,
+                                        color: Colors.green,
+                                        text:
+                                            '-US\$${widget.order.promoDiscount!.toStringAsFixed(2)}',
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
                             if (widget.order.membershipBenefit != null)
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              Column(
                                 children: [
-                                  const AppText(
-                                    size: AppSizes.bodySmall,
-                                    text: 'Membership Benefit',
+                                  const Gap(8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const AppText(
+                                        size: AppSizes.bodySmall,
+                                        text: 'Membership Benefit',
+                                      ),
+                                      AppText(
+                                        size: AppSizes.bodySmall,
+                                        color: Colors.green,
+                                        text:
+                                            '-US\$${widget.order.membershipBenefit!.toStringAsFixed(2)}',
+                                      )
+                                    ],
                                   ),
-                                  AppText(
-                                    size: AppSizes.bodySmall,
-                                    color: Colors.green,
-                                    text:
-                                        '-US\$${widget.order.membershipBenefit!.toStringAsFixed(2)}',
-                                  )
                                 ],
                               ),
                             const Gap(10),
                             const Divider(),
-                            const Gap(10),
-                            const AppText(
-                              size: AppSizes.bodySmall,
-                              text: 'Payments',
-                              weight: FontWeight.w600,
-                            ),
-                            ListView.builder(
-                              padding: EdgeInsets.zero,
-                              shrinkWrap: true,
-                              itemCount: widget.order.payments.length,
-                              itemBuilder: (context, index) {
-                                final payment = widget.order.payments[index];
-                                return ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  // leading: Image.asset(
-                                  //   payment.paymentMethodId.assetImage,
-                                  //   width: 20,
-                                  //   fit: BoxFit.cover,
-                                  // ),
-                                  subtitle: AppText(
-                                      text: AppFunctions.formatDate(
-                                          payment.datePaid.toString(),
-                                          format: 'd/m/Y h:i A')),
-                                  trailing: AppText(
-                                      weight: FontWeight.w600,
-                                      text:
-                                          'US\$${payment.amountPaid.toStringAsFixed(2)}'),
-                                  // title: AppText(
-                                  //     weight: FontWeight.w600,
-                                  //     text:
-                                  //         '${payment.paymentMethodId.name} ••••${payment.cardNumber.substring(4)}'),
-                                );
-                              },
-                            ),
-                            const Divider(),
                             const Gap(20),
-                            const AppText(
-                                text:
-                                    'Uber charges the merchant certain fees and/or costs in connection with the provision of our services.')
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal:
+                                      AppSizes.horizontalPaddingSmallest),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const AppText(
+                                    size: AppSizes.bodySmall,
+                                    text: 'Payments',
+                                    weight: FontWeight.w600,
+                                  ),
+                                  ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    itemCount: widget.order.payments.length,
+                                    itemBuilder: (context, index) {
+                                      final payment =
+                                          widget.order.payments[index];
+                                      return ListTile(
+                                        dense: true,
+                                        contentPadding: EdgeInsets.zero,
+                                        leading: ReceiptCreditCardLogo(
+                                            type: payment.creditCardType),
+                                        subtitle: AppText(
+                                            text: AppFunctions.formatDate(
+                                                payment.datePaid.toString(),
+                                                format: 'd/m/Y h:i A')),
+                                        trailing: AppText(
+                                            weight: FontWeight.w600,
+                                            text:
+                                                'US\$${payment.amountPaid.toStringAsFixed(2)}'),
+                                        title: AppText(
+                                            weight: FontWeight.w600,
+                                            text:
+                                                '${payment.creditCardType}${payment.cardNumber}'),
+                                      );
+                                    },
+                                  ),
+                                  const Divider(),
+                                  const Gap(20),
+                                  const AppText(
+                                      size: AppSizes.bodySmallest,
+                                      text:
+                                          'Uber charges the merchant certain fees and/or costs in connection with the provision of our services.'),
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       ),
-                      const Divider(),
+                      const Divider(
+                        color: AppColors.neutral100,
+                      ),
                       ListTile(
                         dense: true,
                         onTap: () {},
@@ -556,4 +727,36 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   }
 
   Future<void> _getData() async {}
+}
+
+class ReceiptCreditCardLogo extends StatelessWidget {
+  const ReceiptCreditCardLogo({
+    super.key,
+    required this.type,
+  });
+
+  final String type;
+
+  @override
+  Widget build(BuildContext context) {
+    if (type.isEmpty) {
+      return Image.asset(
+        AssetNames.creditCard, // Assuming AssetNames is defined elsewhere
+        width: 30,
+        height: 20,
+        fit: BoxFit.fitWidth,
+      );
+    }
+
+    switch (type) {
+      case 'Visa':
+        return const Iconify(Logos.visa, size: 12);
+      case 'American Express':
+        return const Iconify(Cib.american_express, size: 12);
+      case 'Discover':
+        return const Iconify(Logos.discover, size: 12);
+      default:
+        return const Iconify(Logos.mastercard, size: 12);
+    }
+  }
 }

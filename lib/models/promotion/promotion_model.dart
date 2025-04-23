@@ -12,6 +12,8 @@ class Promotion with _$Promotion {
     required String description,
     required DateTime expirationDate,
     required String applicableLocation,
+    required String title,
+    double? minimumOrder,
   }) = _Promotion;
 
   factory Promotion.fromJson(Map<String, Object?> json) =>

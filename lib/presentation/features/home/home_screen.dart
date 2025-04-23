@@ -4011,12 +4011,15 @@ class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
                         _isLoading = true;
                       });
                       await productsBox.add(HiveCartProduct(
+                        name: widget.product.name,
+                        purchasePrice: widget.product.promoPrice ??
+                            widget.product.initialPrice,
                         id: widget.product.id,
                         quantity: 1,
                       ));
                       if (cartItemInBox == null) {
                         final newCartItem = HiveCartItem(
-                            initialPricesTotal: widget.product.initialPrice,
+                            // initialPricesTotal: widget.product.initialPrice,
                             subtotal: widget.product.promoPrice ??
                                 widget.product.initialPrice,
                             placeDescription:
@@ -4065,8 +4068,8 @@ class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
                               cartItemInBox.subtotal -=
                                   widget.product.promoPrice ??
                                       widget.product.initialPrice;
-                              cartItemInBox.initialPricesTotal -=
-                                  widget.product.initialPrice;
+                              // cartItemInBox.initialPricesTotal -=
+                              //     widget.product.initialPrice;
                               await product.save();
                               await cartItemInBox.save();
                             }
@@ -4106,8 +4109,8 @@ class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
                             cartItemInBox.subtotal +=
                                 widget.product.promoPrice ??
                                     widget.product.initialPrice;
-                            cartItemInBox.initialPricesTotal +=
-                                widget.product.initialPrice;
+                            // cartItemInBox.initialPricesTotal +=
+                            //     widget.product.initialPrice;
                             await product.save();
                             await cartItemInBox.save();
                             setState(() {

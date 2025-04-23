@@ -20,6 +20,7 @@ class CreditCardDetails with _$CreditCardDetails {
       required String cvv,
       required String country,
       required String zipCode,
+      required String? creditCardType,
       required String nickName}) = _CreditCardDetails;
 
   factory CreditCardDetails.fromJson(Map<String, Object?> json) =>

@@ -21,8 +21,8 @@ import '../../main_screen/screens/main_screen.dart';
 
 class OrderScreen extends StatefulWidget {
   final IndividualOrder order;
-  final bool isClosed;
-  const OrderScreen({super.key, required this.order, required this.isClosed});
+
+  const OrderScreen({super.key, required this.order});
 
   @override
   State<OrderScreen> createState() => _OrderScreenState();
@@ -42,6 +42,10 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final timeOfDayNow = TimeOfDay.now();
+    final bool isClosed = timeOfDayNow.hour < _store.openingTime.hour ||
+        (timeOfDayNow.hour >= _store.closingTime.hour &&
+            timeOfDayNow.minute >= _store.closingTime.minute);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -85,7 +89,7 @@ class _OrderScreenState extends State<OrderScreen> {
               )
             ],
           ),
-          if (widget.isClosed)
+          if (isClosed)
             Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.horizontalPaddingSmall),
@@ -286,7 +290,10 @@ class _OrderScreenState extends State<OrderScreen> {
                   isSecondary: true,
                   callback: () {
                     navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => ReceiptScreen(order: widget.order),
+                      builder: (context) => ReceiptScreen(
+                        order: widget.order,
+                        store: _store,
+                      ),
                     ));
                   },
                 ),

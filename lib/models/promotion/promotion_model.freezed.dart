@@ -25,6 +25,8 @@ mixin _$Promotion {
   String get description => throw _privateConstructorUsedError;
   DateTime get expirationDate => throw _privateConstructorUsedError;
   String get applicableLocation => throw _privateConstructorUsedError;
+  String get title => throw _privateConstructorUsedError;
+  double? get minimumOrder => throw _privateConstructorUsedError;
 
   /// Serializes this Promotion to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -46,7 +48,9 @@ abstract class $PromotionCopyWith<$Res> {
       double discount,
       String description,
       DateTime expirationDate,
-      String applicableLocation});
+      String applicableLocation,
+      String title,
+      double? minimumOrder});
 }
 
 /// @nodoc
@@ -69,6 +73,8 @@ class _$PromotionCopyWithImpl<$Res, $Val extends Promotion>
     Object? description = null,
     Object? expirationDate = null,
     Object? applicableLocation = null,
+    Object? title = null,
+    Object? minimumOrder = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -91,6 +97,14 @@ class _$PromotionCopyWithImpl<$Res, $Val extends Promotion>
           ? _value.applicableLocation
           : applicableLocation // ignore: cast_nullable_to_non_nullable
               as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      minimumOrder: freezed == minimumOrder
+          ? _value.minimumOrder
+          : minimumOrder // ignore: cast_nullable_to_non_nullable
+              as double?,
     ) as $Val);
   }
 }
@@ -108,7 +122,9 @@ abstract class _$$PromotionImplCopyWith<$Res>
       double discount,
       String description,
       DateTime expirationDate,
-      String applicableLocation});
+      String applicableLocation,
+      String title,
+      double? minimumOrder});
 }
 
 /// @nodoc
@@ -129,6 +145,8 @@ class __$$PromotionImplCopyWithImpl<$Res>
     Object? description = null,
     Object? expirationDate = null,
     Object? applicableLocation = null,
+    Object? title = null,
+    Object? minimumOrder = freezed,
   }) {
     return _then(_$PromotionImpl(
       id: null == id
@@ -151,6 +169,14 @@ class __$$PromotionImplCopyWithImpl<$Res>
           ? _value.applicableLocation
           : applicableLocation // ignore: cast_nullable_to_non_nullable
               as String,
+      title: null == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      minimumOrder: freezed == minimumOrder
+          ? _value.minimumOrder
+          : minimumOrder // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }
@@ -163,7 +189,9 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
       required this.discount,
       required this.description,
       required this.expirationDate,
-      required this.applicableLocation});
+      required this.applicableLocation,
+      required this.title,
+      this.minimumOrder});
 
   factory _$PromotionImpl.fromJson(Map<String, dynamic> json) =>
       _$$PromotionImplFromJson(json);
@@ -178,10 +206,14 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
   final DateTime expirationDate;
   @override
   final String applicableLocation;
+  @override
+  final String title;
+  @override
+  final double? minimumOrder;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Promotion(id: $id, discount: $discount, description: $description, expirationDate: $expirationDate, applicableLocation: $applicableLocation)';
+    return 'Promotion(id: $id, discount: $discount, description: $description, expirationDate: $expirationDate, applicableLocation: $applicableLocation, title: $title, minimumOrder: $minimumOrder)';
   }
 
   @override
@@ -193,7 +225,9 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
       ..add(DiagnosticsProperty('discount', discount))
       ..add(DiagnosticsProperty('description', description))
       ..add(DiagnosticsProperty('expirationDate', expirationDate))
-      ..add(DiagnosticsProperty('applicableLocation', applicableLocation));
+      ..add(DiagnosticsProperty('applicableLocation', applicableLocation))
+      ..add(DiagnosticsProperty('title', title))
+      ..add(DiagnosticsProperty('minimumOrder', minimumOrder));
   }
 
   @override
@@ -209,13 +243,16 @@ class _$PromotionImpl with DiagnosticableTreeMixin implements _Promotion {
             (identical(other.expirationDate, expirationDate) ||
                 other.expirationDate == expirationDate) &&
             (identical(other.applicableLocation, applicableLocation) ||
-                other.applicableLocation == applicableLocation));
+                other.applicableLocation == applicableLocation) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.minimumOrder, minimumOrder) ||
+                other.minimumOrder == minimumOrder));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, discount, description,
-      expirationDate, applicableLocation);
+      expirationDate, applicableLocation, title, minimumOrder);
 
   /// Create a copy of Promotion
   /// with the given fields replaced by the non-null parameter values.
@@ -239,7 +276,9 @@ abstract class _Promotion implements Promotion {
       required final double discount,
       required final String description,
       required final DateTime expirationDate,
-      required final String applicableLocation}) = _$PromotionImpl;
+      required final String applicableLocation,
+      required final String title,
+      final double? minimumOrder}) = _$PromotionImpl;
 
   factory _Promotion.fromJson(Map<String, dynamic> json) =
       _$PromotionImpl.fromJson;
@@ -254,6 +293,10 @@ abstract class _Promotion implements Promotion {
   DateTime get expirationDate;
   @override
   String get applicableLocation;
+  @override
+  String get title;
+  @override
+  double? get minimumOrder;
 
   /// Create a copy of Promotion
   /// with the given fields replaced by the non-null parameter values.

@@ -29,6 +29,7 @@ mixin _$IndividualOrder {
   String get courier => throw _privateConstructorUsedError;
   Object? get promoApplied => throw _privateConstructorUsedError;
   double get serviceFee => throw _privateConstructorUsedError;
+  double? get promoDiscount => throw _privateConstructorUsedError;
   double get tax => throw _privateConstructorUsedError;
   double get caDriverBenefits => throw _privateConstructorUsedError;
   double get deliveryFee => throw _privateConstructorUsedError;
@@ -65,6 +66,7 @@ abstract class $IndividualOrderCopyWith<$Res> {
       String courier,
       Object? promoApplied,
       double serviceFee,
+      double? promoDiscount,
       double tax,
       double caDriverBenefits,
       double deliveryFee,
@@ -100,6 +102,7 @@ class _$IndividualOrderCopyWithImpl<$Res, $Val extends IndividualOrder>
     Object? courier = null,
     Object? promoApplied = freezed,
     Object? serviceFee = null,
+    Object? promoDiscount = freezed,
     Object? tax = null,
     Object? caDriverBenefits = null,
     Object? deliveryFee = null,
@@ -145,6 +148,10 @@ class _$IndividualOrderCopyWithImpl<$Res, $Val extends IndividualOrder>
           ? _value.serviceFee
           : serviceFee // ignore: cast_nullable_to_non_nullable
               as double,
+      promoDiscount: freezed == promoDiscount
+          ? _value.promoDiscount
+          : promoDiscount // ignore: cast_nullable_to_non_nullable
+              as double?,
       tax: null == tax
           ? _value.tax
           : tax // ignore: cast_nullable_to_non_nullable
@@ -203,6 +210,7 @@ abstract class _$$IndividualOrderImplCopyWith<$Res>
       String courier,
       Object? promoApplied,
       double serviceFee,
+      double? promoDiscount,
       double tax,
       double caDriverBenefits,
       double deliveryFee,
@@ -236,6 +244,7 @@ class __$$IndividualOrderImplCopyWithImpl<$Res>
     Object? courier = null,
     Object? promoApplied = freezed,
     Object? serviceFee = null,
+    Object? promoDiscount = freezed,
     Object? tax = null,
     Object? caDriverBenefits = null,
     Object? deliveryFee = null,
@@ -281,6 +290,10 @@ class __$$IndividualOrderImplCopyWithImpl<$Res>
           ? _value.serviceFee
           : serviceFee // ignore: cast_nullable_to_non_nullable
               as double,
+      promoDiscount: freezed == promoDiscount
+          ? _value.promoDiscount
+          : promoDiscount // ignore: cast_nullable_to_non_nullable
+              as double?,
       tax: null == tax
           ? _value.tax
           : tax // ignore: cast_nullable_to_non_nullable
@@ -336,6 +349,7 @@ class _$IndividualOrderImpl
       this.courier = 'Jonathan',
       this.promoApplied,
       required this.serviceFee,
+      this.promoDiscount,
       required this.tax,
       this.caDriverBenefits = 0,
       required this.deliveryFee,
@@ -378,6 +392,8 @@ class _$IndividualOrderImpl
   @override
   final double serviceFee;
   @override
+  final double? promoDiscount;
+  @override
   final double tax;
   @override
   @JsonKey()
@@ -406,7 +422,7 @@ class _$IndividualOrderImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'IndividualOrder(products: $products, isPriority: $isPriority, deliveryDate: $deliveryDate, tip: $tip, orderNumber: $orderNumber, placeDescription: $placeDescription, courier: $courier, promoApplied: $promoApplied, serviceFee: $serviceFee, tax: $tax, caDriverBenefits: $caDriverBenefits, deliveryFee: $deliveryFee, membershipBenefit: $membershipBenefit, totalFee: $totalFee, payments: $payments, storeId: $storeId, status: $status, userUid: $userUid)';
+    return 'IndividualOrder(products: $products, isPriority: $isPriority, deliveryDate: $deliveryDate, tip: $tip, orderNumber: $orderNumber, placeDescription: $placeDescription, courier: $courier, promoApplied: $promoApplied, serviceFee: $serviceFee, promoDiscount: $promoDiscount, tax: $tax, caDriverBenefits: $caDriverBenefits, deliveryFee: $deliveryFee, membershipBenefit: $membershipBenefit, totalFee: $totalFee, payments: $payments, storeId: $storeId, status: $status, userUid: $userUid)';
   }
 
   @override
@@ -423,6 +439,7 @@ class _$IndividualOrderImpl
       ..add(DiagnosticsProperty('courier', courier))
       ..add(DiagnosticsProperty('promoApplied', promoApplied))
       ..add(DiagnosticsProperty('serviceFee', serviceFee))
+      ..add(DiagnosticsProperty('promoDiscount', promoDiscount))
       ..add(DiagnosticsProperty('tax', tax))
       ..add(DiagnosticsProperty('caDriverBenefits', caDriverBenefits))
       ..add(DiagnosticsProperty('deliveryFee', deliveryFee))
@@ -454,6 +471,8 @@ class _$IndividualOrderImpl
                 .equals(other.promoApplied, promoApplied) &&
             (identical(other.serviceFee, serviceFee) ||
                 other.serviceFee == serviceFee) &&
+            (identical(other.promoDiscount, promoDiscount) ||
+                other.promoDiscount == promoDiscount) &&
             (identical(other.tax, tax) || other.tax == tax) &&
             (identical(other.caDriverBenefits, caDriverBenefits) ||
                 other.caDriverBenefits == caDriverBenefits) &&
@@ -471,26 +490,28 @@ class _$IndividualOrderImpl
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_products),
-      isPriority,
-      deliveryDate,
-      tip,
-      orderNumber,
-      placeDescription,
-      courier,
-      const DeepCollectionEquality().hash(promoApplied),
-      serviceFee,
-      tax,
-      caDriverBenefits,
-      deliveryFee,
-      membershipBenefit,
-      totalFee,
-      const DeepCollectionEquality().hash(_payments),
-      storeId,
-      status,
-      userUid);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        const DeepCollectionEquality().hash(_products),
+        isPriority,
+        deliveryDate,
+        tip,
+        orderNumber,
+        placeDescription,
+        courier,
+        const DeepCollectionEquality().hash(promoApplied),
+        serviceFee,
+        promoDiscount,
+        tax,
+        caDriverBenefits,
+        deliveryFee,
+        membershipBenefit,
+        totalFee,
+        const DeepCollectionEquality().hash(_payments),
+        storeId,
+        status,
+        userUid
+      ]);
 
   /// Create a copy of IndividualOrder
   /// with the given fields replaced by the non-null parameter values.
@@ -520,6 +541,7 @@ abstract class _IndividualOrder implements IndividualOrder {
       final String courier,
       final Object? promoApplied,
       required final double serviceFee,
+      final double? promoDiscount,
       required final double tax,
       final double caDriverBenefits,
       required final double deliveryFee,
@@ -551,6 +573,8 @@ abstract class _IndividualOrder implements IndividualOrder {
   Object? get promoApplied;
   @override
   double get serviceFee;
+  @override
+  double? get promoDiscount;
   @override
   double get tax;
   @override
@@ -1374,6 +1398,8 @@ mixin _$CartProduct {
       throw _privateConstructorUsedError;
   List<CartProductOption> get requiredOptions =>
       throw _privateConstructorUsedError;
+  double get purchasePrice => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
   int get quantity => throw _privateConstructorUsedError;
   String get note => throw _privateConstructorUsedError;
@@ -1399,6 +1425,8 @@ abstract class $CartProductCopyWith<$Res> {
   $Res call(
       {List<CartProductOption> optionalOptions,
       List<CartProductOption> requiredOptions,
+      double purchasePrice,
+      String name,
       String id,
       int quantity,
       String note,
@@ -1423,6 +1451,8 @@ class _$CartProductCopyWithImpl<$Res, $Val extends CartProduct>
   $Res call({
     Object? optionalOptions = null,
     Object? requiredOptions = null,
+    Object? purchasePrice = null,
+    Object? name = null,
     Object? id = null,
     Object? quantity = null,
     Object? note = null,
@@ -1438,6 +1468,14 @@ class _$CartProductCopyWithImpl<$Res, $Val extends CartProduct>
           ? _value.requiredOptions
           : requiredOptions // ignore: cast_nullable_to_non_nullable
               as List<CartProductOption>,
+      purchasePrice: null == purchasePrice
+          ? _value.purchasePrice
+          : purchasePrice // ignore: cast_nullable_to_non_nullable
+              as double,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -1473,6 +1511,8 @@ abstract class _$$CartProductImplCopyWith<$Res>
   $Res call(
       {List<CartProductOption> optionalOptions,
       List<CartProductOption> requiredOptions,
+      double purchasePrice,
+      String name,
       String id,
       int quantity,
       String note,
@@ -1495,6 +1535,8 @@ class __$$CartProductImplCopyWithImpl<$Res>
   $Res call({
     Object? optionalOptions = null,
     Object? requiredOptions = null,
+    Object? purchasePrice = null,
+    Object? name = null,
     Object? id = null,
     Object? quantity = null,
     Object? note = null,
@@ -1510,6 +1552,14 @@ class __$$CartProductImplCopyWithImpl<$Res>
           ? _value._requiredOptions
           : requiredOptions // ignore: cast_nullable_to_non_nullable
               as List<CartProductOption>,
+      purchasePrice: null == purchasePrice
+          ? _value.purchasePrice
+          : purchasePrice // ignore: cast_nullable_to_non_nullable
+              as double,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -1540,6 +1590,8 @@ class _$CartProductImpl with DiagnosticableTreeMixin implements _CartProduct {
   const _$CartProductImpl(
       {required final List<CartProductOption> optionalOptions,
       required final List<CartProductOption> requiredOptions,
+      required this.purchasePrice,
+      required this.name,
       required this.id,
       required this.quantity,
       required this.note,
@@ -1568,6 +1620,10 @@ class _$CartProductImpl with DiagnosticableTreeMixin implements _CartProduct {
   }
 
   @override
+  final double purchasePrice;
+  @override
+  final String name;
+  @override
   final String id;
   @override
   final int quantity;
@@ -1580,7 +1636,7 @@ class _$CartProductImpl with DiagnosticableTreeMixin implements _CartProduct {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CartProduct(optionalOptions: $optionalOptions, requiredOptions: $requiredOptions, id: $id, quantity: $quantity, note: $note, productReplacementId: $productReplacementId, backupInstruction: $backupInstruction)';
+    return 'CartProduct(optionalOptions: $optionalOptions, requiredOptions: $requiredOptions, purchasePrice: $purchasePrice, name: $name, id: $id, quantity: $quantity, note: $note, productReplacementId: $productReplacementId, backupInstruction: $backupInstruction)';
   }
 
   @override
@@ -1590,6 +1646,8 @@ class _$CartProductImpl with DiagnosticableTreeMixin implements _CartProduct {
       ..add(DiagnosticsProperty('type', 'CartProduct'))
       ..add(DiagnosticsProperty('optionalOptions', optionalOptions))
       ..add(DiagnosticsProperty('requiredOptions', requiredOptions))
+      ..add(DiagnosticsProperty('purchasePrice', purchasePrice))
+      ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('id', id))
       ..add(DiagnosticsProperty('quantity', quantity))
       ..add(DiagnosticsProperty('note', note))
@@ -1606,6 +1664,9 @@ class _$CartProductImpl with DiagnosticableTreeMixin implements _CartProduct {
                 .equals(other._optionalOptions, _optionalOptions) &&
             const DeepCollectionEquality()
                 .equals(other._requiredOptions, _requiredOptions) &&
+            (identical(other.purchasePrice, purchasePrice) ||
+                other.purchasePrice == purchasePrice) &&
+            (identical(other.name, name) || other.name == name) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
@@ -1622,6 +1683,8 @@ class _$CartProductImpl with DiagnosticableTreeMixin implements _CartProduct {
       runtimeType,
       const DeepCollectionEquality().hash(_optionalOptions),
       const DeepCollectionEquality().hash(_requiredOptions),
+      purchasePrice,
+      name,
       id,
       quantity,
       note,
@@ -1648,6 +1711,8 @@ abstract class _CartProduct implements CartProduct {
   const factory _CartProduct(
       {required final List<CartProductOption> optionalOptions,
       required final List<CartProductOption> requiredOptions,
+      required final double purchasePrice,
+      required final String name,
       required final String id,
       required final int quantity,
       required final String note,
@@ -1661,6 +1726,10 @@ abstract class _CartProduct implements CartProduct {
   List<CartProductOption> get optionalOptions;
   @override
   List<CartProductOption> get requiredOptions;
+  @override
+  double get purchasePrice;
+  @override
+  String get name;
   @override
   String get id;
   @override

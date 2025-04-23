@@ -14,8 +14,6 @@ class HiveCartItem extends HiveObject {
   DateTime? deliveryDate;
   @HiveField(4)
   double subtotal;
-  @HiveField(5)
-  double initialPricesTotal;
 
   HiveCartItem({
     required this.storeId,
@@ -23,7 +21,6 @@ class HiveCartItem extends HiveObject {
     required this.placeDescription,
     required this.deliveryDate,
     required this.subtotal,
-    required this.initialPricesTotal,
   });
 }
 
@@ -61,11 +58,17 @@ class HiveCartProduct extends HiveObject {
   final List<HiveOption> optionalOptions;
   @HiveField(6)
   final List<HiveOption> requiredOptions;
+  @HiveField(7)
+  final double purchasePrice;
+  @HiveField(8)
+  final String name;
   HiveCartProduct({
     this.optionalOptions = const [],
     this.requiredOptions = const [],
     required this.id,
     required this.quantity,
+    required this.purchasePrice,
+    required this.name,
     this.note = '',
     this.productReplacementId,
     this.backupInstruction,

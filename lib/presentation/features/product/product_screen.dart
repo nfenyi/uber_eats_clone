@@ -109,7 +109,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
       }
     }
     initialSubTotal = _cartItemInBox?.subtotal ?? 0;
-    initialInitialPricesTotal = _cartItemInBox?.initialPricesTotal ?? 0;
+    // initialInitialPricesTotal = _cartItemInBox?.initialPricesTotal ?? 0;
   }
 
   @override
@@ -994,8 +994,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                       _cartItemInBox!.subtotal -=
                                           _product.promoPrice ??
                                               _product.initialPrice;
-                                      _cartItemInBox!.initialPricesTotal -=
-                                          _product.initialPrice;
+                                      // _cartItemInBox!.initialPricesTotal -=
+                                      //     _product.initialPrice;
                                       await _cartItemInBox!.save();
                                       await _productInbox!.delete().then(
                                         (value) {
@@ -1795,6 +1795,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                 }
                 if (_productInbox == null) {
                   final newProduct = HiveCartProduct(
+                    name: widget.product.name,
+                    purchasePrice: widget.product.promoPrice ??
+                        widget.product.initialPrice,
                     id: _product.id,
                     quantity: _quantity,
                     backupInstruction: _backupInstruction,
@@ -1809,7 +1812,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                       deliveryDate: ref.read(deliveryScheduleProvider),
                       placeDescription: ref.read(selectedLocationDescription),
                       products: HiveList(_productsBox),
-                      initialPricesTotal: _product.initialPrice * _quantity,
+                      // initialPricesTotal: _product.initialPrice * _quantity,
                       subtotal: _product.promoPrice ??
                           _product.initialPrice * _quantity,
                       storeId: widget.store.id,
@@ -1824,9 +1827,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                     _cartItemInBox!.subtotal = initialSubTotal +
                         (_product.promoPrice ??
                             _product.initialPrice * _quantity);
-                    _cartItemInBox!.initialPricesTotal =
-                        initialInitialPricesTotal +
-                            _product.initialPrice * _quantity;
+                    // _cartItemInBox!.initialPricesTotal =
+                    //     initialInitialPricesTotal +
+                    //         _product.initialPrice * _quantity;
 
                     await _cartItemInBox!.save();
                   }
@@ -1837,9 +1840,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                   _cartItemInBox!.subtotal = initialSubTotal +
                       (_product.promoPrice ??
                           _product.initialPrice * _quantity);
-                  _cartItemInBox!.initialPricesTotal =
-                      initialInitialPricesTotal +
-                          _product.initialPrice * _quantity;
+                  // _cartItemInBox!.initialPricesTotal =
+                  //     initialInitialPricesTotal +
+                  //         _product.initialPrice * _quantity;
                   await _cartItemInBox!.save();
                 }
 

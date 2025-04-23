@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
@@ -12,6 +13,8 @@ class FamilyProfileModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    String displayName = userInfo['displayName'];
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
@@ -62,14 +65,14 @@ class FamilyProfileModal extends StatelessWidget {
           const Divider(
             thickness: 4,
           ),
-          const ListTile(
+          ListTile(
             dense: true,
-            leading: Icon(Icons.person),
+            leading: const Icon(Icons.person),
             title: AppText(
-              text: 'Nana Fenyi',
+              text: displayName,
               size: AppSizes.bodySmall,
             ),
-            subtitle: AppText(
+            subtitle: const AppText(
               text: 'Organizer',
               color: AppColors.neutral500,
             ),

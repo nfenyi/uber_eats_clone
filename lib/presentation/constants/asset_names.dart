@@ -100,6 +100,7 @@ class AssetNames {
   static const neverShowDelivInformation =
       'assets/images/never_show_deliv_information.png';
   static const neverShareInfoBag = 'assets/images/never_share_info_bag.png';
+  static const receiptBackground = 'assets/images/receipt_background.png';
   static const receiptImage = 'assets/images/receipt_image.png';
   static const noProfilePic = 'assets/images/no_profile_pic.png';
   static const favorites = 'assets/images/favorites.png';

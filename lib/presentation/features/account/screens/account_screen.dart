@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ant_design.dart';
 import 'package:iconify_flutter/icons/bi.dart';
@@ -38,11 +39,14 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   String? _selectedProfile;
+  late final String displayName;
 
   @override
   void initState() {
     super.initState();
     _selectedProfile = 'Personal';
+    final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    displayName = userInfo['displayName'];
   }
 
   @override
@@ -50,8 +54,8 @@ class _AccountScreenState extends State<AccountScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 120,
-        title: const AppText(
-          text: 'Nana Fenyi',
+        title: AppText(
+          text: displayName,
           weight: FontWeight.w600,
           size: AppSizes.heading3,
         ),

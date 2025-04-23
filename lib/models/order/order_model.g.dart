@@ -20,6 +20,7 @@ _$IndividualOrderImpl _$$IndividualOrderImplFromJson(
       courier: json['courier'] as String? ?? 'Jonathan',
       promoApplied: json['promoApplied'],
       serviceFee: (json['serviceFee'] as num).toDouble(),
+      promoDiscount: (json['promoDiscount'] as num?)?.toDouble(),
       tax: (json['tax'] as num).toDouble(),
       caDriverBenefits: (json['caDriverBenefits'] as num?)?.toDouble() ?? 0,
       deliveryFee: (json['deliveryFee'] as num).toDouble(),
@@ -45,6 +46,7 @@ Map<String, dynamic> _$$IndividualOrderImplToJson(
       'courier': instance.courier,
       'promoApplied': instance.promoApplied,
       'serviceFee': instance.serviceFee,
+      'promoDiscount': instance.promoDiscount,
       'tax': instance.tax,
       'caDriverBenefits': instance.caDriverBenefits,
       'deliveryFee': instance.deliveryFee,
@@ -130,6 +132,8 @@ _$CartProductImpl _$$CartProductImplFromJson(Map<String, dynamic> json) =>
       requiredOptions: (json['requiredOptions'] as List<dynamic>)
           .map((e) => CartProductOption.fromJson(e as Map<String, dynamic>))
           .toList(),
+      purchasePrice: (json['purchasePrice'] as num).toDouble(),
+      name: json['name'] as String,
       id: json['id'] as String,
       quantity: (json['quantity'] as num).toInt(),
       note: json['note'] as String,
@@ -143,6 +147,8 @@ Map<String, dynamic> _$$CartProductImplToJson(_$CartProductImpl instance) =>
           instance.optionalOptions.map((e) => e.toJson()).toList(),
       'requiredOptions':
           instance.requiredOptions.map((e) => e.toJson()).toList(),
+      'purchasePrice': instance.purchasePrice,
+      'name': instance.name,
       'id': instance.id,
       'quantity': instance.quantity,
       'note': instance.note,

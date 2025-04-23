@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -155,8 +154,9 @@ class _TermsNPrivacyNoticeScreenState
                           onTap: _isChecked == true
                               ? () => navigatorKey.currentState!
                                       .push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AddressesScreen(),
+                                    builder: (context) => const AddressesScreen(
+                                      newLabel: 'Home',
+                                    ),
                                   ))
                               : () => showInfoToast(
                                     'Please agree to the terms to proceed',

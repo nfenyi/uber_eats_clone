@@ -46,7 +46,7 @@ class AddressDetailsScreen extends ConsumerStatefulWidget {
       required this.location,
       required this.placeDescription,
       required this.markerIcon,
-      this.addressLabel,
+      required this.addressLabel,
       this.building,
       this.dropOffOption});
 
@@ -74,10 +74,10 @@ class _AddressDetailsScreenState extends ConsumerState<AddressDetailsScreen> {
     super.initState();
     _setLocation = LatLng(widget.location.lat!, widget.location.lng!);
     _placeDescription = widget.placeDescription;
+    _addressLabelController.text = widget.addressLabel ?? '';
     if (widget.navigatedWithAddressListTile == true) {
       _instructionsController.text = widget.instruction!;
       _aptController.text = widget.apartment!;
-      _addressLabelController.text = widget.addressLabel!;
       _buildingNameController.text = widget.building!;
     }
     _dropOffOption = widget.navigatedWithAddressListTile == true

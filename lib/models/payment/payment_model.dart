@@ -9,6 +9,7 @@ class Payment with _$Payment {
   const factory Payment({
     required String paymentMethodName,
     required double amountPaid,
+    required String creditCardType,
     required String? cardNumber,
     required DateTime datePaid,
   }) = _Payment;

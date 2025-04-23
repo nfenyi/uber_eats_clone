@@ -14,6 +14,7 @@ _$CreditCardDetailsImpl _$$CreditCardDetailsImplFromJson(
       cvv: json['cvv'] as String,
       country: json['country'] as String,
       zipCode: json['zipCode'] as String,
+      creditCardType: json['creditCardType'] as String?,
       nickName: json['nickName'] as String,
     );
 
@@ -25,5 +26,6 @@ Map<String, dynamic> _$$CreditCardDetailsImplToJson(
       'cvv': instance.cvv,
       'country': instance.country,
       'zipCode': instance.zipCode,
+      'creditCardType': instance.creditCardType,
       'nickName': instance.nickName,
     };
