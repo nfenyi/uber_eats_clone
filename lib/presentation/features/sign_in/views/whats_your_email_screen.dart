@@ -131,7 +131,7 @@ class _WhatsYourEmailScreenState extends ConsumerState<WhatsYourEmailScreen> {
                                   await Hive.box(AppBoxes.appState).put(
                                       'email', _emailController.text.trim());
 
-                                  navigatorKey.currentState!
+                                  await navigatorKey.currentState!
                                       .push(MaterialPageRoute(
                                     builder: (context) => EmailSentScreen(
                                       email: _emailController.text,
@@ -141,7 +141,7 @@ class _WhatsYourEmailScreenState extends ConsumerState<WhatsYourEmailScreen> {
                                         onError: (onError) => showAppInfoDialog(
                                             description:
                                                 'Error sending email verification $onError',
-                                            context));
+                                            navigatorKey.currentContext!));
                               }
                             },
                       child: Ink(

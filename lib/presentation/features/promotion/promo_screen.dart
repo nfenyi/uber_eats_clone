@@ -31,7 +31,7 @@ class PromoScreen extends StatefulWidget {
 
 class _PromoScreenState extends State<PromoScreen> {
   final _searchController = TextEditingController();
-  List _redeemedPromoPaths = [];
+  List _redeemedPromoIds = [];
   List _usedPromos = [];
 
   bool _showSearchArea = false;
@@ -66,7 +66,7 @@ class _PromoScreenState extends State<PromoScreen> {
             child: AppTextFormField(
               constraintWidth: 40,
               controller: _searchController,
-              radius: 20,
+              radius: 10,
               textInputAction: TextInputAction.search,
               onFieldSubmitted: (value) async {
                 final searchedPromoRef = FirebaseFirestore.instance
@@ -80,7 +80,7 @@ class _PromoScreenState extends State<PromoScreen> {
                   });
                   return;
                 }
-                if (_redeemedPromoPaths.any(
+                if (_redeemedPromoIds.any(
                   (element) => element.contains(value),
                 )) {
                   showInfoToast('Promo already claimed',
@@ -244,7 +244,7 @@ class _PromoScreenState extends State<PromoScreen> {
                           ],
                         )
                   : Builder(builder: (context) {
-                      _redeemedPromoPaths = Hive.box(AppBoxes.appState)
+                      _redeemedPromoIds = Hive.box(AppBoxes.appState)
                           .get(BoxKeys.userInfo)['redeemedPromos'];
                       _usedPromos = Hive.box(AppBoxes.appState)
                           .get(BoxKeys.userInfo)['usedPromos'];
@@ -254,7 +254,7 @@ class _PromoScreenState extends State<PromoScreen> {
                       return Column(
                         children: [
                           const Gap(40),
-                          (_redeemedPromoPaths.isNotEmpty)
+                          (_redeemedPromoIds.isNotEmpty)
                               ? const Padding(
                                   padding: EdgeInsets.symmetric(
                                       horizontal:
@@ -290,10 +290,9 @@ class _PromoScreenState extends State<PromoScreen> {
                                   horizontal: AppSizes.horizontalPaddingSmall),
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: _redeemedPromoPaths.length,
+                              itemCount: _redeemedPromoIds.length,
                               itemBuilder: (context, index) {
-                                final String promoId =
-                                    _redeemedPromoPaths[index];
+                                final String promoId = _redeemedPromoIds[index];
                                 final promoRef = FirebaseFirestore.instance
                                     .collection(FirestoreCollections.promotions)
                                     .doc(promoId);
@@ -552,8 +551,6 @@ class _PromoScreenState extends State<PromoScreen> {
                               },
                             ),
                           ),
-                          // const Spacer(),
-                          // Gap(_redeemedPromoPaths.isEmpty ? 150 : 30),
                           const BannerCarousel(),
                         ],
                       );

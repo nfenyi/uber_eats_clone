@@ -164,6 +164,13 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                 //     : Colors.white,
                               ),
                             ),
+                            onMenuStateChange: (isOpen) {
+                              if (isOpen) {
+                                // logger.d(isOpen);
+                                showInfoToast('Loading countries...',
+                                    context: context);
+                              }
+                            },
                             // isExpanded: true,
                             selectedItemBuilder: (context) => _countries
                                 .map((e) => Padding(

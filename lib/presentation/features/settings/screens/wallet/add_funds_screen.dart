@@ -1,26 +1,35 @@
 import 'package:chips_choice/chips_choice.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/carts/screens/checkouts/reg_checkout_screen.dart';
+import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 
+import '../../../../../models/uber_cash/uber_cash_model.dart';
 import '../../../../constants/app_sizes.dart';
-import '../../../../constants/asset_names.dart';
+import '../../../../services/sign_in_view_model.dart';
 
-class AddFundsScreen extends StatefulWidget {
+class AddFundsScreen extends ConsumerStatefulWidget {
   const AddFundsScreen({super.key});
 
   @override
-  State<AddFundsScreen> createState() => _AddFundsScreenState();
+  ConsumerState<AddFundsScreen> createState() => _AddFundsScreenState();
 }
 
-class _AddFundsScreenState extends State<AddFundsScreen> {
+class _AddFundsScreenState extends ConsumerState<AddFundsScreen> {
   final _fundController = TextEditingController();
 
   String? _selectedFund;
+
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -83,6 +92,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                   text: 'Enter an amount between \$25 and \$500',
                   color: AppColors.neutral500,
                 ),
+                const Gap(10),
                 ChipsChoice<String>.single(
                   wrapped: false,
                   padding: EdgeInsets.zero,
@@ -111,6 +121,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                     color: AppColors.neutral200,
                   ),
                 ),
+                const Gap(30),
                 InkWell(
                     onTap: () {},
                     child: Ink(
@@ -122,28 +133,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
               ],
             ),
             Column(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const AppText(
-                    text: 'Payment method',
-                    color: AppColors.neutral500,
-                  ),
-                  Row(
-                    children: [
-                      Image.asset(
-                        AssetNames.masterCardLogo,
-                        width: 15,
-                        height: 15,
-                      ),
-                      const Gap(5),
-                      const AppText(text: '4320'),
-                      const Gap(5),
-                      const Icon(Icons.keyboard_arrow_right)
-                    ],
-                  ),
-                ],
-              ),
+              const PaymentOptionWidget(),
               Row(
                 children: [
                   Expanded(
@@ -158,13 +148,53 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                   const Gap(10),
                   Expanded(
                     child: AppButton(
+                      isLoading: _isLoading,
                       text: 'CONFIRM',
-                      callback: _fundController.text.isEmpty ||
+                      callback: ref.watch(paymentOptionProvider) == null ||
+                              _fundController.text.isEmpty ||
                               double.parse(_fundController.text) < 25 ||
                               double.parse(_fundController.text) > 500
                           ? null
-                          : () {
-                              navigatorKey.currentState!.pop();
+                          : () async {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              try {
+                                final usersDetails = await FirebaseFirestore
+                                    .instance
+                                    .collection(FirestoreCollections.users)
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .get();
+                                final UberCash oldDeviceUserDetails =
+                                    UberCash.fromJson(
+                                        usersDetails.data()!['uberCash']);
+                                final increment =
+                                    double.parse(_fundController.text);
+                                final newDeviceUserDetails =
+                                    oldDeviceUserDetails.copyWith(
+                                        balance: oldDeviceUserDetails.balance +
+                                            increment,
+                                        cashAdded:
+                                            oldDeviceUserDetails.cashAdded +
+                                                increment);
+
+                                await FirebaseFirestore.instance
+                                    .collection(FirestoreCollections.users)
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .update({
+                                  'uberCash': newDeviceUserDetails.toJson()
+                                });
+                                await AppFunctions.getOnlineUserInfo();
+                                showInfoToast('Funds added!',
+                                    context: navigatorKey.currentContext);
+                                navigatorKey.currentState!.pop();
+                              } on Exception catch (e) {
+                                showInfoToast(e.toString(),
+                                    context: navigatorKey.currentContext);
+                              }
+                              setState(() {
+                                _isLoading = false;
+                              });
                             },
                     ),
                   )

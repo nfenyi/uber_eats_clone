@@ -19,7 +19,7 @@ import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:uber_eats_clone/presentation/features/address/screens/payment_options_screen.dart';
+import 'package:uber_eats_clone/presentation/features/payment_options/payment_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/schedule_delivery_screen.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';

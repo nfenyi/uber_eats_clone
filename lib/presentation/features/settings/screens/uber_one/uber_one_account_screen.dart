@@ -29,129 +29,133 @@ class _UberOneAccountScreenState extends State<UberOneAccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.horizontalPaddingSmall),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Image.asset(
-                        AssetNames.uberOneSmall,
-                        width: 40,
-                      ),
-                      const AppText(
-                        text: 'Uber One',
-                        size: AppSizes.heading4,
-                        weight: FontWeight.w600,
-                      )
-                    ],
-                  ),
-                  const Row(
-                    children: [
-                      AppText(
-                        text: '\$9.99/mo',
-                        decoration: TextDecoration.lineThrough,
-                        color: AppColors.neutral500,
-                      ),
-                      AppText(
-                        text: ' 4 weeks free',
-                        color: Colors.brown,
-                      ),
-                    ],
-                  ),
-                  const Gap(10),
-                  GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: OtherConstants.benefits.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisExtent: 205,
-                      crossAxisSpacing: 15,
-                      mainAxisSpacing: 15,
-                      crossAxisCount: 2,
-                    ),
-                    itemBuilder: (context, index) {
-                      final benefit = OtherConstants.benefits[index];
-                      return Container(
-                        padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.neutral300)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              benefit.assetImage,
-                              height: 50,
-                            ),
-                            const Gap(15),
-                            AppText(
-                              text: benefit.title,
-                              size: AppSizes.bodySmall,
-                              weight: FontWeight.w600,
-                            ),
-                            const Gap(5),
-                            AppText(
-                              text: benefit.message,
-                              color: AppColors.neutral500,
-                              // size: AppSizes.bodySmall,
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                navigatorKey.currentState!.push(MaterialPageRoute(
-                  builder: (context) => const UberOneScreen2(),
-                ));
-              },
-              title: const AppText(
-                text: 'See terms and benefit details',
-                weight: FontWeight.bold,
-              ),
-              trailing: const Icon(Icons.keyboard_arrow_right),
-            ),
-            const Divider(
-              thickness: 4,
-            ),
-            Center(
-              child: SizedBox(
-                width: 300,
+      body: Scrollbar(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.horizontalPaddingSmall),
                 child: Column(
                   children: [
-                    Image.asset(
-                      AssetNames.uberOneSmall,
-                      width: 50,
+                    Row(
+                      children: [
+                        Image.asset(
+                          AssetNames.uberOneSmall,
+                          width: 40,
+                        ),
+                        const AppText(
+                          text: 'Uber One',
+                          size: AppSizes.heading4,
+                          weight: FontWeight.w600,
+                        )
+                      ],
                     ),
-                    const Gap(5),
-                    const AppText(
-                      text: 'Save \$25 every month',
-                      color: Colors.brown,
-                      size: AppSizes.bodySmall,
+                    const Row(
+                      children: [
+                        AppText(
+                          text: '\$9.99/mo',
+                          decoration: TextDecoration.lineThrough,
+                          color: AppColors.neutral500,
+                        ),
+                        AppText(
+                          text: ' 4 weeks free',
+                          color: Colors.brown,
+                        ),
+                      ],
                     ),
                     const Gap(10),
-                    const AppText(
-                      text:
-                          "That's how much people save on average from Uber One and promos in your country",
-                      color: AppColors.neutral500, textAlign: TextAlign.center,
-                      // size: AppSizes.bodySmall,
+                    GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: OtherConstants.benefits.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisExtent: 205,
+                        crossAxisSpacing: 15,
+                        mainAxisSpacing: 15,
+                        crossAxisCount: 2,
+                      ),
+                      itemBuilder: (context, index) {
+                        final benefit = OtherConstants.benefits[index];
+                        return Container(
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.neutral300)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                benefit.assetImage,
+                                height: 50,
+                              ),
+                              const Gap(15),
+                              AppText(
+                                text: benefit.title,
+                                size: AppSizes.bodySmall,
+                                weight: FontWeight.w600,
+                              ),
+                              const Gap(5),
+                              AppText(
+                                text: benefit.message,
+                                size: AppSizes.bodySmallest,
+                                color: AppColors.neutral500,
+                                // size: AppSizes.bodySmall,
+                              )
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    const Gap(20)
                   ],
                 ),
               ),
-            )
-          ],
+              ListTile(
+                onTap: () {
+                  navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) => const UberOneScreen2(),
+                  ));
+                },
+                title: const AppText(
+                  text: 'See terms and benefit details',
+                  weight: FontWeight.bold,
+                ),
+                trailing: const Icon(Icons.keyboard_arrow_right),
+              ),
+              const Divider(
+                thickness: 4,
+              ),
+              Center(
+                child: SizedBox(
+                  width: 300,
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        AssetNames.uberOneSmall,
+                        width: 50,
+                      ),
+                      const Gap(5),
+                      const AppText(
+                        text: 'Save \$25 every month',
+                        color: Colors.brown,
+                        size: AppSizes.bodySmall,
+                      ),
+                      const Gap(10),
+                      const AppText(
+                        text:
+                            "That's how much people save on average from Uber One and promos in your country",
+                        color: AppColors.neutral500,
+                        textAlign: TextAlign.center,
+                        size: AppSizes.bodySmallest,
+                      ),
+                      const Gap(20)
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
       persistentFooterButtons: [

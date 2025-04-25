@@ -1,15 +1,18 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_udid/flutter_udid.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
-import '../../../constants/app_sizes.dart';
-import '../../../services/sign_in_view_model.dart';
+import '../../../../constants/app_sizes.dart';
+import '../../../../services/sign_in_view_model.dart';
 
 class NameEditScreen extends StatefulWidget {
   const NameEditScreen({super.key});
@@ -23,6 +26,8 @@ class _NameEditScreenState extends State<NameEditScreen> {
   final _lastNameController = TextEditingController();
   late final String _initialFirstName;
   late final String _initialLastName;
+
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -42,6 +47,7 @@ class _NameEditScreenState extends State<NameEditScreen> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     super.dispose();
+    _debounce?.cancel();
   }
 
   @override
@@ -77,6 +83,14 @@ class _NameEditScreenState extends State<NameEditScreen> {
               ),
               const Gap(10),
               AppTextFormField(
+                onChanged: (value) {
+                  if (_debounce?.isActive ?? false) {
+                    _debounce?.cancel();
+                  }
+                  _debounce = Timer(const Duration(milliseconds: 500), () {
+                    setState(() {});
+                  });
+                },
                 controller: _firstNameController,
                 suffixIcon: _firstNameController.text.isNotEmpty
                     ? GestureDetector(
@@ -98,6 +112,14 @@ class _NameEditScreenState extends State<NameEditScreen> {
               ),
               const Gap(10),
               AppTextFormField(
+                onChanged: (value) {
+                  if (_debounce?.isActive ?? false) {
+                    _debounce?.cancel();
+                  }
+                  _debounce = Timer(const Duration(milliseconds: 500), () {
+                    setState(() {});
+                  });
+                },
                 controller: _lastNameController,
                 suffixIcon: _lastNameController.text.isNotEmpty
                     ? GestureDetector(
@@ -159,6 +181,7 @@ class _NameEditScreenState extends State<NameEditScreen> {
                               .update({
                             userCredential.uid: deviceUserDetails,
                           });
+                          await AppFunctions.getOnlineUserInfo();
                           showInfoToast(
                               icon: const Icon(
                                 Icons.check,

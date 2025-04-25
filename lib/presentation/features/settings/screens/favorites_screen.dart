@@ -1,13 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
 
 import '../../../../models/store/store_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
-import '../../home/home_screen.dart';
+
 import '../../main_screen/screens/main_screen.dart';
 
 class FavoritesScreen extends StatefulWidget {
@@ -40,11 +41,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    TimeOfDay timeOfDayNow = TimeOfDay.now();
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
           text: 'Your Favorites',
-          size: AppSizes.bodySmall,
+          size: AppSizes.body,
         ),
       ),
       body: CustomScrollView(
@@ -55,9 +57,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   horizontal: AppSizes.horizontalPaddingSmall),
               sliver: SliverToBoxAdapter(
                 child: AppText(
-                  //add date liked to like model?
                   text: 'Recently added',
-                  // weight: FontWeight.w600,
+                  weight: FontWeight.w600,
                   size: AppSizes.heading6,
                 ),
               ),
@@ -74,10 +75,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         color: AppColors.neutral200,
                         borderRadius: BorderRadius.circular(50)),
                     child: AppText(
+                        size: AppSizes.bodyTiny,
                         text: favoriteStore.rating.averageRating
                             .toStringAsFixed(1)),
                   ),
-                  titleAlignment: ListTileTitleAlignment.titleHeight,
+                  titleAlignment: ListTileTitleAlignment.top,
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -100,26 +102,32 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             size: AppSizes.bodySmallest,
                           )
                         ],
-                      )
+                      ),
+                      if (favoriteStore.offers != null &&
+                          favoriteStore.offers!.isNotEmpty)
+                        const AppText(
+                          text: 'Offers available',
+                          color: Colors.green,
+                        )
                     ],
                   ),
+                  isThreeLine: true,
                   title: AppText(text: favoriteStore.name),
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Stack(
                       alignment: Alignment.topRight,
                       children: [
-                        CachedNetworkImage(
-                          imageUrl: favoriteStore.cardImage,
-                          width: 70,
-                          height: 70,
+                        AppFunctions.displayNetworkImage(
+                          favoriteStore.cardImage,
+                          width: 80,
+                          height: 80,
                           fit: BoxFit.cover,
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(right: 5, top: 5),
-                          child: Icon(
-                            Icons.favorite,
-                            color: Colors.white,
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5, top: 5),
+                          child: FavouriteButton(
+                            store: favoriteStore,
                             size: 20,
                           ),
                         )
@@ -135,9 +143,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   horizontal: AppSizes.horizontalPaddingSmall),
               sliver: SliverToBoxAdapter(
                 child: AppText(
-                  //add date liked to like model?
                   text: 'Currently unavailable',
-                  // weight: FontWeight.w600,
+                  weight: FontWeight.w600,
                   size: AppSizes.heading6,
                 ),
               ),
@@ -154,11 +161,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         color: AppColors.neutral200,
                         borderRadius: BorderRadius.circular(50)),
                     child: AppText(
+                        size: AppSizes.bodyTiny,
                         text: favoriteStore.rating.averageRating
                             .toStringAsFixed(1)),
                   ),
-                  titleAlignment: ListTileTitleAlignment.titleHeight,
+                  titleAlignment: ListTileTitleAlignment.top,
                   subtitle: Column(
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    // mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Gap(3),
@@ -175,14 +185,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       Row(
                         children: [
                           AppText(
-                            text:
-                                '\$${favoriteStore.delivery.fee.toStringAsFixed(2)} Delivery Fee • ${favoriteStore.delivery.estimatedDeliveryTime} min',
+                            text: favoriteStore.openingTime.hour -
+                                        timeOfDayNow.hour >
+                                    1
+                                ? 'Available at ${AppFunctions.formatDate(favoriteStore.openingTime.toString(), format: 'h:i A')}'
+                                : 'Available in ${favoriteStore.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${favoriteStore.openingTime.minute - timeOfDayNow.minute} mins'}',
                             size: AppSizes.bodySmallest,
                           )
                         ],
-                      )
+                      ),
+                      if (favoriteStore.offers != null &&
+                          favoriteStore.offers!.isNotEmpty)
+                        const AppText(
+                          text: 'Offers available',
+                          color: Colors.green,
+                        )
                     ],
                   ),
+                  isThreeLine: true,
                   title: AppText(text: favoriteStore.name),
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
@@ -192,15 +212,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         Stack(
                           alignment: Alignment.center,
                           children: [
-                            CachedNetworkImage(
-                              imageUrl: favoriteStore.cardImage,
-                              width: 70,
-                              height: 70,
+                            AppFunctions.displayNetworkImage(
+                              favoriteStore.cardImage,
+                              width: 80,
+                              height: 80,
                               fit: BoxFit.cover,
                             ),
                             Container(
-                              width: 70,
-                              height: 70,
+                              width: 80,
+                              height: 80,
                               decoration:
                                   const BoxDecoration(color: Colors.black26),
                             ),
@@ -211,11 +231,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             ),
                           ],
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(right: 5, top: 5),
-                          child: Icon(
-                            Icons.favorite,
-                            color: Colors.white,
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5, top: 5),
+                          child: FavouriteButton(
+                            store: favoriteStore,
                             size: 20,
                           ),
                         )

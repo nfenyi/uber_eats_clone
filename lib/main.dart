@@ -13,7 +13,7 @@ import 'package:uber_eats_clone/firebase_options.dart';
 import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/hive_adapters/hive_credit_card/hive_credit_card_model.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
-import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen_wrapper_screen.dart';
+import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen_wrapper.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
 import 'hive_adapters/cart_item/cart_item_model.dart';
 import 'hive_adapters/country/country_ip_model.dart';
@@ -310,7 +310,7 @@ class Wrapper extends ConsumerWidget {
           if (!authenticated) {
             return const SignInScreen();
           } else {
-            return const MainScreenWrapperScreen();
+            return const MainScreenWrapper();
           }
         });
   }

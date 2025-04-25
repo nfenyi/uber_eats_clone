@@ -7,6 +7,7 @@ import 'package:flutter_udid/flutter_udid.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/phone_number_screen.dart';
@@ -15,7 +16,7 @@ import '../../../../main.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../main_screen/screens/main_screen_wrapper_screen.dart';
+import '../../main_screen/screens/main_screen_wrapper.dart';
 import 'name_screen.dart';
 
 class EmailSentScreen extends StatefulWidget {
@@ -99,8 +100,8 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                       .put(BoxKeys.authenticated, true);
                   await navigatorKey.currentState!.pushAndRemoveUntil(
                       MaterialPageRoute(
-                          builder: (context) =>
-                              const MainScreenWrapperScreen()), (r) {
+                          builder: (context) => const MainScreenWrapper()),
+                      (r) {
                     return false;
                   });
                 } else {
@@ -114,28 +115,62 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
               // }
             );
           }
-        }
-        // else {
-        // final user = FirebaseAuth.instance.currentUser;
-        // if (user != null) {
-        //   final credential = EmailAuthProvider.credentialWithLink(
-        //       email: widget.email,
-        //       emailLink: dynamicLinkData.link.toString());
-        //   await user.linkWithCredential(credential);
-        //   await user.reload();
+        } else {
+          final user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            await AppFunctions.getOnlineUserInfo();
+            String udid = await FlutterUdid.consistentUdid;
+            final deviceUsersDetails = await FirebaseFirestore.instance
+                .collection(FirestoreCollections.devices)
+                .doc(udid)
+                .get();
+            final userCredential = FirebaseAuth.instance.currentUser!;
+            final deviceUserDetails =
+                deviceUsersDetails.data()![userCredential.uid];
+            deviceUserDetails['email'] = userCredential.email;
+            await FirebaseFirestore.instance
+                .collection(FirestoreCollections.devices)
+                .doc(udid)
+                .update({
+              userCredential.uid: deviceUserDetails,
+            }).then(
+              (value) {
+                showInfoToast(
+                    icon: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                    ),
+                    'Email updated',
+                    context: navigatorKey.currentContext);
+                if (context.mounted) {
+                  navigatorKey.currentState!.pop(true);
+                }
+              },
+            );
+          }
 
-        //   if (user.emailVerified) {
-        //     await Hive.box(AppBoxes.appState)
-        //         .put(BoxKeys.addedEmailToPhoneNumber, true);
-        //     await navigatorKey.currentState!.push(
-        //         MaterialPageRoute(builder: (context) => const NameScreen()));
-        //   } else {
-        //     await showAppInfoDialog(navigatorKey.currentContext!,
-        //         description:
-        //             'Seems you used the wrong link to verify your email. Try again.');
-        //   }
-        // }
-        // }
+          // else {
+          // final user = FirebaseAuth.instance.currentUser;
+          // if (user != null) {
+          //   final credential = EmailAuthProvider.credentialWithLink(
+          //       email: widget.email,
+          //       emailLink: dynamicLinkData.link.toString());
+          //   await user.linkWithCredential(credential);
+          //   await user.reload();
+
+          //   if (user.emailVerified) {
+          //     await Hive.box(AppBoxes.appState)
+          //         .put(BoxKeys.addedEmailToPhoneNumber, true);
+          //     await navigatorKey.currentState!.push(
+          //         MaterialPageRoute(builder: (context) => const NameScreen()));
+          //   } else {
+          //     await showAppInfoDialog(navigatorKey.currentContext!,
+          //         description:
+          //             'Seems you used the wrong link to verify your email. Try again.');
+          //   }
+          // }
+          // }
+        }
       } on FirebaseAuthException catch (e) {
         await showAppInfoDialog(navigatorKey.currentContext!,
             description: e.toString());
@@ -286,29 +321,32 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      onTap: () => navigatorKey.currentState!.pop(),
-                      child: Ink(
-                        child: Container(
-                          padding: const EdgeInsets.all(AppSizes.bodySmallest),
-                          decoration: const BoxDecoration(
-                            color: AppColors.neutral200,
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                          ),
-                          child: Row(
-                            children: [
-                              if (navigatorKey.currentState!.canPop())
-                                const Icon(
+                    if (navigatorKey.currentState!.canPop())
+                      InkWell(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        onTap: () => navigatorKey.currentState!.pop(),
+                        child: Ink(
+                          child: Container(
+                            padding:
+                                const EdgeInsets.all(AppSizes.bodySmallest),
+                            decoration: const BoxDecoration(
+                              color: AppColors.neutral200,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(
                                   FontAwesomeIcons.arrowLeft,
                                   size: 15,
                                 ),
-                              const AppText(text: '  Wrong email ?')
-                            ],
+                                AppText(text: '  Wrong email ?')
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 const Gap(10)

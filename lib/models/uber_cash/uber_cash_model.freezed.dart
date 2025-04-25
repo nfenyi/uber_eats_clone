@@ -22,6 +22,8 @@ UberCash _$UberCashFromJson(Map<String, dynamic> json) {
 mixin _$UberCash {
   bool get isActive => throw _privateConstructorUsedError;
   double get balance => throw _privateConstructorUsedError;
+  double get cashAdded => throw _privateConstructorUsedError;
+  double get cashSpent => throw _privateConstructorUsedError;
 
   /// Serializes this UberCash to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -38,7 +40,8 @@ abstract class $UberCashCopyWith<$Res> {
   factory $UberCashCopyWith(UberCash value, $Res Function(UberCash) then) =
       _$UberCashCopyWithImpl<$Res, UberCash>;
   @useResult
-  $Res call({bool isActive, double balance});
+  $Res call(
+      {bool isActive, double balance, double cashAdded, double cashSpent});
 }
 
 /// @nodoc
@@ -58,6 +61,8 @@ class _$UberCashCopyWithImpl<$Res, $Val extends UberCash>
   $Res call({
     Object? isActive = null,
     Object? balance = null,
+    Object? cashAdded = null,
+    Object? cashSpent = null,
   }) {
     return _then(_value.copyWith(
       isActive: null == isActive
@@ -67,6 +72,14 @@ class _$UberCashCopyWithImpl<$Res, $Val extends UberCash>
       balance: null == balance
           ? _value.balance
           : balance // ignore: cast_nullable_to_non_nullable
+              as double,
+      cashAdded: null == cashAdded
+          ? _value.cashAdded
+          : cashAdded // ignore: cast_nullable_to_non_nullable
+              as double,
+      cashSpent: null == cashSpent
+          ? _value.cashSpent
+          : cashSpent // ignore: cast_nullable_to_non_nullable
               as double,
     ) as $Val);
   }
@@ -80,7 +93,8 @@ abstract class _$$UberCashImplCopyWith<$Res>
       __$$UberCashImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({bool isActive, double balance});
+  $Res call(
+      {bool isActive, double balance, double cashAdded, double cashSpent});
 }
 
 /// @nodoc
@@ -98,6 +112,8 @@ class __$$UberCashImplCopyWithImpl<$Res>
   $Res call({
     Object? isActive = null,
     Object? balance = null,
+    Object? cashAdded = null,
+    Object? cashSpent = null,
   }) {
     return _then(_$UberCashImpl(
       isActive: null == isActive
@@ -108,6 +124,14 @@ class __$$UberCashImplCopyWithImpl<$Res>
           ? _value.balance
           : balance // ignore: cast_nullable_to_non_nullable
               as double,
+      cashAdded: null == cashAdded
+          ? _value.cashAdded
+          : cashAdded // ignore: cast_nullable_to_non_nullable
+              as double,
+      cashSpent: null == cashSpent
+          ? _value.cashSpent
+          : cashSpent // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
   }
 }
@@ -115,7 +139,11 @@ class __$$UberCashImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$UberCashImpl implements _UberCash {
-  const _$UberCashImpl({this.isActive = false, this.balance = 0.00});
+  const _$UberCashImpl(
+      {this.isActive = false,
+      this.balance = 0.00,
+      this.cashAdded = 0,
+      this.cashSpent = 0});
 
   factory _$UberCashImpl.fromJson(Map<String, dynamic> json) =>
       _$$UberCashImplFromJson(json);
@@ -126,10 +154,16 @@ class _$UberCashImpl implements _UberCash {
   @override
   @JsonKey()
   final double balance;
+  @override
+  @JsonKey()
+  final double cashAdded;
+  @override
+  @JsonKey()
+  final double cashSpent;
 
   @override
   String toString() {
-    return 'UberCash(isActive: $isActive, balance: $balance)';
+    return 'UberCash(isActive: $isActive, balance: $balance, cashAdded: $cashAdded, cashSpent: $cashSpent)';
   }
 
   @override
@@ -139,12 +173,17 @@ class _$UberCashImpl implements _UberCash {
             other is _$UberCashImpl &&
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
-            (identical(other.balance, balance) || other.balance == balance));
+            (identical(other.balance, balance) || other.balance == balance) &&
+            (identical(other.cashAdded, cashAdded) ||
+                other.cashAdded == cashAdded) &&
+            (identical(other.cashSpent, cashSpent) ||
+                other.cashSpent == cashSpent));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, isActive, balance);
+  int get hashCode =>
+      Object.hash(runtimeType, isActive, balance, cashAdded, cashSpent);
 
   /// Create a copy of UberCash
   /// with the given fields replaced by the non-null parameter values.
@@ -163,8 +202,11 @@ class _$UberCashImpl implements _UberCash {
 }
 
 abstract class _UberCash implements UberCash {
-  const factory _UberCash({final bool isActive, final double balance}) =
-      _$UberCashImpl;
+  const factory _UberCash(
+      {final bool isActive,
+      final double balance,
+      final double cashAdded,
+      final double cashSpent}) = _$UberCashImpl;
 
   factory _UberCash.fromJson(Map<String, dynamic> json) =
       _$UberCashImpl.fromJson;
@@ -173,6 +215,10 @@ abstract class _UberCash implements UberCash {
   bool get isActive;
   @override
   double get balance;
+  @override
+  double get cashAdded;
+  @override
+  double get cashSpent;
 
   /// Create a copy of UberCash
   /// with the given fields replaced by the non-null parameter values.

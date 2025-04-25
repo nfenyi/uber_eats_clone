@@ -7,7 +7,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
-import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
 import 'package:uber_eats_clone/models/store/store_model.dart';
@@ -53,14 +52,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     const AccountScreen()
   ];
 
-  bool _hasUberOne = false;
-
-  String _accountType = 'Personal';
-
   @override
   void initState() {
     super.initState();
-    _getAccountStatus();
+
     _currentScreen = ref.read(bottomNavIndexProvider);
     FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
       try {
@@ -234,13 +229,15 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               activeIcon: ValueListenableBuilder(
                   valueListenable: Hive.box(AppBoxes.appState)
                       .listenable(keys: [BoxKeys.userInfo]),
-                  builder: (context, box, child) {
-                    // if(box.get(BoxKeys.userInfo) == nul)
+                  builder: (context, appStateBox, child) {
+                    final userInfo = appStateBox.get(BoxKeys.userInfo);
+                    final accountType = userInfo['type'];
+                    final hasUberOne = userInfo['hasUberOne'];
 
                     return Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        _accountType == 'Personal'
+                        accountType == 'Personal'
                             ? const Icon(
                                 Icons.person,
                                 // color: AppColors.primary,
@@ -248,9 +245,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                               )
                             : const Iconify(
                                 Mdi.briefcase,
-                                size: 26,
+                                size: 24,
                               ),
-                        if (_hasUberOne == true)
+                        if (hasUberOne == true)
                           Container(
                             decoration: BoxDecoration(
                                 color: Colors.white,
@@ -267,20 +264,24 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               icon: ValueListenableBuilder(
                   valueListenable: Hive.box(AppBoxes.appState)
                       .listenable(keys: [BoxKeys.userInfo]),
-                  builder: (context, box, child) {
+                  builder: (context, appStateBox, child) {
+                    final userInfo = appStateBox.get(BoxKeys.userInfo);
+                    final accountType = userInfo['type'];
+                    final hasUberOne = userInfo['hasUberOne'];
                     return Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        _accountType == 'Personal'
+                        accountType == 'Personal'
                             ? const Icon(
                                 Icons.person,
                                 size: 27,
                               )
                             : const Iconify(
                                 Mdi.briefcase,
-                                size: 26,
+                                size: 24,
+                                color: AppColors.neutral500,
                               ),
-                        if (_hasUberOne == true)
+                        if (hasUberOne == true)
                           Container(
                             decoration: BoxDecoration(
                                 color: Colors.white,
@@ -301,14 +302,5 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _getAccountStatus() async {
-    Map<dynamic, dynamic>? userInfo =
-        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    userInfo ??= await AppFunctions.getOnlineUserInfo();
-
-    _hasUberOne = userInfo['hasUberOne'];
-    _accountType = userInfo['type'];
   }
 }

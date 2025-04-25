@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:uber_eats_clone/presentation/features/settings/screens/name_edit_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/uber_account/name_edit_screen.dart';
+import 'package:uber_eats_clone/presentation/features/settings/screens/phone_number/phone_number_update_screen.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../constants/app_sizes.dart';
@@ -11,12 +14,16 @@ import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
 import '../../webview/webview_screen.dart';
+import 'uber_account/email_edit_screen.dart';
 
-class UberAccountScreen extends StatelessWidget {
-  final bool _isVerified = true;
-
+class UberAccountScreen extends StatefulWidget {
   const UberAccountScreen({super.key});
 
+  @override
+  State<UberAccountScreen> createState() => _UberAccountScreenState();
+}
+
+class _UberAccountScreenState extends State<UberAccountScreen> {
   @override
   Widget build(BuildContext context) {
     final webViewcontroller = WebViewControllerPlus();
@@ -121,25 +128,51 @@ class UberAccountScreen extends StatelessWidget {
                             size: AppSizes.heading6,
                           ),
                         ),
+                        ValueListenableBuilder(
+                            valueListenable: Hive.box(AppBoxes.appState)
+                                .listenable(keys: [BoxKeys.userInfo]),
+                            builder: (context, appStateBox, child) {
+                              Map<dynamic, dynamic> userInfo =
+                                  appStateBox.get(BoxKeys.userInfo);
+                              final displayName = userInfo['displayName'];
+
+                              return ListTile(
+                                onTap: () {
+                                  navigatorKey.currentState!
+                                      .push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        const NameEditScreen(),
+                                  ));
+                                },
+                                title: const AppText(
+                                  text: 'Name',
+                                  size: AppSizes.bodySmall,
+                                  weight: FontWeight.w600,
+                                ),
+                                subtitle: AppText(text: displayName),
+                                trailing: const Icon(
+                                  Icons.keyboard_arrow_right,
+                                  color: AppColors.neutral500,
+                                ),
+                              );
+                            }),
                         ListTile(
-                          onTap: () {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => const NameEditScreen(),
+                          onTap: () async {
+                            final shouldSetState = await navigatorKey
+                                .currentState!
+                                .push(MaterialPageRoute(
+                              builder: (context) =>
+                                  const PhoneNumberUpdateScreen(),
                             ));
+                            if (shouldSetState == true) {
+                              setState(() {});
+                            }
                           },
-                          title: const AppText(
-                            text: 'Name',
-                            size: AppSizes.bodySmall,
-                            weight: FontWeight.w600,
+                          subtitle: AppText(
+                            text: FirebaseAuth
+                                    .instance.currentUser!.phoneNumber ??
+                                '',
                           ),
-                          subtitle: const AppText(text: 'Nana Fenyi'),
-                          trailing: const Icon(
-                            Icons.keyboard_arrow_right,
-                            color: AppColors.neutral500,
-                          ),
-                        ),
-                        ListTile(
-                          onTap: () {},
                           title: const AppText(
                             text: 'Phone number',
                             size: AppSizes.bodySmall,
@@ -151,7 +184,12 @@ class UberAccountScreen extends StatelessWidget {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
+                          onTap: () async {
+                            await navigatorKey.currentState!.push(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const EmailEditScreen()));
+                          },
                           title: const AppText(
                             text: 'Email',
                             size: AppSizes.bodySmall,
@@ -160,17 +198,19 @@ class UberAccountScreen extends StatelessWidget {
                           subtitle: Row(
                             children: [
                               const AppText(text: 'nanafenyim@gmail.com'),
-                              if (_isVerified)
-                                const Row(
-                                  children: [
-                                    Gap(5),
-                                    Icon(
-                                      Icons.check_circle,
-                                      size: 14,
-                                      color: Colors.green,
-                                    ),
-                                  ],
-                                )
+                              Row(
+                                children: [
+                                  const Gap(5),
+                                  Icon(
+                                    Icons.check_circle,
+                                    size: 14,
+                                    color: (FirebaseAuth.instance.currentUser!
+                                            .emailVerified)
+                                        ? Colors.green
+                                        : AppColors.neutral300,
+                                  ),
+                                ],
+                              )
                             ],
                           ),
                           trailing: const Icon(

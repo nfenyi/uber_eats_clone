@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -9,6 +11,7 @@ import 'package:iconify_flutter/icons/la.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/simple_line_icons.dart';
+import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/communication/communication_screen.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/voice_command_screen.dart';
@@ -27,6 +30,8 @@ import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
+import '../../../services/sign_in_view_model.dart';
+import '../../carts/screens/orders_screen.dart';
 import '../../settings/screens/settings_screen.dart';
 import 'family_and_teens/family_and_teens_screen.dart';
 
@@ -38,15 +43,13 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  String? _selectedProfile;
-  late final String displayName;
+  late final ValueNotifier<String?> _selectedProfile;
 
   @override
   void initState() {
     super.initState();
-    _selectedProfile = 'Personal';
     final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    displayName = userInfo['displayName'];
+    _selectedProfile = ValueNotifier<String?>(userInfo['type']);
   }
 
   @override
@@ -54,11 +57,19 @@ class _AccountScreenState extends State<AccountScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 120,
-        title: AppText(
-          text: displayName,
-          weight: FontWeight.w600,
-          size: AppSizes.heading3,
-        ),
+        title: ValueListenableBuilder(
+            valueListenable: Hive.box(AppBoxes.appState)
+                .listenable(keys: [BoxKeys.userInfo]),
+            builder: (context, appStateBox, child) {
+              final userInfo = appStateBox.get(BoxKeys.userInfo);
+              final String displayName = userInfo['displayName'];
+
+              return AppText(
+                text: displayName,
+                weight: FontWeight.w600,
+                size: AppSizes.heading3,
+              );
+            }),
         actions: [
           Padding(
             padding:
@@ -111,124 +122,163 @@ class _AccountScreenState extends State<AccountScreen> {
                     showModalBottomSheet(
                       context: context,
                       builder: (context) {
-                        return Container(
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10))),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Gap(15),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal:
-                                        AppSizes.horizontalPaddingSmall),
-                                child: Center(
-                                  child: AppText(
-                                    text: 'Switch profile',
-                                    size: AppSizes.heading6,
-                                    weight: FontWeight.w600,
+                        bool isSwitchingProfiles = false;
+                        return StatefulBuilder(builder: (context, setState) {
+                          return Container(
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10))),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Gap(15),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          AppSizes.horizontalPaddingSmall),
+                                  child: Center(
+                                    child: AppText(
+                                      text: 'Switch profile',
+                                      size: AppSizes.heading6,
+                                      weight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const Gap(5),
-                              const Divider(),
-                              RadioListTile.adaptive(
-                                title: const AppText(
-                                  text: 'Personal',
-                                  size: AppSizes.bodySmall,
-                                ),
-                                controlAffinity:
-                                    ListTileControlAffinity.trailing,
-                                secondary: const Icon(
-                                  Icons.person_outline,
-                                  size: 18,
-                                ),
-                                value: 'Personal',
-                                groupValue: _selectedProfile,
-                                onChanged: (value) {
-                                  navigatorKey.currentState!.pop();
+                                const Gap(5),
+                                isSwitchingProfiles
+                                    ? const LinearProgressIndicator(
+                                        color: Colors.blue,
+                                      )
+                                    : const Divider(),
+                                RadioListTile.adaptive(
+                                  title: const AppText(
+                                    text: 'Personal',
+                                    size: AppSizes.bodySmall,
+                                  ),
+                                  controlAffinity:
+                                      ListTileControlAffinity.trailing,
+                                  secondary: const Icon(
+                                    Icons.person_outline,
+                                    size: 18,
+                                  ),
+                                  value: 'Personal',
+                                  groupValue: _selectedProfile.value,
+                                  onChanged: (value) async {
+                                    setState(() {
+                                      isSwitchingProfiles = true;
+                                    });
+                                    await FirebaseFirestore.instance
+                                        .collection(FirestoreCollections.users)
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .update({
+                                      'type': value,
+                                    });
+                                    await AppFunctions.getOnlineUserInfo();
+                                    _selectedProfile.value = value;
 
-                                  setState(() {
-                                    _selectedProfile = value;
-                                  });
-
-                                  showInfoToast('Switched to $_selectedProfile',
-                                      icon: const Icon(
-                                        Icons.person,
-                                        size: 18,
-                                        color: Colors.white,
-                                      ),
-                                      context: context);
-                                },
-                              ),
-                              RadioListTile.adaptive(
-                                title: const AppText(
-                                  text: 'Business',
-                                  size: AppSizes.bodySmall,
+                                    showInfoToast(
+                                        'Switched to ${_selectedProfile.value}',
+                                        icon: const Icon(
+                                          Icons.person,
+                                          size: 18,
+                                          color: Colors.white,
+                                        ),
+                                        context: navigatorKey.currentContext);
+                                    //     setState(() {
+                                    //   isSwitchingProfiles = false;
+                                    // });
+                                    if (context.mounted) {
+                                      navigatorKey.currentState!.pop();
+                                    }
+                                  },
                                 ),
-                                controlAffinity:
-                                    ListTileControlAffinity.trailing,
-                                secondary: const Iconify(
-                                  Mdi.briefcase,
-                                  size: 18,
+                                RadioListTile.adaptive(
+                                  title: const AppText(
+                                    text: 'Business',
+                                    size: AppSizes.bodySmall,
+                                  ),
+                                  controlAffinity:
+                                      ListTileControlAffinity.trailing,
+                                  secondary: const Iconify(
+                                    Mdi.briefcase_outline,
+                                    size: 18,
+                                  ),
+                                  value: 'Business',
+                                  groupValue: _selectedProfile.value,
+                                  onChanged: (value) async {
+                                    setState(() {
+                                      isSwitchingProfiles = true;
+                                    });
+                                    await FirebaseFirestore.instance
+                                        .collection(FirestoreCollections.users)
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .update({
+                                      'type': value,
+                                    });
+                                    await AppFunctions.getOnlineUserInfo();
+                                    _selectedProfile.value = value;
+
+                                    showInfoToast(
+                                        'Switched to ${_selectedProfile.value}',
+                                        icon: const Icon(
+                                          Icons.person,
+                                          size: 18,
+                                          color: Colors.white,
+                                        ),
+                                        context: navigatorKey.currentContext);
+                                    //     setState(() {
+                                    //   isSwitchingProfiles = false;
+                                    // });
+                                    if (context.mounted) {
+                                      navigatorKey.currentState!.pop();
+                                    }
+                                  },
                                 ),
-                                value: 'Business',
-                                groupValue: _selectedProfile,
-                                onChanged: (value) {
-                                  navigatorKey.currentState!.pop();
-
-                                  setState(() {
-                                    _selectedProfile = value;
-                                  });
-
-                                  showInfoToast('Switched to $_selectedProfile',
-                                      icon: const Iconify(
-                                        Mdi.briefcase_outline,
-                                        size: 19,
-                                        color: Colors.white,
-                                      ),
-                                      context: context);
-                                },
-                              ),
-                            ],
-                          ),
-                        );
+                              ],
+                            ),
+                          );
+                        });
                       },
                     );
                   },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 20),
-                    decoration: BoxDecoration(
-                        color: AppColors.neutral100,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            AppText(
-                              text: '$_selectedProfile  ',
-                              size: AppSizes.bodySmall,
-                            ),
-                            _selectedProfile == 'Business'
-                                ? const Iconify(
-                                    Mdi.briefcase_outline,
-                                    size: 19,
-                                  )
-                                : const Icon(
-                                    Icons.person_outline,
-                                    size: 19,
+                  child: ValueListenableBuilder(
+                      valueListenable: _selectedProfile,
+                      builder: (context, value, child) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 20),
+                          decoration: BoxDecoration(
+                              color: AppColors.neutral100,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  AppText(
+                                    text: '$value  ',
+                                    size: AppSizes.bodySmall,
                                   ),
-                          ],
-                        ),
-                        const Icon(Icons.keyboard_arrow_down)
-                      ],
-                    ),
-                  ),
+                                  value == 'Business'
+                                      ? const Iconify(
+                                          Mdi.briefcase_outline,
+                                          size: 19,
+                                        )
+                                      : const Icon(
+                                          Icons.person_outline,
+                                          size: 19,
+                                        ),
+                                ],
+                              ),
+                              const Icon(Icons.keyboard_arrow_down)
+                            ],
+                          ),
+                        );
+                      }),
                 ),
                 const Gap(15),
                 GridView(
@@ -284,20 +334,28 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                       ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                          color: AppColors.neutral100,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            AssetNames.orders,
-                            width: 30,
-                            height: 30,
+                    InkWell(
+                      onTap: () =>
+                          navigatorKey.currentState!.push(MaterialPageRoute(
+                        builder: (context) => const OrdersScreen(),
+                      )),
+                      child: Ink(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: AppColors.neutral100,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                AssetNames.orders,
+                                width: 30,
+                                height: 30,
+                              ),
+                              const AppText(text: 'Orders'),
+                            ],
                           ),
-                          const AppText(text: 'Orders'),
-                        ],
+                        ),
                       ),
                     ),
                   ],
@@ -359,7 +417,6 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           ListTile(
             onTap: () {},
-            //TODO: may use this icon throughout
             leading: const Iconify(AntDesign.tag_outlined),
             title: const AppText(text: 'Promotions'),
           ),

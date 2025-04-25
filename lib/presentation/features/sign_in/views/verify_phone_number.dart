@@ -17,15 +17,18 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/name_screen.
 import '../../../../main.dart';
 import '../../../core/app_colors.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../main_screen/screens/main_screen_wrapper_screen.dart';
+import '../../main_screen/screens/main_screen_wrapper.dart';
 
 class VerifyPhoneNumberScreen extends ConsumerStatefulWidget {
   final String verificationId;
   final bool signedInWithEmail;
   final String phoneNumber;
+  final bool justUpdatingPhoneNumber;
+
   const VerifyPhoneNumberScreen(
       {super.key,
       this.signedInWithEmail = false,
+      this.justUpdatingPhoneNumber = false,
       required this.verificationId,
       required this.phoneNumber});
 
@@ -100,13 +103,14 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                   weight: FontWeight.w600,
                 ),
                 const Gap(10),
-                GestureDetector(
-                  onTap: () => navigatorKey.currentState!.pop(),
-                  child: const AppText(
-                    text: 'Changed your mobile number?',
-                    decoration: TextDecoration.underline,
+                if (!widget.justUpdatingPhoneNumber)
+                  GestureDetector(
+                    onTap: () => navigatorKey.currentState!.pop(),
+                    child: const AppText(
+                      text: 'Changed your mobile number?',
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
-                ),
                 const Gap(30),
                 Pinput(
                   length: 6,
@@ -120,6 +124,14 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                       final credential = PhoneAuthProvider.credential(
                           verificationId: widget.verificationId,
                           smsCode: value);
+                      if (widget.justUpdatingPhoneNumber) {
+                        await FirebaseAuth.instance.currentUser!
+                            .updatePhoneNumber(credential);
+                        if (context.mounted) {
+                          navigatorKey.currentState!.pop(true);
+                        }
+                        return;
+                      }
 
                       if (widget.signedInWithEmail) {
                         await FirebaseAuth.instance.currentUser!
@@ -165,7 +177,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                           await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const MainScreenWrapperScreen()), (r) {
+                                      const MainScreenWrapper()), (r) {
                             return false;
                           });
                         } else {
@@ -199,8 +211,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                                   .pushAndRemoveUntil(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const MainScreenWrapperScreen()),
-                                      (r) {
+                                              const MainScreenWrapper()), (r) {
                                 return false;
                               });
                             },

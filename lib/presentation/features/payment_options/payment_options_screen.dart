@@ -14,10 +14,11 @@ import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
-import '../../../core/app_colors.dart';
-import '../../../core/app_text.dart';
+import '../../core/app_colors.dart';
+import '../../core/app_text.dart';
 
-import '../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
+import '../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
+import 'add_voucher_screen.dart';
 
 class PaymentOptionsScreen extends ConsumerStatefulWidget {
   final bool showOnlyPaymentMethods;
@@ -155,46 +156,7 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
                     text: 'Payment Method',
                     color: AppColors.neutral500,
                   ),
-                  FutureBuilder<List<CreditCardDetails>>(
-                      future: AppFunctions.getCreditCards(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return ListView.builder(
-                            itemCount: snapshot.data!.length,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              final creditCard = snapshot.data![index];
-
-                              final types = detectCCType(creditCard.cardNumber);
-
-                              return ListTile(
-                                onTap: () async {
-                                  ref
-                                      .read(paymentOptionProvider.notifier)
-                                      .state = creditCard;
-                                  // await Hive.box(AppBoxes.appState).put(
-                                  //     BoxKeys.creditCardInUse,
-                                  //     HiveCreditCard(
-                                  //         obscuredNumber:
-                                  //             '••••${creditCard.cardNumber.substring(6)}',
-                                  //         cardType: types.first.type));
-                                  navigatorKey.currentState!.pop();
-                                },
-                                contentPadding: EdgeInsets.zero,
-                                leading: CreditCardLogo(types: types),
-                                title: AppText(
-                                  text:
-                                      '${AppFunctions.getCreditCardName(types)}••••${creditCard.cardNumber.substring(6)}',
-                                ),
-                              );
-                            },
-                          );
-                        } else if (snapshot.hasError) {
-                          return AppText(text: snapshot.error.toString());
-                        } else {
-                          return const SizedBox.shrink();
-                        }
-                      }),
+                  const PaymentMethodsBuilder(),
                   const Gap(10),
                   GestureDetector(
                     onTap: () async => await navigatorKey.currentState!
@@ -211,28 +173,30 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
                   ),
                   const Gap(30),
                   if (!widget.showOnlyPaymentMethods)
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppText(
+                        const AppText(
                           size: AppSizes.bodySmall,
                           text: 'Vouchers',
                           weight: FontWeight.w600,
                         ),
-                        Gap(10),
-                        //TODO: implement add voucher code ontap
+                        const Gap(10),
                         ListTile(
-                          // onTap: () =>
-                          //     navigatorKey.currentState!.push(MaterialPageRoute(
-                          //   builder: (context) => const PromoScreen(),
-                          // ))
-                          // ,
+                          onTap: () => showModalBottomSheet(
+                            context: context,
+                            useSafeArea: true,
+                            barrierColor: Colors.transparent,
+                            builder: (context) {
+                              return const AddVoucherScreen();
+                            },
+                          ),
                           contentPadding: EdgeInsets.zero,
-                          leading: Icon(
+                          leading: const Icon(
                             Icons.add,
                             weight: 4,
                           ),
-                          title: AppText(
+                          title: const AppText(
                             text: 'Add voucher code',
                             size: AppSizes.bodySmall,
                           ),
@@ -283,4 +247,45 @@ class Address {
   final String location;
 
   Address({required this.name, required this.location});
+}
+
+class PaymentMethodsBuilder extends ConsumerWidget {
+  const PaymentMethodsBuilder({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return FutureBuilder<List<CreditCardDetails>>(
+        future: AppFunctions.getCreditCards(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final creditCard = snapshot.data![index];
+
+                final types = detectCCType(creditCard.cardNumber);
+
+                return ListTile(
+                  onTap: () async {
+                    ref.read(paymentOptionProvider.notifier).state = creditCard;
+
+                    navigatorKey.currentState!.pop();
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  leading: CreditCardLogo(types: types),
+                  title: AppText(
+                    text:
+                        '${AppFunctions.getCreditCardName(types)}••••${creditCard.cardNumber.substring(6)}',
+                  ),
+                );
+              },
+            );
+          } else if (snapshot.hasError) {
+            return AppText(text: snapshot.error.toString());
+          } else {
+            return const SizedBox.shrink();
+          }
+        });
+  }
 }

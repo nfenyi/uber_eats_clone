@@ -31,7 +31,7 @@ import '../../../../../models/store/store_model.dart';
 import '../../../../../state/user_location_providers.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_text.dart';
-import '../../../address/screens/payment_options_screen.dart';
+import '../../../payment_options/payment_options_screen.dart';
 import '../../../address/screens/schedule_delivery_screen.dart';
 import '../../../promotion/promo_screen.dart';
 import '../../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';

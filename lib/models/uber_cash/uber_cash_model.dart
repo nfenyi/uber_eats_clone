@@ -8,6 +8,8 @@ class UberCash with _$UberCash {
   const factory UberCash({
     @Default(false) bool isActive,
     @Default(0.00) double balance,
+    @Default(0) double cashAdded,
+    @Default(0) double cashSpent,
   }) = _UberCash;
 
   factory UberCash.fromJson(Map<String, Object?> json) =>

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/models/uber_cash/uber_cash_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -133,7 +134,6 @@ class _RedeemGiftCardScreenState extends State<RedeemGiftCardScreen> {
                               final giftCardSnapshot =
                                   await _searchedGiftCardRef!.get();
 
-                              logger.d(giftCardSnapshot.exists);
                               if (!giftCardSnapshot.exists) {
                                 setState(() {
                                   _searchedGiftCard = null;
@@ -160,13 +160,25 @@ class _RedeemGiftCardScreenState extends State<RedeemGiftCardScreen> {
                               }
                             }
                       : () async {
+                          final usersDetails = await FirebaseFirestore.instance
+                              .collection(FirestoreCollections.users)
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .get();
+                          final UberCash oldDeviceUserDetails =
+                              UberCash.fromJson(
+                                  usersDetails.data()!['uberCash']);
+                          final newDeviceUserDetails =
+                              oldDeviceUserDetails.copyWith(
+                                  balance: oldDeviceUserDetails.balance +
+                                      _searchedGiftCard!.giftAmount,
+                                  cashAdded: oldDeviceUserDetails.cashAdded +
+                                      _searchedGiftCard!.giftAmount);
+
                           await FirebaseFirestore.instance
                               .collection(FirestoreCollections.users)
                               .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .update({
-                            'totalGiftCardAmount': FieldValue.increment(
-                                _searchedGiftCard!.giftAmount)
-                          });
+                              .update(
+                                  {'uberCash': newDeviceUserDetails.toJson()});
                           await FirebaseFirestore.instance
                               .collection(FirestoreCollections.giftCardsAnkasa)
                               .doc(_searchedGiftCard!.id)

@@ -8,7 +8,7 @@ import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../../main.dart';
 import '../../../../constants/weblinks.dart';
-import '../../../main_screen/screens/main_screen_wrapper_screen.dart';
+import '../../../main_screen/screens/main_screen_wrapper.dart';
 import '../../../webview/webview_screen.dart';
 
 class TermsForFamilyProfilesScreen extends StatefulWidget {
@@ -212,7 +212,7 @@ class _TermsForFamilyProfilesScreenState
                           await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const MainScreenWrapperScreen()), (r) {
+                                      const MainScreenWrapper()), (r) {
                             return false;
                           });
                         }

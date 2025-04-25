@@ -16,7 +16,7 @@ import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../../core/widgets.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../main_screen/screens/main_screen_wrapper_screen.dart';
+import '../../main_screen/screens/main_screen_wrapper.dart';
 import '../../webview/webview_screen.dart';
 
 class UberOneScreen extends StatelessWidget {
@@ -165,8 +165,9 @@ class UberOneScreen extends StatelessWidget {
       "onboarded": true,
       "redeemedPromos": <String>[],
       "usedPromos": <String>[],
+      "redeemedVouchers": <String>[],
+      "usedVouchers": <String>[],
       "groupOrders": <Object>[],
-      "totalGiftCardAmount": 0,
       'displayName': userCredential.displayName,
       'uberCash': const UberCash().toJson(),
     });
@@ -202,8 +203,8 @@ class UberOneScreen extends StatelessWidget {
     await Hive.box(AppBoxes.appState).delete(BoxKeys.addedEmailToPhoneNumber);
     await Hive.box(AppBoxes.appState).delete(BoxKeys.addressDetailsSaved);
     await navigatorKey.currentState!.pushAndRemoveUntil(
-        MaterialPageRoute(
-            builder: (context) => const MainScreenWrapperScreen()), (r) {
+        MaterialPageRoute(builder: (context) => const MainScreenWrapper()),
+        (r) {
       return false;
     });
   }

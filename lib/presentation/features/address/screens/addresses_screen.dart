@@ -20,7 +20,7 @@ import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/address/screens/payment_options_screen.dart';
+import 'package:uber_eats_clone/presentation/features/payment_options/payment_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/schedule_delivery_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/states/onboarding_state_model.dart';
 import 'package:uber_eats_clone/presentation/services/google_location_model.dart';

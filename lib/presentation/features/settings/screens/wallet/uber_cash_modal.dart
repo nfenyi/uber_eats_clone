@@ -2,10 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/bi.dart';
 import 'package:iconify_flutter/icons/material_symbols.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
+import 'package:uber_eats_clone/models/uber_cash/uber_cash_model.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/wallet/add_funds_screen.dart';
@@ -38,12 +40,20 @@ class _UberCashModalState extends State<UberCashModal> {
               child: const Icon(Icons.close)),
         ),
         // const Gap(10),
-        const Center(
-          child: AppText(
-            text: '\$0.00',
-            weight: FontWeight.w600,
-            size: AppSizes.heading3,
-          ),
+        Center(
+          child: ValueListenableBuilder(
+              valueListenable: Hive.box(AppBoxes.appState)
+                  .listenable(keys: [BoxKeys.userInfo]),
+              builder: (context, appStateBox, child) {
+                final userInfo = appStateBox.get(BoxKeys.userInfo);
+                final double cashAmount = userInfo['uberCash']['balance'];
+
+                return AppText(
+                  text: '\$${cashAmount.toStringAsFixed(2)}',
+                  weight: FontWeight.w600,
+                  size: AppSizes.heading3,
+                );
+              }),
         ),
         const Gap(5),
         Padding(
@@ -77,7 +87,6 @@ class _UberCashModalState extends State<UberCashModal> {
                         Gap(10),
                         AppText(
                           text: 'Add funds',
-                          size: AppSizes.bodySmall,
                           weight: FontWeight.bold,
                         )
                       ],
@@ -108,7 +117,6 @@ class _UberCashModalState extends State<UberCashModal> {
                       AppText(
                         text: 'Auto refill',
                         weight: FontWeight.bold,
-                        size: AppSizes.bodySmall,
                       )
                     ],
                   ),
@@ -131,7 +139,6 @@ class _UberCashModalState extends State<UberCashModal> {
                       Gap(10),
                       AppText(
                         text: 'Deals & rewards',
-                        weight: FontWeight.bold,
                         size: AppSizes.bodySmall,
                       ),
                     ],
@@ -156,29 +163,40 @@ class _UberCashModalState extends State<UberCashModal> {
           ),
         ),
         const Gap(10),
-        const ListTile(
-          leading: Iconify(Mdi.arrow_bottom_right),
-          title: AppText(
-            text: 'Uber Cash added',
-            size: AppSizes.bodySmall,
-          ),
-          trailing: AppText(
-            text: '\$0.00',
-            color: Colors.green,
-            size: AppSizes.bodySmall,
-          ),
-        ),
-        const ListTile(
-          leading: Iconify(Mdi.arrow_bottom_right),
-          title: AppText(
-            text: 'Uber Cash spent',
-            size: AppSizes.bodySmall,
-          ),
-          trailing: AppText(
-            text: '\$0.00',
-            size: AppSizes.bodySmall,
-          ),
-        ),
+        ValueListenableBuilder(
+            valueListenable: Hive.box(AppBoxes.appState)
+                .listenable(keys: [BoxKeys.userInfo]),
+            builder: (context, appStateBox, child) {
+              final userInfo = appStateBox.get(BoxKeys.userInfo);
+              final UberCash uberCash = UberCash.fromJson(userInfo['uberCash']);
+              return Column(
+                children: [
+                  ListTile(
+                    leading: const Iconify(Mdi.arrow_bottom_right),
+                    title: const AppText(
+                      text: 'Uber Cash added',
+                      size: AppSizes.bodySmall,
+                    ),
+                    trailing: AppText(
+                      text: '\$${uberCash.cashAdded.toStringAsFixed(2)}',
+                      color: Colors.green,
+                      size: AppSizes.bodySmall,
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Iconify(Mdi.arrow_top_right),
+                    title: const AppText(
+                      text: 'Uber Cash spent',
+                      size: AppSizes.bodySmall,
+                    ),
+                    trailing: AppText(
+                      text: '\$${uberCash.cashSpent.toStringAsFixed(2)}',
+                      size: AppSizes.bodySmall,
+                    ),
+                  ),
+                ],
+              );
+            }),
         const Divider(
           thickness: 4,
         ),
@@ -261,6 +279,7 @@ class _UberCashModalState extends State<UberCashModal> {
                               ],
                             ),
                             AppButton(
+                              deactivateExpansion: true,
                               buttonColor: Colors.white,
                               isSecondary: true,
                               text: 'Enroll',
@@ -335,6 +354,7 @@ class _UberCashModalState extends State<UberCashModal> {
                               ],
                             ),
                             AppButton(
+                              deactivateExpansion: true,
                               buttonColor: Colors.white,
                               isSecondary: true,
                               text: 'Enroll',

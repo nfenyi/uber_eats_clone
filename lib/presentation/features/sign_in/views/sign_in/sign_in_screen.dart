@@ -25,7 +25,7 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/whats_your_e
 
 import '../../../../core/app_colors.dart';
 import '../../../../services/sign_in_view_model.dart';
-import '../../../main_screen/screens/main_screen_wrapper_screen.dart';
+import '../../../main_screen/screens/main_screen_wrapper.dart';
 import '../email_address_screen.dart';
 import '../email_sent_screen.dart';
 import '../phone_number_screen.dart';
@@ -46,6 +46,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
 
   bool _isLoading = false;
+
+  bool _isRetrievingDeviceInfo = false;
 
   @override
   void initState() {
@@ -132,6 +134,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             borderRadius: BorderRadius.circular(5.0),
                           ),
                         ),
+                        onMenuStateChange: (isOpen) {
+                          if (isOpen) {
+                            // logger.d(isOpen);
+                            showInfoToast('Loading countries...',
+                                context: context);
+                          }
+                        },
                         // isExpanded: true,
                         selectedItemBuilder: (context) => _countries
                             .map((e) => Padding(
@@ -246,7 +255,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const MainScreenWrapperScreen()), (r) {
+                                      const MainScreenWrapper()), (r) {
                             return false;
                           });
                         } else {
@@ -348,7 +357,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const MainScreenWrapperScreen()), (r) {
+                                      const MainScreenWrapper()), (r) {
                             return false;
                           });
                         } else {
@@ -484,6 +493,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               ),
               const Gap(10),
               AppButton(
+                isLoading: _isRetrievingDeviceInfo,
                 buttonColor: Colors.transparent,
                 iconFirst: true,
                 icon: const Icon(Icons.search),
@@ -491,12 +501,18 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 text: 'Find my account',
                 //Not tested
                 callback: () async {
+                  setState(() {
+                    _isRetrievingDeviceInfo = true;
+                  });
                   String udid = await FlutterUdid.consistentUdid;
-                  logger.d(udid);
+
                   final info = await FirebaseFirestore.instance
                       .collection(FirestoreCollections.devices)
                       .doc(udid)
                       .get();
+                  setState(() {
+                    _isRetrievingDeviceInfo = false;
+                  });
                   if (info.exists && info.data() != null) {
                     if (context.mounted) {
                       await showModalBottomSheet(
@@ -550,7 +566,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                                     .pushAndRemoveUntil(
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                const MainScreenWrapperScreen()),
+                                                                const MainScreenWrapper()),
                                                         (r) {
                                                   return false;
                                                 });

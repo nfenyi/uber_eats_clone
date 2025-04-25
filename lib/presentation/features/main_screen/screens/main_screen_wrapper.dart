@@ -12,16 +12,15 @@ import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 import 'main_screen.dart';
 
-class MainScreenWrapperScreen extends ConsumerStatefulWidget {
-  const MainScreenWrapperScreen({super.key});
+class MainScreenWrapper extends ConsumerStatefulWidget {
+  const MainScreenWrapper({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _MainScreenWrapperScreenState();
 }
 
-class _MainScreenWrapperScreenState
-    extends ConsumerState<MainScreenWrapperScreen> {
+class _MainScreenWrapperScreenState extends ConsumerState<MainScreenWrapper> {
   Future<bool> _fetchStoredUserLocation() async {
     Map userInfo = await AppFunctions.getOnlineUserInfo();
     ref.read(selectedLocationDescription.notifier).state =
@@ -58,10 +57,10 @@ class _MainScreenWrapperScreenState
                         horizontal: AppSizes.horizontalPaddingSmall),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         AppText(
                           text: snapshot.error.toString(),
-                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
