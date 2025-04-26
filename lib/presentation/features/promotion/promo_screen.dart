@@ -570,7 +570,7 @@ class BannerCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     Map<dynamic, dynamic> userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    bool hasUberOne = userInfo['hasUberOne'] ?? false;
+    bool hasUberOne = userInfo['uberOneStatus']['hasUberOne'] ?? false;
     return SizedBox(
       height: 142,
       child: CarouselSlider(

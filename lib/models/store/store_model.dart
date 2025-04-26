@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
-import '../offer/offer_model.dart';
-
 part 'store_model.freezed.dart';
 part 'store_model.g.dart';
 
@@ -19,7 +17,7 @@ class Store with _$Store {
     required String priceCategory,
     int? groupSize,
     required String type,
-    List<Offer>? offers,
+    List<Object>? offers,
     List<Aisle>? aisles,
     required String name,
     required String logo,

@@ -579,13 +579,13 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                                   null &&
                                                               store.offers!
                                                                   .isNotEmpty)
-                                                            AppText(
-                                                                color: Colors
-                                                                    .green,
-                                                                size: AppSizes
-                                                                    .bodySmallest,
-                                                                text:
-                                                                    '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                            StoreOffersText(
+                                                              store,
+                                                              color:
+                                                                  Colors.green,
+                                                              size: AppSizes
+                                                                  .bodySmallest,
+                                                            )
                                                         ],
                                                       )
                                                     ],
@@ -712,12 +712,10 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                     CrossAxisAlignment.center,
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  AppText(
-                                                      color: Colors.white,
-                                                      size:
-                                                          AppSizes.bodySmallest,
-                                                      text:
-                                                          '${groceryScreenStore.offers?.length == 1 ? groceryScreenStore.offers?.first.title : '${groceryScreenStore.offers?.length} Offers available'}'),
+                                                  StoreOffersText(
+                                                    groceryScreenStore,
+                                                    size: AppSizes.bodySmallest,
+                                                  )
                                                 ],
                                               ),
                                             )),
@@ -894,12 +892,10 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                     CrossAxisAlignment.center,
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  AppText(
-                                                      color: Colors.white,
-                                                      size:
-                                                          AppSizes.bodySmallest,
-                                                      text:
-                                                          '${groceryScreenStore.offers?.length == 1 ? groceryScreenStore.offers?.first.title : '${groceryScreenStore.offers?.length} Offers available'}'),
+                                                  StoreOffersText(
+                                                    groceryScreenStore,
+                                                    size: AppSizes.bodySmallest,
+                                                  )
                                                 ],
                                               ),
                                             )),

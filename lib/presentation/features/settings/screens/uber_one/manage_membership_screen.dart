@@ -6,6 +6,7 @@ import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/
 
 import '../../../../../app_functions.dart';
 import '../../../../../models/payment_method_model.dart';
+import '../../../../../models/uber_one_status/uber_one_status_model.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../constants/asset_names.dart';
 import '../../../../core/app_colors.dart';
@@ -14,7 +15,8 @@ import 'switch_to_annual_plan_screen.dart';
 import 'uber_one_account_screen.dart';
 
 class ManageMembershipScreen extends StatefulWidget {
-  const ManageMembershipScreen({super.key});
+  final UberOneStatus uberOneStatus;
+  const ManageMembershipScreen(this.uberOneStatus, {super.key});
 
   @override
   State<ManageMembershipScreen> createState() => _ManageMembershipScreenState();

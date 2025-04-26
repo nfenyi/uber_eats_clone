@@ -103,7 +103,10 @@ class _AdvertScreenState extends State<AdvertScreen> {
                       ),
                       if (widget.store.offers != null &&
                           widget.store.offers!.isNotEmpty)
-                        OfferText(store: widget.store)
+                        StoreOffersText(
+                          widget.store,
+                          color: Colors.green,
+                        )
                     ],
                   )),
               const Divider(
@@ -150,23 +153,6 @@ class _AdvertScreenState extends State<AdvertScreen> {
               )),
             ],
           )),
-    );
-  }
-}
-
-class OfferText extends StatelessWidget {
-  const OfferText(
-      {super.key, required this.store, this.textColor = Colors.green});
-
-  final Store store;
-  final Color? textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppText(
-      text:
-          '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}',
-      color: Colors.green,
     );
   }
 }

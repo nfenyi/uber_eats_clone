@@ -278,18 +278,21 @@ class _UberCashModalState extends State<UberCashModal> {
                                 ),
                               ],
                             ),
-                            AppButton(
-                              deactivateExpansion: true,
-                              buttonColor: Colors.white,
-                              isSecondary: true,
-                              text: 'Enroll',
-                              callback: () {},
-                              width: 90,
-                              borderRadius: 30,
-                              height: 40,
-                              icon: const Icon(
-                                Icons.arrow_forward,
-                                size: 15,
+                            SizedBox(
+                              width: 100,
+                              child: AppButton(
+                                deactivateExpansion: true,
+                                buttonColor: Colors.white,
+                                isSecondary: true,
+                                text: 'Enroll',
+                                callback: () {},
+                                // width: 30,
+                                borderRadius: 30,
+                                height: 40,
+                                icon: const Icon(
+                                  Icons.arrow_forward,
+                                  size: 15,
+                                ),
                               ),
                             )
                           ],
@@ -353,18 +356,21 @@ class _UberCashModalState extends State<UberCashModal> {
                                 ),
                               ],
                             ),
-                            AppButton(
-                              deactivateExpansion: true,
-                              buttonColor: Colors.white,
-                              isSecondary: true,
-                              text: 'Enroll',
-                              callback: () {},
-                              width: 90,
-                              borderRadius: 30,
-                              height: 40,
-                              icon: const Icon(
-                                Icons.arrow_forward,
-                                size: 15,
+                            SizedBox(
+                              width: 100,
+                              child: AppButton(
+                                deactivateExpansion: true,
+                                buttonColor: Colors.white,
+                                isSecondary: true,
+                                text: 'Enroll',
+                                callback: () {},
+                                // width: 90,
+                                borderRadius: 30,
+                                height: 40,
+                                icon: const Icon(
+                                  Icons.arrow_forward,
+                                  size: 15,
+                                ),
                               ),
                             )
                           ],

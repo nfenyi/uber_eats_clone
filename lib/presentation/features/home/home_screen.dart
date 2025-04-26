@@ -2143,7 +2143,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                       crossAxisAlignment: CrossAxisAlignment.center,
                                                                                       mainAxisSize: MainAxisSize.min,
                                                                                       children: [
-                                                                                        AppText(color: Colors.white, size: AppSizes.bodySmallest, text: '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                                                        StoreOffersText(store)
                                                                                       ],
                                                                                     ),
                                                                                   ))
@@ -2376,13 +2376,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                         MainAxisSize
                                                                             .min,
                                                                     children: [
-                                                                      AppText(
-                                                                          color: Colors
-                                                                              .white,
-                                                                          size: AppSizes
-                                                                              .bodySmallest,
-                                                                          text:
-                                                                              '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                                      StoreOffersText(
+                                                                          store)
                                                                     ],
                                                                   ),
                                                                 )),
@@ -2682,10 +2677,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                         mainAxisSize:
                                                                             MainAxisSize.min,
                                                                         children: [
-                                                                          AppText(
-                                                                              color: Colors.white,
-                                                                              size: AppSizes.bodySmallest,
-                                                                              text: '${nationalBrand.offers?.length == 1 ? nationalBrand.offers?.first.title : '${nationalBrand.offers?.length} Offers available'}'),
+                                                                          StoreOffersText(
+                                                                              nationalBrand)
                                                                         ],
                                                                       ),
                                                                     ))
@@ -2912,10 +2905,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                         mainAxisSize:
                                                                             MainAxisSize.min,
                                                                         children: [
-                                                                          AppText(
-                                                                              color: Colors.white,
-                                                                              size: AppSizes.bodySmallest,
-                                                                              text: '${popularStore.offers?.length == 1 ? popularStore.offers?.first.title : '${popularStore.offers?.length} Offers available'}'),
+                                                                          StoreOffersText(
+                                                                              popularStore)
                                                                         ],
                                                                       ),
                                                                     ))
@@ -3256,13 +3247,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                       MainAxisSize
                                                                           .min,
                                                                   children: [
-                                                                    AppText(
-                                                                        color: Colors
-                                                                            .white,
-                                                                        size: AppSizes
-                                                                            .bodySmallest,
-                                                                        text:
-                                                                            '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                                    StoreOffersText(
+                                                                        store)
                                                                   ],
                                                                 ),
                                                               ))
@@ -4499,10 +4485,11 @@ class SearchResultDisplay extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const AppText(
-                          text: 'Offers available',
-                          color: AppColors.primary2,
-                        )
+                        if (store.offers != null && store.offers!.isNotEmpty)
+                          const AppText(
+                            text: 'Offers available',
+                            color: AppColors.primary2,
+                          )
                       ],
                     ),
                   ),
@@ -4628,25 +4615,39 @@ class SearchResultDisplay extends StatelessWidget {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           Builder(builder: (context) {
-                                            late Offer matchingOffer;
-                                            return (offers.any(
-                                              (element) {
-                                                matchingOffer = element;
-                                                final castedProduct =
-                                                    element.product
-                                                        as DocumentReference;
-                                                return castedProduct.path
-                                                        .contains(product.id) &&
-                                                    element.store.id ==
-                                                        store.id;
-                                              },
-                                            ))
-                                                ? AppText(
-                                                    text: matchingOffer.title,
-                                                    color:
-                                                        Colors.green.shade900,
-                                                    size: AppSizes.bodySmallest,
-                                                  )
+                                            return product.offer != null
+                                                ? FutureBuilder(
+                                                    future: AppFunctions
+                                                        .loadOfferReference(product
+                                                                .offer
+                                                            as DocumentReference),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot.hasData) {
+                                                        final offer =
+                                                            snapshot.data!;
+                                                        return AppText(
+                                                          text: offer.title,
+                                                          color: Colors
+                                                              .green.shade900,
+                                                          size: AppSizes
+                                                              .bodySmallest,
+                                                        );
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return AppText(
+                                                          text: snapshot.error
+                                                              .toString(),
+                                                        );
+                                                      } else {
+                                                        return const Skeletonizer(
+                                                          enabled: true,
+                                                          child: AppText(
+                                                            text: 'soajlaskls',
+                                                          ),
+                                                        );
+                                                      }
+                                                    })
                                                 : const SizedBox.shrink();
                                           }),
                                         ],
@@ -4965,5 +4966,41 @@ class MainScreenTopic extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class StoreOffersText extends StatelessWidget {
+  final Store store;
+  final Color color;
+  final double? size;
+  const StoreOffersText(this.store,
+      {super.key, this.color = Colors.white, this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return store.offers?.length == 1
+        ? FutureBuilder(
+            future: AppFunctions.loadOfferReference(
+                store.offers!.first as DocumentReference),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final offer = snapshot.data!;
+                return AppText(
+                    color: color,
+                    size: AppSizes.bodySmallest,
+                    text: offer.title);
+              } else if (snapshot.hasError) {
+                return AppText(
+                  color: color,
+                  text: snapshot.error.toString(),
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            })
+        : AppText(
+            size: size,
+            color: color,
+            text: '${store.offers?.length} Offers available');
   }
 }

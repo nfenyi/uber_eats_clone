@@ -232,7 +232,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   builder: (context, appStateBox, child) {
                     final userInfo = appStateBox.get(BoxKeys.userInfo);
                     final accountType = userInfo['type'];
-                    final hasUberOne = userInfo['hasUberOne'];
+                    final hasUberOne = userInfo['uberOneStatus']['hasUberOne'];
 
                     return Stack(
                       alignment: Alignment.bottomRight,
@@ -267,7 +267,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   builder: (context, appStateBox, child) {
                     final userInfo = appStateBox.get(BoxKeys.userInfo);
                     final accountType = userInfo['type'];
-                    final hasUberOne = userInfo['hasUberOne'];
+                    final hasUberOne = userInfo['uberOneStatus']['hasUberOne'];
                     return Stack(
                       alignment: Alignment.bottomRight,
                       children: [

@@ -491,13 +491,13 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
                                                                   null &&
                                                               store.offers!
                                                                   .isNotEmpty)
-                                                            AppText(
-                                                                color: Colors
-                                                                    .green,
-                                                                size: AppSizes
-                                                                    .bodySmallest,
-                                                                text:
-                                                                    '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                                            StoreOffersText(
+                                                              store,
+                                                              size: AppSizes
+                                                                  .bodySmallest,
+                                                              color:
+                                                                  Colors.green,
+                                                            )
                                                         ],
                                                       )
                                                     ],

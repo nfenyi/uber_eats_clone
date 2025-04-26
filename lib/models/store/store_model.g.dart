@@ -21,9 +21,8 @@ _$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
       priceCategory: json['priceCategory'] as String,
       groupSize: (json['groupSize'] as num?)?.toInt(),
       type: json['type'] as String,
-      offers: (json['offers'] as List<dynamic>?)
-          ?.map((e) => Offer.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      offers:
+          (json['offers'] as List<dynamic>?)?.map((e) => e as Object).toList(),
       aisles: (json['aisles'] as List<dynamic>?)
           ?.map((e) => Aisle.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -54,7 +53,7 @@ Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
       'priceCategory': instance.priceCategory,
       'groupSize': instance.groupSize,
       'type': instance.type,
-      'offers': instance.offers?.map((e) => e.toJson()).toList(),
+      'offers': instance.offers,
       'aisles': instance.aisles?.map((e) => e.toJson()).toList(),
       'name': instance.name,
       'logo': instance.logo,

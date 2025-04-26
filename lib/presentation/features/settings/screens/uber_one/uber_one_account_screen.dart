@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:credit_card_type_detector/credit_card_type_detector.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/constants/other_constants.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
@@ -12,9 +17,14 @@ import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../../app_functions.dart';
+import '../../../../../models/uber_one_status/uber_one_status_model.dart';
+import '../../../../../state/delivery_schedule_provider.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../constants/weblinks.dart';
 import '../../../../core/widgets.dart';
+import '../../../../services/sign_in_view_model.dart';
+import '../../../payment_options/payment_options_screen.dart';
+import '../../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
 import '../../../webview/webview_screen.dart';
 
 class UberOneAccountScreen extends StatefulWidget {
@@ -163,227 +173,10 @@ class _UberOneAccountScreenState extends State<UberOneAccountScreen> {
             text: 'Join Uber One',
             callback: () {
               showModalBottomSheet(
-                isScrollControlled: true,
                 context: context,
-                builder: (context) {
-                  final billings = <Plan>[
-                    Plan(period: 'Monthly', bill: 9.99),
-                    Plan(period: 'Annual', bill: 8)
-                  ];
-
-                  Plan? selectedBilling = billings.first;
-                  final webViewcontroller = WebViewControllerPlus();
-                  return StatefulBuilder(builder: (context, setState) {
-                    return Container(
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10))),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Gap(15),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            child: Center(
-                              child: AppText(
-                                text: 'Join Uber One',
-                                size: AppSizes.heading6,
-                                weight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          const Gap(5),
-                          const Divider(),
-                          const Gap(5),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: AppSizes.horizontalPaddingSmall),
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      top: 5, left: 5, bottom: 5),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color:
-                                              selectedBilling == billings.first
-                                                  ? Colors.black
-                                                  : AppColors.neutral300)),
-                                  child: RadioListTile.adaptive(
-                                    subtitle: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const AppText(
-                                          text: '4 weeks free',
-                                          color: Colors.brown,
-                                        ),
-                                        Row(
-                                          children: [
-                                            AppText(
-                                                text:
-                                                    '\$${billings.first.bill.toStringAsFixed(2)}/mo'),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    title: AppText(
-                                      text: billings.first.period,
-                                      size: AppSizes.bodySmall,
-                                    ),
-                                    controlAffinity:
-                                        ListTileControlAffinity.trailing,
-                                    value: billings.first,
-                                    groupValue: selectedBilling,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        selectedBilling = value;
-                                      });
-
-                                      // showInfoToast('Switched to $_selectedBilling',
-                                      //     icon: const Icon(
-                                      //       Icons.person,
-                                      //       size: 18,
-                                      //       color: Colors.white,
-                                      //     ),
-                                      //     context: context);
-                                    },
-                                  ),
-                                ),
-                                const Gap(10),
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      top: 5, left: 5, bottom: 15),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color:
-                                              selectedBilling == billings.last
-                                                  ? Colors.black
-                                                  : AppColors.neutral300)),
-                                  child: Column(
-                                    children: [
-                                      RadioListTile.adaptive(
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const AppText(
-                                              text: '4 weeks free',
-                                              color: Colors.brown,
-                                            ),
-                                            Row(
-                                              children: [
-                                                AppText(
-                                                    text:
-                                                        '\$${billings.last.bill.toStringAsFixed(2)}/mo'),
-                                                AppText(
-                                                    text:
-                                                        'billed at \$${(billings.last.bill * 12).toStringAsFixed(2)}/yr')
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        title: AppText(
-                                          text: billings.last.period,
-                                          size: AppSizes.bodySmall,
-                                        ),
-                                        controlAffinity:
-                                            ListTileControlAffinity.trailing,
-                                        value: billings.last,
-                                        groupValue: selectedBilling,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedBilling = value;
-                                          });
-
-                                          // showInfoToast('Switched to $_selectedBilling',
-                                          //     icon: const Icon(
-                                          //       Icons.person,
-                                          //       size: 18,
-                                          //       color: Colors.white,
-                                          //     ),
-                                          //     context: context);
-                                        },
-                                      ),
-                                      ListTile(
-                                        leading:
-                                            Image.asset(AssetNames.uberOneTag),
-                                        title: const AppText(
-                                          text:
-                                              'Save an extra 20% each year compared to a monthly plan',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Gap(10),
-                                AppText(
-                                    text:
-                                        'Billing starts ${AppFunctions.formatDate(DateTime.now().add(const Duration(days: 28)).toString(), format: 'M j, Y')} for \$${selectedBilling?.bill.toStringAsFixed(2)}/mo. Cancel without fees or penalties.'),
-                                RichText(
-                                  text: TextSpan(
-                                      text:
-                                          "By joining Uber One, you authorize Uber to charge \$${selectedBilling?.bill.toStringAsFixed(2)} on any payment method on your account, and monthly thereafter, based on the terms, until you cancel. To avoid charges cancel up to 48 hours before ${AppFunctions.formatDate(DateTime.now().add(const Duration(days: 28)).toString(), format: 'M j, Y')} in the app. ",
-                                      style: const TextStyle(
-                                        fontSize: AppSizes.bodySmallest,
-                                        color: AppColors.neutral500,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: 'View terms and conditions',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              decoration:
-                                                  TextDecoration.underline),
-                                          recognizer: TapGestureRecognizer()
-                                            ..onTap = () {
-                                              navigatorKey.currentState!
-                                                  .push(MaterialPageRoute(
-                                                builder: (context) =>
-                                                    WebViewScreen(
-                                                  controller: webViewcontroller,
-                                                  link: Weblinks.uberOneTerms,
-                                                ),
-                                              ));
-                                            },
-                                        ),
-                                      ]),
-                                ),
-                                ListTile(
-                                  leading: Image.asset(
-                                    AssetNames.masterCardLogo,
-                                    width: 10,
-                                  ),
-                                  title: const AppText(text: '••••4320'),
-                                  trailing: AppButton2(
-                                      text: 'Switch', callback: () {}),
-                                ),
-                                const Gap(10),
-                                AppButton(
-                                  text: 'Try for free',
-                                  callback: () {
-                                    navigatorKey.currentState!.pop();
-                                    navigatorKey.currentState!
-                                        .pushReplacement(MaterialPageRoute(
-                                      builder: (context) =>
-                                          const UberOneAllSetScreen(),
-                                    ));
-                                  },
-                                ),
-                                const Gap(20),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  });
-                },
+                useSafeArea: true,
+                isScrollControlled: true,
+                builder: (context) => const JoinUberOneModal(),
               );
             })
       ],
@@ -397,4 +190,325 @@ class Plan {
   // final DateTime?
 
   Plan({required this.period, required this.bill});
+}
+
+class JoinUberOneModal extends StatefulWidget {
+  const JoinUberOneModal({super.key});
+
+  @override
+  State<JoinUberOneModal> createState() => _JoinUberOneModalState();
+}
+
+class _JoinUberOneModalState extends State<JoinUberOneModal> {
+  final billings = <Plan>[
+    Plan(period: 'Monthly', bill: 9.99),
+    Plan(period: 'Annual', bill: 8)
+  ];
+
+  final webViewcontroller = WebViewControllerPlus();
+  late Plan? selectedBilling;
+  bool _isLoading = false;
+
+  CreditCardDetails? _selectedPaymentMethod;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedBilling = billings.first;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10), topRight: Radius.circular(10))),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Gap(15),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.horizontalPaddingSmall),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox.shrink(),
+                const AppText(
+                  text: 'Join Uber One',
+                  size: AppSizes.heading6,
+                  weight: FontWeight.w600,
+                ),
+                GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.close))
+              ],
+            ),
+          ),
+          const Gap(5),
+          const Divider(),
+          const Gap(5),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.horizontalPaddingSmall),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(top: 5, left: 5, bottom: 5),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color:
+                              selectedBilling?.period == billings.first.period
+                                  ? Colors.black
+                                  : AppColors.neutral300)),
+                  child: RadioListTile.adaptive(
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const AppText(
+                          text: '4 weeks free',
+                          color: Colors.brown,
+                        ),
+                        Row(
+                          children: [
+                            AppText(
+                                size: AppSizes.bodySmallest,
+                                color: AppColors.neutral500,
+                                text:
+                                    '\$${billings.first.bill.toStringAsFixed(2)}/mo'),
+                          ],
+                        ),
+                      ],
+                    ),
+                    title: AppText(
+                      text: billings.first.period,
+                      size: AppSizes.bodySmall,
+                    ),
+                    controlAffinity: ListTileControlAffinity.trailing,
+                    value: billings.first.period,
+                    groupValue: selectedBilling?.period,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedBilling = billings.firstWhere(
+                          (element) => element.period == value,
+                        );
+                      });
+                    },
+                  ),
+                ),
+                const Gap(10),
+                Container(
+                  padding: const EdgeInsets.only(top: 5, left: 5, bottom: 15),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color: selectedBilling?.period == billings.last.period
+                              ? Colors.black
+                              : AppColors.neutral300)),
+                  child: Column(
+                    children: [
+                      RadioListTile.adaptive(
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const AppText(
+                              text: '4 weeks free',
+                              color: Colors.brown,
+                            ),
+                            Row(
+                              children: [
+                                AppText(
+                                    size: AppSizes.bodySmallest,
+                                    color: AppColors.neutral500,
+                                    text:
+                                        '\$${billings.last.bill.toStringAsFixed(2)}/mo'),
+                                AppText(
+                                    size: AppSizes.bodySmallest,
+                                    color: AppColors.neutral500,
+                                    text:
+                                        ' (billed at \$${(billings.last.bill * 12).toStringAsFixed(2)}/yr)')
+                              ],
+                            ),
+                          ],
+                        ),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 3, vertical: 2),
+                              decoration: BoxDecoration(
+                                  color: AppColors.uberOneGold,
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: const AppText(
+                                text: 'Best value',
+                                color: Colors.white,
+                                size: AppSizes.bodyTiny,
+                              ),
+                            ),
+                            AppText(
+                              text: billings.last.period,
+                              size: AppSizes.bodySmall,
+                            ),
+                          ],
+                        ),
+                        controlAffinity: ListTileControlAffinity.trailing,
+                        value: billings.last.period,
+                        groupValue: selectedBilling?.period,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedBilling = billings.firstWhere(
+                              (element) => element.period == value,
+                            );
+                          });
+
+                          // showInfoToast('Switched to $_selectedBilling',
+                          //     icon: const Icon(
+                          //       Icons.person,
+                          //       size: 18,
+                          //       color: Colors.white,
+                          //     ),
+                          //     context: context);
+                        },
+                      ),
+                      ListTile(
+                        leading: Image.asset(
+                          AssetNames.uberOneTag,
+                          width: 30,
+                        ),
+                        title: const AppText(
+                          text:
+                              'Save an extra 20% each year compared to a monthly plan',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Gap(10),
+                AppText(
+                    text:
+                        'Billing starts ${AppFunctions.formatDate(DateTime.now().add(const Duration(days: 28)).toString(), format: 'M j, Y')} for \$${selectedBilling?.bill.toStringAsFixed(2)}/mo. Cancel without fees or penalties.'),
+                const Gap(10),
+                RichText(
+                  text: TextSpan(
+                      text:
+                          "By joining Uber One, you authorize Uber to charge \$${selectedBilling?.bill.toStringAsFixed(2)} on any payment method on your account, and monthly thereafter, based on the terms, until you cancel. To avoid charges cancel up to 48 hours before ${AppFunctions.formatDate(DateTime.now().add(const Duration(days: 28)).toString(), format: 'M j, Y')} in the app. ",
+                      style: const TextStyle(
+                        fontSize: AppSizes.bodySmallest,
+                        color: AppColors.neutral500,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'View terms and conditions',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              navigatorKey.currentState!.push(MaterialPageRoute(
+                                builder: (context) => WebViewScreen(
+                                  controller: webViewcontroller,
+                                  link: Weblinks.uberOneTerms,
+                                ),
+                              ));
+                            },
+                        ),
+                      ]),
+                ),
+                Consumer(builder: (context, ref, child) {
+                  final selectedPaymentMethod =
+                      ref.watch(paymentOptionProvider);
+                  _selectedPaymentMethod = selectedPaymentMethod;
+                  final types = selectedPaymentMethod != null
+                      ? detectCCType(selectedPaymentMethod.cardNumber)
+                      : null;
+
+                  return ListTile(
+                    leading: selectedPaymentMethod == null
+                        ? null
+                        : CreditCardLogo(types: types!),
+                    title: AppText(
+                      text: selectedPaymentMethod == null
+                          ? 'Select Payment'
+                          : '${selectedPaymentMethod.creditCardType!}••••${selectedPaymentMethod.cardNumber.substring(6)}',
+                      weight: FontWeight.w600,
+                    ),
+                    subtitle: const AppText(
+                      text: 'Any Uber Cash will be applied',
+                    ),
+                    trailing: AppButton2(
+                        text: selectedPaymentMethod == null
+                            ? 'Select >'
+                            : 'Switch',
+                        callback: () {
+                          showModalBottomSheet(
+                              isScrollControlled: true,
+                              useSafeArea: true,
+                              barrierColor: Colors.transparent,
+                              context: context,
+                              builder: (context) {
+                                return const PaymentOptionsScreen(
+                                  showOnlyPaymentMethods: true,
+                                );
+                              });
+                        }),
+                  );
+                }),
+                const Gap(10),
+                AppButton(
+                  isLoading: _isLoading,
+                  text: 'Try for free',
+                  callback: () async {
+                    if (_selectedPaymentMethod == null) {
+                      showInfoToast('Select a payment method',
+                          context: context);
+                      return;
+                    }
+                    if (selectedBilling == null) {
+                      showInfoToast('Please select a plan', context: context);
+                      return;
+                    }
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    final userDetailsSnapshot = await FirebaseFirestore.instance
+                        .collection(FirestoreCollections.users)
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .get();
+                    final userDetails = userDetailsSnapshot.data()!;
+                    userDetails['uberOneStatus'] = UberOneStatus(
+                            hasUberOne: true,
+                            plan: selectedBilling!.period,
+                            expirationDate: selectedBilling?.period == 'Monthly'
+                                ? DateTime.now().add(const Duration(days: 58))
+                                : DateTime.now().add(const Duration(days: 393)))
+                        .toJson;
+                    await FirebaseFirestore.instance
+                        .collection(FirestoreCollections.users)
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .update({
+                      'uberOneStatus': userDetails,
+                    });
+
+                    await AppFunctions.getOnlineUserInfo();
+                    navigatorKey.currentState!.pop();
+                    await navigatorKey.currentState!
+                        .pushReplacement(MaterialPageRoute(
+                      builder: (context) => const UberOneAllSetScreen(),
+                    ));
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  },
+                ),
+                const Gap(20),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }

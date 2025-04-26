@@ -1,8 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:uber_eats_clone/main.dart';
-import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 
 import '../../../app_functions.dart';
 import '../../../models/store/store_model.dart';
@@ -10,9 +7,7 @@ import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
-import '../../services/sign_in_view_model.dart';
 import '../home/home_screen.dart';
-import '../store/store_screen.dart';
 
 class GroceryGroceryScreen extends StatefulWidget {
   final List<Store> stores;
@@ -108,7 +103,10 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                       ),
                       if (groceryStore.offers != null &&
                           groceryStore.offers!.isNotEmpty)
-                        OfferText(store: groceryStore)
+                        StoreOffersText(
+                          groceryStore,
+                          color: Colors.green,
+                        )
                     ],
                   ));
             },

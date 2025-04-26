@@ -74,12 +74,12 @@ class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
                       child: Stack(
                         alignment: Alignment.topLeft,
                         children: [
-                          CachedNetworkImage(
-                            imageUrl: offer.store.cardImage,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            height: 170,
-                          ),
+                          // CachedNetworkImage(
+                          //   imageUrl: offer.store.cardImage,
+                          //   width: double.infinity,
+                          //   fit: BoxFit.cover,
+                          //   height: 170,
+                          // ),
                           Padding(
                             padding: const EdgeInsets.only(top: 15.0),
                             child: Row(
@@ -99,16 +99,16 @@ class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
                                   //   color: Colors.white,
                                   // ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: Icon(
-                                    favoriteStores.any((element) =>
-                                            element.id == offer.store.id)
-                                        ? Icons.favorite
-                                        : Icons.favorite_outline,
-                                    color: AppColors.neutral300,
-                                  ),
-                                ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(right: 8.0),
+                                //   child: Icon(
+                                //     favoriteStores.any((element) =>
+                                //             element.id == offer.store.id)
+                                //         ? Icons.favorite
+                                //         : Icons.favorite_outline,
+                                //     color: AppColors.neutral300,
+                                //   ),
+                                // ),
                               ],
                             ),
                           )
@@ -122,32 +122,32 @@ class _ExclusiveOffersScreenState extends State<ExclusiveOffersScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            AppText(
-                              size: AppSizes.bodySmall,
-                              text: offer.store.name,
-                              overflow: TextOverflow.ellipsis,
-                              weight: FontWeight.bold,
-                            ),
-                            Row(
-                              children: [
-                                AppText(
-                                  text:
-                                      '\$${offer.store.delivery.fee.toStringAsFixed(2)} Delivery Fee • ${offer.store.delivery.estimatedDeliveryTime} min',
-                                  size: AppSizes.bodySmall,
-                                )
-                              ],
-                            )
+                            // AppText(
+                            //   size: AppSizes.bodySmall,
+                            //   text: offer.store.name,
+                            //   overflow: TextOverflow.ellipsis,
+                            //   weight: FontWeight.bold,
+                            // ),
+                            // Row(
+                            //   children: [
+                            //     AppText(
+                            //       text:
+                            //           '\$${offer.store.delivery.fee.toStringAsFixed(2)} Delivery Fee • ${offer.store.delivery.estimatedDeliveryTime} min',
+                            //       size: AppSizes.bodySmall,
+                            //     )
+                            //   ],
+                            // )
                           ],
                         ),
-                        Container(
-                            decoration: BoxDecoration(
-                                color: AppColors.neutral200,
-                                borderRadius: BorderRadius.circular(20)),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 5, vertical: 5),
-                            child: AppText(
-                                text: offer.store.rating.averageRating
-                                    .toString()))
+                        // Container(
+                        //     decoration: BoxDecoration(
+                        //         color: AppColors.neutral200,
+                        //         borderRadius: BorderRadius.circular(20)),
+                        //     padding: const EdgeInsets.symmetric(
+                        //         horizontal: 5, vertical: 5),
+                        //     child: AppText(
+                        //         text: offer.store.rating.averageRating
+                        //             .toString()))
                       ],
                     )
                   ],

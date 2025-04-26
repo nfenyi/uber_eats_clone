@@ -29,7 +29,7 @@ mixin _$Store {
   String get priceCategory => throw _privateConstructorUsedError;
   int? get groupSize => throw _privateConstructorUsedError;
   String get type => throw _privateConstructorUsedError;
-  List<Offer>? get offers => throw _privateConstructorUsedError;
+  List<Object>? get offers => throw _privateConstructorUsedError;
   List<Aisle>? get aisles => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get logo => throw _privateConstructorUsedError;
@@ -68,7 +68,7 @@ abstract class $StoreCopyWith<$Res> {
       String priceCategory,
       int? groupSize,
       String type,
-      List<Offer>? offers,
+      List<Object>? offers,
       List<Aisle>? aisles,
       String name,
       String logo,
@@ -165,7 +165,7 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
       offers: freezed == offers
           ? _value.offers
           : offers // ignore: cast_nullable_to_non_nullable
-              as List<Offer>?,
+              as List<Object>?,
       aisles: freezed == aisles
           ? _value.aisles
           : aisles // ignore: cast_nullable_to_non_nullable
@@ -265,7 +265,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       String priceCategory,
       int? groupSize,
       String type,
-      List<Offer>? offers,
+      List<Object>? offers,
       List<Aisle>? aisles,
       String name,
       String logo,
@@ -363,7 +363,7 @@ class __$$StoreImplCopyWithImpl<$Res>
       offers: freezed == offers
           ? _value._offers
           : offers // ignore: cast_nullable_to_non_nullable
-              as List<Offer>?,
+              as List<Object>?,
       aisles: freezed == aisles
           ? _value._aisles
           : aisles // ignore: cast_nullable_to_non_nullable
@@ -429,7 +429,7 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       required this.priceCategory,
       this.groupSize,
       required this.type,
-      final List<Offer>? offers,
+      final List<Object>? offers,
       final List<Aisle>? aisles,
       required this.name,
       required this.logo,
@@ -486,9 +486,9 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   final int? groupSize;
   @override
   final String type;
-  final List<Offer>? _offers;
+  final List<Object>? _offers;
   @override
-  List<Offer>? get offers {
+  List<Object>? get offers {
     final value = _offers;
     if (value == null) return null;
     if (_offers is EqualUnmodifiableListView) return _offers;
@@ -671,7 +671,7 @@ abstract class _Store implements Store {
       required final String priceCategory,
       final int? groupSize,
       required final String type,
-      final List<Offer>? offers,
+      final List<Object>? offers,
       final List<Aisle>? aisles,
       required final String name,
       required final String logo,
@@ -706,7 +706,7 @@ abstract class _Store implements Store {
   @override
   String get type;
   @override
-  List<Offer>? get offers;
+  List<Object>? get offers;
   @override
   List<Aisle>? get aisles;
   @override

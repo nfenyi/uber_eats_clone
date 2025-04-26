@@ -11,6 +11,7 @@ import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
 import '../../../../models/uber_cash/uber_cash_model.dart';
+import '../../../../models/uber_one_status/uber_one_status_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
@@ -160,7 +161,7 @@ class UberOneScreen extends StatelessWidget {
         .collection(FirestoreCollections.users)
         .doc(userCredential!.uid)
         .update({
-      'hasUberOne': false,
+      'uberOneStatus': UberOneStatus().toJson(),
       'type': "Personal",
       "onboarded": true,
       "redeemedPromos": <String>[],

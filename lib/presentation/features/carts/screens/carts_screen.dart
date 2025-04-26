@@ -806,7 +806,7 @@ class CartSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     Map<dynamic, dynamic> userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    bool hasUberOne = userInfo['hasUberOne'] ?? false;
+    bool hasUberOne = userInfo['uberOneStatus']['hasUberOne'] ?? false;
     final String? activatedPromoId =
         Hive.box(AppBoxes.appState).get(BoxKeys.activatedPromoId);
     Promotion? promo;
@@ -1154,10 +1154,9 @@ class CartSheet extends StatelessWidget {
                                       itemBuilder: (context, index) {
                                         final offer = store.offers![index];
                                         return FutureBuilder(
-                                            future: AppFunctions
-                                                .loadProductReference(
-                                                    offer.product
-                                                        as DocumentReference),
+                                            future:
+                                                AppFunctions.getOfferProduct(
+                                                    offer as DocumentReference),
                                             builder: (context, snapshot) {
                                               if (snapshot.hasData) {
                                                 return ProductGridTilePriceFirst(

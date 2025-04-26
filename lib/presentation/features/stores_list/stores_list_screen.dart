@@ -1,20 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
-import 'package:uber_eats_clone/presentation/features/store/store_screen.dart';
-import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../app_functions.dart';
-import '../../../main.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
-import '../grocery_store/screens/screens/grocery_store_main_screen.dart';
 import '../home/home_screen.dart';
 
 class StoresListScreen extends StatefulWidget {
@@ -83,12 +77,10 @@ class _StoresListScreenState extends State<StoresListScreen> {
                                 //   color: Colors.white,
                                 //   size: 15,
                                 // ),
-                                AppText(
-                                    color: Colors.white,
-                                    size: AppSizes.bodySmallest,
-                                    text:
-                                        // ' Top offer •
-                                        '${store.offers?.length == 1 ? store.offers?.first.title : '${store.offers?.length} Offers available'}'),
+                                StoreOffersText(
+                                  store,
+                                  size: AppSizes.bodySmallest,
+                                )
                               ],
                             ),
                           ))

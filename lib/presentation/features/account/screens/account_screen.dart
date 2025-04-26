@@ -360,41 +360,61 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                   ],
                 ),
-                const Gap(20),
-                InkWell(
-                  onTap: () {
-                    navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => const UberOneAccountScreen(),
-                    ));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 20),
-                    decoration: BoxDecoration(
-                      color: AppColors.neutral100,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                ValueListenableBuilder(
+                    valueListenable: Hive.box(AppBoxes.appState)
+                        .listenable(keys: [BoxKeys.userInfo]),
+                    builder: (context, appStateBox, child) {
+                      final userInfo = appStateBox.get(BoxKeys.userInfo);
+                      final bool hasUberOne =
+                          userInfo['uberOneStatus']['hasUberOne'];
+                      if (hasUberOne) {
+                        return Column(
                           children: [
-                            AppText(
-                              text: 'Uber One',
-                              size: AppSizes.bodySmall,
+                            const Gap(20),
+                            InkWell(
+                              onTap: () {
+                                navigatorKey.currentState!
+                                    .push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      const UberOneAccountScreen(),
+                                ));
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 20),
+                                decoration: BoxDecoration(
+                                  color: AppColors.neutral100,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AppText(
+                                          text: 'Uber One',
+                                          size: AppSizes.bodySmall,
+                                        ),
+                                        AppText(text: 'Try free for 4 weeks'),
+                                      ],
+                                    ),
+                                    Image.asset(
+                                      AssetNames.uberOneSmall,
+                                      width: 50,
+                                    )
+                                  ],
+                                ),
+                              ),
                             ),
-                            AppText(text: 'Try free for 4 weeks'),
                           ],
-                        ),
-                        Image.asset(
-                          AssetNames.uberOneSmall,
-                          width: 50,
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    }),
               ],
             ),
           ),

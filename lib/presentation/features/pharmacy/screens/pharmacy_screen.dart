@@ -20,8 +20,6 @@ import '../../../core/app_text.dart';
 import '../../../core/widgets.dart';
 import '../../home/home_screen.dart';
 import '../../sign_in/views/drop_off_options_screen.dart';
-import '../../some_kind_of_section/advert_screen.dart';
-import '../../store/store_screen.dart';
 
 class PharmacyScreen extends ConsumerStatefulWidget {
   const PharmacyScreen({super.key});
@@ -951,7 +949,10 @@ class _PharmacyScreenState extends ConsumerState<PharmacyScreen> {
                                             '${pharmacyStore.delivery.estimatedDeliveryTime} min'),
                                     if (pharmacyStore.offers != null &&
                                         pharmacyStore.offers!.isNotEmpty)
-                                      OfferText(store: pharmacyStore)
+                                      StoreOffersText(
+                                        pharmacyStore,
+                                        color: Colors.green,
+                                      )
                                   ],
                                 ));
                           },

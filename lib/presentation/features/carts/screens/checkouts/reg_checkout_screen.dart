@@ -85,7 +85,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     super.initState();
     Map<dynamic, dynamic> userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    _hasUberOne = userInfo['hasUberOne'] ?? false;
+    _hasUberOne = userInfo['uberOneStatus']['hasUberOne'] ?? false;
     Map<dynamic, dynamic> selectedAddress = userInfo['selectedAddress'];
     HiveGeoPoint temp = selectedAddress['latlng'];
     _placeDescription = selectedAddress['placeDescription'];
@@ -907,6 +907,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 membershipBenefit: _hasUberOne
                     ? OtherConstants.uberOneDiscount * _cartItem.subtotal
                     : null);
+            //update uberOneStatus if user has uber one
+            final userDetailsSnapshot = await FirebaseFirestore.instance
+                .collection(FirestoreCollections.users)
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .get();
+            final userDetails = userDetailsSnapshot.data()!;
+            userDetails['uberOneStatus']['moneySaved'] =
+                userDetails['uberOneStatus']['moneySaved'] +
+                    (OtherConstants.uberOneDiscount * _cartItem.subtotal);
+
             await FirebaseFirestore.instance
                 .collection(FirestoreCollections.individualOrders)
                 .doc(order.orderNumber)
@@ -915,17 +925,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               await product.delete();
             }
             await _cartItem.delete();
-            if (_activatedPromoId != null) {
-              await FirebaseFirestore.instance
-                  .collection(FirestoreCollections.users)
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .update({
-                'redeemedPromos': FieldValue.arrayRemove([_activatedPromoId]),
-                'usedPromos': FieldValue.arrayUnion([_activatedPromoId])
-              });
 
-              await AppFunctions.getOnlineUserInfo();
-            }
+            await FirebaseFirestore.instance
+                .collection(FirestoreCollections.users)
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .update({
+              if (_hasUberOne) 'uberOneStatus': userDetails,
+              if (_activatedPromoId != null)
+                'redeemedPromos': FieldValue.arrayRemove([_activatedPromoId]),
+              if (_activatedPromoId != null)
+                'usedPromos': FieldValue.arrayUnion([_activatedPromoId])
+            });
+
+            await AppFunctions.getOnlineUserInfo();
 
             setState(() {
               _isLoading = false;

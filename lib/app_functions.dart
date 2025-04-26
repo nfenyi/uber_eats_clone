@@ -18,7 +18,6 @@ import 'package:uber_eats_clone/models/group_order/group_order_model.dart';
 import 'package:uber_eats_clone/models/offer/offer_model.dart';
 import 'package:uber_eats_clone/models/order/order_model.dart';
 import 'package:uber_eats_clone/models/promotion/promotion_model.dart';
-import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 // import 'package:flutter/material.dart';
 
@@ -179,6 +178,26 @@ class AppFunctions {
     ).toList();
 
     return giftCategories;
+  }
+
+  static Future<List<Offer>> getOffers() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.offers)
+        .get();
+
+    final offers = snapshot.docs.map(
+      (snapshot) {
+        return Offer.fromJson(snapshot.data());
+      },
+    ).toList();
+
+    return offers;
+  }
+
+  static Future<Product> getOfferProduct(DocumentReference offerRef) async {
+    final offer = await AppFunctions.loadOfferReference(offerRef);
+    return await AppFunctions.loadProductReference(
+        offer.product as DocumentReference);
   }
 
   static Future<GiftCardImage> getGiftCardImage(
