@@ -7,13 +7,12 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_account/name_edit_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/phone_number/phone_number_update_screen.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
-import '../../webview/webview_screen.dart';
 import 'uber_account/email_edit_screen.dart';
 
 class UberAccountScreen extends StatefulWidget {
@@ -26,7 +25,6 @@ class UberAccountScreen extends StatefulWidget {
 class _UberAccountScreenState extends State<UberAccountScreen> {
   @override
   Widget build(BuildContext context) {
-    final webViewcontroller = WebViewControllerPlus();
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
@@ -342,7 +340,9 @@ class _UberAccountScreenState extends State<UberAccountScreen> {
                           ),
                         ),
                         ListTile(
-                          onTap: () {},
+                          onTap: () async {
+                            await launchUrl(Uri.parse(Weblinks.privacyPolicy));
+                          },
                           title: const AppText(
                             text: 'Privacy Center',
                             size: AppSizes.bodySmall,
@@ -385,16 +385,7 @@ class _UberAccountScreenState extends State<UberAccountScreen> {
                                           decoration: TextDecoration.underline,
                                         ),
                                         recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            navigatorKey.currentState!
-                                                .push(MaterialPageRoute(
-                                              builder: (context) =>
-                                                  WebViewScreen(
-                                                controller: webViewcontroller,
-                                                link: Weblinks.uberOneTerms,
-                                              ),
-                                            ));
-                                          },
+                                          ..onTap = () {},
                                       ),
                                     ]),
                               ),

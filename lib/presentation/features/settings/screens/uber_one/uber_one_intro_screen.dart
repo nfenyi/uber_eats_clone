@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/main.dart';
-import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/constants/other_constants.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
@@ -14,7 +13,7 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/uber_one_all_set_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/uber_one_screen2.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../app_functions.dart';
 import '../../../../../models/uber_one_status/uber_one_status_model.dart';
@@ -25,16 +24,16 @@ import '../../../../core/widgets.dart';
 import '../../../../services/sign_in_view_model.dart';
 import '../../../payment_options/payment_options_screen.dart';
 import '../../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
-import '../../../webview/webview_screen.dart';
 
-class UberOneAccountScreen extends StatefulWidget {
-  const UberOneAccountScreen({super.key});
+class UberOneIntroScreen extends StatefulWidget {
+  final UberOneStatus uberOneStatus;
+  const UberOneIntroScreen(this.uberOneStatus, {super.key});
 
   @override
-  State<UberOneAccountScreen> createState() => _UberOneAccountScreenState();
+  State<UberOneIntroScreen> createState() => _UberOneIntroScreenState();
 }
 
-class _UberOneAccountScreenState extends State<UberOneAccountScreen> {
+class _UberOneIntroScreenState extends State<UberOneIntroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +123,7 @@ class _UberOneAccountScreenState extends State<UberOneAccountScreen> {
               ListTile(
                 onTap: () {
                   navigatorKey.currentState!.push(MaterialPageRoute(
-                    builder: (context) => const UberOneScreen2(),
+                    builder: (context) => UberOneScreen2(widget.uberOneStatus),
                   ));
                 },
                 title: const AppText(
@@ -184,14 +183,6 @@ class _UberOneAccountScreenState extends State<UberOneAccountScreen> {
   }
 }
 
-class Plan {
-  final String period;
-  final double bill;
-  // final DateTime?
-
-  Plan({required this.period, required this.bill});
-}
-
 class JoinUberOneModal extends StatefulWidget {
   const JoinUberOneModal({super.key});
 
@@ -200,16 +191,11 @@ class JoinUberOneModal extends StatefulWidget {
 }
 
 class _JoinUberOneModalState extends State<JoinUberOneModal> {
-  final billings = <Plan>[
-    Plan(period: 'Monthly', bill: 9.99),
-    Plan(period: 'Annual', bill: 8)
-  ];
-
-  final webViewcontroller = WebViewControllerPlus();
   late Plan? selectedBilling;
   bool _isLoading = false;
+  final billings = OtherConstants.billings;
 
-  CreditCardDetails? _selectedPaymentMethod;
+  late UberOneStatus _uberOneStatus;
 
   @override
   void initState() {
@@ -379,6 +365,7 @@ class _JoinUberOneModalState extends State<JoinUberOneModal> {
                           width: 30,
                         ),
                         title: const AppText(
+                          size: AppSizes.bodySmallest,
                           text:
                               'Save an extra 20% each year compared to a monthly plan',
                         ),
@@ -406,109 +393,111 @@ class _JoinUberOneModalState extends State<JoinUberOneModal> {
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) => WebViewScreen(
-                                  controller: webViewcontroller,
-                                  link: Weblinks.uberOneTerms,
-                                ),
-                              ));
+                            ..onTap = () async {
+                              await launchUrl(Uri.parse(Weblinks.uberOneTerms));
                             },
                         ),
                       ]),
                 ),
-                Consumer(builder: (context, ref, child) {
-                  final selectedPaymentMethod =
-                      ref.watch(paymentOptionProvider);
-                  _selectedPaymentMethod = selectedPaymentMethod;
-                  final types = selectedPaymentMethod != null
-                      ? detectCCType(selectedPaymentMethod.cardNumber)
-                      : null;
-
-                  return ListTile(
-                    leading: selectedPaymentMethod == null
-                        ? null
-                        : CreditCardLogo(types: types!),
-                    title: AppText(
-                      text: selectedPaymentMethod == null
-                          ? 'Select Payment'
-                          : '${selectedPaymentMethod.creditCardType!}••••${selectedPaymentMethod.cardNumber.substring(6)}',
-                      weight: FontWeight.w600,
-                    ),
-                    subtitle: const AppText(
-                      text: 'Any Uber Cash will be applied',
-                    ),
-                    trailing: AppButton2(
-                        text: selectedPaymentMethod == null
-                            ? 'Select >'
-                            : 'Switch',
-                        callback: () {
-                          showModalBottomSheet(
-                              isScrollControlled: true,
-                              useSafeArea: true,
-                              barrierColor: Colors.transparent,
-                              context: context,
-                              builder: (context) {
-                                return const PaymentOptionsScreen(
-                                  showOnlyPaymentMethods: true,
-                                );
-                              });
-                        }),
-                  );
-                }),
+                const UberOnePaymentMethodWidget(),
                 const Gap(10),
-                AppButton(
-                  isLoading: _isLoading,
-                  text: 'Try for free',
-                  callback: () async {
-                    if (_selectedPaymentMethod == null) {
-                      showInfoToast('Select a payment method',
-                          context: context);
-                      return;
-                    }
-                    if (selectedBilling == null) {
-                      showInfoToast('Please select a plan', context: context);
-                      return;
-                    }
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    final userDetailsSnapshot = await FirebaseFirestore.instance
-                        .collection(FirestoreCollections.users)
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .get();
-                    final userDetails = userDetailsSnapshot.data()!;
-                    userDetails['uberOneStatus'] = UberOneStatus(
+                Consumer(builder: (context, ref, child) {
+                  return AppButton(
+                    isLoading: _isLoading,
+                    text: 'Try for free',
+                    callback: () async {
+                      try {
+                        if (ref.read(paymentOptionProvider) == null) {
+                          showInfoToast('Select a payment method',
+                              context: context);
+                          return;
+                        }
+                        if (selectedBilling == null) {
+                          showInfoToast('Please select a plan',
+                              context: context);
+                          return;
+                        }
+                        setState(() {
+                          _isLoading = true;
+                        });
+
+                        _uberOneStatus = UberOneStatus(
                             hasUberOne: true,
                             plan: selectedBilling!.period,
                             expirationDate: selectedBilling?.period == 'Monthly'
                                 ? DateTime.now().add(const Duration(days: 58))
-                                : DateTime.now().add(const Duration(days: 393)))
-                        .toJson;
-                    await FirebaseFirestore.instance
-                        .collection(FirestoreCollections.users)
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .update({
-                      'uberOneStatus': userDetails,
-                    });
+                                : DateTime.now()
+                                    .add(const Duration(days: 393)));
+                        await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.users)
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .update({
+                          'uberOneStatus': _uberOneStatus.toJson(),
+                        });
 
-                    await AppFunctions.getOnlineUserInfo();
-                    navigatorKey.currentState!.pop();
-                    await navigatorKey.currentState!
-                        .pushReplacement(MaterialPageRoute(
-                      builder: (context) => const UberOneAllSetScreen(),
-                    ));
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  },
-                ),
+                        await AppFunctions.getOnlineUserInfo();
+                        navigatorKey.currentState!.pop();
+                        await navigatorKey.currentState!
+                            .pushReplacement(MaterialPageRoute(
+                          builder: (context) => const UberOneAllSetScreen(),
+                        ));
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      } on Exception catch (e) {
+                        showInfoToast(e.toString(),
+                            context: navigatorKey.currentContext);
+                      }
+                    },
+                  );
+                }),
                 const Gap(20),
               ],
             ),
           )
         ],
       ),
+    );
+  }
+}
+
+class UberOnePaymentMethodWidget extends ConsumerWidget {
+  const UberOnePaymentMethodWidget({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedPaymentMethod = ref.watch(paymentOptionProvider);
+
+    final types = selectedPaymentMethod != null
+        ? detectCCType(selectedPaymentMethod.cardNumber)
+        : null;
+
+    return ListTile(
+      leading:
+          selectedPaymentMethod == null ? null : CreditCardLogo(types: types!),
+      title: AppText(
+        text: selectedPaymentMethod == null
+            ? 'Select Payment'
+            : '${selectedPaymentMethod.creditCardType!}••••${selectedPaymentMethod.cardNumber.substring(6)}',
+        weight: FontWeight.w600,
+      ),
+      subtitle: const AppText(
+        text: 'Any Uber Cash will be applied',
+      ),
+      trailing: AppButton2(
+          text: selectedPaymentMethod == null ? 'Select  >' : 'Switch',
+          callback: () {
+            showModalBottomSheet(
+                isScrollControlled: true,
+                useSafeArea: true,
+                barrierColor: Colors.transparent,
+                context: context,
+                builder: (context) {
+                  return const PaymentOptionsScreen(
+                    showOnlyPaymentMethods: true,
+                  );
+                });
+          }),
     );
   }
 }

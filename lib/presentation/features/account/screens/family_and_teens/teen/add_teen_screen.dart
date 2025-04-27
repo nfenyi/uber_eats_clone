@@ -5,8 +5,10 @@ import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/family_and_teens/teen/select_a_teen_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../../main.dart';
+import '../../../../../constants/weblinks.dart';
 
 class AddTeenScreen extends StatelessWidget {
   const AddTeenScreen({super.key});
@@ -58,67 +60,70 @@ class AddTeenScreen extends StatelessWidget {
             ),
           ),
           const ListTile(
-            leading: AppText(
-              text: '•',
-              size: AppSizes.heading1,
-              weight: FontWeight.bold,
+            dense: true,
+            leading: Icon(
+              Icons.circle,
+              size: 10,
             ),
             title: AppText(
               text: 'Top-rated drivers only',
-              size: AppSizes.bodySmall,
               weight: FontWeight.bold,
             ),
           ),
           const ListTile(
-            leading: AppText(
-              text: '•',
-              size: AppSizes.heading1,
-              weight: FontWeight.bold,
+            dense: true,
+            leading: Icon(
+              Icons.circle,
+              size: 10,
             ),
             title: AppText(
               text: 'Live trip tracking',
-              size: AppSizes.bodySmall,
               weight: FontWeight.bold,
             ),
           ),
           const ListTile(
-            leading: AppText(
-              text: '•',
-              size: AppSizes.heading1,
-              weight: FontWeight.bold,
+            dense: true,
+            leading: Icon(
+              Icons.circle,
+              size: 10,
             ),
             title: AppText(
               text: 'PIN verification',
-              size: AppSizes.bodySmall,
               weight: FontWeight.bold,
             ),
           ),
           const ListTile(
-            leading: AppText(
-              text: '•',
-              size: AppSizes.heading1,
-              weight: FontWeight.bold,
+            dense: true,
+            leading: Icon(
+              Icons.circle,
+              size: 10,
             ),
             title: AppText(
               text: 'Unexpected event sensing',
-              size: AppSizes.bodySmall,
               weight: FontWeight.bold,
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(
+          Padding(
+            padding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.horizontalPaddingSmall),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppText(
+                const AppText(
                     text:
                         "Choose a teen to add to your Family profile, and we'll send them an invitation."),
-                Gap(20),
-                AppText(
-                  weight: FontWeight.bold,
-                  text: 'Learn more about teen accounts',
-                  decoration: TextDecoration.underline,
+                const Gap(20),
+                InkWell(
+                  onTap: () async {
+                    await launchUrl(Uri.parse(Weblinks.teens));
+                  },
+                  child: Ink(
+                    child: const AppText(
+                      weight: FontWeight.bold,
+                      text: 'Learn more about teen accounts',
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
                 )
               ],
             ),

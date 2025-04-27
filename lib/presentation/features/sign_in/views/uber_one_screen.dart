@@ -7,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../main.dart';
 import '../../../../models/uber_cash/uber_cash_model.dart';
@@ -18,14 +18,12 @@ import '../../../constants/weblinks.dart';
 import '../../../core/widgets.dart';
 import '../../../services/sign_in_view_model.dart';
 import '../../main_screen/screens/main_screen_wrapper.dart';
-import '../../webview/webview_screen.dart';
 
 class UberOneScreen extends StatelessWidget {
   const UberOneScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final webViewcontroller = WebViewControllerPlus();
     return Scaffold(
       body: SafeArea(
           child: Column(
@@ -120,14 +118,9 @@ class UberOneScreen extends StatelessWidget {
                                   decoration: TextDecoration.underline,
                                 ),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    navigatorKey.currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => WebViewScreen(
-                                        controller: webViewcontroller,
-                                        link: Weblinks.uberOneTerms,
-                                      ),
-                                    ));
+                                  ..onTap = () async {
+                                    await launchUrl(
+                                        Uri.parse(Weblinks.uberOneTerms));
                                   },
                               ),
                             ]),

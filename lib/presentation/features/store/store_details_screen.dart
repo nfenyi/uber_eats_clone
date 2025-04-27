@@ -10,7 +10,7 @@ import 'package:marquee_list/marquee_list.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/features/uber_one/join_uber_one_screen.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app_functions.dart';
 import '../../../main.dart';
@@ -19,7 +19,6 @@ import '../../constants/asset_names.dart';
 import '../../constants/weblinks.dart';
 import '../../core/app_text.dart';
 import '../../services/place_detail_model.dart';
-import '../webview/webview_screen.dart';
 
 class StoreDetailsScreen extends StatefulWidget {
   final Store store;
@@ -37,7 +36,6 @@ class StoreDetailsScreen extends StatefulWidget {
 }
 
 class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
-  final _webViewcontroller = WebViewControllerPlus();
   late LatLng _setLocation;
   bool _timeExpanded = false;
   late LatLng _initialCameraPositionTarget;
@@ -282,13 +280,8 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
                             color: Colors.green,
                           ),
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              navigatorKey.currentState!.push(MaterialPageRoute(
-                                builder: (context) => WebViewScreen(
-                                  controller: _webViewcontroller,
-                                  link: Weblinks.p65Warnings,
-                                ),
-                              ));
+                            ..onTap = () async {
+                              await launchUrl(Uri.parse(Weblinks.p65Warnings));
                             },
                         ),
                       ]),

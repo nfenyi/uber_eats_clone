@@ -94,10 +94,12 @@ class _MyGiftsScreenState extends State<MyGiftsScreen> {
                       trailing: AppText(
                           color: AppColors.neutral500,
                           size: AppSizes.bodySmallest,
-                          text: giftCard.dateCreated == null
-                              ? 'N/A'
-                              : AppFunctions.formatDate(
-                                  giftCard.dateCreated!.toString(),
+                          text:
+                              //  giftCard.dateCreated == null
+                              //     ? 'N/A'
+                              //     :
+                              AppFunctions.formatDate(
+                                  giftCard.dateCreated.toString(),
                                   format: 'j M')),
                     ),
                   );
@@ -141,7 +143,7 @@ class _MyGiftsScreenState extends State<MyGiftsScreen> {
     );
 
     return myGiftCards.sorted(
-      (a, b) => b.dateCreated!.compareTo(a.dateCreated!),
+      (a, b) => b.dateCreated.compareTo(a.dateCreated),
     );
   }
 }

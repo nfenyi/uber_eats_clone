@@ -29,6 +29,11 @@ class OtherConstants {
     'Sort'
   ];
 
+  static const billings = <Plan>[
+    Plan(period: 'Monthly', bill: 9.99),
+    Plan(period: 'Annual', bill: 8)
+  ];
+
   static const double uberOneDiscount = 0.1;
   static const double tax = 0.05;
 
@@ -93,4 +98,12 @@ class UberOneBenefit {
 
   UberOneBenefit(
       {required this.assetImage, required this.title, required this.message});
+}
+
+class Plan {
+  final String period;
+  final double bill;
+  // final DateTime?
+
+  const Plan({required this.period, required this.bill});
 }

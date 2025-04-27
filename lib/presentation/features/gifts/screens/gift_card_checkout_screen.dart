@@ -24,7 +24,6 @@ import 'package:uber_eats_clone/presentation/features/address/screens/schedule_d
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../main.dart';
 import '../../../../models/gift_card/gift_card_model.dart';
@@ -51,7 +50,6 @@ class _GiftCardCheckoutScreenState
   final List<String> _giftSchedules = ['Send Now', 'Schedule'];
   late String _selectedSendSchedule;
   final List<String> _sendMethods = ['Message', 'Email'];
-  final _webViewcontroller = WebViewControllerPlus();
   CreditCardDetails? _selectedPaymentMethod;
 
   final _emailController = TextEditingController();
@@ -318,13 +316,8 @@ class _GiftCardCheckoutScreenState
                           decoration: TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => WebViewScreen(
-                                controller: _webViewcontroller,
-                                link: Weblinks.giftTerms,
-                              ),
-                            ));
+                          ..onTap = () async {
+                            await launchUrl(Uri.parse(Weblinks.giftTerms));
                           },
                       ),
                     ]),
@@ -401,13 +394,8 @@ class _GiftCardCheckoutScreenState
                           decoration: TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            navigatorKey.currentState!.push(MaterialPageRoute(
-                              builder: (context) => WebViewScreen(
-                                controller: _webViewcontroller,
-                                link: Weblinks.giftTerms,
-                              ),
-                            ));
+                          ..onTap = () async {
+                            await launchUrl(Uri.parse(Weblinks.giftTerms));
                           },
                       ),
                       const TextSpan(

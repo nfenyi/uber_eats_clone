@@ -8,8 +8,7 @@ import 'package:uber_eats_clone/presentation/constants/weblinks.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:uber_eats_clone/presentation/features/webview/webview_screen.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../main.dart';
 import '../../../constants/asset_names.dart';
@@ -25,8 +24,6 @@ class TermsNPrivacyNoticeScreen extends ConsumerStatefulWidget {
 
 class _TermsNPrivacyNoticeScreenState
     extends ConsumerState<TermsNPrivacyNoticeScreen> {
-  final _webViewcontroller = WebViewControllerPlus();
-
   bool? _isChecked = false;
 
   @override
@@ -74,14 +71,8 @@ class _TermsNPrivacyNoticeScreenState
                             text: 'Terms of Use',
                             style: const TextStyle(color: Colors.blue),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                navigatorKey.currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) => WebViewScreen(
-                                    controller: _webViewcontroller,
-                                    link: Weblinks.termsOfUse,
-                                  ),
-                                ));
+                              ..onTap = () async {
+                                await launchUrl(Uri.parse(Weblinks.termsOfUse));
                               },
                           ),
                           const TextSpan(
@@ -90,14 +81,9 @@ class _TermsNPrivacyNoticeScreenState
                           TextSpan(
                               text: 'Privacy Notice',
                               recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  navigatorKey.currentState!
-                                      .push(MaterialPageRoute(
-                                    builder: (context) => WebViewScreen(
-                                      controller: _webViewcontroller,
-                                      link: Weblinks.policyNotice,
-                                    ),
-                                  ));
+                                ..onTap = () async {
+                                  await launchUrl(
+                                      Uri.parse(Weblinks.policyNotice));
                                 },
                               style: const TextStyle(color: Colors.blue)),
                           const TextSpan(

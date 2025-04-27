@@ -307,7 +307,7 @@ class _ExploreVideoScreenState extends State<ExploreVideoScreen> {
                                       }
                                       final product = _products[index];
                                       final store = _stores[index];
-                                      // logger.d(stores);
+                                      bool isContainerTapped = false;
                                       return Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -375,8 +375,6 @@ class _ExploreVideoScreenState extends State<ExploreVideoScreen> {
                                           if (product.description != null)
                                             StatefulBuilder(
                                                 builder: (context, setState) {
-                                              bool isContainerTapped = false;
-
                                               return GestureDetector(
                                                 onTap: () {
                                                   setState(

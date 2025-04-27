@@ -7,6 +7,9 @@ class Weblinks {
       'https://www.uber.com/legal/en/document/?country=united-states&lang=en&name=renewable-passes-terms';
   static const String p65Warnings = 'https://www.P65Warnings.ca.gov/restaurant';
   static const String uberEatsWebApp = 'https://www.ubereats.com';
+  static const String teens = 'https://www.uber.com/gh/en/ride/teens/';
+  static const String uberEatsHelp =
+      'https://help.uber.com/en/ubereats/restaurants';
   static const String privacyPolicy =
       'https://www.uber.com/gh/en/privacy-notice-riders-order-recipients';
   static const String corporatePortal =

@@ -21,26 +21,24 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/alcohol/alcohol_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import 'package:uber_eats_clone/state/user_location_providers.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
 import '../../../models/offer/offer_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../constants/other_constants.dart';
-import '../../constants/weblinks.dart';
 import '../../services/sign_in_view_model.dart';
 import '../main_screen/screens/main_screen.dart';
 import '../stores_list/stores_list_screen.dart';
 import '../product/product_screen.dart';
 import '../promotion/promo_screen.dart';
-import '../webview/webview_screen.dart';
 import 'map/map_screen.dart';
 
 Map<String, Product> products = {};
@@ -320,7 +318,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin {
-  final webViewcontroller = WebViewControllerPlus();
   late List<Advert> _homeScreenAdverts;
 
   List<FoodCategory> _foodCategories = [];
@@ -3406,19 +3403,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                 ),
                                                 recognizer:
                                                     TapGestureRecognizer()
-                                                      ..onTap = () {
-                                                        navigatorKey
-                                                            .currentState!
-                                                            .push(
-                                                                MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              WebViewScreen(
-                                                            controller:
-                                                                webViewcontroller,
-                                                            link: Weblinks
-                                                                .uberOneTerms,
-                                                          ),
-                                                        ));
+                                                      ..onTap = () async {
+                                                        await showModalBottomSheet(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return const PersonalizedRecommendationsWidget();
+                                                          },
+                                                        );
                                                       },
                                               ),
                                             ]),

@@ -17,7 +17,7 @@ import 'package:uber_eats_clone/presentation/features/home/screens/search_screen
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../app_functions.dart';
 import '../../../../models/advert/advert_model.dart';
 import '../../../../models/store/store_model.dart';
@@ -29,7 +29,6 @@ import '../../home/home_screen.dart';
 import '../../home/map/map_screen.dart';
 import '../../main_screen/screens/main_screen.dart';
 import '../../stores_list/stores_list_screen.dart';
-import '../../webview/webview_screen.dart';
 
 class GroceryScreen extends ConsumerStatefulWidget {
   const GroceryScreen({super.key});
@@ -39,8 +38,6 @@ class GroceryScreen extends ConsumerStatefulWidget {
 }
 
 class _GroceryScreenState extends ConsumerState<GroceryScreen> {
-  final webViewcontroller = WebViewControllerPlus();
-
   List<FoodCategory> _groceryCategories = [];
 
   // bool _onSearchScreen = false;
@@ -1135,14 +1132,9 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                               decoration: TextDecoration.underline,
                             ),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                navigatorKey.currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) => WebViewScreen(
-                                    controller: webViewcontroller,
-                                    link: Weblinks.uberOneTerms,
-                                  ),
-                                ));
+                              ..onTap = () async {
+                                await launchUrl(
+                                    Uri.parse(Weblinks.uberOneTerms));
                               },
                           ),
                         ]),

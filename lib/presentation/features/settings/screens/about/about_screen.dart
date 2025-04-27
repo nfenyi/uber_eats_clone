@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/about/legal/legal_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../../main.dart';
 import '../../../../constants/app_sizes.dart';
@@ -16,7 +15,6 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final webViewcontroller = WebViewControllerPlus();
     return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -70,14 +68,8 @@ class AboutScreen extends StatelessWidget {
             title: const AppText(text: 'Legal'),
           ),
           ListTile(
-            onTap: () {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => WebViewScreen(
-                  controller: webViewcontroller,
-                  link: Weblinks.uberEatsWebApp,
-                  showHeader: true,
-                ),
-              ));
+            onTap: () async {
+              await launchUrl(Uri.parse(Weblinks.uberEatsWebApp));
             },
             title: const AppText(text: 'UberEats.com'),
           ),

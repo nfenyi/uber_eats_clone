@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../app_functions.dart';
 
@@ -17,7 +16,6 @@ import '../../../models/advert/advert_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
-import '../../constants/weblinks.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../../core/widgets.dart';
@@ -27,7 +25,6 @@ import '../home/home_screen.dart';
 import '../home/screens/search_screen.dart';
 import '../main_screen/screens/main_screen.dart';
 import '../some_kind_of_section/advert_screen.dart';
-import '../webview/webview_screen.dart';
 
 class AlcoholScreen extends ConsumerStatefulWidget {
   const AlcoholScreen({super.key});
@@ -37,8 +34,6 @@ class AlcoholScreen extends ConsumerStatefulWidget {
 }
 
 class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
-  final webViewcontroller = WebViewControllerPlus();
-
   final List<Store> _alcoholStores = allStores
       .where(
         (element) => element.type.toLowerCase().contains('alcohol'),
@@ -758,14 +753,13 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
                               decoration: TextDecoration.underline,
                             ),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                navigatorKey.currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) => WebViewScreen(
-                                    controller: webViewcontroller,
-                                    link: Weblinks.uberOneTerms,
-                                  ),
-                                ));
+                              ..onTap = () async {
+                                await showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return const PersonalizedRecommendationsWidget();
+                                  },
+                                );
                               },
                           ),
                         ]),
@@ -793,5 +787,55 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
       },
     ).toList();
     return alcoholAdverts;
+  }
+}
+
+class PersonalizedRecommendationsWidget extends StatelessWidget {
+  const PersonalizedRecommendationsWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+                child: AppText(
+              text: 'Delivery fee',
+              size: AppSizes.bodySmall,
+              weight: FontWeight.w600,
+            )),
+            const Gap(10),
+            const Divider(),
+            const Gap(10),
+            const AppText(
+                text:
+                    'We are paid by merchants, brands and other partners to advertise and promote their products and services in the Uber Eats and Postmates apps. These are indicated by a "Sponsored" or "Ad" tag.\n\nWe may use information such as your location and user profile, as well as your trip, order and search history, to personalise the ads you see.\n\n'),
+            InkWell(
+              onTap: () {},
+              child: Ink(
+                child: const AppText(
+                  text:
+                      'You can opt out of this personalisation in your Recommendations and Promos settings.',
+                  decoration: TextDecoration.underline,
+                  weight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Gap(10),
+            AppButton(
+              text: 'OK',
+              callback: navigatorKey.currentState!.pop,
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../../main.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../constants/weblinks.dart';
-import '../../../webview/webview_screen.dart';
 import 'thank_you_modal.dart';
 
 class INeedHelpUpdatingAccountScreen extends StatefulWidget {
@@ -21,7 +19,6 @@ class INeedHelpUpdatingAccountScreen extends StatefulWidget {
 
 class _INeedHelpUpdatingAccountScreenState
     extends State<INeedHelpUpdatingAccountScreen> {
-  final _webViewcontroller = WebViewControllerPlus();
   final _deleteReasons = [
     'Bad experience on a ride',
     'Bad experience with an order',
@@ -89,13 +86,8 @@ class _INeedHelpUpdatingAccountScreenState
                     text: 'contact us.',
                     style: const TextStyle(),
                     recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                          builder: (context) => WebViewScreen(
-                            controller: _webViewcontroller,
-                            link: Weblinks.uberOneTerms,
-                          ),
-                        ));
+                      ..onTap = () async {
+                        await launchUrl(Uri.parse(Weblinks.uberEatsHelp));
                       },
                   ),
                 ]),

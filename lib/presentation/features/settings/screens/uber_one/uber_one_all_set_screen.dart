@@ -72,11 +72,14 @@ class UberOneAllSetScreen extends StatelessWidget {
                         AppButton(
                           text: 'Start saving now',
                           callback: () {
-                            navigatorKey.currentState!
-                                .pushReplacement(MaterialPageRoute(
+                            showModalBottomSheet(
+                              context: context,
+                              useSafeArea: true,
+                              // backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
                               builder: (context) =>
                                   const ExclusiveOffersScreen(),
-                            ));
+                            );
                           },
                         ),
                         const Gap(10)

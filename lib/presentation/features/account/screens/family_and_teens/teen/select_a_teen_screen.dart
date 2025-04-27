@@ -23,7 +23,7 @@ class SelectATeenScreen extends StatelessWidget {
                 const EdgeInsets.only(right: AppSizes.horizontalPaddingSmall),
             child: GestureDetector(
                 onTap: () => showModalBottomSheet(
-                      backgroundColor: Colors.transparent,
+                      barrierColor: Colors.transparent,
                       isScrollControlled: true,
                       useSafeArea: true,
                       context: context,

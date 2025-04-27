@@ -17,8 +17,8 @@ import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_card_checkout_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../main.dart';
@@ -50,7 +50,6 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
 
   String? _selectedMessageOption;
 
-  final _webViewcontroller = WebViewControllerPlus();
   late final String _userDisplayName;
 
   bool? _agreedToTerms = false;
@@ -527,14 +526,9 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                   decoration: TextDecoration.underline,
                                 ),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    navigatorKey.currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => WebViewScreen(
-                                        controller: _webViewcontroller,
-                                        link: Weblinks.userGeneratedContent,
-                                      ),
-                                    ));
+                                  ..onTap = () async {
+                                    await launchUrl(Uri.parse(
+                                        Weblinks.userGeneratedContent));
                                   },
                               ),
                               TextSpan(
@@ -543,14 +537,9 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                   decoration: TextDecoration.underline,
                                 ),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    navigatorKey.currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => WebViewScreen(
-                                        controller: _webViewcontroller,
-                                        link: Weblinks.policyNotice,
-                                      ),
-                                    ));
+                                  ..onTap = () async {
+                                    await launchUrl(
+                                        Uri.parse(Weblinks.policyNotice));
                                   },
                               ),
                             ]),
@@ -585,7 +574,6 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                           useSafeArea: true,
                           context: context,
                           builder: (context) {
-                            final webViewcontroller = WebViewControllerPlus();
                             return Container(
                               height: double.infinity,
                               decoration: const BoxDecoration(
@@ -732,17 +720,10 @@ class _CustomizeGiftScreenState extends State<CustomizeGiftScreen> {
                                                   ),
                                                 const Gap(15),
                                                 GestureDetector(
-                                                  onTap: () {
-                                                    navigatorKey.currentState!
-                                                        .push(MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          WebViewScreen(
-                                                        controller:
-                                                            webViewcontroller,
-                                                        link: Weblinks
-                                                            .uberGiftCardTerms,
-                                                      ),
-                                                    ));
+                                                  onTap: () async {
+                                                    await launchUrl(Uri.parse(
+                                                        Weblinks
+                                                            .uberGiftCardTerms));
                                                   },
                                                   child: const AppText(
                                                     text: 'Terms apply',

@@ -11,7 +11,6 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:image_color_builder/image_color_builder.dart';
 import 'package:marquee_list/marquee_list.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:uber_eats_clone/models/offer/offer_model.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 

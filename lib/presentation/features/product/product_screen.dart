@@ -21,7 +21,7 @@ import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen
 import 'package:uber_eats_clone/presentation/features/product/back_up_option_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import 'package:uber_eats_clone/state/user_location_providers.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app_functions.dart';
 import '../../../hive_adapters/cart_item/cart_item_model.dart';
@@ -30,7 +30,6 @@ import '../../constants/app_sizes.dart';
 import '../../constants/weblinks.dart';
 import '../../core/app_colors.dart';
 import '../address/screens/addresses_screen.dart';
-import '../webview/webview_screen.dart';
 import 'product_image_screen.dart';
 import 'sub_option_selection_screen.dart';
 
@@ -49,7 +48,6 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   late double initialSubTotal;
   late double initialInitialPricesTotal;
   String? _backupInstruction = 'Best match';
-  final _webViewcontroller = WebViewControllerPlus();
   int _activeIndex = 0;
   int _quantity = 1;
   final _noteController = TextEditingController();
@@ -1736,15 +1734,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                     decoration: TextDecoration.underline,
                                   ),
                                   recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      navigatorKey.currentState!
-                                          .push(MaterialPageRoute(
-                                        //TODO: fix webviewscreens not loading. It glitches like the map
-                                        builder: (context) => WebViewScreen(
-                                          controller: _webViewcontroller,
-                                          link: Weblinks.p65Warnings,
-                                        ),
-                                      ));
+                                    ..onTap = () async {
+                                      await launchUrl(
+                                          Uri.parse(Weblinks.p65Warnings));
                                     },
                                 ),
                               ]),

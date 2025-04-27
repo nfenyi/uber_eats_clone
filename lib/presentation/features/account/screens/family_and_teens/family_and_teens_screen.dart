@@ -93,7 +93,7 @@ class FamilyAndTeensScreen extends StatelessWidget {
                             isScrollControlled: false,
                             context: context,
                             builder: (context) {
-                              String? selectedOption = 'Adult';
+                              String? selectedOption = 'Teen';
                               return StatefulBuilder(
                                   builder: (context, setState) {
                                 return Container(
@@ -118,29 +118,6 @@ class FamilyAndTeensScreen extends StatelessWidget {
                                       ),
                                       const Divider(),
                                       RadioListTile.adaptive(
-                                        dense: true,
-                                        title: const AppText(
-                                          text: 'Adult',
-                                          size: AppSizes.bodySmall,
-                                        ),
-                                        subtitle: const AppText(
-                                          text: 'Adults are 18 and older',
-                                        ),
-                                        controlAffinity:
-                                            ListTileControlAffinity.trailing,
-                                        secondary: const Iconify(Uil.i_18_plus),
-                                        value: 'Adult',
-                                        groupValue: selectedOption,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedOption = value;
-                                          });
-                                        },
-                                      ),
-                                      const Divider(
-                                        indent: 60,
-                                      ),
-                                      RadioListTile.adaptive(
                                         title: const AppText(
                                           text: 'Teen',
                                           size: AppSizes.bodySmall,
@@ -154,6 +131,29 @@ class FamilyAndTeensScreen extends StatelessWidget {
                                         secondary:
                                             const Iconify(Mdi.human_male_child),
                                         value: 'Teen',
+                                        groupValue: selectedOption,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedOption = value;
+                                          });
+                                        },
+                                      ),
+                                      const Divider(
+                                        indent: 60,
+                                      ),
+                                      RadioListTile.adaptive(
+                                        dense: true,
+                                        title: const AppText(
+                                          text: 'Adult',
+                                          size: AppSizes.bodySmall,
+                                        ),
+                                        subtitle: const AppText(
+                                          text: 'Adults are 18 and older',
+                                        ),
+                                        controlAffinity:
+                                            ListTileControlAffinity.trailing,
+                                        secondary: const Iconify(Uil.i_18_plus),
+                                        value: 'Adult',
                                         groupValue: selectedOption,
                                         onChanged: (value) {
                                           setState(() {

@@ -1,14 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../../../main.dart';
 import '../../../../../constants/app_sizes.dart';
 import '../../../../../constants/weblinks.dart';
-import '../../../../webview/webview_screen.dart';
 import 'software_licenses_screen.dart';
 
 class LegalScreen extends StatelessWidget {
@@ -16,8 +12,6 @@ class LegalScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final webViewcontroller = WebViewControllerPlus();
-
     return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -36,13 +30,7 @@ class LegalScreen extends StatelessWidget {
           ListTile(
             dense: true,
             onTap: () async {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => WebViewScreen(
-                  controller: webViewcontroller,
-                  link: Weblinks.copyrightInfringement,
-                  // showHeader: true,
-                ),
-              ));
+              await launchUrl(Uri.parse(Weblinks.copyrightInfringement));
             },
             title: const AppText(text: 'Copyright'),
           ),
@@ -50,13 +38,7 @@ class LegalScreen extends StatelessWidget {
           ListTile(
             dense: true,
             onTap: () async {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => WebViewScreen(
-                  controller: webViewcontroller,
-                  link: Weblinks.termsOfUse,
-                  // showHeader: true,
-                ),
-              ));
+              await launchUrl(Uri.parse(Weblinks.termsOfUse));
             },
             title: const AppText(text: 'Terms & Conditions'),
           ),
@@ -64,13 +46,7 @@ class LegalScreen extends StatelessWidget {
           ListTile(
             dense: true,
             onTap: () async {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => WebViewScreen(
-                  controller: webViewcontroller,
-                  link: Weblinks.privacyPolicy,
-                  // showHeader: true,
-                ),
-              ));
+              await launchUrl(Uri.parse(Weblinks.termsOfUse));
             },
             title: const AppText(text: 'Privacy Policy'),
           ),
@@ -86,14 +62,8 @@ class LegalScreen extends StatelessWidget {
           const Divider(),
           ListTile(
             dense: true,
-            onTap: () {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => WebViewScreen(
-                  controller: webViewcontroller,
-                  link: Weblinks.pricing,
-                  showHeader: true,
-                ),
-              ));
+            onTap: () async {
+              await launchUrl(Uri.parse(Weblinks.pricing));
             },
             title: const AppText(text: 'Pricing'),
           ),

@@ -5,20 +5,17 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../main.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
-import '../../webview/webview_screen.dart';
 
 class InviteAFriendScreen extends StatelessWidget {
   const InviteAFriendScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final webViewcontroller = WebViewControllerPlus();
     const invitationCode = 'eats-46446161664649s';
     return Scaffold(
       appBar: AppBar(
@@ -59,14 +56,9 @@ class InviteAFriendScreen extends StatelessWidget {
                                 decoration: TextDecoration.underline,
                                 color: Colors.green),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                navigatorKey.currentState!
-                                    .push(MaterialPageRoute(
-                                  builder: (context) => WebViewScreen(
-                                    controller: webViewcontroller,
-                                    link: Weblinks.uberOneTerms,
-                                  ),
-                                ));
+                              ..onTap = () async {
+                                await launchUrl(
+                                    Uri.parse(Weblinks.uberOneTerms));
                               },
                           ),
                         ]),

@@ -10,7 +10,7 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../models/gift_card/gift_card_model.dart';
@@ -203,7 +203,6 @@ class GiftCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final webViewcontroller = WebViewControllerPlus();
     return Container(
       padding: const EdgeInsets.all(15.0),
       decoration: BoxDecoration(
@@ -283,13 +282,8 @@ class GiftCardWidget extends StatelessWidget {
             ),
           const Gap(15),
           GestureDetector(
-            onTap: () {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => WebViewScreen(
-                  controller: webViewcontroller,
-                  link: Weblinks.uberGiftCardTerms,
-                ),
-              ));
+            onTap: () async {
+              await launchUrl(Uri.parse(Weblinks.uberGiftCardTerms));
             },
             child: const AppText(
               text: 'Terms apply',
