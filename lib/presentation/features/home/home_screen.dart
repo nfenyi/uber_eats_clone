@@ -337,7 +337,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   String? _selectedPriceCategory;
   List<String> _selectedDietaryOptions = [];
   String? _selectedSort;
-  final _scrollController = ScrollController();
+  // final _scrollController = ScrollController();
 
   List<AnimationController> _animationControllers = [];
   late List<Animation<double>> _rotations;
@@ -345,6 +345,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late List<Store> _popularNearYou;
 
   FoodCategory? _selectedFoodCategory;
+  // Define the scroll range and corresponding width range (as fractions of screen width)
+  final double _fullWidthFraction = 1.0;
+  final double _minWidthFraction = 0.8;
+  final double _scrollThreshold = 350.0;
+
+  late double _screenWidth;
+  late final ValueNotifier<double> _searchFieldWidthNotifier;
+
+  final _nestedScrollViewKey = GlobalKey<NestedScrollViewState>();
 
   @override
   void initState() {
@@ -353,23 +362,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       statusBarIconBrightness: Brightness.dark,
       statusBarColor: Colors.white,
     ));
-
-    //   _scrollController.addListener(() {
-    //   setState(() {
-    //     if (_scrollController. == 1) {
-    //       //so floating button does not show in inspection tabbarview
-    //       _showFloatingActionButton = false;
-    //     } else {
-    //       _showFloatingActionButton = true;
-    //     }
-    //   });
-    // });
+    _searchFieldWidthNotifier = ValueNotifier<double>(double.infinity);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _nestedScrollViewKey.currentState!.outerController.addListener(() {
+        if (_nestedScrollViewKey.currentState!.outerController.offset <= 0) {
+          _searchFieldWidthNotifier.value = (_screenWidth * _fullWidthFraction);
+        } else if (_nestedScrollViewKey.currentState!.outerController.offset >=
+            _scrollThreshold) {
+          _searchFieldWidthNotifier.value = _screenWidth * _minWidthFraction;
+        } else {
+          final double scrollRatio =
+              _nestedScrollViewKey.currentState!.outerController.offset /
+                  _scrollThreshold;
+          _searchFieldWidthNotifier.value = (_screenWidth *
+                  (_fullWidthFraction -
+                      (scrollRatio *
+                          (_fullWidthFraction - _minWidthFraction)))) -
+              50;
+        }
+      });
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    _scrollController.dispose();
+    // _scrollController.dispose();
     for (var animationController in _animationControllers) {
       animationController.dispose();
     }
@@ -379,6 +397,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget build(BuildContext context) {
     final currentLocation = ref.watch(userCurrentGeoLocationProvider);
     final storedGeoPoint = ref.watch(selectedLocationGeoPoint);
+    _screenWidth = MediaQuery.sizeOf(context).width;
     // var addressDetails = const AddressDetails(
     //     instruction: "bring your own tip",
     //     apartment: "A1",
@@ -698,31 +717,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     DateTime dateTimeNow = DateTime.now();
     return SafeArea(
       child: NestedScrollView(
+        key: _nestedScrollViewKey,
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar.medium(
-            title: InkWell(
-              onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => SearchScreen(
-                  stores: allStores,
-                ),
-              )),
-              child: Ink(
-                child: const AppTextFormField(
-                  constraintWidth: 40,
-                  enabled: false,
-                  hintText: 'Search Uber Eats',
-                  radius: 50,
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Icon(
-                      Icons.search,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
+          SliverAppBar(
             // automaticallyImplyLeading: false,
             expandedHeight: 125,
             floating: true,
@@ -789,6 +786,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   }),
             ],
             flexibleSpace: FlexibleSpaceBar(
+              title: ScrollResponsiveSearchField(_searchFieldWidthNotifier),
               expandedTitleScale: 1,
               titlePadding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.horizontalPaddingSmallest),
@@ -864,29 +862,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 timePreference: timePreference,
                               );
                       }),
-                  InkWell(
-                    onTap: () =>
-                        navigatorKey.currentState!.push(MaterialPageRoute(
-                      builder: (context) => SearchScreen(
-                        stores: allStores,
-                      ),
-                    )),
-                    child: Ink(
-                      child: const AppTextFormField(
-                        constraintWidth: 40,
-                        enabled: false,
-                        hintText: 'Search Uber Eats',
-                        radius: 50,
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.only(left: 8.0),
-                          child: Icon(
-                            Icons.search,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -4993,5 +4968,61 @@ class StoreOffersText extends StatelessWidget {
             size: size,
             color: color,
             text: '${store.offers?.length} Offers available');
+  }
+}
+
+class ScrollResponsiveSearchField extends StatefulWidget {
+  final ValueNotifier<double> currentWidthNotifier;
+  const ScrollResponsiveSearchField(
+    this.currentWidthNotifier, {
+    super.key,
+  });
+
+  @override
+  State<ScrollResponsiveSearchField> createState() =>
+      _ScrollResponsiveSearchFieldState();
+}
+
+class _ScrollResponsiveSearchFieldState
+    extends State<ScrollResponsiveSearchField> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+        valueListenable: widget.currentWidthNotifier,
+        builder: (context, value, child) {
+          return InkWell(
+            onTap: () => navigatorKey.currentState!.push(MaterialPageRoute(
+              builder: (context) => SearchScreen(
+                stores: allStores,
+              ),
+            )),
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              decoration: BoxDecoration(
+                  color: AppColors.neutral100,
+                  borderRadius: BorderRadius.circular(50)),
+              width: value,
+              height: 50.0,
+              child: const Row(
+                children: [
+                  Icon(
+                    Icons.search,
+                    size: 18,
+                  ),
+                  Gap(10),
+                  AppText(
+                    text: 'Search Uber Eats',
+                    color: AppColors.neutral500,
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

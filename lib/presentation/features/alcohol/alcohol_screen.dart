@@ -807,7 +807,7 @@ class PersonalizedRecommendationsWidget extends StatelessWidget {
           children: [
             const Center(
                 child: AppText(
-              text: 'Delivery fee',
+              text: 'Recommendations and Promotions',
               size: AppSizes.bodySmall,
               weight: FontWeight.w600,
             )),

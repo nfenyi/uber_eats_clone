@@ -54,6 +54,7 @@ dependencies:
   firebase_storage: ^12.4.5
   flutter:
     sdk: flutter
+  flutter_contacts: ^1.1.9+2
   flutter_launcher_icons: ^0.14.2
   flutter_native_splash: ^2.4.3
   flutter_riverpod: ^2.6.1

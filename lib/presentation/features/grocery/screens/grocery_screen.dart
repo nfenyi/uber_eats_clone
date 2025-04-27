@@ -217,6 +217,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
               ),
             ),
           ),
+          const SliverGap(10)
         ],
         body: Visibility(
           visible: !_onFilterScreen,

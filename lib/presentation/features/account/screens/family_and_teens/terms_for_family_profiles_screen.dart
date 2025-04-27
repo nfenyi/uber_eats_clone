@@ -5,12 +5,10 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../../../main.dart';
 import '../../../../constants/weblinks.dart';
 import '../../../main_screen/screens/main_screen_wrapper.dart';
-import '../../../webview/webview_screen.dart';
 
 class TermsForFamilyProfilesScreen extends StatefulWidget {
   final String familyMemberName;
@@ -25,8 +23,6 @@ class TermsForFamilyProfilesScreen extends StatefulWidget {
 class _TermsForFamilyProfilesScreenState
     extends State<TermsForFamilyProfilesScreen> {
   bool? _hasAgreed = false;
-
-  final _webViewcontroller = WebViewControllerPlus();
 
   @override
   Widget build(BuildContext context) {
