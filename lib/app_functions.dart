@@ -12,6 +12,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:location/location.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:uber_eats_clone/models/business_profile/business_profile_model.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
 import 'package:uber_eats_clone/models/gift_card_category_model.dart';
 import 'package:uber_eats_clone/models/group_order/group_order_model.dart';
@@ -496,5 +497,25 @@ class AppFunctions {
     final docSnapshot = querySnapshot.docs.first;
 
     return IndividualOrder.fromJson(docSnapshot.data());
+  }
+
+  static Future<List<BusinessProfile>> getBusinessProfiles() async {
+    List<BusinessProfile> businessProfiles = [];
+    final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+
+    final List businessProflieIds = userInfo['businessProfileIds'];
+    for (var businessProflieId in businessProflieIds) {
+      final snapshot = await FirebaseFirestore.instance
+          .collection(FirestoreCollections.businessProfiles)
+          .doc(businessProflieId)
+          .get();
+      if (snapshot.exists) {
+        final businessProfie = BusinessProfile.fromJson(snapshot.data()!);
+        businessProfiles.add(businessProfie);
+      } else {
+        logger.d('No longer exists');
+      }
+    }
+    return businessProfiles;
   }
 }

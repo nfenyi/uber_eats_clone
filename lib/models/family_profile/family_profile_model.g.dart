@@ -30,7 +30,7 @@ _$FamilyMemberInviteImpl _$$FamilyMemberInviteImplFromJson(
         Map<String, dynamic> json) =>
     _$FamilyMemberInviteImpl(
       id: json['id'] as String,
-      familyProfileId: json['familyProfileId'] as String?,
+      familyProfileId: json['familyProfileId'] as String,
       name: json['name'] as String,
       dob: DateTime.parse(json['dob'] as String),
     );

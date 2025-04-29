@@ -13,6 +13,7 @@ import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/simple_line_icons.dart';
 import 'package:uber_eats_clone/app_functions.dart';
+import 'package:uber_eats_clone/models/business_profile/business_profile_model.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/communication/communication_screen.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/voice_command_screen.dart';
@@ -39,6 +40,7 @@ import '../../../services/sign_in_view_model.dart';
 import '../../carts/screens/orders_screen.dart';
 import '../../main_screen/state/bottom_nav_index_provider.dart';
 import '../../promotion/promo_screen.dart';
+import '../../settings/screens/business_preferences/business_preferences_screen.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../../settings/screens/uber_one/uber_one_screen2.dart';
 import 'family_and_teens/family_intro_screen.dart';
@@ -505,8 +507,8 @@ class _AccountScreenState extends State<AccountScreen> {
             );
           }),
           ListTile(
-            onTap: () {
-              navigatorKey.currentState!.push(MaterialPageRoute(
+            onTap: () async {
+              await navigatorKey.currentState!.push(MaterialPageRoute(
                 builder: (context) => const HelpScreen(),
               ));
             },
@@ -514,10 +516,37 @@ class _AccountScreenState extends State<AccountScreen> {
             title: const AppText(text: 'Help'),
           ),
           ListTile(
-            onTap: () {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => const TurnOnBusinessPreferencesScreen(),
-              ));
+            onTap: () async {
+              try {
+                final userInfo =
+                    Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+                final selectedBusinessProfileId =
+                    userInfo['selectedBusinessProfileId'];
+                if (selectedBusinessProfileId == null) {
+                  await navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) =>
+                        const TurnOnBusinessPreferencesScreen(),
+                  ));
+                } else {
+                  final businessProfileSnapshot = await FirebaseFirestore
+                      .instance
+                      .collection(FirestoreCollections.businessProfiles)
+                      .doc(selectedBusinessProfileId)
+                      .get();
+
+                  final businessProfileJson = businessProfileSnapshot.data()!;
+                  final businessProfile =
+                      BusinessProfile.fromJson(businessProfileJson);
+                  await navigatorKey.currentState!
+                      .pushReplacement(MaterialPageRoute(
+                    builder: (context) =>
+                        BusinessPreferencesScreen(businessProfile),
+                  ));
+                }
+              } on Exception catch (e) {
+                await showAppInfoDialog(navigatorKey.currentContext!,
+                    description: e.toString());
+              }
             },
             leading: const Iconify(Mdi.briefcase_outline),
             title: const AppText(text: 'Setup your business profile'),

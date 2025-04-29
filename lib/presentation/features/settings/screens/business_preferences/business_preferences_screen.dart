@@ -5,6 +5,7 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ep.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/models/business_profile/business_profile_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -13,7 +14,8 @@ import 'package:uber_eats_clone/presentation/features/settings/screens/business_
 import '../../../../core/app_colors.dart';
 
 class BusinessPreferencesScreen extends StatefulWidget {
-  const BusinessPreferencesScreen({super.key});
+  final BusinessProfile selectedBusinessProfile;
+  const BusinessPreferencesScreen(this.selectedBusinessProfile, {super.key});
 
   @override
   State<BusinessPreferencesScreen> createState() =>
@@ -56,7 +58,7 @@ class _BusinessPreferencesScreenState extends State<BusinessPreferencesScreen> {
                 size: AppSizes.heading6,
               ),
               subtitle: AppText(
-                text: FirebaseAuth.instance.currentUser!.email ??
+                text: widget.selectedBusinessProfile.email ??
                     'Email not provided',
                 color: AppColors.neutral500,
               ),

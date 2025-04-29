@@ -77,10 +77,14 @@ class InitialAddBusinessProfileScreen extends StatelessWidget {
               },
             ),
             const Gap(10),
-            AppTextButton(
-              text: 'I have a pin code',
-              callback: () {},
-            )
+            InkWell(
+              child: Ink(
+                child: const AppText(
+                  text: 'I have a pin code',
+                ),
+              ),
+            ),
+            const Gap(20),
           ],
         )
       ],

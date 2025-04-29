@@ -270,7 +270,7 @@ FamilyMemberInvite _$FamilyMemberInviteFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$FamilyMemberInvite {
   String get id => throw _privateConstructorUsedError;
-  String? get familyProfileId => throw _privateConstructorUsedError;
+  String get familyProfileId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   DateTime get dob => throw _privateConstructorUsedError;
 
@@ -290,7 +290,7 @@ abstract class $FamilyMemberInviteCopyWith<$Res> {
           FamilyMemberInvite value, $Res Function(FamilyMemberInvite) then) =
       _$FamilyMemberInviteCopyWithImpl<$Res, FamilyMemberInvite>;
   @useResult
-  $Res call({String id, String? familyProfileId, String name, DateTime dob});
+  $Res call({String id, String familyProfileId, String name, DateTime dob});
 }
 
 /// @nodoc
@@ -309,7 +309,7 @@ class _$FamilyMemberInviteCopyWithImpl<$Res, $Val extends FamilyMemberInvite>
   @override
   $Res call({
     Object? id = null,
-    Object? familyProfileId = freezed,
+    Object? familyProfileId = null,
     Object? name = null,
     Object? dob = null,
   }) {
@@ -318,10 +318,10 @@ class _$FamilyMemberInviteCopyWithImpl<$Res, $Val extends FamilyMemberInvite>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      familyProfileId: freezed == familyProfileId
+      familyProfileId: null == familyProfileId
           ? _value.familyProfileId
           : familyProfileId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -342,7 +342,7 @@ abstract class _$$FamilyMemberInviteImplCopyWith<$Res>
       __$$FamilyMemberInviteImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String? familyProfileId, String name, DateTime dob});
+  $Res call({String id, String familyProfileId, String name, DateTime dob});
 }
 
 /// @nodoc
@@ -359,7 +359,7 @@ class __$$FamilyMemberInviteImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? familyProfileId = freezed,
+    Object? familyProfileId = null,
     Object? name = null,
     Object? dob = null,
   }) {
@@ -368,10 +368,10 @@ class __$$FamilyMemberInviteImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      familyProfileId: freezed == familyProfileId
+      familyProfileId: null == familyProfileId
           ? _value.familyProfileId
           : familyProfileId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -399,7 +399,7 @@ class _$FamilyMemberInviteImpl implements _FamilyMemberInvite {
   @override
   final String id;
   @override
-  final String? familyProfileId;
+  final String familyProfileId;
   @override
   final String name;
   @override
@@ -446,7 +446,7 @@ class _$FamilyMemberInviteImpl implements _FamilyMemberInvite {
 abstract class _FamilyMemberInvite implements FamilyMemberInvite {
   const factory _FamilyMemberInvite(
       {required final String id,
-      required final String? familyProfileId,
+      required final String familyProfileId,
       required final String name,
       required final DateTime dob}) = _$FamilyMemberInviteImpl;
 
@@ -456,7 +456,7 @@ abstract class _FamilyMemberInvite implements FamilyMemberInvite {
   @override
   String get id;
   @override
-  String? get familyProfileId;
+  String get familyProfileId;
   @override
   String get name;
   @override

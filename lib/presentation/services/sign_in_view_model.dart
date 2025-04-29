@@ -163,7 +163,7 @@ class FirestoreCollections {
   static String familyProfiles = 'family profiles';
   static String orderSchedules = 'order schedules';
   static String familyInvites = 'family invites';
-
+  static String businessProfiles = 'business profiles';
   static String exploreVideos = 'browse videos';
   static String featuredStores = 'featured stores';
   static String giftCards = 'gift cards';
