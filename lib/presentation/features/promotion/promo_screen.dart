@@ -10,6 +10,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
+import 'package:uber_eats_clone/presentation/constants/weblinks.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
@@ -677,8 +678,8 @@ class BannerCarousel extends StatelessWidget {
                             AppButton2(
                                 text: 'Request ride',
                                 callback: () async {
-                                  await launchUrl(Uri.parse(
-                                      'https://play.google.com/store/apps/details?id=com.ubercab'));
+                                  await launchUrl(
+                                      Uri.parse(Weblinks.googlePlayUberLink));
                                 }),
                           ],
                         ),

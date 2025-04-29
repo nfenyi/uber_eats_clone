@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:uber_eats_clone/main.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../state/user_location_providers.dart';
@@ -22,13 +23,11 @@ class MainScreenWrapper extends ConsumerStatefulWidget {
 
 class _MainScreenWrapperScreenState extends ConsumerState<MainScreenWrapper> {
   Future<bool> _fetchStoredUserLocation() async {
-    Map userInfo = await AppFunctions.getOnlineUserInfo();
-    ref.read(selectedLocationDescription.notifier).state =
-        userInfo['selectedAddress']['placeDescription'];
+    Map? storedUserInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    if (storedUserInfo == null) {
+      await AppFunctions.getOnlineUserInfo();
+    }
 
-    ref.read(selectedLocationGeoPoint.notifier).state = GeoPoint(
-        userInfo['selectedAddress']['latlng'].latitude,
-        userInfo['selectedAddress']['latlng'].longitude);
     await ref
         .read(userCurrentGeoLocationProvider.notifier)
         .getCurrentGeoLocation();

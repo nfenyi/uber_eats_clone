@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/account/screens/family_and_teens/teen/select_a_teen_screen.dart';
+import 'package:uber_eats_clone/presentation/features/account/screens/family_and_teens/teen/select_a_member_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../../main.dart';
@@ -133,9 +134,12 @@ class AddTeenScreen extends StatelessWidget {
       persistentFooterButtons: [
         AppButton(
           text: 'Choose contact',
-          callback: () {
-            navigatorKey.currentState!.push(MaterialPageRoute(
-              builder: (context) => const SelectATeenScreen(),
+          callback: () async {
+            await Hive.box(AppBoxes.appState)
+                .put(BoxKeys.firstTimeAddingTeen, false);
+            await navigatorKey.currentState!.pushReplacement(MaterialPageRoute(
+              builder: (context) =>
+                  const SelectAMemberScreen(memberType: FamilyMemberType.teen),
             ));
           },
         )

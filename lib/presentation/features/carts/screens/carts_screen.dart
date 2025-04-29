@@ -199,8 +199,8 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                           size: AppSizes.bodySmall,
                                         ),
                                         GestureDetector(
-                                            onTap: () {
-                                              showModalBottomSheet(
+                                            onTap: () async {
+                                              await showModalBottomSheet(
                                                 context: context,
                                                 builder: (context) {
                                                   return Container(
@@ -1140,56 +1140,71 @@ class CartSheet extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              if (store.offers != null)
+                              if (store.offers != null &&
+                                  store.offers!.isNotEmpty)
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Divider(),
-                                    const AppText(
-                                      text: 'Offers for you',
-                                      weight: FontWeight.bold,
-                                      size: AppSizes.body,
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal:
+                                              AppSizes.horizontalPaddingSmall),
+                                      child: AppText(
+                                        text: 'Offers for you',
+                                        weight: FontWeight.bold,
+                                        size: AppSizes.body,
+                                      ),
                                     ),
-                                    ListView.builder(
-                                      itemBuilder: (context, index) {
-                                        final offer = store.offers![index];
-                                        return FutureBuilder(
-                                            future:
-                                                AppFunctions.getOfferProduct(
-                                                    offer as DocumentReference),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.hasData) {
-                                                return ProductGridTilePriceFirst(
-                                                    product: snapshot.data!,
-                                                    store: store);
-                                              } else if (snapshot.hasError) {
-                                                return AppText(
-                                                  text:
-                                                      snapshot.error.toString(),
-                                                );
-                                              } else {
-                                                return Skeletonizer(
-                                                    enabled: true,
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Container(
-                                                          color: AppColors
-                                                              .neutral100,
-                                                        ),
-                                                        const AppText(
-                                                            text: 'lkajlskj'),
-                                                        const AppText(
-                                                            text: 'nlanjsklaf')
-                                                      ],
-                                                    ));
-                                              }
-                                            });
-                                      },
-                                      itemCount: store.offers!.length,
-                                      scrollDirection: Axis.horizontal,
+                                    const Gap(10),
+                                    SizedBox(
+                                      height: 200,
+                                      child: ListView.builder(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: AppSizes
+                                                .horizontalPaddingSmall),
+                                        itemBuilder: (context, index) {
+                                          final offer = store.offers![index];
+                                          return FutureBuilder(
+                                              future:
+                                                  AppFunctions.getOfferProduct(
+                                                      offer
+                                                          as DocumentReference),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.hasData) {
+                                                  return ProductGridTilePriceFirst(
+                                                      product: snapshot.data!,
+                                                      store: store);
+                                                } else if (snapshot.hasError) {
+                                                  return AppText(
+                                                    text: snapshot.error
+                                                        .toString(),
+                                                  );
+                                                } else {
+                                                  return Skeletonizer(
+                                                      enabled: true,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                            color: AppColors
+                                                                .neutral100,
+                                                          ),
+                                                          const AppText(
+                                                              text: 'lkajlskj'),
+                                                          const AppText(
+                                                              text:
+                                                                  'nlanjsklaf')
+                                                        ],
+                                                      ));
+                                                }
+                                              });
+                                        },
+                                        itemCount: store.offers!.length,
+                                        scrollDirection: Axis.horizontal,
+                                      ),
                                     )
                                   ],
                                 ),
@@ -1225,7 +1240,7 @@ class CartSheet extends StatelessWidget {
                                   children: [
                                     AppText(
                                         size: AppSizes.bodySmall,
-                                        decoration: promo != null
+                                        decoration: promo != null || hasUberOne
                                             ? TextDecoration.lineThrough
                                             : TextDecoration.none,
                                         text:

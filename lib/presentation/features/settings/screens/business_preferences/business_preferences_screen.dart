@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
@@ -54,8 +55,9 @@ class _BusinessPreferencesScreenState extends State<BusinessPreferencesScreen> {
                 weight: FontWeight.bold,
                 size: AppSizes.heading6,
               ),
-              subtitle: const AppText(
-                text: 'nanafenyim@gmail.com',
+              subtitle: AppText(
+                text: FirebaseAuth.instance.currentUser!.email ??
+                    'Email not provided',
                 color: AppColors.neutral500,
               ),
               leading: Container(

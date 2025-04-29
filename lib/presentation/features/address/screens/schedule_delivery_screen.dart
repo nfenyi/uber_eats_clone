@@ -61,11 +61,8 @@ class _ScheduleDeliveryScreenState
               text: 'Schedule',
               callback: () {
                 if (_selectedTime.difference(DateTime.now()) >
-                        const Duration(hours: 1) ||
+                        const Duration(hours: 1) &&
                     _selectedDay.isAfter(DateTime.now())) {
-                  // navigatorKey.currentState!.pop(_selectedDay.copyWith(
-                  //     hour: _selectedTime.hour, minute: _selectedTime.minute));
-                  // Hive.box(AppBoxes.appState).put(BoxKeys.activatedPromoPath, value)
                   if (widget.isFromGiftScreen) {
                     ref
                             .read(deliveryScheduleProviderForRecipient.notifier)
@@ -82,7 +79,7 @@ class _ScheduleDeliveryScreenState
                   navigatorKey.currentState!.pop();
                 } else {
                   showInfoToast(
-                      'The time schedule time selected must be at least an hour ahead of now',
+                      'The time schedule time selected must be at least an hour ahead',
                       context: context);
                 }
               },

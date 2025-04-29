@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
@@ -24,18 +25,24 @@ import 'package:uber_eats_clone/presentation/features/settings/screens/invite_a_
 import 'package:uber_eats_clone/presentation/features/settings/screens/privacy_center_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/uber_one/uber_one_intro_screen.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/wallet/wallet_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../main.dart';
+import '../../../../models/family_profile/family_profile_model.dart';
 import '../../../../models/uber_one_status/uber_one_status_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../constants/asset_names.dart';
+import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 import '../../../services/sign_in_view_model.dart';
 import '../../carts/screens/orders_screen.dart';
+import '../../main_screen/state/bottom_nav_index_provider.dart';
+import '../../promotion/promo_screen.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../../settings/screens/uber_one/uber_one_screen2.dart';
-import 'family_and_teens/family_and_teens_screen.dart';
+import 'family_and_teens/family_intro_screen.dart';
+import 'family_and_teens/family_profile_modal.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -366,9 +373,14 @@ class _AccountScreenState extends State<AccountScreen> {
                     valueListenable: Hive.box(AppBoxes.appState)
                         .listenable(keys: [BoxKeys.userInfo]),
                     builder: (context, appStateBox, child) {
-                      final userInfo = appStateBox.get(BoxKeys.userInfo);
+                      final Map<dynamic, dynamic> userInfo =
+                          appStateBox.get(BoxKeys.userInfo);
+                      Map<String, dynamic> stringObjectMap =
+                          userInfo.map((key, value) {
+                        return MapEntry(key.toString(), value);
+                      });
                       final uberOneStatus =
-                          UberOneStatus.fromJson(userInfo['uberOneStatus']);
+                          UberOneStatus.fromJson(stringObjectMap);
 
                       return Column(
                         children: [
@@ -425,34 +437,73 @@ class _AccountScreenState extends State<AccountScreen> {
           const Gap(15),
           const Divider(),
           ListTile(
-            onTap: () {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => const FamilyAndTeensScreen(),
-              ));
+            onTap: () async {
+              final userInfo = Hive.box(AppBoxes.appState).get(
+                BoxKeys.userInfo,
+              );
+              final storedFamilyProfieId = userInfo['familyProfile'];
+              if (storedFamilyProfieId == null) {
+                await navigatorKey.currentState!
+                    .push(MaterialPageRoute(builder: (context) {
+                  return const FamilyIntroScreen();
+                }));
+              } else {
+                final snapshot = await FirebaseFirestore.instance
+                    .collection(FirestoreCollections.familyProfiles)
+                    .doc(storedFamilyProfieId)
+                    .get();
+                if (snapshot.exists) {
+                  final familyProfile =
+                      FamilyProfile.fromJson(snapshot.data()!);
+                  if (context.mounted) {
+                    await showModalBottomSheet(
+                      isScrollControlled: true,
+                      useSafeArea: true,
+                      context: context,
+                      barrierColor: Colors.transparent,
+                      builder: (context) {
+                        return FamilyProfileModal(familyProfile);
+                      },
+                    );
+                  }
+                } else {
+                  logger.d(storedFamilyProfieId);
+                }
+              }
             },
             leading: const Icon(Icons.groups_outlined),
             title: const AppText(text: 'Family and teens'),
             subtitle: const AppText(text: 'Teen and adult accounts'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () async {
+              await launchUrl(Uri.parse(Weblinks.googlePlayUberLink));
+            },
             leading: const Icon(Icons.directions_car_outlined),
             title: const AppText(text: 'Ride'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () => navigatorKey.currentState!.push(
+                MaterialPageRoute(builder: (context) => const PromoScreen())),
             leading: const Iconify(AntDesign.tag_outlined),
             title: const AppText(text: 'Promotions'),
           ),
-          ListTile(
-            onTap: () {
-              navigatorKey.currentState!.push(MaterialPageRoute(
-                builder: (context) => const SendGiftsIntroScreen(),
-              ));
-            },
-            leading: const Iconify(Ph.gift),
-            title: const AppText(text: 'Send a gift'),
-          ),
+          Consumer(builder: (context, ref, child) {
+            return ListTile(
+              onTap: () {
+                if (Hive.box(AppBoxes.appState)
+                    .get(BoxKeys.firstTimeSendingGift, defaultValue: true)) {
+                  navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) => const SendGiftsIntroScreen(),
+                  ));
+                } else {
+                  ref.read(bottomNavIndexProvider.notifier).showGiftScreen();
+                }
+              },
+              leading: const Iconify(Ph.gift),
+              title: const AppText(text: 'Send a gift'),
+            );
+          }),
           ListTile(
             onTap: () {
               navigatorKey.currentState!.push(MaterialPageRoute(

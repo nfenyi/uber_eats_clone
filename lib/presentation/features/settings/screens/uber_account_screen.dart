@@ -195,7 +195,10 @@ class _UberAccountScreenState extends State<UberAccountScreen> {
                           ),
                           subtitle: Row(
                             children: [
-                              const AppText(text: 'nanafenyim@gmail.com'),
+                              AppText(
+                                  text: FirebaseAuth
+                                          .instance.currentUser!.email ??
+                                      'Email not provided'),
                               Row(
                                 children: [
                                   const Gap(5),

@@ -15,6 +15,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/hive_adapters/cart_item/cart_item_model.dart';
+import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
@@ -30,7 +31,6 @@ import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import 'package:uber_eats_clone/state/user_location_providers.dart';
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
-import '../../../models/offer/offer_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../constants/other_constants.dart';
@@ -326,18 +326,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   late List<Store> _nationalBrands;
   late List<Store> _hottestDeals;
-
-  // bool _onSearchScreen = false;
   bool _onFilterScreen = false;
-
-  // final FocusNode _focus = FocusNode();
 
   int? _selectedDeliveryFeeIndex;
   int? _selectedRatingIndex;
   String? _selectedPriceCategory;
   List<String> _selectedDietaryOptions = [];
   String? _selectedSort;
-  // final _scrollController = ScrollController();
 
   List<AnimationController> _animationControllers = [];
   late List<Animation<double>> _rotations;
@@ -387,7 +382,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     super.dispose();
-    // _scrollController.dispose();
     for (var animationController in _animationControllers) {
       animationController.dispose();
     }
@@ -395,8 +389,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final currentLocation = ref.watch(userCurrentGeoLocationProvider);
-    final storedGeoPoint = ref.watch(selectedLocationGeoPoint);
+    // final storedGeoPoint = ref.watch(selectedLocationGeoPoint);
     _screenWidth = MediaQuery.sizeOf(context).width;
     // var addressDetails = const AddressDetails(
     //     instruction: "bring your own tip",
@@ -797,70 +790,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       valueListenable: Hive.box(AppBoxes.appState)
                           .listenable(keys: [BoxKeys.userInfo]),
                       builder: (context, appStateBox, child) {
-                        var timePreference =
-                            ref.watch(deliveryScheduleProvider);
-                        return appStateBox.get(BoxKeys.userInfo) == null ||
-                                currentLocation == null
-                            ? FutureBuilder(
-                                future: _getLocation(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Padding(
-                                      padding: EdgeInsets.all(
-                                          AppSizes.horizontalPaddingSmall),
-                                      child: Skeletonizer(
-                                        enabled: true,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            AppText(
-                                              text: 'bnbnmbkbkbj',
-                                              color: AppColors.neutral500,
-                                            ),
-                                            AppText(
-                                                text:
-                                                    'vjvjbhhnklnlklsljkslkjajlkaslkaasklf')
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  } else if (snapshot.hasError) {
-                                    logger.d(snapshot.error.toString());
-                                    return Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppSizes.horizontalPaddingSmall),
-                                      child: InkWell(
-                                        onTap: () {
-                                          setState(() {});
-                                        },
-                                        child: Ink(
-                                          child: const Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              AppText(
-                                                text: 'Error',
-                                                color: AppColors.neutral500,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return LocationWidget(
-                                    appStateBox: appStateBox,
-                                    timePreference: timePreference,
-                                  );
-                                })
-                            : LocationWidget(
-                                appStateBox: appStateBox,
-                                timePreference: timePreference,
-                              );
+                        return const LocationWidget();
                       }),
                 ],
               ),
@@ -2003,14 +1933,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                     const Gap(10),
                                                     InkWell(
                                                       onTap: () async {
+                                                        final userInfo =
+                                                            Hive.box(AppBoxes
+                                                                    .appState)
+                                                                .get(BoxKeys
+                                                                    .userInfo);
+                                                        final HiveGeoPoint
+                                                            userSelectedGeoPoint =
+                                                            userInfo[
+                                                                    'selectedAddress']
+                                                                ['latlng'];
                                                         await navigatorKey
                                                             .currentState!
                                                             .push(
                                                                 MaterialPageRoute(
                                                           builder: (context) =>
                                                               MapScreen(
-                                                            userLocation:
-                                                                storedGeoPoint!,
+                                                            userLocation: GeoPoint(
+                                                                userSelectedGeoPoint
+                                                                    .latitude,
+                                                                userSelectedGeoPoint
+                                                                    .longitude),
                                                             filteredStores:
                                                                 allStores,
                                                             selectedFilters:
@@ -3626,12 +3569,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     return userInfo['redeemedPromos'].length;
   }
-
-  Future<void> _getLocation() async {
-    Map<dynamic, dynamic>? userInfo =
-        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-    userInfo ??= await AppFunctions.getOnlineUserInfo();
-  }
 }
 
 class AverageRatingWidget extends StatelessWidget {
@@ -3653,21 +3590,13 @@ class AverageRatingWidget extends StatelessWidget {
   }
 }
 
-class LocationWidget extends ConsumerWidget {
+class LocationWidget extends StatelessWidget {
   const LocationWidget({
     super.key,
-    required this.timePreference,
-    required this.appStateBox,
   });
 
-  final DateTime? timePreference;
-
-  final Box<dynamic> appStateBox;
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final storedGeoPoint = ref.read(selectedLocationGeoPoint)!;
-    final currentLocation = ref.read(userCurrentGeoLocationProvider);
+  Widget build(BuildContext context) {
     final locationFarAway = GlobalKey();
     return Padding(
       padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
@@ -3682,59 +3611,82 @@ class LocationWidget extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              AppText(
-                text: timePreference == null
-                    ? 'Deliver now'
-                    : '${AppFunctions.formatDate(timePreference.toString(), format: 'D, G:i A')} - ${AppFunctions.formatDate(timePreference!.add(const Duration(minutes: 30)).toString(), format: 'G:i A')}',
-                color: AppColors.neutral500,
-              ),
-              Showcase(
-                overlayOpacity: 0.05,
-                // disableMovingAnimation: true,
-                textColor: Colors.white,
-                tooltipBackgroundColor: Colors.black87,
-                tooltipBorderRadius: BorderRadius.circular(5),
-                description:
-                    'Is this the right address? You seem quite far away',
-                key: locationFarAway,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Builder(builder: (context) {
-                      const distance = Distance(roundResult: true);
-                      final distanceResult = distance.as(
-                          LengthUnit.Meter,
-                          LatLng(currentLocation!.latitude!,
-                              currentLocation.longitude!),
-                          LatLng(storedGeoPoint.latitude,
-                              storedGeoPoint.longitude));
+              Consumer(builder: (context, ref, child) {
+                final timePreference = ref.watch(deliveryScheduleProvider);
 
-                      if (distanceResult > 400) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (context.mounted) {
-                            ShowCaseWidget.of(context)
-                                .startShowCase([locationFarAway]);
-                          }
-                        });
-                        Future.delayed(
-                          const Duration(seconds: 30),
-                          () {
-                            if (context.mounted) {
-                              ShowCaseWidget.of(context).dismiss();
-                            }
-                          },
-                        );
-                      }
-                      return AppText(
-                          text: AppFunctions.formatPlaceDescription(ref
-                              .read(selectedLocationDescription)
-                              .split(', ')
-                              .first));
-                    }),
-                    const Icon(Icons.keyboard_arrow_down)
-                  ],
-                ),
-              )
+                return AppText(
+                  text: timePreference == null
+                      ? 'Deliver now'
+                      : '${AppFunctions.formatDate(timePreference.toString(), format: 'D, G:i A')} - ${AppFunctions.formatDate(timePreference.add(const Duration(minutes: 30)).toString(), format: 'G:i A')}',
+                  color: AppColors.neutral500,
+                );
+              }),
+              Consumer(builder: (context, ref, child) {
+                final currentLocation =
+                    ref.watch(userCurrentGeoLocationProvider);
+
+                return ValueListenableBuilder(
+                    valueListenable: Hive.box(AppBoxes.appState)
+                        .listenable(keys: [BoxKeys.userInfo]),
+                    builder: (context, appStateBox, child) {
+                      final userInfo = appStateBox.get(BoxKeys.userInfo);
+                      final HiveGeoPoint storedGeoPoint =
+                          userInfo['selectedAddress']['latlng'];
+                      return Showcase(
+                        overlayOpacity: 0.05,
+                        // disableMovingAnimation: true,
+                        textColor: Colors.white,
+                        tooltipBackgroundColor: Colors.black87,
+                        tooltipBorderRadius: BorderRadius.circular(5),
+                        description:
+                            'Is this the right address? You seem quite far away',
+                        key: locationFarAway,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Builder(builder: (context) {
+                              const distance = Distance(roundResult: true);
+                              final distanceResult = distance.as(
+                                  LengthUnit.Meter,
+                                  LatLng(currentLocation!.latitude!,
+                                      currentLocation.longitude!),
+                                  LatLng(storedGeoPoint.latitude,
+                                      storedGeoPoint.longitude));
+
+                              if (distanceResult > 400) {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  if (context.mounted) {
+                                    ShowCaseWidget.of(context)
+                                        .startShowCase([locationFarAway]);
+                                  }
+                                });
+                                Future.delayed(
+                                  const Duration(seconds: 30),
+                                  () {
+                                    if (context.mounted) {
+                                      ShowCaseWidget.of(context).dismiss();
+                                    }
+                                  },
+                                );
+                              }
+                              final userInfo = Hive.box(AppBoxes.appState)
+                                  .get(BoxKeys.userInfo);
+                              final String userSelectedPlaceDescription =
+                                  userInfo['selectedAddress']
+                                      ['placeDescription'];
+                              return AppText(
+                                  text: AppFunctions.formatPlaceDescription(
+                                      userSelectedPlaceDescription
+                                          .split(', ')
+                                          .first));
+                            }),
+                            const Icon(Icons.keyboard_arrow_down)
+                          ],
+                        ),
+                      );
+                    });
+              })
             ],
           ),
         ),
@@ -3970,12 +3922,14 @@ class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
                         quantity: 1,
                       ));
                       if (cartItemInBox == null) {
+                        final userInfo =
+                            Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+                        final String selectedLocationDescription =
+                            userInfo['selectedAddress']['placeDescription'];
                         final newCartItem = HiveCartItem(
-                            // initialPricesTotal: widget.product.initialPrice,
                             subtotal: widget.product.promoPrice ??
                                 widget.product.initialPrice,
-                            placeDescription:
-                                ref.read(selectedLocationDescription),
+                            placeDescription: selectedLocationDescription,
                             deliveryDate: ref
                                 .read(deliveryScheduleProvider.notifier)
                                 .state,
@@ -4352,7 +4306,6 @@ class SearchResultDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Offer> offers = [];
     List<DocumentReference> matchingProducts = [];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

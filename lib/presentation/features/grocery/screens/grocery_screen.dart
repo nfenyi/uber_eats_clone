@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
@@ -19,6 +20,7 @@ import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_n
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../app_functions.dart';
+import '../../../../hive_adapters/geopoint/geopoint_adapter.dart';
 import '../../../../models/advert/advert_model.dart';
 import '../../../../models/store/store_model.dart';
 import '../../../../state/user_location_providers.dart';
@@ -150,7 +152,6 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedGeoPoint = ref.read(selectedLocationGeoPoint)!;
     // FirebaseFirestore.instance
     //     .collection(FirestoreCollections.featuredStores)
     //     .doc()
@@ -248,9 +249,14 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                   const Gap(10),
                   InkWell(
                     onTap: () async {
+                      final userInfo =
+                          Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+                      final HiveGeoPoint selectedGeoPoint =
+                          userInfo['selectedAddress']['latlng'];
                       await navigatorKey.currentState!.push(MaterialPageRoute(
                         builder: (context) => MapScreen(
-                          userLocation: selectedGeoPoint,
+                          userLocation: GeoPoint(selectedGeoPoint.latitude,
+                              selectedGeoPoint.longitude),
                           filteredStores: const [],
                         ),
                       ));

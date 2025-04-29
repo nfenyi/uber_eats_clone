@@ -1800,9 +1800,13 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                   );
                   await _productsBox.add(newProduct);
                   if (_cartItemInBox == null) {
+                    final userInfo =
+                        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+                    final String selectedPlaceDescription =
+                        userInfo['selectedAddress']['placeDescription'];
                     var temp = HiveCartItem(
                       deliveryDate: ref.read(deliveryScheduleProvider),
-                      placeDescription: ref.read(selectedLocationDescription),
+                      placeDescription: selectedPlaceDescription,
                       products: HiveList(_productsBox),
                       // initialPricesTotal: _product.initialPrice * _quantity,
                       subtotal: _product.promoPrice ??

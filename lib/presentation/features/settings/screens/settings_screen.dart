@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
@@ -67,8 +68,8 @@ class SettingsScreen extends ConsumerWidget {
                     ],
                   ),
                   const Gap(10),
-                  const AppText(
-                    text: 'Nana Fenyi',
+                  AppText(
+                    text: FirebaseAuth.instance.currentUser!.displayName!,
                     size: AppSizes.bodySmall,
                   ),
                   const Gap(5),

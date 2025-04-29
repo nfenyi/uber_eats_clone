@@ -102,6 +102,7 @@ void main() async {
       }
     }
   }
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent, // Or any other color you want
     // statusBarIconBrightness: Brightness.light, // For light status bar icons (white)
@@ -340,6 +341,8 @@ class BoxKeys {
   static const String activatedPromoId = 'activatedPromoPath';
   static const String recentlyViewed = 'recentlyViewed';
   static const String firstTimeSendingGift = 'firstTimeSendingGift';
+  static const String firstTimeAddingTeen = 'firstTimeAddingTeen';
+
   static const String isOnboardedToUberGifts = 'isOnboardedToUberGifts';
   static const String creditCardInUse = 'creditCardInUse';
 

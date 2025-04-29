@@ -9,8 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart' as lt;
-import 'package:marquee_list/marquee_list.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
@@ -20,8 +20,8 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/search_menu_screen.dart';
 import 'package:uber_eats_clone/presentation/features/store/store_details_screen.dart';
-import 'package:uber_eats_clone/state/user_location_providers.dart';
 
+import '../../../hive_adapters/geopoint/geopoint_adapter.dart';
 import '../../../main.dart';
 import '../../../models/favourite/favourite_model.dart';
 import '../../../models/store/store_model.dart';
@@ -47,12 +47,11 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
   late final Store _store;
   late final List<GlobalKey> _categoryKeys;
   late final GeoPoint _storeLatLng;
-  // final _scrollController = ScrollController();
-  // late final ScrollNotification _scrollNotification;
+
   late lt.Distance _distance;
   int? _retrievalFilter = 0;
   late bool _isFavorite;
-  late final GeoPoint _selectedGeoPoint;
+  late final HiveGeoPoint _selectedGeoPoint;
 
   int _currentCategoryIndex = 0;
 
@@ -107,7 +106,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
       statusBarIconBrightness: Brightness.light,
       statusBarColor: null,
     ));
-    _selectedGeoPoint = ref.read(selectedLocationGeoPoint)!;
+
     _store = widget.store;
     _storeLatLng = _store.location.latlng as GeoPoint;
     if (_store.productCategories != null) {
@@ -124,6 +123,8 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
     _distance = const lt.Distance(
       roundResult: true,
     );
+    final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    _selectedGeoPoint = userInfo['selectedAddress']['latlng'];
     // WidgetsBinding.instance.addPostFrameCallback(
     //   (timeStamp) {
     //     SystemChrome.setSystemUIOverlayStyle(

@@ -1,5 +1,6 @@
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:credit_card_validator/credit_card_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -204,33 +205,34 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
                       ],
                     ),
                   if (accountType == 'Business')
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Divider(),
-                        AppText(
+                        const Divider(),
+                        const AppText(
                           size: AppSizes.bodySmall,
                           text: 'Business settings',
                           weight: FontWeight.w600,
                         ),
-                        Gap(10),
+                        const Gap(10),
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: Icon(
+                          leading: const Icon(
                             Icons.receipt,
                             weight: 4,
                           ),
                           title: AppText(
-                            text: 'Receipts to nanafenyim@gmail.com',
+                            text:
+                                'Receipts to ${FirebaseAuth.instance.currentUser!.email ?? 'Email not set'}',
                             color: AppColors.neutral500,
                             size: AppSizes.bodySmall,
                           ),
-                          subtitle: AppText(
+                          subtitle: const AppText(
                             text: 'Expense not set',
                             color: AppColors.neutral500,
                             size: AppSizes.bodySmall,
                           ),
-                          trailing: Icon(Icons.keyboard_arrow_right),
+                          trailing: const Icon(Icons.keyboard_arrow_right),
                         ),
                       ],
                     ),
