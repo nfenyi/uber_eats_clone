@@ -17,8 +17,6 @@ class CommunicationEmailScreen extends ConsumerStatefulWidget {
 
 class _CommunicationEmailScreenState
     extends ConsumerState<CommunicationEmailScreen> {
-  bool _isEmailExpanded = false;
-
   bool _hasSubscribed = false;
 
   bool _enablePromoOffers = false;
@@ -64,57 +62,43 @@ class _CommunicationEmailScreenState
               ),
               ListTile(
                 onTap: () {
-                  setState(() {
-                    _isEmailExpanded = !_isEmailExpanded;
-                  });
-                  if (_isEmailExpanded) {
-                    showModalBottomSheet(
-                      isDismissible: false,
-                      backgroundColor: Colors.transparent,
-                      isScrollControlled: false,
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                            width: double.infinity,
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10))),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: _emails
-                                  .map(
-                                    (email) => ListTile(
-                                      onTap: () {
-                                        setState(() {
-                                          _selectedEmail = email;
-                                          // _isEmailExpanded = false;
-                                        });
-                                        navigatorKey.currentState!.pop();
-                                      },
-                                      title: AppText(text: email),
-                                    ),
-                                  )
-                                  .toList(),
-                            ));
-                      },
-                    ).then(
-                      (value) {
-                        setState(() {
-                          _isEmailExpanded = false;
-                        });
-                      },
-                    );
-                  }
+                  showModalBottomSheet(
+                    backgroundColor: Colors.transparent,
+                    isScrollControlled: false,
+                    context: context,
+                    builder: (context) {
+                      return Container(
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10))),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: _emails
+                                .map(
+                                  (email) => ListTile(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedEmail = email;
+                                        // _isEmailExpanded = false;
+                                      });
+                                      navigatorKey.currentState!.pop();
+                                    },
+                                    title: AppText(text: email),
+                                  ),
+                                )
+                                .toList(),
+                          ));
+                    },
+                  );
                 },
                 title: AppText(
                   text: _selectedEmail,
                   size: AppSizes.bodySmall,
                 ),
-                trailing: Icon(_isEmailExpanded
-                    ? Icons.keyboard_arrow_up
-                    : Icons.keyboard_arrow_down),
+                trailing: const Icon(Icons.keyboard_arrow_down),
               ),
               SwitchListTile.adaptive(
                 title: const AppText(

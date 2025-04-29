@@ -585,7 +585,9 @@ class _AccountScreenState extends State<AccountScreen> {
             title: const AppText(text: 'Communication'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () async {
+              await launchUrl(Uri.parse(Weblinks.uberDeliveryWebPage));
+            },
             leading: const Iconify(La.shopping_bag),
             title: const AppText(text: 'Earn by driving or delivering'),
           ),
