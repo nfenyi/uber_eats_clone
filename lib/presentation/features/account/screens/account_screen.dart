@@ -537,8 +537,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   final businessProfileJson = businessProfileSnapshot.data()!;
                   final businessProfile =
                       BusinessProfile.fromJson(businessProfileJson);
-                  await navigatorKey.currentState!
-                      .pushReplacement(MaterialPageRoute(
+                  await navigatorKey.currentState!.push(MaterialPageRoute(
                     builder: (context) =>
                         BusinessPreferencesScreen(businessProfile),
                   ));
@@ -553,10 +552,9 @@ class _AccountScreenState extends State<AccountScreen> {
             subtitle:
                 const AppText(text: 'Automate work travel & meal expenses'),
           ),
-          ListTile(
-            onTap: () {},
-            leading: const Iconify(Ep.trophy),
-            title: const AppText(text: 'Partner Rewards'),
+          const ListTile(
+            leading: Iconify(Ep.trophy),
+            title: AppText(text: 'Partner Rewards'),
           ),
           ListTile(
             onTap: () {

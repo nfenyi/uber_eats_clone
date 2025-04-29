@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/business_preferences/link_an_expense_program_screen.dart';
+import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 
 import '../../../../../app_functions.dart';
@@ -16,7 +18,8 @@ import '../../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
 import '../../../sign_in/views/payment_method_screen.dart';
 
 class BusinessChoosePaymentScreen extends ConsumerStatefulWidget {
-  const BusinessChoosePaymentScreen({super.key});
+  final String? businessId;
+  const BusinessChoosePaymentScreen({super.key, this.businessId});
 
   @override
   ConsumerState<BusinessChoosePaymentScreen> createState() =>
@@ -59,16 +62,27 @@ class _BusinessChoosePaymentScreenState
                             '${AppFunctions.getCreditCardName(types)}••••${creditCard.cardNumber.substring(6)}';
                         return ListTile(
                           onTap: () async {
-                            ref.read(businessFormProiver.notifier).state = ref
-                                .read(businessFormProiver.notifier)
-                                .state!
-                                .copyWith(creditCardNumber: cardNumberToShow);
-
-                            await navigatorKey.currentState!
-                                .push(MaterialPageRoute(
-                              builder: (context) =>
-                                  const LinkAnExpenseProgramScreen(),
-                            ));
+                            if (widget.businessId != null) {
+                              await FirebaseFirestore.instance
+                                  .collection(
+                                      FirestoreCollections.businessProfiles)
+                                  .doc(widget.businessId)
+                                  .update(
+                                      {'creditCardNumber': cardNumberToShow});
+                              if (context.mounted) {
+                                navigatorKey.currentState!.pop();
+                              }
+                            } else {
+                              ref.read(businessFormProiver.notifier).state = ref
+                                  .read(businessFormProiver.notifier)
+                                  .state!
+                                  .copyWith(creditCardNumber: cardNumberToShow);
+                              await navigatorKey.currentState!
+                                  .push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const LinkAnExpenseProgramScreen(),
+                              ));
+                            }
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: CreditCardLogo(types: types),

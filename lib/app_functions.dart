@@ -499,11 +499,10 @@ class AppFunctions {
     return IndividualOrder.fromJson(docSnapshot.data());
   }
 
-  static Future<List<BusinessProfile>> getBusinessProfiles() async {
+  static Future<List<BusinessProfile>> getBusinessProfiles(
+      List<dynamic> businessProflieIds) async {
     List<BusinessProfile> businessProfiles = [];
-    final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
 
-    final List businessProflieIds = userInfo['businessProfileIds'];
     for (var businessProflieId in businessProflieIds) {
       final snapshot = await FirebaseFirestore.instance
           .collection(FirestoreCollections.businessProfiles)

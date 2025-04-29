@@ -1,18 +1,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
+import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/settings/screens/business_preferences/business_preference_ready_modal.dart';
+import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
+import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 
+import '../../../../../app_functions.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../core/app_colors.dart';
 
-class LinkAnExpenseProgramScreen extends StatelessWidget {
+class LinkAnExpenseProgramScreen extends ConsumerWidget {
   const LinkAnExpenseProgramScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final _expensePrograms = <ExpenseProgram>[
       ExpenseProgram(
           imageUrl:
@@ -46,11 +53,34 @@ class LinkAnExpenseProgramScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final expenseProgram = _expensePrograms[index];
                   return ListTile(
-                    onTap: () {
-                      navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) =>
-                            const BusinessPreferenceReadyModal(),
-                      ));
+                    onTap: () async {
+                      try {
+                        final newProfile = ref
+                            .read(businessFormProiver)!
+                            .copyWith(expenseProgram: expenseProgram.name);
+                        await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.businessProfiles)
+                            .doc(newProfile.id)
+                            .set(newProfile.toJson());
+
+                        await FirebaseFirestore.instance
+                            .collection(FirestoreCollections.users)
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .update({
+                          'selectedBusinessProfileId': newProfile.id,
+                          'businessProfileIds':
+                              FieldValue.arrayUnion([newProfile.id])
+                        });
+                        await AppFunctions.getOnlineUserInfo();
+
+                        await navigatorKey.currentState!.push(MaterialPageRoute(
+                          builder: (context) =>
+                              const BusinessPreferenceReadyModal(),
+                        ));
+                      } on Exception catch (e) {
+                        await showAppInfoDialog(navigatorKey.currentContext!,
+                            description: e.toString());
+                      }
                     },
                     contentPadding: EdgeInsets.zero,
                     leading: CachedNetworkImage(
@@ -74,10 +104,30 @@ class LinkAnExpenseProgramScreen extends StatelessWidget {
             padding:
                 const EdgeInsets.only(right: AppSizes.horizontalPaddingSmall),
             child: InkWell(
-              onTap: () {
-                navigatorKey.currentState!.push(MaterialPageRoute(
-                  builder: (context) => const BusinessPreferenceReadyModal(),
-                ));
+              onTap: () async {
+                try {
+                  final newProfile = ref.read(businessFormProiver)!;
+                  await FirebaseFirestore.instance
+                      .collection(FirestoreCollections.businessProfiles)
+                      .doc(newProfile.id)
+                      .set(newProfile.toJson());
+
+                  await FirebaseFirestore.instance
+                      .collection(FirestoreCollections.users)
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .update({
+                    'selectedBusinessProfileId': newProfile.id,
+                    'businessProfileIds': FieldValue.arrayUnion([newProfile.id])
+                  });
+                  await AppFunctions.getOnlineUserInfo();
+
+                  await navigatorKey.currentState!.push(MaterialPageRoute(
+                    builder: (context) => const BusinessPreferenceReadyModal(),
+                  ));
+                } on Exception catch (e) {
+                  await showAppInfoDialog(navigatorKey.currentContext!,
+                      description: e.toString());
+                }
               },
               child: const Padding(
                 padding: EdgeInsets.all(3),
