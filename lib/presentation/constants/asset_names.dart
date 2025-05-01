@@ -140,6 +140,7 @@ class AssetNames {
   static const greenTag = 'assets/images/green_tag.png';
   static const addGiftCard = 'assets/images/add_gift_card.png';
   static const noCarts = 'assets/images/no_carts.png';
+  static const marker3 = 'assets/images/marker_3.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

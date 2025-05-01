@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -110,6 +111,7 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                         ),
                         const Gap(15),
                         AppTextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           onChanged: (value) {
                             if (value != null) {
                               if (_debounce?.isActive ?? false) {
@@ -122,8 +124,10 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                             }
                           },
                           keyboardType: const TextInputType.numberWithOptions(),
-                          validator: FormBuilderValidators.compose(
-                              [FormBuilderValidators.required()]),
+                          validator: FormBuilderValidators.compose([
+                            FormBuilderValidators.required(),
+                            FormBuilderValidators.numeric()
+                          ]),
                           controller: _cardNumberController,
                           removePrefixConstraints: true,
                           prefixIcon: ValueListenableBuilder(
@@ -157,11 +161,24 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                                       DeviceOrientation.portraitUp);
                                   //TODO: complete camera capture
                                   if (context.mounted) {
-                                    await navigatorKey.currentState!
+                                    final result = await navigatorKey
+                                        .currentState!
                                         .push(MaterialPageRoute(
                                       builder: (context) =>
                                           AddACardCameraView(controller),
                                     ));
+
+                                    if (result != null) {
+                                      result as String;
+                                      setState(() {
+                                        final formattedText =
+                                            result.replaceAll(' ', '');
+                                        _cardNumberController.text =
+                                            formattedText;
+                                        _cardNumberNotifier.value =
+                                            formattedText;
+                                      });
+                                    }
                                   } else {
                                     await controller.dispose();
                                   }
@@ -198,6 +215,10 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                                   ),
                                   const Gap(5),
                                   AppTextFormField(
+                                    inputFormatters: [
+                                      CardNumberInputFormatter()
+                                    ],
+                                    keyboardType: TextInputType.number,
                                     maxLength: 5,
                                     validator: FormBuilderValidators.compose(
                                         [FormBuilderValidators.required()]),
@@ -558,7 +579,9 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                       creditCardType: AppFunctions.getCreditCardName(
                           detectCCType(_cardNumberController.text)),
                       cardNumber: _cardNumberController.text,
-                      expDate: _expController.text.trim(),
+                      expDate: _expController.text[2] == '/'
+                          ? _expController.text
+                          : '${_expController.text.substring(0, 3)}/${_expController.text.substring(2)}',
                       cvv: _cvvController.text,
                       country: _countryController.text,
                       zipCode: _zipCodeController.text,
@@ -629,5 +652,36 @@ class CreditCardLogo extends StatelessWidget {
         size: 12,
       );
     }
+  }
+}
+
+class CardNumberInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final String newText = newValue.text.replaceAll(RegExp(r'\D+'), '');
+    final int newTextLength = newText.length;
+    final StringBuffer buffer = StringBuffer();
+
+    try {
+      if (newTextLength > 0) {
+        buffer.write(newText.substring(0, min(2, newTextLength)));
+        if (newTextLength > 2) {
+          buffer.write('/');
+          buffer.write(newText.substring(2, min(4, newTextLength)));
+        }
+      }
+    } catch (e) {
+      logger.d('Error formatting input: $e');
+
+      return oldValue;
+    }
+
+    final String formattedText = buffer.toString();
+
+    return newValue.copyWith(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
   }
 }

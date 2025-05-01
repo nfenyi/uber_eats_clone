@@ -19,121 +19,126 @@ import '../../../core/widgets.dart';
 import '../../../services/sign_in_view_model.dart';
 import '../../main_screen/screens/main_screen_wrapper.dart';
 
-class UberOneScreen extends StatelessWidget {
+class UberOneScreen extends StatefulWidget {
   const UberOneScreen({super.key});
+
+  @override
+  State<UberOneScreen> createState() => _UberOneScreenState();
+}
+
+class _UberOneScreenState extends State<UberOneScreen> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
           child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  children: [
-                    Image.asset(
-                      width: double.infinity,
-                      fit: BoxFit.fitWidth,
-                      AssetNames.uberOne1,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0, top: 8),
-                      child: GestureDetector(
-                        onTap: () async {
-                          await _executeOnboardingUploads();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(50)),
-                          child: const Icon(Icons.close),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const Gap(10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.horizontalPaddingSmall),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const AppText(
-                          text: "You've got \$0 Delivery Fees with Uber One!"),
-                      const Gap(10),
-                      const AppText(
-                        text:
-                            'Enjoy our membership free for I week, Joshua - no payment method required- Choose if you want to join at anytime.',
-                      ),
-                      const Gap(20),
-                      const ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Icon(
-                          Icons.shopping_bag,
-                        ),
-                        title: AppText(
-                          text:
-                              'SC Delivery Fee on eligible food, groceries, and more',
-                        ),
-                      ),
-                      const ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Icon(
-                          FontAwesomeIcons.tag,
-                        ),
-                        title: AppText(
-                          text:
-                              'Up to 10% off eligible deliveries and pickup orders',
-                        ),
-                      ),
-                      const ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Icon(
-                          FontAwesomeIcons.car,
-                        ),
-                        title: AppText(
-                          text:
-                              'Earn 6% Uber Cash and get top-rated drivers on eligible rides',
-                        ),
-                      ),
-                      const Gap(20),
-                      RichText(
-                        text: TextSpan(
-                            text:
-                                "*If you choose to join, Uber One is \$9.99/mo after free trials. Benefits available only for eligible stores and rides marked with the Uber One icon. Participating restaurants and non-grocery stores: \$15.00 minimum order to receive \$0 Delivery Fee and up to 10% Off, Participating grocery stores: \$35 minimum order to receive \$0 Delivery Fee and 5% Off. Membership savings applied as a reduction to service fees. 6% Uber Cash earned after completion of eligible rides. Taxes and similar fees, as applicable, do not apply towards order minimums or Uber Cash back benefits. Other fees and exclusions may apply. ",
-                            style: const TextStyle(
-                              fontSize: AppSizes.bodySmallest,
-                              color: Colors.black,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'View terms and conditions',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () async {
-                                    await launchUrl(
-                                        Uri.parse(Weblinks.uberOneTerms));
-                                  },
-                              ),
-                            ]),
-                      ),
-                    ],
+          Stack(
+            children: [
+              Image.asset(
+                width: double.infinity,
+                fit: BoxFit.fitWidth,
+                AssetNames.uberOne1,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 8),
+                child: GestureDetector(
+                  onTap: () async {
+                    await _executeOnboardingUploads();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50)),
+                    child: const Icon(Icons.close),
                   ),
                 ),
-              ],
+              )
+            ],
+          ),
+          const Gap(10),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.horizontalPaddingSmall),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppText(
+                        text: "You've got \$0 Delivery Fees with Uber One!"),
+                    const Gap(10),
+                    const AppText(
+                      text:
+                          'Enjoy our membership free for I week, Joshua - no payment method required- Choose if you want to join at anytime.',
+                    ),
+                    const Gap(20),
+                    const ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        Icons.shopping_bag,
+                      ),
+                      title: AppText(
+                        text:
+                            'SC Delivery Fee on eligible food, groceries, and more',
+                      ),
+                    ),
+                    const ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        FontAwesomeIcons.tag,
+                      ),
+                      title: AppText(
+                        text:
+                            'Up to 10% off eligible deliveries and pickup orders',
+                      ),
+                    ),
+                    const ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        FontAwesomeIcons.car,
+                      ),
+                      title: AppText(
+                        text:
+                            'Earn 6% Uber Cash and get top-rated drivers on eligible rides',
+                      ),
+                    ),
+                    const Gap(20),
+                    RichText(
+                      text: TextSpan(
+                          text:
+                              "*If you choose to join, Uber One is \$9.99/mo after free trials. Benefits available only for eligible stores and rides marked with the Uber One icon. Participating restaurants and non-grocery stores: \$15.00 minimum order to receive \$0 Delivery Fee and up to 10% Off, Participating grocery stores: \$35 minimum order to receive \$0 Delivery Fee and 5% Off. Membership savings applied as a reduction to service fees. 6% Uber Cash earned after completion of eligible rides. Taxes and similar fees, as applicable, do not apply towards order minimums or Uber Cash back benefits. Other fees and exclusions may apply. ",
+                          style: const TextStyle(
+                            fontSize: AppSizes.bodySmallest,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'View terms and conditions',
+                              style: const TextStyle(
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () async {
+                                  await launchUrl(
+                                      Uri.parse(Weblinks.uberOneTerms));
+                                },
+                            ),
+                          ]),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
             child: AppButton(
+              isLoading: _isLoading,
               text: 'Got it',
               callback: () async {
                 await _executeOnboardingUploads();
@@ -146,6 +151,9 @@ class UberOneScreen extends StatelessWidget {
   }
 
   Future<void> _executeOnboardingUploads() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       await Hive.box(AppBoxes.appState).delete('isVerifiedViaLink');
       await Hive.box(AppBoxes.appState).delete(BoxKeys.addedEmailToPhoneNumber);
@@ -205,6 +213,9 @@ class UberOneScreen extends StatelessWidget {
         return false;
       });
     } on Exception catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       await showAppInfoDialog(navigatorKey.currentContext!,
           description: e.toString());
     }

@@ -66,6 +66,8 @@ class _MapScreenState extends State<MapScreen> {
 
   String? _selectedPriceCategory;
 
+  late String _storeInFocus;
+
   @override
   void initState() {
     super.initState();
@@ -84,13 +86,14 @@ class _MapScreenState extends State<MapScreen> {
       roundResult: true,
     );
     _stores = widget.filteredStores;
+    _storeInFocus = _stores.first.name;
     for (var i = 0; i < _stores.length; i++) {
       final storeLatlng = _stores[i].location.latlng as GeoPoint;
       _markers.add(
         Marker(
             onTap: () async {
               final controller = await _mapController.future;
-
+              _storeInFocus = _stores[i].name;
               await controller.moveCamera(CameraUpdate.newCameraPosition(
                   CameraPosition(
                       target:
@@ -119,7 +122,27 @@ class _MapScreenState extends State<MapScreen> {
           Builder(builder: (context) {
             final storeLatlng = _stores.first.location.latlng as GeoPoint;
             return GoogleMap(
-              markers: _markers,
+              markers: _markers.map(
+                (e) {
+                  if (e.markerId.value == _storeInFocus) {
+                    return Marker(
+                        onTap: () async {
+                          final controller = await _mapController.future;
+
+                          await controller.moveCamera(
+                              CameraUpdate.newCameraPosition(CameraPosition(
+                                  target: LatLng(storeLatlng.latitude,
+                                      storeLatlng.longitude),
+                                  zoom: 15)));
+                        },
+                        markerId: MarkerId(_storeInFocus),
+                        position: LatLng(
+                            storeLatlng.latitude, storeLatlng.longitude));
+                  } else {
+                    return e;
+                  }
+                },
+              ).toSet(),
               zoomControlsEnabled: false,
               myLocationButtonEnabled: true,
               minMaxZoomPreference: const MinMaxZoomPreference(10, 30),
@@ -183,6 +206,7 @@ class _MapScreenState extends State<MapScreen> {
                                             onTap: () async {
                                               final controller =
                                                   await _mapController.future;
+                                              _storeInFocus = _stores[i].name;
                                               await controller.moveCamera(
                                                   CameraUpdate.newCameraPosition(
                                                       CameraPosition(
@@ -888,7 +912,7 @@ class _MapScreenState extends State<MapScreen> {
                           color: Colors.white,
                         ),
                         child: const Iconify(
-                          Bi.cursor,
+                          Bi.cursor_fill,
                           size: 15,
                           color: Colors.black,
                         ),
@@ -992,6 +1016,7 @@ class _MapScreenState extends State<MapScreen> {
                           final controller = await _mapController.future;
                           final storelatLng =
                               _stores[index].location.latlng as GeoPoint;
+                          _storeInFocus = _stores[index].name;
                           await controller.moveCamera(
                               CameraUpdate.newCameraPosition(CameraPosition(
                                   target: LatLng(storelatLng.latitude,

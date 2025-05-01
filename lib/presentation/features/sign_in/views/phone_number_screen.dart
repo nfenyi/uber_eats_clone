@@ -302,7 +302,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                     },
                                     verificationFailed:
                                         (FirebaseAuthException e) {
-                                      showInfoToast(e.code, context: context);
+                                      showInfoToast(e.toString(),
+                                          context: context);
                                     },
                                     codeSent: (String verificationId,
                                         int? resendToken) {

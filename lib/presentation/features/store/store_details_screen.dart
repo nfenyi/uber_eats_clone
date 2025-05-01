@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/octicon.dart';
+import 'package:maps_curved_line/maps_curved_line.dart';
 import 'package:marquee_list/marquee_list.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
@@ -22,11 +23,13 @@ import '../../services/place_detail_model.dart';
 
 class StoreDetailsScreen extends StatefulWidget {
   final Store store;
+  final double distance;
   final PlaceLocation location;
   final BitmapDescriptor markerIcon;
   const StoreDetailsScreen({
     super.key,
     required this.location,
+    required this.distance,
     required this.markerIcon,
     required this.store,
   });
@@ -36,19 +39,41 @@ class StoreDetailsScreen extends StatefulWidget {
 }
 
 class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
-  late LatLng _setLocation;
+  late final LatLng _setLatLng;
   bool _timeExpanded = false;
   late LatLng _initialCameraPositionTarget;
   late GeoPoint _storeGeoPoint;
+  final Set<Polyline> _polylines = {};
+  late final LatLng _storeLatLng;
 
   @override
   void initState() {
     super.initState();
-    _setLocation = LatLng(widget.location.lat!, widget.location.lng!);
+    _setLatLng = LatLng(widget.location.lat!, widget.location.lng!);
     _storeGeoPoint = widget.store.location.latlng as GeoPoint;
+    _storeLatLng = LatLng(_storeGeoPoint.latitude, _storeGeoPoint.longitude);
+
     _initialCameraPositionTarget = LatLng(
         (widget.location.lat! + _storeGeoPoint.latitude) / 2,
         (widget.location.lng! + _storeGeoPoint.longitude) / 2);
+    _polylines.add(Polyline(
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        width: 3,
+        geodesic: true,
+        jointType: JointType.round,
+        zIndex: 2,
+        polylineId: const PolylineId("polyline"),
+        color: Colors.black,
+        points: MapsCurvedLines.getPointsOnCurve(_storeLatLng, _setLatLng)));
+    _polylines.add(Polyline(
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        width: 1,
+        jointType: JointType.round,
+        polylineId: const PolylineId("polyline"),
+        color: AppColors.neutral300,
+        points: [_storeLatLng, _setLatLng]));
   }
 
   @override
@@ -74,22 +99,27 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
                         width: double.infinity,
                         height: double.infinity,
                         child: GoogleMap(
+                          liteModeEnabled: true,
                           zoomControlsEnabled: false,
-                          zoomGesturesEnabled: false,
+                          zoomGesturesEnabled: true,
                           tiltGesturesEnabled: false,
+                          polylines: _polylines,
                           markers: {
                             Marker(
                                 markerId: const MarkerId('set_location'),
                                 icon: widget.markerIcon,
-                                position: _setLocation),
+                                anchor: const Offset(0.4, 0),
+                                position: _setLatLng),
                             Marker(
                                 markerId: const MarkerId('store_location'),
                                 icon: widget.markerIcon,
-                                position: LatLng(_storeGeoPoint.latitude,
-                                    _storeGeoPoint.longitude))
+                                anchor: const Offset(0.4, 0),
+                                infoWindow:
+                                    InfoWindow(title: '${widget.distance} km'),
+                                position: _storeLatLng)
                           },
                           initialCameraPosition: CameraPosition(
-                              target: _initialCameraPositionTarget, zoom: 15),
+                              target: _initialCameraPositionTarget, zoom: 13),
                         ),
                       ),
                       SafeArea(

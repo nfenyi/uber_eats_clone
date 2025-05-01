@@ -40,7 +40,7 @@ class _GroceryStoreMainScreenState
       DealsScreen(
         groceryStore: _groceryStore,
       ),
-      const OrderAgainScreen(),
+      OrderAgainScreen(_groceryStore),
     ];
   }
 

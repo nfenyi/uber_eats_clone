@@ -553,6 +553,7 @@ class _PromoScreenState extends State<PromoScreen> {
                             ),
                           ),
                           const BannerCarousel(),
+                          const Gap(5),
                         ],
                       );
                     })),
@@ -573,12 +574,12 @@ class BannerCarousel extends StatelessWidget {
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
     bool hasUberOne = userInfo['uberOneStatus']['hasUberOne'] ?? false;
     return SizedBox(
-      height: 142,
+      height: 138,
       child: CarouselSlider(
         options: CarouselOptions(
             autoPlayInterval: const Duration(seconds: 8),
             autoPlay: true,
-
+            viewportFraction: 0.84,
             // padEnds: true,
             height: 150,
             enableInfiniteScroll: false,

@@ -15,6 +15,7 @@ import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_s
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../../../app_functions.dart';
+import '../../../../../hive_adapters/geopoint/geopoint_adapter.dart';
 import '../../../../../main.dart';
 import '../../../../../models/favourite/favourite_model.dart';
 import '../../../../../models/store/store_model.dart';
@@ -30,6 +31,7 @@ import '../../../address/screens/addresses_screen.dart';
 import '../../../store/store_details_screen.dart';
 import 'grocery_shop_search_screen.dart';
 import '../../../home/home_screen.dart';
+import 'package:latlong2/latlong.dart' as lt;
 
 class GroceryShopScreen extends StatefulWidget {
   final Store groceryStore;
@@ -40,15 +42,25 @@ class GroceryShopScreen extends StatefulWidget {
 }
 
 class _GroceryShopScreenState extends State<GroceryShopScreen> {
-  bool _onFilterScreen = false;
-  List<String> _selectedFilters = [];
   final _backgroundColorNotifier = ValueNotifier<Color?>(null);
-
-  // final FocusNode _focus = FocusNode();
+  late lt.Distance _distance;
+  late final double _calculatedDistance;
+  late final HiveGeoPoint _selectedGeoPoint;
+  late final GeoPoint _storeLatLng;
 
   @override
   void initState() {
     super.initState();
+    _storeLatLng = widget.groceryStore.location.latlng as GeoPoint;
+    _distance = const lt.Distance(
+      roundResult: true,
+    );
+    final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+    _selectedGeoPoint = userInfo['selectedAddress']['latlng'];
+    _calculatedDistance = _distance.as(
+        lt.LengthUnit.Kilometer,
+        lt.LatLng(_storeLatLng.latitude, _storeLatLng.longitude),
+        lt.LatLng(_selectedGeoPoint.latitude, _selectedGeoPoint.longitude));
   }
 
   @override
@@ -234,7 +246,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                                   bitmapDescriptor =
                                                   await BitmapDescriptor.asset(
                                                 const ImageConfiguration(
-                                                    size: Size(30, 46)),
+                                                    size: Size(15, 15)),
                                                 AssetNames.mapMarker2,
                                               );
                                               navigatorKey.currentState!.pop();
@@ -242,6 +254,8 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                                   .push(MaterialPageRoute(
                                                 builder: (context) =>
                                                     StoreDetailsScreen(
+                                                        distance:
+                                                            _calculatedDistance,
                                                         location: location!,
                                                         markerIcon:
                                                             bitmapDescriptor,
@@ -366,7 +380,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                       final BitmapDescriptor bitmapDescriptor =
                                           await BitmapDescriptor.asset(
                                         const ImageConfiguration(
-                                            size: Size(30, 46)),
+                                            size: Size(15, 15)),
                                         AssetNames.mapMarker2,
                                       );
 
@@ -374,6 +388,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                           .push(MaterialPageRoute(
                                         builder: (context) =>
                                             StoreDetailsScreen(
+                                                distance: _calculatedDistance,
                                                 location: location!,
                                                 markerIcon: bitmapDescriptor,
                                                 store: widget.groceryStore),
@@ -582,7 +597,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                       itemCount: 2,
                       itemBuilder: (context, index, realIndex) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -599,6 +614,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       const AppText(
+                                          size: AppSizes.bodySmallest,
                                           text:
                                               'Make Cinco de Mayo delicious! Get 30% off on DellMax'),
                                       AppButton2(
@@ -623,7 +639,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                       },
                       options: CarouselOptions(
                           autoPlay: true,
-
+                          viewportFraction: 0.84,
                           // padEnds: true,
                           height: 109,
                           enableInfiniteScroll: false,

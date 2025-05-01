@@ -54,7 +54,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
   late final HiveGeoPoint _selectedGeoPoint;
 
   int _currentCategoryIndex = 0;
-
+  late final double _calculatedDistance;
   BuildContext? _tabContext;
 
   void _animateToTab(ScrollNotification scrollNotification) {
@@ -125,6 +125,10 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
     );
     final userInfo = Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
     _selectedGeoPoint = userInfo['selectedAddress']['latlng'];
+    _calculatedDistance = _distance.as(
+        lt.LengthUnit.Kilometer,
+        lt.LatLng(_storeLatLng.latitude, _storeLatLng.longitude),
+        lt.LatLng(_selectedGeoPoint.latitude, _selectedGeoPoint.longitude));
     // WidgetsBinding.instance.addPostFrameCallback(
     //   (timeStamp) {
     //     SystemChrome.setSystemUIOverlayStyle(
@@ -1212,7 +1216,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                                                 .asset(
                                                           const ImageConfiguration(
                                                               size:
-                                                                  Size(30, 46)),
+                                                                  Size(15, 15)),
                                                           AssetNames.mapMarker2,
                                                         );
                                                         navigatorKey
@@ -1224,6 +1228,8 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                                                 MaterialPageRoute(
                                                           builder: (context) =>
                                                               StoreDetailsScreen(
+                                                                  distance:
+                                                                      _calculatedDistance,
                                                                   location:
                                                                       location!,
                                                                   markerIcon:
@@ -1314,13 +1320,14 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                     final BitmapDescriptor bitmapDescriptor =
                                         await BitmapDescriptor.asset(
                                       const ImageConfiguration(
-                                          size: Size(30, 46)),
+                                          size: Size(15, 15)),
                                       AssetNames.mapMarker2,
                                     );
 
                                     await navigatorKey.currentState!
                                         .push(MaterialPageRoute(
                                       builder: (context) => StoreDetailsScreen(
+                                          distance: _calculatedDistance,
                                           location: location!,
                                           markerIcon: bitmapDescriptor,
                                           store: widget.store),
@@ -1359,7 +1366,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen> {
                                           ),
                                         AppText(
                                             text:
-                                                ' • ${_distance.as(lt.LengthUnit.Kilometer, lt.LatLng(_storeLatLng.latitude, _storeLatLng.longitude), lt.LatLng(_selectedGeoPoint.latitude, _selectedGeoPoint.longitude))} km '),
+                                                ' • $_calculatedDistance km '),
                                         const Icon(Icons.keyboard_arrow_right)
                                       ],
                                     ),

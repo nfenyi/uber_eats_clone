@@ -347,10 +347,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   late double _screenWidth;
   late final ValueNotifier<double> _searchFieldWidthNotifier;
-  int? previousFoodCategoryIndex;
-  int? currentFoodCategoryIndex;
-  int? previousFoodCategoryIndex0;
-  int? currentFoodCategoryIndex0;
+
+  int? _previousFoodCategoryIndex0;
+  int? _currentFoodCategoryIndex0;
 
   final _nestedScrollViewKey = GlobalKey<NestedScrollViewState>();
 
@@ -906,14 +905,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   onTap: () {
                                     if (_selectedFoodCategory?.name !=
                                         category.name) {
-                                      previousFoodCategoryIndex0 =
-                                          currentFoodCategoryIndex0;
-                                      currentFoodCategoryIndex0 = index;
+                                      _previousFoodCategoryIndex0 =
+                                          _currentFoodCategoryIndex0;
+                                      _currentFoodCategoryIndex0 = index;
                                       _selectedFoodCategory = category;
                                       _animationControllers[index].forward();
-                                      if (previousFoodCategoryIndex0 != null) {
+                                      if (_previousFoodCategoryIndex0 != null) {
                                         _animationControllers[
-                                                previousFoodCategoryIndex0!]
+                                                _previousFoodCategoryIndex0!]
                                             .reverse();
                                       }
 
@@ -924,8 +923,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       });
                                     } else if (_selectedFoodCategory?.name ==
                                         category.name) {
-                                      previousFoodCategoryIndex0 = null;
-                                      currentFoodCategoryIndex0 = null;
+                                      _previousFoodCategoryIndex0 = null;
+                                      _currentFoodCategoryIndex0 = null;
                                       _selectedFoodCategory = null;
                                       _animationControllers[index].reverse();
                                       setState(() {
