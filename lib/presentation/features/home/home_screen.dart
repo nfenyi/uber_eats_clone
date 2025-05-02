@@ -348,8 +348,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late double _screenWidth;
   late final ValueNotifier<double> _searchFieldWidthNotifier;
 
-  int? _previousFoodCategoryIndex0;
-  int? _currentFoodCategoryIndex0;
+  int? _previousFoodCategoryIndex;
+  int? _currentFoodCategoryIndex;
 
   final _nestedScrollViewKey = GlobalKey<NestedScrollViewState>();
 
@@ -905,14 +905,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   onTap: () {
                                     if (_selectedFoodCategory?.name !=
                                         category.name) {
-                                      _previousFoodCategoryIndex0 =
-                                          _currentFoodCategoryIndex0;
-                                      _currentFoodCategoryIndex0 = index;
+                                      _previousFoodCategoryIndex =
+                                          _currentFoodCategoryIndex;
+                                      _currentFoodCategoryIndex = index;
                                       _selectedFoodCategory = category;
                                       _animationControllers[index].forward();
-                                      if (_previousFoodCategoryIndex0 != null) {
+                                      if (_previousFoodCategoryIndex != null) {
                                         _animationControllers[
-                                                _previousFoodCategoryIndex0!]
+                                                _previousFoodCategoryIndex!]
                                             .reverse();
                                       }
 
@@ -923,8 +923,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       });
                                     } else if (_selectedFoodCategory?.name ==
                                         category.name) {
-                                      _previousFoodCategoryIndex0 = null;
-                                      _currentFoodCategoryIndex0 = null;
+                                      _previousFoodCategoryIndex = null;
+                                      _currentFoodCategoryIndex = null;
                                       _selectedFoodCategory = null;
                                       _animationControllers[index].reverse();
                                       setState(() {
@@ -1981,6 +1981,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                           AppButton2(
                                                             text: 'Reset',
                                                             callback: () {
+                                                              _animationControllers[
+                                                                      _currentFoodCategoryIndex!]
+                                                                  .reverse();
+
                                                               setState(() {
                                                                 _selectedFoodCategory =
                                                                     null;
@@ -1997,6 +2001,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                 _selectedDietaryOptions =
                                                                     [];
                                                                 _selectedSort =
+                                                                    null;
+                                                                _previousFoodCategoryIndex =
+                                                                    null;
+                                                                _currentFoodCategoryIndex =
                                                                     null;
                                                               });
                                                             },
