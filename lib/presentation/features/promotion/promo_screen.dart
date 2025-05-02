@@ -701,6 +701,66 @@ class BannerCarousel extends StatelessWidget {
                   ],
                 )),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Container(
+                width: Adaptive.w(80),
+                height: 100,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 201, 176, 102),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AppText(
+                                    text:
+                                        'Save 20% when you order \$25 or more',
+                                  ),
+                                  Gap(10),
+                                  AppText(
+                                    text: 'Use by May 31, 2025 11 PM',
+                                  ),
+                                ]),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                        flex: 1,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(10),
+                              bottomRight: Radius.circular(10)),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Container(
+                              //   width: double.infinity,
+                              //   color: AppColors.uberOneGold,
+                              // ),
+                              Image.asset(
+                                height: double.infinity,
+                                AssetNames.greenTag,
+
+                                // fit: BoxFit.cover,
+                              ),
+                            ],
+                          ),
+                        ))
+                  ],
+                )),
+          ),
         ],
       ),
     );
