@@ -129,6 +129,8 @@ class AssetNames {
       'assets/images/business_preference_ready.png';
   static String inviteFriend = 'assets/images/invite_friend.png';
   static String theyGet = 'assets/images/they_get.png';
+  static String groupOrdersOthersImage =
+      'assets/images/group_orders_others_image.png';
   static String dataNPrivacy1 = 'assets/images/data_n_privacy1.png';
   static String dataNPrivacyBottomImage =
       'assets/images/data_n_privacy_bottom_image.png';

@@ -60,6 +60,7 @@ Map<String, dynamic> _$$IndividualOrderImplToJson(
 
 _$OrderScheduleImpl _$$OrderScheduleImplFromJson(Map<String, dynamic> json) =>
     _$OrderScheduleImpl(
+      isLocked: json['isLocked'] ?? false,
       deliveryDate: json['deliveryDate'] == null
           ? null
           : DateTime.parse(json['deliveryDate'] as String),
@@ -79,6 +80,7 @@ _$OrderScheduleImpl _$$OrderScheduleImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$OrderScheduleImplToJson(_$OrderScheduleImpl instance) =>
     <String, dynamic>{
+      'isLocked': instance.isLocked,
       'deliveryDate': instance.deliveryDate?.toIso8601String(),
       'orderDate': instance.orderDate.toIso8601String(),
       'orderNumber': instance.orderNumber,
@@ -90,16 +92,16 @@ Map<String, dynamic> _$$OrderScheduleImplToJson(_$OrderScheduleImpl instance) =>
 
 _$GroupOrderItemImpl _$$GroupOrderItemImplFromJson(Map<String, dynamic> json) =>
     _$GroupOrderItemImpl(
-      person: json['person'] as String,
-      productsAndQuantities:
-          json['productsAndQuantities'] as Map<String, dynamic>,
+      person: GroupOrderPerson.fromJson(json['person'] as Map<String, dynamic>),
+      individualOrder: IndividualOrder.fromJson(
+          json['individualOrder'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$GroupOrderItemImplToJson(
         _$GroupOrderItemImpl instance) =>
     <String, dynamic>{
-      'person': instance.person,
-      'productsAndQuantities': instance.productsAndQuantities,
+      'person': instance.person.toJson(),
+      'individualOrder': instance.individualOrder.toJson(),
     };
 
 _$CartItemImpl _$$CartItemImplFromJson(Map<String, dynamic> json) =>

@@ -390,9 +390,7 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                 if (_frequency != null) {
                   String orderNumber = Random().nextInt(4294967296).toString();
                   final firstOrderSchedule = OrderSchedule(
-                    orderItems: [
-                      GroupOrderItem(person: _displayName, productsAndQuantities: {})
-                    ],
+                    orderItems: [],
                     storeRef: matchingStores.docs.first.reference,
                     orderDate: _firstOrderSchedule!,
                     orderNumber: orderNumber,
@@ -404,7 +402,7 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                   orderScheduleRefs.add(scheduleRef);
                 }
 
-                var userId = FirebaseAuth.instance.currentUser!.uid;
+                var currentUser = FirebaseAuth.instance.currentUser!;
 
                 var groupOrder = GroupOrder(
                     createdAt: DateTime.now(),
@@ -422,10 +420,13 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                             ? _firstOrderSchedule!.add(const Duration(hours: 2))
                             : _orderByDeadline,
                     orderPlacementSetting: _orderPlacementSetting,
-                    ownerId: userId,
+                    ownerId: currentUser.uid,
                     spendingLimit: double.tryParse(_spendingLimit),
                     storeRef: matchingStores.docs.first.reference,
-                    persons: [],
+                    persons: [
+                      GroupOrderPerson(
+                          id: currentUser.uid, name: currentUser.displayName!)
+                    ],
                     whoPays: _whoPays);
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.groupOrders)
@@ -434,7 +435,7 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
 
                 await FirebaseFirestore.instance
                     .collection(FirestoreCollections.users)
-                    .doc(userId)
+                    .doc(currentUser.uid)
                     .update({
                   'groupOrders': FieldValue.arrayUnion([groupOrderId])
                 });
@@ -442,7 +443,7 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
 
                 await navigatorKey.currentState!
                     .pushReplacement(MaterialPageRoute(
-                        builder: (context) => GroupOrderCompleteScreen(
+                        builder: (context) => GroupOrderInvitationScreen(
                               store: widget.store,
                               groupOrder: groupOrder,
                             )));

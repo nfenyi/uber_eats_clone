@@ -20,9 +20,19 @@ class GroupOrder with _$GroupOrder {
     String? orderPlacementSetting,
     required String? whoPays,
     double? spendingLimit,
-    @Default([]) List<String> persons,
+    @Default([]) List<GroupOrderPerson> persons,
     @Default([]) List<Object> orderScheduleRefs,
   }) = _GroupOrder;
   factory GroupOrder.fromJson(Map<String, Object?> json) =>
       _$GroupOrderFromJson(json);
+}
+
+@freezed
+class GroupOrderPerson with _$GroupOrderPerson {
+  factory GroupOrderPerson({
+    required String id,
+    required String name,
+  }) = _GroupOrderPerson;
+  factory GroupOrderPerson.fromJson(Map<String, Object?> json) =>
+      _$GroupOrderPersonFromJson(json);
 }

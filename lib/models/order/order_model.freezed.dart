@@ -608,6 +608,7 @@ OrderSchedule _$OrderScheduleFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$OrderSchedule {
+  dynamic get isLocked => throw _privateConstructorUsedError;
   DateTime? get deliveryDate => throw _privateConstructorUsedError;
   DateTime get orderDate => throw _privateConstructorUsedError;
   String get orderNumber => throw _privateConstructorUsedError;
@@ -633,7 +634,8 @@ abstract class $OrderScheduleCopyWith<$Res> {
       _$OrderScheduleCopyWithImpl<$Res, OrderSchedule>;
   @useResult
   $Res call(
-      {DateTime? deliveryDate,
+      {dynamic isLocked,
+      DateTime? deliveryDate,
       DateTime orderDate,
       String orderNumber,
       List<GroupOrderItem> orderItems,
@@ -657,6 +659,7 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? isLocked = freezed,
     Object? deliveryDate = freezed,
     Object? orderDate = null,
     Object? orderNumber = null,
@@ -666,6 +669,10 @@ class _$OrderScheduleCopyWithImpl<$Res, $Val extends OrderSchedule>
     Object? storeRef = null,
   }) {
     return _then(_value.copyWith(
+      isLocked: freezed == isLocked
+          ? _value.isLocked
+          : isLocked // ignore: cast_nullable_to_non_nullable
+              as dynamic,
       deliveryDate: freezed == deliveryDate
           ? _value.deliveryDate
           : deliveryDate // ignore: cast_nullable_to_non_nullable
@@ -704,7 +711,8 @@ abstract class _$$OrderScheduleImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {DateTime? deliveryDate,
+      {dynamic isLocked,
+      DateTime? deliveryDate,
       DateTime orderDate,
       String orderNumber,
       List<GroupOrderItem> orderItems,
@@ -726,6 +734,7 @@ class __$$OrderScheduleImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? isLocked = freezed,
     Object? deliveryDate = freezed,
     Object? orderDate = null,
     Object? orderNumber = null,
@@ -735,6 +744,7 @@ class __$$OrderScheduleImplCopyWithImpl<$Res>
     Object? storeRef = null,
   }) {
     return _then(_$OrderScheduleImpl(
+      isLocked: freezed == isLocked ? _value.isLocked! : isLocked,
       deliveryDate: freezed == deliveryDate
           ? _value.deliveryDate
           : deliveryDate // ignore: cast_nullable_to_non_nullable
@@ -767,7 +777,8 @@ class _$OrderScheduleImpl
     with DiagnosticableTreeMixin
     implements _OrderSchedule {
   const _$OrderScheduleImpl(
-      {this.deliveryDate,
+      {this.isLocked = false,
+      this.deliveryDate,
       required this.orderDate,
       required this.orderNumber,
       final List<GroupOrderItem> orderItems = const [],
@@ -780,6 +791,9 @@ class _$OrderScheduleImpl
   factory _$OrderScheduleImpl.fromJson(Map<String, dynamic> json) =>
       _$$OrderScheduleImplFromJson(json);
 
+  @override
+  @JsonKey()
+  final dynamic isLocked;
   @override
   final DateTime? deliveryDate;
   @override
@@ -812,7 +826,7 @@ class _$OrderScheduleImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'OrderSchedule(deliveryDate: $deliveryDate, orderDate: $orderDate, orderNumber: $orderNumber, orderItems: $orderItems, skippedBy: $skippedBy, totalFee: $totalFee, storeRef: $storeRef)';
+    return 'OrderSchedule(isLocked: $isLocked, deliveryDate: $deliveryDate, orderDate: $orderDate, orderNumber: $orderNumber, orderItems: $orderItems, skippedBy: $skippedBy, totalFee: $totalFee, storeRef: $storeRef)';
   }
 
   @override
@@ -820,6 +834,7 @@ class _$OrderScheduleImpl
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'OrderSchedule'))
+      ..add(DiagnosticsProperty('isLocked', isLocked))
       ..add(DiagnosticsProperty('deliveryDate', deliveryDate))
       ..add(DiagnosticsProperty('orderDate', orderDate))
       ..add(DiagnosticsProperty('orderNumber', orderNumber))
@@ -834,6 +849,7 @@ class _$OrderScheduleImpl
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$OrderScheduleImpl &&
+            const DeepCollectionEquality().equals(other.isLocked, isLocked) &&
             (identical(other.deliveryDate, deliveryDate) ||
                 other.deliveryDate == deliveryDate) &&
             (identical(other.orderDate, orderDate) ||
@@ -852,6 +868,7 @@ class _$OrderScheduleImpl
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      const DeepCollectionEquality().hash(isLocked),
       deliveryDate,
       orderDate,
       orderNumber,
@@ -878,7 +895,8 @@ class _$OrderScheduleImpl
 
 abstract class _OrderSchedule implements OrderSchedule {
   const factory _OrderSchedule(
-      {final DateTime? deliveryDate,
+      {final dynamic isLocked,
+      final DateTime? deliveryDate,
       required final DateTime orderDate,
       required final String orderNumber,
       final List<GroupOrderItem> orderItems,
@@ -889,6 +907,8 @@ abstract class _OrderSchedule implements OrderSchedule {
   factory _OrderSchedule.fromJson(Map<String, dynamic> json) =
       _$OrderScheduleImpl.fromJson;
 
+  @override
+  dynamic get isLocked;
   @override
   DateTime? get deliveryDate;
   @override
@@ -918,9 +938,8 @@ GroupOrderItem _$GroupOrderItemFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$GroupOrderItem {
-  String get person => throw _privateConstructorUsedError;
-  Map<String, dynamic> get productsAndQuantities =>
-      throw _privateConstructorUsedError;
+  GroupOrderPerson get person => throw _privateConstructorUsedError;
+  IndividualOrder get individualOrder => throw _privateConstructorUsedError;
 
   /// Serializes this GroupOrderItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -938,7 +957,10 @@ abstract class $GroupOrderItemCopyWith<$Res> {
           GroupOrderItem value, $Res Function(GroupOrderItem) then) =
       _$GroupOrderItemCopyWithImpl<$Res, GroupOrderItem>;
   @useResult
-  $Res call({String person, Map<String, dynamic> productsAndQuantities});
+  $Res call({GroupOrderPerson person, IndividualOrder individualOrder});
+
+  $GroupOrderPersonCopyWith<$Res> get person;
+  $IndividualOrderCopyWith<$Res> get individualOrder;
 }
 
 /// @nodoc
@@ -957,18 +979,38 @@ class _$GroupOrderItemCopyWithImpl<$Res, $Val extends GroupOrderItem>
   @override
   $Res call({
     Object? person = null,
-    Object? productsAndQuantities = null,
+    Object? individualOrder = null,
   }) {
     return _then(_value.copyWith(
       person: null == person
           ? _value.person
           : person // ignore: cast_nullable_to_non_nullable
-              as String,
-      productsAndQuantities: null == productsAndQuantities
-          ? _value.productsAndQuantities
-          : productsAndQuantities // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
+              as GroupOrderPerson,
+      individualOrder: null == individualOrder
+          ? _value.individualOrder
+          : individualOrder // ignore: cast_nullable_to_non_nullable
+              as IndividualOrder,
     ) as $Val);
+  }
+
+  /// Create a copy of GroupOrderItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GroupOrderPersonCopyWith<$Res> get person {
+    return $GroupOrderPersonCopyWith<$Res>(_value.person, (value) {
+      return _then(_value.copyWith(person: value) as $Val);
+    });
+  }
+
+  /// Create a copy of GroupOrderItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $IndividualOrderCopyWith<$Res> get individualOrder {
+    return $IndividualOrderCopyWith<$Res>(_value.individualOrder, (value) {
+      return _then(_value.copyWith(individualOrder: value) as $Val);
+    });
   }
 }
 
@@ -980,7 +1022,12 @@ abstract class _$$GroupOrderItemImplCopyWith<$Res>
       __$$GroupOrderItemImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String person, Map<String, dynamic> productsAndQuantities});
+  $Res call({GroupOrderPerson person, IndividualOrder individualOrder});
+
+  @override
+  $GroupOrderPersonCopyWith<$Res> get person;
+  @override
+  $IndividualOrderCopyWith<$Res> get individualOrder;
 }
 
 /// @nodoc
@@ -997,17 +1044,17 @@ class __$$GroupOrderItemImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? person = null,
-    Object? productsAndQuantities = null,
+    Object? individualOrder = null,
   }) {
     return _then(_$GroupOrderItemImpl(
       person: null == person
           ? _value.person
           : person // ignore: cast_nullable_to_non_nullable
-              as String,
-      productsAndQuantities: null == productsAndQuantities
-          ? _value._productsAndQuantities
-          : productsAndQuantities // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
+              as GroupOrderPerson,
+      individualOrder: null == individualOrder
+          ? _value.individualOrder
+          : individualOrder // ignore: cast_nullable_to_non_nullable
+              as IndividualOrder,
     ));
   }
 }
@@ -1018,27 +1065,19 @@ class _$GroupOrderItemImpl
     with DiagnosticableTreeMixin
     implements _GroupOrderItem {
   const _$GroupOrderItemImpl(
-      {required this.person,
-      required final Map<String, dynamic> productsAndQuantities})
-      : _productsAndQuantities = productsAndQuantities;
+      {required this.person, required this.individualOrder});
 
   factory _$GroupOrderItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$GroupOrderItemImplFromJson(json);
 
   @override
-  final String person;
-  final Map<String, dynamic> _productsAndQuantities;
+  final GroupOrderPerson person;
   @override
-  Map<String, dynamic> get productsAndQuantities {
-    if (_productsAndQuantities is EqualUnmodifiableMapView)
-      return _productsAndQuantities;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_productsAndQuantities);
-  }
+  final IndividualOrder individualOrder;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'GroupOrderItem(person: $person, productsAndQuantities: $productsAndQuantities)';
+    return 'GroupOrderItem(person: $person, individualOrder: $individualOrder)';
   }
 
   @override
@@ -1047,8 +1086,7 @@ class _$GroupOrderItemImpl
     properties
       ..add(DiagnosticsProperty('type', 'GroupOrderItem'))
       ..add(DiagnosticsProperty('person', person))
-      ..add(
-          DiagnosticsProperty('productsAndQuantities', productsAndQuantities));
+      ..add(DiagnosticsProperty('individualOrder', individualOrder));
   }
 
   @override
@@ -1057,14 +1095,13 @@ class _$GroupOrderItemImpl
         (other.runtimeType == runtimeType &&
             other is _$GroupOrderItemImpl &&
             (identical(other.person, person) || other.person == person) &&
-            const DeepCollectionEquality()
-                .equals(other._productsAndQuantities, _productsAndQuantities));
+            (identical(other.individualOrder, individualOrder) ||
+                other.individualOrder == individualOrder));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, person,
-      const DeepCollectionEquality().hash(_productsAndQuantities));
+  int get hashCode => Object.hash(runtimeType, person, individualOrder);
 
   /// Create a copy of GroupOrderItem
   /// with the given fields replaced by the non-null parameter values.
@@ -1085,17 +1122,16 @@ class _$GroupOrderItemImpl
 
 abstract class _GroupOrderItem implements GroupOrderItem {
   const factory _GroupOrderItem(
-          {required final String person,
-          required final Map<String, dynamic> productsAndQuantities}) =
-      _$GroupOrderItemImpl;
+      {required final GroupOrderPerson person,
+      required final IndividualOrder individualOrder}) = _$GroupOrderItemImpl;
 
   factory _GroupOrderItem.fromJson(Map<String, dynamic> json) =
       _$GroupOrderItemImpl.fromJson;
 
   @override
-  String get person;
+  GroupOrderPerson get person;
   @override
-  Map<String, dynamic> get productsAndQuantities;
+  IndividualOrder get individualOrder;
 
   /// Create a copy of GroupOrderItem
   /// with the given fields replaced by the non-null parameter values.

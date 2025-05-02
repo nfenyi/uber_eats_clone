@@ -859,79 +859,73 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                       final groceryScreenStore = _groceryScreenStores[index];
                       return SizedBox(
                         width: 200,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Stack(
-                                alignment: Alignment.topRight,
-                                children: [
-                                  Stack(
-                                    alignment: Alignment.topLeft,
+                        child: InkWell(
+                          onTap: () async => AppFunctions.navigateToStoreScreen(
+                              groceryScreenStore),
+                          child: Ink(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
                                     children: [
-                                      CachedNetworkImage(
-                                        imageUrl: groceryScreenStore.cardImage,
-                                        width: 200,
-                                        height: 120,
-                                        fit: BoxFit.fill,
-                                      ),
-                                      if (groceryScreenStore.offers != null &&
-                                          groceryScreenStore.offers!.isNotEmpty)
-                                        Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0, top: 8.0),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                                color: Colors.green.shade900,
-                                              ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                      Stack(
+                                        alignment: Alignment.topLeft,
+                                        children: [
+                                          CachedNetworkImage(
+                                            imageUrl:
+                                                groceryScreenStore.cardImage,
+                                            width: 200,
+                                            height: 120,
+                                            fit: BoxFit.fill,
+                                          ),
+                                          if (groceryScreenStore.offers !=
+                                                  null &&
+                                              groceryScreenStore
+                                                  .offers!.isNotEmpty)
+                                            Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8.0, top: 8.0),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    color:
+                                                        Colors.green.shade900,
+                                                  ),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
                                                       horizontal: 5,
                                                       vertical: 2),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  StoreOffersText(
-                                                    groceryScreenStore,
-                                                    size: AppSizes.bodySmallest,
-                                                  )
-                                                ],
-                                              ),
-                                            )),
-                                      (timeOfDayNow.hour <
-                                                  groceryScreenStore
-                                                      .openingTime.hour ||
-                                              (timeOfDayNow.hour >=
-                                                      groceryScreenStore
-                                                          .closingTime.hour &&
-                                                  timeOfDayNow.minute >=
-                                                      groceryScreenStore
-                                                          .closingTime.minute))
-                                          ? Container(
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              width: 200,
-                                              height: 120,
-                                              child: const Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  AppText(
-                                                    text: 'Closed',
-                                                    color: Colors.white,
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      StoreOffersText(
+                                                        groceryScreenStore,
+                                                        size: AppSizes
+                                                            .bodySmallest,
+                                                      )
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
-                                            )
-                                          : !groceryScreenStore
-                                                  .delivery.canDeliver
+                                                )),
+                                          (timeOfDayNow.hour <
+                                                      groceryScreenStore
+                                                          .openingTime.hour ||
+                                                  (timeOfDayNow.hour >=
+                                                          groceryScreenStore
+                                                              .closingTime
+                                                              .hour &&
+                                                      timeOfDayNow.minute >=
+                                                          groceryScreenStore
+                                                              .closingTime
+                                                              .minute))
                                               ? Container(
                                                   color: Colors.black
                                                       .withOpacity(0.5),
@@ -946,69 +940,94 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                             .center,
                                                     children: [
                                                       AppText(
-                                                        text: 'Pick up',
+                                                        text: 'Closed',
                                                         color: Colors.white,
                                                       ),
                                                     ],
                                                   ),
                                                 )
-                                              : const SizedBox.shrink(),
+                                              : !groceryScreenStore
+                                                      .delivery.canDeliver
+                                                  ? Container(
+                                                      color: Colors.black
+                                                          .withOpacity(0.5),
+                                                      width: 200,
+                                                      height: 120,
+                                                      child: const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          AppText(
+                                                            text: 'Pick up',
+                                                            color: Colors.white,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  : const SizedBox.shrink(),
+                                        ],
+                                      ),
+                                      Padding(
+                                          padding: const EdgeInsets.only(
+                                              right: 8.0, top: 8.0),
+                                          child: FavouriteButton(
+                                              store: groceryScreenStore))
                                     ],
                                   ),
-                                  Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 8.0, top: 8.0),
-                                      child: FavouriteButton(
-                                          store: groceryScreenStore))
-                                ],
-                              ),
-                            ),
-                            const Gap(5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                AppText(
-                                  text: groceryScreenStore.name,
-                                  weight: FontWeight.w600,
                                 ),
-                                Container(
-                                    decoration: BoxDecoration(
-                                        color: AppColors.neutral100,
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 2),
-                                    child: AppText(
-                                        text: groceryScreenStore
-                                            .rating.averageRating
-                                            .toString()))
+                                const Gap(5),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    AppText(
+                                      text: groceryScreenStore.name,
+                                      weight: FontWeight.w600,
+                                    ),
+                                    Container(
+                                        decoration: BoxDecoration(
+                                            color: AppColors.neutral100,
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 2),
+                                        child: AppText(
+                                            text: groceryScreenStore
+                                                .rating.averageRating
+                                                .toString()))
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Visibility(
+                                        visible:
+                                            groceryScreenStore.delivery.fee < 1,
+                                        child: Image.asset(
+                                          AssetNames.uberOneSmall,
+                                          height: 10,
+                                        )),
+                                    Visibility(
+                                        visible:
+                                            groceryScreenStore.delivery.fee < 1,
+                                        child: const AppText(
+                                          text: ' • ',
+                                        )),
+                                    AppText(
+                                      text:
+                                          '\$${groceryScreenStore.delivery.fee} Delivery Fee',
+                                    ),
+                                  ],
+                                ),
+                                AppText(
+                                    text:
+                                        '${groceryScreenStore.delivery.estimatedDeliveryTime} min')
                               ],
                             ),
-                            Row(
-                              children: [
-                                Visibility(
-                                    visible:
-                                        groceryScreenStore.delivery.fee < 1,
-                                    child: Image.asset(
-                                      AssetNames.uberOneSmall,
-                                      height: 10,
-                                    )),
-                                Visibility(
-                                    visible:
-                                        groceryScreenStore.delivery.fee < 1,
-                                    child: const AppText(
-                                      text: ' • ',
-                                    )),
-                                AppText(
-                                  text:
-                                      '\$${groceryScreenStore.delivery.fee} Delivery Fee',
-                                ),
-                              ],
-                            ),
-                            AppText(
-                                text:
-                                    '${groceryScreenStore.delivery.estimatedDeliveryTime} min')
-                          ],
+                          ),
                         ),
                       );
                     },
@@ -1222,6 +1241,7 @@ class AllStoresListView extends StatelessWidget {
                       (timeOfDayNow.hour >= store.closingTime.hour &&
                           timeOfDayNow.minute >= store.closingTime.minute);
               return ListTile(
+                  onTap: () async => AppFunctions.navigateToStoreScreen(store),
                   leading: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(

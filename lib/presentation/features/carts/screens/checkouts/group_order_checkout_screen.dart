@@ -20,9 +20,7 @@ import 'package:uber_eats_clone/models/payment/payment_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/other_constants.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/orders_screen.dart';
-import 'package:uber_eats_clone/presentation/features/settings/screens/phone_number/phone_number_update_screen.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 
@@ -33,28 +31,32 @@ import '../../../../../models/store/store_model.dart';
 import '../../../../../state/user_location_providers.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/app_text.dart';
+import '../../../address/screens/addresses_screen.dart';
 import '../../../payment_options/payment_options_screen.dart';
 import '../../../address/screens/schedule_delivery_screen.dart';
 import '../../../promotion/promo_screen.dart';
+import '../../../settings/screens/phone_number/phone_number_update_screen.dart';
 import '../../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
 import '../../../sign_in/views/confirm_location.dart';
 
-class CheckoutScreen extends ConsumerStatefulWidget {
+class GroupOrderCheckoutScreen extends ConsumerStatefulWidget {
   final Promotion? promotion;
 
   final BitmapDescriptor markerIcon;
   final Store store;
-  const CheckoutScreen(
+  const GroupOrderCheckoutScreen(
       {super.key,
       required this.markerIcon,
       required this.promotion,
       required this.store});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _CheckoutScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _GroupOrderCheckoutScreenState();
 }
 
-class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
+class _GroupOrderCheckoutScreenState
+    extends ConsumerState<GroupOrderCheckoutScreen> {
   late LatLng _setLocation;
 
   late String _placeDescription;
@@ -199,11 +201,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ],
                 ),
                 ListTile(
+                  dense: true,
                   onTap: () async =>
                       navigatorKey.currentState!.push(MaterialPageRoute(
                     builder: (context) => const AddressesScreen(),
                   )),
-                  dense: true,
                   leading: _addressLabel == 'Work'
                       ? const Iconify(
                           Mdi.briefcase_outline,
@@ -809,98 +811,98 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             ),
           )),
       persistentFooterButtons: [
-        AppButton(
-          isLoading: _isLoading,
-          text: 'Next',
-          callback: () async {
-            if (_isClosed && schedule == null) {
-              showInfoToast('Please select a delivery time', context: context);
-              return;
-            }
+        AppButton(isLoading: _isLoading, text: 'Next', callback: null
 
-            final paymentOption = ref.read(paymentOptionProvider);
-            if (paymentOption == null) {
-              showInfoToast('Select a payment method', context: context);
-            }
-            setState(() {
-              _isLoading = true;
-            });
-            List<CartProduct> cartProducts =
-                AppFunctions.transformHiveProductToCartProduct(_cartItem);
+            // () async {
+            //   if (_isClosed && schedule == null) {
+            //     showInfoToast('Please select a delivery time', context: context);
+            //     return;
+            //   }
 
-            final order = IndividualOrder(
-                userUid: FirebaseAuth.instance.currentUser!.uid,
-                isPriority: _isPriority,
-                products: cartProducts,
-                deliveryDate: schedule ?? DateTime.now(),
-                orderNumber: Random().nextInt(4294967296).toString(),
-                placeDescription: _placeDescription,
-                serviceFee: _serviceFee,
-                tax: _taxes,
-                status: schedule == null ? 'Completed' : 'Ongoing',
-                deliveryFee: _deliveryFee,
-                totalFee: total,
-                promoApplied: _activatedPromoId == null
-                    ? null
-                    : FirebaseFirestore.instance
-                        .collection(FirestoreCollections.promotions)
-                        .doc(_activatedPromoId),
-                payments: [
-                  Payment(
-                      creditCardType: paymentOption!.creditCardType!,
-                      paymentMethodName: 'Debit or Credit Card',
-                      amountPaid: total,
-                      cardNumber:
-                          '••••${paymentOption.cardNumber.substring(6)}',
-                      datePaid: DateTime.now())
-                ],
-                promoDiscount: _activatedPromo?.discount,
-                storeId: widget.store.id,
-                membershipBenefit: _hasUberOne
-                    ? OtherConstants.uberOneDiscount * _cartItem.subtotal
-                    : null);
-            //update uberOneStatus if user has uber one
-            final userDetailsSnapshot = await FirebaseFirestore.instance
-                .collection(FirestoreCollections.users)
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .get();
-            final userDetails = userDetailsSnapshot.data()!;
-            userDetails['uberOneStatus']['moneySaved'] =
-                userDetails['uberOneStatus']['moneySaved'] +
-                    (OtherConstants.uberOneDiscount * _cartItem.subtotal);
+            //   final paymentOption = ref.read(paymentOptionProvider);
+            //   if (paymentOption == null) {
+            //     showInfoToast('Select a payment method', context: context);
+            //   }
+            //   setState(() {
+            //     _isLoading = true;
+            //   });
+            //   List<CartProduct> cartProducts =
+            //       AppFunctions.transformHiveProductToCartProduct(_cartItem);
 
-            await FirebaseFirestore.instance
-                .collection(FirestoreCollections.individualOrders)
-                .doc(order.orderNumber)
-                .set(order.toJson());
-            for (var product in _cartItem.products) {
-              await product.delete();
-            }
-            await _cartItem.delete();
+            //   final order = IndividualOrder(
+            //       userUid: FirebaseAuth.instance.currentUser!.uid,
+            //       isPriority: _isPriority,
+            //       products: cartProducts,
+            //       deliveryDate: schedule ?? DateTime.now(),
+            //       orderNumber: Random().nextInt(4294967296).toString(),
+            //       placeDescription: _placeDescription,
+            //       serviceFee: _serviceFee,
+            //       tax: _taxes,
+            //       status: schedule == null ? 'Completed' : 'Ongoing',
+            //       deliveryFee: _deliveryFee,
+            //       totalFee: total,
+            //       promoApplied: _activatedPromoId == null
+            //           ? null
+            //           : FirebaseFirestore.instance
+            //               .collection(FirestoreCollections.promotions)
+            //               .doc(_activatedPromoId),
+            //       payments: [
+            //         Payment(
+            //             creditCardType: paymentOption!.creditCardType!,
+            //             paymentMethodName: 'Debit or Credit Card',
+            //             amountPaid: total,
+            //             cardNumber:
+            //                 '••••${paymentOption.cardNumber.substring(6)}',
+            //             datePaid: DateTime.now())
+            //       ],
+            //       promoDiscount: _activatedPromo?.discount,
+            //       storeId: widget.store.id,
+            //       membershipBenefit: _hasUberOne
+            //           ? OtherConstants.uberOneDiscount * _cartItem.subtotal
+            //           : null);
+            //   //update uberOneStatus if user has uber one
+            //   final userDetailsSnapshot = await FirebaseFirestore.instance
+            //       .collection(FirestoreCollections.users)
+            //       .doc(FirebaseAuth.instance.currentUser!.uid)
+            //       .get();
+            //   final userDetails = userDetailsSnapshot.data()!;
+            //   userDetails['uberOneStatus']['moneySaved'] =
+            //       userDetails['uberOneStatus']['moneySaved'] +
+            //           (OtherConstants.uberOneDiscount * _cartItem.subtotal);
 
-            await FirebaseFirestore.instance
-                .collection(FirestoreCollections.users)
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .update({
-              if (_hasUberOne) 'uberOneStatus': userDetails,
-              if (_activatedPromoId != null)
-                'redeemedPromos': FieldValue.arrayRemove([_activatedPromoId]),
-              if (_activatedPromoId != null)
-                'usedPromos': FieldValue.arrayUnion([_activatedPromoId])
-            });
+            //   await FirebaseFirestore.instance
+            //       .collection(FirestoreCollections.individualOrders)
+            //       .doc(order.orderNumber)
+            //       .set(order.toJson());
+            //   for (var product in _cartItem.products) {
+            //     await product.delete();
+            //   }
+            //   await _cartItem.delete();
 
-            await AppFunctions.getOnlineUserInfo();
+            //   await FirebaseFirestore.instance
+            //       .collection(FirestoreCollections.users)
+            //       .doc(FirebaseAuth.instance.currentUser!.uid)
+            //       .update({
+            //     if (_hasUberOne) 'uberOneStatus': userDetails,
+            //     if (_activatedPromoId != null)
+            //       'redeemedPromos': FieldValue.arrayRemove([_activatedPromoId]),
+            //     if (_activatedPromoId != null)
+            //       'usedPromos': FieldValue.arrayUnion([_activatedPromoId])
+            //   });
 
-            setState(() {
-              _isLoading = false;
-            });
-            navigatorKey.currentState!.pop();
-            navigatorKey.currentState!.pop();
-            await navigatorKey.currentState!.push(MaterialPageRoute(
-              builder: (context) => const OrdersScreen(),
-            ));
-          },
-        )
+            //   await AppFunctions.getOnlineUserInfo();
+
+            //   setState(() {
+            //     _isLoading = false;
+            //   });
+            //   navigatorKey.currentState!.pop();
+            //   navigatorKey.currentState!.pop();
+            //   await navigatorKey.currentState!.push(MaterialPageRoute(
+            //     builder: (context) => const OrdersScreen(),
+            //   ));
+            // },
+
+            )
       ],
     );
   }

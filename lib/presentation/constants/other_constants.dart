@@ -36,6 +36,7 @@ class OtherConstants {
 
   static const double uberOneDiscount = 0.1;
   static const double tax = 0.05;
+  static const double serviceFee = 0.4;
 
   static const List<String> boxCateringFilters = [
     'Group size',

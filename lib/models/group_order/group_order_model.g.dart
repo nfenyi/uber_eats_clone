@@ -30,7 +30,7 @@ _$GroupOrderImpl _$$GroupOrderImplFromJson(Map<String, dynamic> json) =>
       whoPays: json['whoPays'] as String?,
       spendingLimit: (json['spendingLimit'] as num?)?.toDouble(),
       persons: (json['persons'] as List<dynamic>?)
-              ?.map((e) => e as String)
+              ?.map((e) => GroupOrderPerson.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       orderScheduleRefs: (json['orderScheduleRefs'] as List<dynamic>?)
@@ -54,6 +54,20 @@ Map<String, dynamic> _$$GroupOrderImplToJson(_$GroupOrderImpl instance) =>
       'orderPlacementSetting': instance.orderPlacementSetting,
       'whoPays': instance.whoPays,
       'spendingLimit': instance.spendingLimit,
-      'persons': instance.persons,
+      'persons': instance.persons.map((e) => e.toJson()).toList(),
       'orderScheduleRefs': instance.orderScheduleRefs,
+    };
+
+_$GroupOrderPersonImpl _$$GroupOrderPersonImplFromJson(
+        Map<String, dynamic> json) =>
+    _$GroupOrderPersonImpl(
+      id: json['id'] as String,
+      name: json['name'] as String,
+    );
+
+Map<String, dynamic> _$$GroupOrderPersonImplToJson(
+        _$GroupOrderPersonImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
     };

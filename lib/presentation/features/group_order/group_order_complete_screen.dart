@@ -15,10 +15,10 @@ import '../../core/app_colors.dart';
 import '../../core/app_text.dart';
 import '../../core/widgets.dart';
 
-class GroupOrderCompleteScreen extends ConsumerStatefulWidget {
+class GroupOrderInvitationScreen extends ConsumerStatefulWidget {
   final GroupOrder groupOrder;
   final Store store;
-  const GroupOrderCompleteScreen(
+  const GroupOrderInvitationScreen(
       {super.key, required this.groupOrder, required this.store});
 
   @override
@@ -27,7 +27,7 @@ class GroupOrderCompleteScreen extends ConsumerStatefulWidget {
 }
 
 class _GroupOrderCompleteScreenState
-    extends ConsumerState<GroupOrderCompleteScreen> {
+    extends ConsumerState<GroupOrderInvitationScreen> {
   bool _isLoading = false;
 
   @override

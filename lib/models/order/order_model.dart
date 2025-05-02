@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uber_eats_clone/models/group_order/group_order_model.dart';
 
 import '../payment/payment_model.dart';
 
@@ -37,6 +38,7 @@ class IndividualOrder with _$IndividualOrder {
 @freezed
 class OrderSchedule with _$OrderSchedule {
   const factory OrderSchedule({
+    @Default(false) isLocked,
     DateTime? deliveryDate,
     required DateTime orderDate,
     required String orderNumber,
@@ -53,8 +55,8 @@ class OrderSchedule with _$OrderSchedule {
 @freezed
 class GroupOrderItem with _$GroupOrderItem {
   const factory GroupOrderItem({
-    required String person,
-    required Map<String, dynamic> productsAndQuantities,
+    required GroupOrderPerson person,
+    required IndividualOrder individualOrder,
   }) = _GroupOrderItem;
 
   factory GroupOrderItem.fromJson(Map<String, Object?> json) =>

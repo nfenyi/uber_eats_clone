@@ -164,6 +164,9 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                       Hive.box<HiveCartItem>(AppBoxes.carts).listenable(),
                   builder: (context, cartsBox, child) {
                     final cartItems = cartsBox.values;
+                    final userInfo =
+                        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+                    final groupOrders = userInfo['groupOrders'];
 
                     return CustomScrollView(
                       slivers: [
@@ -177,6 +180,14 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                             if (store == null) {
                               return const AppText(
                                   text: 'Seems store no longer exists');
+                            }
+                            if (groupOrders != null && groupOrders.isNotEmpty) {
+                              groupOrders as List<String>;
+                              if (groupOrders.any(
+                                (element) => element.contains(store.id),
+                              )) {
+                                return const SizedBox.shrink();
+                              }
                             }
 
                             return Container(
@@ -807,21 +818,11 @@ class CartSheet extends StatelessWidget {
     Map<dynamic, dynamic> userInfo =
         Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
     bool hasUberOne = userInfo['uberOneStatus']['hasUberOne'] ?? false;
-    final String? activatedPromoId =
-        Hive.box(AppBoxes.appState).get(BoxKeys.activatedPromoId);
-    Promotion? promo;
-    Future<void> getActivatedPromo(String? promoId) async {
-      if (promoId == null) {
-        return;
-      }
-      promo = await AppFunctions.loadPromoReference(FirebaseFirestore.instance
-          .collection(FirestoreCollections.promotions)
-          .doc(promoId));
-    }
 
-    return FutureBuilder(
-        future: getActivatedPromo(activatedPromoId),
+    return FutureBuilder<Promotion?>(
+        future: AppFunctions.getActivatedPromo(),
         builder: (context, snapshot) {
+          final promo = snapshot.hasData ? snapshot.data : null;
           return ValueListenableBuilder(
               valueListenable:
                   Hive.box<HiveCartProduct>(AppBoxes.storedProducts)
@@ -1317,19 +1318,15 @@ class CartSheet extends StatelessWidget {
                                   final BitmapDescriptor bitmapDescriptor =
                                       await BitmapDescriptor.asset(
                                     const ImageConfiguration(
-                                        size: Size(
-                                            30, 46)), // Adjust size as needed
-                                    AssetNames.mapMarker2, // Path to your asset
+                                        size: Size(30, 46)),
+                                    AssetNames.mapMarker2,
                                   );
-                                  final phoneNumber = FirebaseAuth
-                                      .instance.currentUser!.phoneNumber;
 
                                   await navigatorKey.currentState!
                                       .push(MaterialPageRoute(
                                     builder: (context) => CheckoutScreen(
                                         promotion: promo,
                                         markerIcon: bitmapDescriptor,
-                                        phoneNumber: phoneNumber,
                                         store: store),
                                   ));
                                 },

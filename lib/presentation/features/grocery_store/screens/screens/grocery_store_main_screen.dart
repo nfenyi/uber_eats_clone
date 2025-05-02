@@ -115,7 +115,10 @@ class _GroceryStoreMainScreenState
                 ),
             BottomNavigationBarItem(
                 activeIcon: Iconify(Ph.tag_fill),
-                icon: Iconify(Ph.tag_light),
+                icon: Iconify(
+                  Ph.tag_light,
+                  color: AppColors.neutral500,
+                ),
                 label: 'Deals'
                 // 'Home',
                 ),

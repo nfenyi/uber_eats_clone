@@ -22,6 +22,7 @@ import 'package:uber_eats_clone/models/promotion/promotion_model.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 // import 'package:flutter/material.dart';
 
+import 'hive_adapters/cart_item/cart_item_model.dart';
 import 'hive_adapters/geopoint/geopoint_adapter.dart';
 import 'main.dart';
 import 'models/advert/advert_model.dart';
@@ -88,6 +89,85 @@ class AppFunctions {
   //   //     ? value
   //   //     : DateTime.now(); // Or handle null as needed
   // }
+
+  static Future<Promotion?> getActivatedPromo() async {
+    final String? activatedPromoId =
+        Hive.box(AppBoxes.appState).get(BoxKeys.activatedPromoId);
+    if (activatedPromoId == null) {
+      return null;
+    }
+    return await AppFunctions.loadPromoReference(FirebaseFirestore.instance
+        .collection(FirestoreCollections.promotions)
+        .doc(activatedPromoId));
+  }
+
+  static List<CartProduct> transformHiveProductToCartProduct(
+      HiveCartItem cartItem) {
+    List<CartProduct> cartProducts = [];
+    for (var product in cartItem.products) {
+      List<CartProductOption> optionalOptions = [];
+      for (var option in product.optionalOptions) {
+        List<CartProductOption> subOptions = [];
+        for (var subOption in option.options) {
+          List<CartProductOption> subSubOptions = [];
+          for (var subSubOption in subOption.options) {
+            subSubOptions.add(CartProductOption(
+                categoryName: subSubOption.categoryName,
+                name: subSubOption.name,
+                quantity: subSubOption.quantity,
+                options: []));
+          }
+          subOptions.add(CartProductOption(
+              options: subSubOptions,
+              categoryName: subOption.categoryName,
+              name: subOption.name,
+              quantity: subOption.quantity));
+        }
+        optionalOptions.add(CartProductOption(
+            name: option.name,
+            options: subOptions,
+            categoryName: option.categoryName,
+            quantity: option.quantity));
+      }
+
+      List<CartProductOption> requiredOptions = [];
+      for (var option in product.requiredOptions) {
+        List<CartProductOption> subOptions = [];
+        for (var subOption in option.options) {
+          List<CartProductOption> subSubOptions = [];
+          for (var subSubOption in subOption.options) {
+            subSubOptions.add(CartProductOption(
+                categoryName: subSubOption.categoryName,
+                name: subSubOption.name,
+                quantity: subSubOption.quantity,
+                options: []));
+          }
+          subOptions.add(CartProductOption(
+              options: subSubOptions,
+              categoryName: subOption.categoryName,
+              name: subOption.name,
+              quantity: subOption.quantity));
+        }
+        requiredOptions.add(CartProductOption(
+            name: option.name,
+            options: subOptions,
+            categoryName: option.categoryName,
+            quantity: option.quantity));
+      }
+
+      cartProducts.add(CartProduct(
+          name: product.name,
+          purchasePrice: product.purchasePrice,
+          backupInstruction: product.backupInstruction ?? '',
+          id: product.id,
+          note: product.note,
+          optionalOptions: optionalOptions,
+          requiredOptions: requiredOptions,
+          productReplacementId: product.productReplacementId ?? '',
+          quantity: product.quantity));
+    }
+    return cartProducts;
+  }
 
   static Future<List<Advert>> getGiftAdverts() async {
     final advertsSnapshot = await FirebaseFirestore.instance

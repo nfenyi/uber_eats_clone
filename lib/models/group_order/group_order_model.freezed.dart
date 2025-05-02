@@ -33,7 +33,7 @@ mixin _$GroupOrder {
   String? get orderPlacementSetting => throw _privateConstructorUsedError;
   String? get whoPays => throw _privateConstructorUsedError;
   double? get spendingLimit => throw _privateConstructorUsedError;
-  List<String> get persons => throw _privateConstructorUsedError;
+  List<GroupOrderPerson> get persons => throw _privateConstructorUsedError;
   List<Object> get orderScheduleRefs => throw _privateConstructorUsedError;
 
   /// Serializes this GroupOrder to a JSON map.
@@ -66,7 +66,7 @@ abstract class $GroupOrderCopyWith<$Res> {
       String? orderPlacementSetting,
       String? whoPays,
       double? spendingLimit,
-      List<String> persons,
+      List<GroupOrderPerson> persons,
       List<Object> orderScheduleRefs});
 }
 
@@ -154,7 +154,7 @@ class _$GroupOrderCopyWithImpl<$Res, $Val extends GroupOrder>
       persons: null == persons
           ? _value.persons
           : persons // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<GroupOrderPerson>,
       orderScheduleRefs: null == orderScheduleRefs
           ? _value.orderScheduleRefs
           : orderScheduleRefs // ignore: cast_nullable_to_non_nullable
@@ -185,7 +185,7 @@ abstract class _$$GroupOrderImplCopyWith<$Res>
       String? orderPlacementSetting,
       String? whoPays,
       double? spendingLimit,
-      List<String> persons,
+      List<GroupOrderPerson> persons,
       List<Object> orderScheduleRefs});
 }
 
@@ -271,7 +271,7 @@ class __$$GroupOrderImplCopyWithImpl<$Res>
       persons: null == persons
           ? _value._persons
           : persons // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<GroupOrderPerson>,
       orderScheduleRefs: null == orderScheduleRefs
           ? _value._orderScheduleRefs
           : orderScheduleRefs // ignore: cast_nullable_to_non_nullable
@@ -297,7 +297,7 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
       this.orderPlacementSetting,
       required this.whoPays,
       this.spendingLimit,
-      final List<String> persons = const [],
+      final List<GroupOrderPerson> persons = const [],
       final List<Object> orderScheduleRefs = const []})
       : _persons = persons,
         _orderScheduleRefs = orderScheduleRefs;
@@ -331,10 +331,10 @@ class _$GroupOrderImpl with DiagnosticableTreeMixin implements _GroupOrder {
   final String? whoPays;
   @override
   final double? spendingLimit;
-  final List<String> _persons;
+  final List<GroupOrderPerson> _persons;
   @override
   @JsonKey()
-  List<String> get persons {
+  List<GroupOrderPerson> get persons {
     if (_persons is EqualUnmodifiableListView) return _persons;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_persons);
@@ -458,7 +458,7 @@ abstract class _GroupOrder implements GroupOrder {
       final String? orderPlacementSetting,
       required final String? whoPays,
       final double? spendingLimit,
-      final List<String> persons,
+      final List<GroupOrderPerson> persons,
       final List<Object> orderScheduleRefs}) = _$GroupOrderImpl;
 
   factory _GroupOrder.fromJson(Map<String, dynamic> json) =
@@ -491,7 +491,7 @@ abstract class _GroupOrder implements GroupOrder {
   @override
   double? get spendingLimit;
   @override
-  List<String> get persons;
+  List<GroupOrderPerson> get persons;
   @override
   List<Object> get orderScheduleRefs;
 
@@ -500,5 +500,184 @@ abstract class _GroupOrder implements GroupOrder {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GroupOrderImplCopyWith<_$GroupOrderImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+GroupOrderPerson _$GroupOrderPersonFromJson(Map<String, dynamic> json) {
+  return _GroupOrderPerson.fromJson(json);
+}
+
+/// @nodoc
+mixin _$GroupOrderPerson {
+  String get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+
+  /// Serializes this GroupOrderPerson to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of GroupOrderPerson
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $GroupOrderPersonCopyWith<GroupOrderPerson> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $GroupOrderPersonCopyWith<$Res> {
+  factory $GroupOrderPersonCopyWith(
+          GroupOrderPerson value, $Res Function(GroupOrderPerson) then) =
+      _$GroupOrderPersonCopyWithImpl<$Res, GroupOrderPerson>;
+  @useResult
+  $Res call({String id, String name});
+}
+
+/// @nodoc
+class _$GroupOrderPersonCopyWithImpl<$Res, $Val extends GroupOrderPerson>
+    implements $GroupOrderPersonCopyWith<$Res> {
+  _$GroupOrderPersonCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of GroupOrderPerson
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$GroupOrderPersonImplCopyWith<$Res>
+    implements $GroupOrderPersonCopyWith<$Res> {
+  factory _$$GroupOrderPersonImplCopyWith(_$GroupOrderPersonImpl value,
+          $Res Function(_$GroupOrderPersonImpl) then) =
+      __$$GroupOrderPersonImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, String name});
+}
+
+/// @nodoc
+class __$$GroupOrderPersonImplCopyWithImpl<$Res>
+    extends _$GroupOrderPersonCopyWithImpl<$Res, _$GroupOrderPersonImpl>
+    implements _$$GroupOrderPersonImplCopyWith<$Res> {
+  __$$GroupOrderPersonImplCopyWithImpl(_$GroupOrderPersonImpl _value,
+      $Res Function(_$GroupOrderPersonImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of GroupOrderPerson
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+  }) {
+    return _then(_$GroupOrderPersonImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$GroupOrderPersonImpl
+    with DiagnosticableTreeMixin
+    implements _GroupOrderPerson {
+  _$GroupOrderPersonImpl({required this.id, required this.name});
+
+  factory _$GroupOrderPersonImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GroupOrderPersonImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String name;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'GroupOrderPerson(id: $id, name: $name)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'GroupOrderPerson'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$GroupOrderPersonImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name);
+
+  /// Create a copy of GroupOrderPerson
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$GroupOrderPersonImplCopyWith<_$GroupOrderPersonImpl> get copyWith =>
+      __$$GroupOrderPersonImplCopyWithImpl<_$GroupOrderPersonImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$GroupOrderPersonImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _GroupOrderPerson implements GroupOrderPerson {
+  factory _GroupOrderPerson(
+      {required final String id,
+      required final String name}) = _$GroupOrderPersonImpl;
+
+  factory _GroupOrderPerson.fromJson(Map<String, dynamic> json) =
+      _$GroupOrderPersonImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get name;
+
+  /// Create a copy of GroupOrderPerson
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$GroupOrderPersonImplCopyWith<_$GroupOrderPersonImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
