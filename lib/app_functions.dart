@@ -322,17 +322,25 @@ class AppFunctions {
         .where('promoPrice', isNotEqualTo: null)
         .get();
 
-    final promoProducts = await FirebaseFirestore.instance
-        .collection(FirestoreCollections.deals)
-        .where('stores', arrayContains: storeId)
-        .where('offer', isNotEqualTo: null)
-        .get();
     for (var element in discountedProducts.docs) {
       productsWithDeals.add(Product.fromJson(element.data()));
     }
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.stores)
+        .where('id', isEqualTo: storeId)
+        .get();
+    final storeDocId = querySnapshot.docs.first.id;
+    final offersSnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreCollections.offers)
+        .where('store',
+            isEqualTo: FirebaseFirestore.instance
+                .collection(FirestoreCollections.stores)
+                .doc(storeDocId))
+        .get();
 
-    for (var element in promoProducts.docs) {
-      productsWithDeals.add(Product.fromJson(element.data()));
+    for (var element in offersSnapshot.docs) {
+      productsWithDeals.add(
+          await AppFunctions.loadProductReference(element.data()['product']));
     }
     return productsWithDeals;
   }

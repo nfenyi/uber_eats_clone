@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
+import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../../../main.dart';
 import '../../../../../models/store/store_model.dart';
@@ -54,6 +55,7 @@ class _DealsScreenState extends State<DealsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppFunctions.fetchDeals(widget.groceryStore.id);
     return FutureBuilder(
         future: AppFunctions.fetchDeals(widget.groceryStore.id),
         builder: (context, snapshot) {
@@ -77,20 +79,30 @@ class _DealsScreenState extends State<DealsScreen> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppSizes.horizontalPaddingSmall),
                 child: Column(
-                  // mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Gap(100),
-                    Image.asset(
-                      AssetNames.fallenIceCream,
-                      width: 180,
-                    ),
-                    const Gap(10),
-                    const AppText(
-                      text: 'Sorry, something went wrong.',
-                      weight: FontWeight.bold,
-                      size: AppSizes.body,
-                    ),
-                    AppText(text: snapshot.error.toString())
+                    Transform.translate(
+                      offset: const Offset(0, -100),
+                      child: Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Gap(100),
+                            Image.asset(
+                              AssetNames.fallenIceCream,
+                              width: 180,
+                            ),
+                            const Gap(10),
+                            const AppText(
+                              text: 'Sorry, something went wrong.',
+                              weight: FontWeight.bold,
+                              size: AppSizes.body,
+                            ),
+                            AppText(text: snapshot.error.toString()),
+                          ],
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -118,6 +130,7 @@ class _DealsScreenState extends State<DealsScreen> {
               }
             }
           }
+
           if (_aislesAndProducts.isEmpty) {
             return Scaffold(
               body: Column(

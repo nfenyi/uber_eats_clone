@@ -159,7 +159,6 @@ class FirestoreCollections {
   static String groupOrders = 'group orders';
   static String promotions = 'promotions';
   static String vouchers = 'vouchers';
-  static String deals = 'deals';
   static String familyProfiles = 'family profiles';
   static String orderSchedules = 'order schedules';
   static String familyInvites = 'family invites';
