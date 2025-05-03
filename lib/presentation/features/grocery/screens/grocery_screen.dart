@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/main.dart';
@@ -19,6 +20,7 @@ import 'package:uber_eats_clone/presentation/features/address/screens/addresses_
 import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:widget_to_marker/widget_to_marker.dart';
 import '../../../../app_functions.dart';
 import '../../../../hive_adapters/geopoint/geopoint_adapter.dart';
 import '../../../../models/advert/advert_model.dart';
@@ -247,36 +249,74 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                     ],
                   ),
                   const Gap(10),
-                  InkWell(
-                    onTap: () async {
-                      final userInfo =
-                          Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-                      final HiveGeoPoint selectedGeoPoint =
-                          userInfo['selectedAddress']['latlng'];
-                      await navigatorKey.currentState!.push(MaterialPageRoute(
-                        builder: (context) => MapScreen(
-                          userLocation: GeoPoint(selectedGeoPoint.latitude,
-                              selectedGeoPoint.longitude),
-                          filteredStores: const [],
+                  // if(_)
+                  Column(
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          final userInfo =
+                              Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+                          final HiveGeoPoint selectedGeoPoint =
+                              userInfo['selectedAddress']['latlng'];
+                          final bitmapDescriptor = await BitmapDescriptor.asset(
+                            const ImageConfiguration(size: Size(30, 46)),
+                            AssetNames.mapMarker3,
+                          );
+                          final storeMarkerIcons = <BitmapDescriptor>[];
+                          for (var store in allStores) {
+                            storeMarkerIcons.add(await Transform.flip(
+                                flipY: true,
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50)),
+                                  child: store.rating.averageRating >= 4
+                                      ? AppText(
+                                          text: store.rating.averageRating
+                                              .toStringAsFixed(1),
+                                          color: Colors.black,
+                                          weight: FontWeight.bold,
+                                        )
+                                      : Image.asset(
+                                          width: 25,
+                                          store.type
+                                                  .toLowerCase()
+                                                  .contains('grocery')
+                                              ? AssetNames.groceryMarker
+                                              : AssetNames.restaurantMarker),
+                                )).toBitmapDescriptor());
+                          }
+                          await navigatorKey.currentState!
+                              .push(MaterialPageRoute(
+                            builder: (context) => MapScreen(
+                              storeMarkerIcons: storeMarkerIcons,
+                              markerIcon: bitmapDescriptor,
+                              userLocation: GeoPoint(selectedGeoPoint.latitude,
+                                  selectedGeoPoint.longitude),
+                              filteredStores: const [],
+                            ),
+                          ));
+                        },
+                        child: Ink(
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Image.asset(AssetNames.map,
+                                  width: double.infinity),
+                              Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50)),
+                                  child: const AppText(text: 'View map'))
+                            ],
+                          ),
                         ),
-                      ));
-                    },
-                    child: Ink(
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Image.asset(AssetNames.map, width: double.infinity),
-                          Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: const AppText(text: 'View map'))
-                        ],
                       ),
-                    ),
+                      const Gap(20),
+                    ],
                   ),
-                  const Gap(20),
                   ListView.separated(
                       physics: const NeverScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,

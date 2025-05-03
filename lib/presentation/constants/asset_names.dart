@@ -142,7 +142,9 @@ class AssetNames {
   static const greenTag = 'assets/images/green_tag.png';
   static const addGiftCard = 'assets/images/add_gift_card.png';
   static const noCarts = 'assets/images/no_carts.png';
-  static const marker3 = 'assets/images/marker_3.png';
+  static const mapMarker3 = 'assets/images/marker_3.png';
+  static const groceryMarker = 'assets/images/grocery_marker.png';
+  static const restaurantMarker = 'assets/images/restaurant_marker.png';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

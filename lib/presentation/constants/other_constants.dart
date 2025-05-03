@@ -44,12 +44,7 @@ class OtherConstants {
     'Offers',
     'Best overall'
   ];
-  static const List<String> deliveryPriceFilters = [
-    '\$1',
-    '\$3',
-    '\$5',
-    '\$5+'
-  ];
+  static const List<String> deliveryPriceFilters = ['\$1', '\$3', '\$5', '_'];
   static const List<String> sortOptions = ['Rating', 'Delivery time'];
 
   static const List<String> ratingsFilters = ['3+', '3.5+', '4+', '4.5+', '5'];

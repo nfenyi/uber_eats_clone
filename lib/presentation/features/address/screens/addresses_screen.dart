@@ -347,15 +347,14 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                                                   .first
                                                                   .geometry!
                                                                   .location;
-                                                          final BitmapDescriptor
-                                                              bitmapDescriptor =
+                                                          final bitmapDescriptor =
                                                               await BitmapDescriptor
                                                                   .asset(
                                                             const ImageConfiguration(
-                                                                size: Size(30,
-                                                                    46)), // Adjust size as needed
+                                                                size: Size(
+                                                                    30, 46)),
                                                             AssetNames
-                                                                .mapMarker, // Path to your asset
+                                                                .mapMarker,
                                                           );
                                                           navigatorKey
                                                               .currentState!

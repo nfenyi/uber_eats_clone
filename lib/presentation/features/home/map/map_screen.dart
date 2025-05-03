@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,7 +13,9 @@ import 'package:latlong2/latlong.dart' as lt;
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
+import 'package:widget_to_marker/widget_to_marker.dart';
 
+import '../../../../app_functions.dart';
 import '../../../../main.dart';
 import '../../../../models/store/store_model.dart';
 import '../../../constants/asset_names.dart';
@@ -25,24 +26,27 @@ import '../../main_screen/screens/main_screen.dart';
 import '../../sign_in/views/drop_off_options_screen.dart';
 
 class MapScreen extends StatefulWidget {
+  final BitmapDescriptor markerIcon;
   final List<Store> filteredStores;
-  final List<String>? selectedFilters;
+  final List<String> selectedFilters;
+  final List<BitmapDescriptor> storeMarkerIcons;
   final int? selectedDeliveryFeeIndex;
   final int? selectedRatingIndex;
   final String? selectedPriceCategory;
-  final List<String>? selectedDietaryOptions;
-  final String? selectedSort;
+  final List<String> selectedDietaryOptions;
+
   final GeoPoint userLocation;
   const MapScreen(
       {super.key,
       required this.filteredStores,
+      required this.storeMarkerIcons,
       required this.userLocation,
-      this.selectedFilters,
+      required this.markerIcon,
+      this.selectedFilters = const [],
       this.selectedDeliveryFeeIndex,
       this.selectedRatingIndex,
       this.selectedPriceCategory,
-      this.selectedSort,
-      this.selectedDietaryOptions});
+      this.selectedDietaryOptions = const []});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -54,17 +58,17 @@ class _MapScreenState extends State<MapScreen> {
   int? _selectedRatingIndex;
   final Completer<GoogleMapController> _mapController = Completer();
 
-  List<String>? _selectedDietaryOptions;
-  String? _selectedSort;
-  late lt.Distance _distance;
-  List<Store> _stores = [];
-  late final Set<Marker> _markers = {};
+  List<String> _selectedDietaryOptions = [];
 
-  Timer? _debounce;
+  late lt.Distance _distance;
+  List<Store> _filteredStores = [];
+  late final Set<Marker> _markers = {};
 
   final _carouselController = CarouselSliderController();
 
   String? _selectedPriceCategory;
+  List<Store> _storesToFilter = [];
+  late List<String> _filters = [];
 
   late String _storeInFocus;
 
@@ -76,7 +80,7 @@ class _MapScreenState extends State<MapScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarColor: Colors.transparent,
     ));
-    _selectedFilters = widget.selectedFilters!;
+
     _selectedPriceCategory = widget.selectedPriceCategory;
 
     _selectedDeliveryFeeIndex = widget.selectedDeliveryFeeIndex;
@@ -85,33 +89,49 @@ class _MapScreenState extends State<MapScreen> {
     _distance = const lt.Distance(
       roundResult: true,
     );
-    _stores = widget.filteredStores;
-    _storeInFocus = _stores.first.name;
-    for (var i = 0; i < _stores.length; i++) {
-      final storeLatlng = _stores[i].location.latlng as GeoPoint;
+    _storesToFilter = widget.filteredStores;
+    _filteredStores = widget.filteredStores;
+    _selectedFilters = widget.selectedFilters
+        .where(
+          (element) => element != 'Pickup' && element != 'Sort',
+        )
+        .toList();
+    _filters = OtherConstants.filters
+        .where(
+          (element) => element != 'Pickup' && element != 'Sort',
+        )
+        .toList();
+    // _storeInFocus =
+    _markers.add(
+      Marker(
+          icon: widget.markerIcon,
+          markerId: const MarkerId('user_Location'),
+          position: LatLng(
+              widget.userLocation.latitude, widget.userLocation.longitude)),
+    );
+    for (var i = 0; i < _filteredStores.length; i++) {
+      final storeLatlng = _filteredStores[i].location.latlng as GeoPoint;
       _markers.add(
         Marker(
             onTap: () async {
               final controller = await _mapController.future;
-              _storeInFocus = _stores[i].name;
+
               await controller.moveCamera(CameraUpdate.newCameraPosition(
                   CameraPosition(
                       target:
                           LatLng(storeLatlng.latitude, storeLatlng.longitude),
                       zoom: 15)));
               await _carouselController.animateToPage(i);
+              // setState(() {
+              _storeInFocus = _filteredStores[i].name;
+              // });
               // _carouselController.jumpTo(e.)
             },
-            markerId: MarkerId(_stores[i].name),
+            icon: widget.storeMarkerIcons[i],
+            markerId: MarkerId(_filteredStores[i].name),
             position: LatLng(storeLatlng.latitude, storeLatlng.longitude)),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
   }
 
   @override
@@ -120,37 +140,80 @@ class _MapScreenState extends State<MapScreen> {
       body: Stack(
         children: [
           Builder(builder: (context) {
-            final storeLatlng = _stores.first.location.latlng as GeoPoint;
+            // final storeLatlng =
+            //     _filteredStores.first.location.latlng as GeoPoint;
             return GoogleMap(
+              buildingsEnabled: false,
               markers: _markers.map(
                 (e) {
-                  if (e.markerId.value == _storeInFocus) {
-                    return Marker(
-                        onTap: () async {
-                          final controller = await _mapController.future;
+                  //                 logger.d(e.markerId.value == _storeInFocus);
+                  //                 if (e.markerId.value == _storeInFocus) {
+                  //                   final store = _storesToFilter.firstWhere((element) => element.name == e.markerId.value,);
+                  //                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  // final selectedMarker =  await Transform.flip(
+                  //                                             flipY: true,
+                  //                                             child: Container(
+                  //                                               padding:
+                  //                                                   const EdgeInsets.all(10),
+                  //                                               decoration: BoxDecoration(
+                  //                                                   color: AppColors.neutral300,
+                  //                                                   borderRadius:
+                  //                                                       BorderRadius.circular(
+                  //                                                           50)),
+                  //                                               child:
+                  //                                                          store .rating
+                  //                                                           .averageRating >=
+                  //                                                       4
+                  //                                                   ? AppText(
+                  //                                                       text: store
+                  //                                                           .rating
+                  //                                                           .averageRating
+                  //                                                           .toStringAsFixed(1),
+                  //                                                       color: Colors.black,
+                  //                                                       weight: FontWeight.bold,
+                  //                                                     )
+                  //                                                   : Image.asset(
+                  //                                                       width: 25,
+                  //                                                       store
+                  //                                                               .type
+                  //                                                               .toLowerCase()
+                  //                                                               .contains(
+                  //                                                                   'grocery')
+                  //                                                           ? AssetNames
+                  //                                                               .groceryMarker
+                  //                                                           : AssetNames
+                  //                                                               .restaurantMarker),
+                  //                                             )).toBitmapDescriptor();
 
-                          await controller.moveCamera(
-                              CameraUpdate.newCameraPosition(CameraPosition(
-                                  target: LatLng(storeLatlng.latitude,
-                                      storeLatlng.longitude),
-                                  zoom: 15)));
-                        },
-                        markerId: MarkerId(_storeInFocus),
-                        position: LatLng(
-                            storeLatlng.latitude, storeLatlng.longitude));
-                  } else {
-                    return e;
-                  }
+                  //   });
+
+                  //                   return Marker(
+                  //                       icon: selectedMarker,  onTap: () async {
+                  //                         final controller = await _mapController.future;
+
+                  //                         await controller.moveCamera(
+                  //                             CameraUpdate.newCameraPosition(CameraPosition(
+                  //                                 target: LatLng(storeLatlng.latitude,
+                  //                                     storeLatlng.longitude),
+                  //                                 zoom: 15)));
+                  //                       },
+                  //                       markerId: MarkerId(_storeInFocus),
+                  //                       position: LatLng(
+                  //                           storeLatlng.latitude, storeLatlng.longitude));
+                  //                 } else {
+                  return e;
+                  // }
                 },
               ).toSet(),
               zoomControlsEnabled: false,
-              myLocationButtonEnabled: true,
+              mapType: MapType.terrain,
               minMaxZoomPreference: const MinMaxZoomPreference(10, 30),
               onMapCreated: (controller) {
                 _mapController.complete(controller);
               },
               initialCameraPosition: CameraPosition(
-                  target: LatLng(storeLatlng.latitude, storeLatlng.longitude),
+                  target: LatLng(widget.userLocation.latitude,
+                      widget.userLocation.longitude),
                   zoom: 15),
             );
           }),
@@ -160,7 +223,6 @@ class _MapScreenState extends State<MapScreen> {
             children: [
               Column(
                 children: [
-                  const Gap(10),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppSizes.horizontalPaddingSmall),
@@ -170,7 +232,7 @@ class _MapScreenState extends State<MapScreen> {
                           onTap: () => navigatorKey.currentState!.pop(),
                           child: Ink(
                             child: Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(50)),
@@ -181,57 +243,100 @@ class _MapScreenState extends State<MapScreen> {
                         const Gap(20),
                         Expanded(
                           child: AppTextFormField(
-                            onChanged: (value) {
-                              if (_debounce?.isActive ?? false) {
-                                _debounce?.cancel();
-                              }
-                              _debounce =
-                                  Timer(const Duration(seconds: 1), () async {
-                                if (value != null) {
-                                  setState(() {
-                                    _stores = allStores
-                                        .where(
-                                          (element) => element.name
-                                              .toLowerCase()
-                                              .contains(value.toLowerCase()),
-                                        )
-                                        .toList();
-                                    _markers.clear();
-                                    for (var i = 0; i < _stores.length; i++) {
-                                      final storelatLng = _stores[i]
-                                          .location
-                                          .latlng as GeoPoint;
-                                      _markers.add(
-                                        Marker(
-                                            onTap: () async {
-                                              final controller =
-                                                  await _mapController.future;
-                                              _storeInFocus = _stores[i].name;
-                                              await controller.moveCamera(
-                                                  CameraUpdate.newCameraPosition(
-                                                      CameraPosition(
-                                                          target: LatLng(
-                                                              storelatLng
-                                                                  .latitude,
-                                                              storelatLng
-                                                                  .longitude),
-                                                          zoom: 15)));
-                                              await _carouselController
-                                                  .animateToPage(i);
-                                              // _carouselController.jumpTo(e.)
-                                            },
-                                            markerId: MarkerId(_stores[i].name),
-                                            position: LatLng(
-                                                storelatLng.latitude,
-                                                storelatLng.longitude)),
-                                      );
-                                    }
-                                  });
+                            height: 9,
+                            fillColor: Colors.white,
+                            textInputAction: TextInputAction.search,
+                            onFieldSubmitted: (value) async {
+                              if (value != null) {
+                                _storesToFilter = allStores
+                                    .where(
+                                      (element) => element.name
+                                          .toLowerCase()
+                                          .contains(value.toLowerCase()),
+                                    )
+                                    .toList();
+                                _markers.clear();
+                                for (var i = 0;
+                                    i < _storesToFilter.length;
+                                    i++) {
+                                  final storeLatlng = _storesToFilter[i]
+                                      .location
+                                      .latlng as GeoPoint;
+                                  _markers.add(
+                                    Marker(
+                                        onTap: () async {
+                                          final controller =
+                                              await _mapController.future;
+
+                                          await controller.moveCamera(
+                                              CameraUpdate.newCameraPosition(
+                                                  CameraPosition(
+                                                      target: LatLng(
+                                                          storeLatlng.latitude,
+                                                          storeLatlng
+                                                              .longitude),
+                                                      zoom: 15)));
+                                          await _carouselController
+                                              .animateToPage(i);
+                                          // setState(() {
+                                          _storeInFocus =
+                                              _storesToFilter[i].name;
+                                          // });
+                                          // _carouselController.jumpTo(e.)
+                                        },
+                                        icon: await Transform.flip(
+                                            flipY: true,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50)),
+                                              child: _storesToFilter[i]
+                                                          .rating
+                                                          .averageRating >=
+                                                      4
+                                                  ? AppText(
+                                                      text: _storesToFilter[i]
+                                                          .rating
+                                                          .averageRating
+                                                          .toStringAsFixed(1),
+                                                      color: Colors.black,
+                                                      weight: FontWeight.bold,
+                                                    )
+                                                  : Image.asset(
+                                                      width: 25,
+                                                      _storesToFilter[i]
+                                                              .type
+                                                              .toLowerCase()
+                                                              .contains(
+                                                                  'grocery')
+                                                          ? AssetNames
+                                                              .groceryMarker
+                                                          : AssetNames
+                                                              .restaurantMarker),
+                                            )).toBitmapDescriptor(),
+                                        markerId:
+                                            MarkerId(_storesToFilter[i].name),
+                                        position: LatLng(storeLatlng.latitude,
+                                            storeLatlng.longitude)),
+                                  );
                                 }
-                              });
+
+                                setState(() {
+                                  _selectedFilters = [];
+                                  _selectedDeliveryFeeIndex = null;
+                                  _selectedDietaryOptions = [];
+                                  _selectedPriceCategory = null;
+                                  _selectedRatingIndex = null;
+                                  _filteredStores = _storesToFilter;
+                                  _storeInFocus = _filteredStores.first.name;
+                                });
+                              }
                             },
-                            enabled: false,
-                            hintText: 'Search',
+                            enabled: true,
+                            hintText: 'Search Pickup',
                             radius: 50,
                             constraintWidth: 40,
                             prefixIcon: const Padding(
@@ -245,11 +350,11 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                   ChipsChoice<String>.multiple(
                     choiceLabelBuilder: (item, i) {
-                      if (i < 3) {
+                      if (i < 2) {
                         return AppText(
                           text: item.label,
                         );
-                      } else if (i == 3) {
+                      } else if (i == 2) {
                         if (_selectedDeliveryFeeIndex == null) {
                           return AppText(
                             text: item.label,
@@ -259,7 +364,7 @@ class _MapScreenState extends State<MapScreen> {
                               text: OtherConstants.deliveryPriceFilters[
                                   _selectedDeliveryFeeIndex!]);
                         }
-                      } else if (i == 4) {
+                      } else if (i == 3) {
                         if (_selectedRatingIndex == null) {
                           return AppText(
                             text: item.label,
@@ -269,7 +374,7 @@ class _MapScreenState extends State<MapScreen> {
                               text: OtherConstants
                                   .ratingsFilters[_selectedRatingIndex!]);
                         }
-                      } else if (i == 5) {
+                      } else if (i == 4) {
                         if (_selectedPriceCategory == null) {
                           return AppText(
                             text: item.label,
@@ -277,29 +382,20 @@ class _MapScreenState extends State<MapScreen> {
                         } else {
                           return AppText(text: _selectedPriceCategory!);
                         }
-                      } else if (i == 6) {
-                        if (_selectedDietaryOptions == null ||
-                            _selectedDietaryOptions!.isEmpty) {
+                      } else {
+                        if (_selectedDietaryOptions.isEmpty) {
                           return AppText(
                             text: item.label,
                           );
                         } else {
                           return AppText(
                               text:
-                                  '${item.label}(${_selectedDietaryOptions!.length})');
-                        }
-                      } else {
-                        if (_selectedSort == null) {
-                          return AppText(
-                            text: item.label,
-                          );
-                        } else {
-                          return AppText(text: _selectedSort!);
+                                  '${item.label}(${_selectedDietaryOptions.length})');
                         }
                       }
                     },
                     choiceTrailingBuilder: (item, i) {
-                      if (i > 2) {
+                      if (i > 1) {
                         return const Icon(Icons.keyboard_arrow_down_sharp);
                       }
                       return null;
@@ -309,51 +405,34 @@ class _MapScreenState extends State<MapScreen> {
                         horizontal: AppSizes.horizontalPaddingSmall),
                     value: _selectedFilters,
                     onChanged: (value) {
-                      late String newFilter;
+                      late String tappedFilter;
 
                       if (value.isEmpty) {
-                        newFilter = _selectedFilters.first;
-                      } else if (_selectedFilters.isNotEmpty) {
-                        _selectedFilters.any(
+                        tappedFilter = _selectedFilters.first;
+                      } else if (_selectedFilters.isNotEmpty &&
+                          _selectedFilters.length < value.length) {
+                        value.any(
                           (element) {
-                            if (!value.contains(element)) {
-                              newFilter = element;
+                            if (!_selectedFilters.contains(element)) {
+                              tappedFilter = element;
                               return true;
                             }
                             return false;
                           },
                         );
-                      } else if (value.length == 1) {
-                        newFilter = value.first;
+                      } else if (_selectedFilters.isNotEmpty &&
+                          _selectedFilters.length > value.length) {
+                        for (var filter in _selectedFilters) {
+                          if (!value.contains(filter)) {
+                            tappedFilter = filter;
+                            break;
+                          }
+                        }
+                      } else {
+                        tappedFilter = value.first;
                       }
-                      if (OtherConstants.filters.indexOf(newFilter) == 0) {
-                        setState(() {
-                          if (_selectedFilters.contains(newFilter)) {
-                            _selectedFilters.remove(newFilter);
-                          } else {
-                            _selectedFilters.add(newFilter);
-                          }
-                        });
-                      } else if (OtherConstants.filters.indexOf(newFilter) ==
-                          1) {
-                        setState(() {
-                          if (_selectedFilters.contains(newFilter)) {
-                            _selectedFilters.remove(newFilter);
-                          } else {
-                            _selectedFilters.add(newFilter);
-                          }
-                        });
-                      } else if (OtherConstants.filters.indexOf(newFilter) ==
-                          2) {
-                        setState(() {
-                          if (_selectedFilters.contains(newFilter)) {
-                            _selectedFilters.remove(newFilter);
-                          } else {
-                            _selectedFilters.add(newFilter);
-                          }
-                        });
-                      } else if (OtherConstants.filters.indexOf(newFilter) ==
-                          3) {
+
+                      if (_filters.indexOf(tappedFilter) == 2) {
                         showModalBottomSheet(
                           context: context,
                           builder: (context) {
@@ -427,12 +506,9 @@ class _MapScreenState extends State<MapScreen> {
                                         text: 'Apply',
                                         callback: () {
                                           _selectedDeliveryFeeIndex = temp;
-                                          // logger.d(_selectedDeliveryFeeIndex);
-                                          //                      setState(() {
-                                          //   _currentlySelectedFilters = value;
-                                          // });
 
-                                          setStateWithModal(value, newFilter);
+                                          _setStateWithModal(
+                                              value, tappedFilter);
                                         },
                                       ),
                                       Center(
@@ -441,7 +517,7 @@ class _MapScreenState extends State<MapScreen> {
                                           text: 'Reset',
                                           callback: () {
                                             _selectedDeliveryFeeIndex = null;
-                                            resetFilter(value, 3);
+                                            _resetFilter(value, 3);
                                           },
                                         ),
                                       ),
@@ -452,8 +528,7 @@ class _MapScreenState extends State<MapScreen> {
                             });
                           },
                         );
-                      } else if (OtherConstants.filters.indexOf(newFilter) ==
-                          4) {
+                      } else if (_filters.indexOf(tappedFilter) == 3) {
                         showModalBottomSheet(
                           context: context,
                           builder: (context) {
@@ -495,7 +570,7 @@ class _MapScreenState extends State<MapScreen> {
                                                       ? 'Over 4'
                                                       : temp == 3
                                                           ? 'Over 4.5'
-                                                          : 'Over 5'),
+                                                          : '5'),
                                       Padding(
                                         padding: const EdgeInsets.all(25.0),
                                         child: Row(
@@ -529,12 +604,9 @@ class _MapScreenState extends State<MapScreen> {
                                         text: 'Apply',
                                         callback: () {
                                           _selectedRatingIndex = temp;
-                                          // logger.d(_selectedRatingIndex);
-                                          //                      setState(() {
-                                          //   _currentlySelectedFilters = value;
-                                          // });
 
-                                          setStateWithModal(value, newFilter);
+                                          _setStateWithModal(
+                                              value, tappedFilter);
                                         },
                                       ),
                                       Center(
@@ -550,10 +622,9 @@ class _MapScreenState extends State<MapScreen> {
                                             //         element == 'Delivery fee',
                                             //   );
                                             // });
-                                            navigatorKey.currentState!.pop();
 
                                             _selectedRatingIndex = null;
-                                            resetFilter(value, 4);
+                                            _resetFilter(value, 4);
                                           },
                                         ),
                                       ),
@@ -564,8 +635,7 @@ class _MapScreenState extends State<MapScreen> {
                             });
                           },
                         );
-                      } else if (OtherConstants.filters.indexOf(newFilter) ==
-                          5) {
+                      } else if (_filters.indexOf(tappedFilter) == 4) {
                         showModalBottomSheet(
                           context: context,
                           builder: (context) {
@@ -636,7 +706,8 @@ class _MapScreenState extends State<MapScreen> {
                                           if (temp != null) {
                                             _selectedPriceCategory = temp;
 
-                                            setStateWithModal(value, newFilter);
+                                            _setStateWithModal(
+                                                value, tappedFilter);
                                           }
                                         },
                                       ),
@@ -646,7 +717,7 @@ class _MapScreenState extends State<MapScreen> {
                                           text: 'Reset',
                                           callback: () {
                                             _selectedPriceCategory = null;
-                                            resetFilter(value, 5);
+                                            _resetFilter(value, 5);
                                           },
                                         ),
                                       ),
@@ -657,12 +728,11 @@ class _MapScreenState extends State<MapScreen> {
                             });
                           },
                         );
-                      } else if (OtherConstants.filters.indexOf(newFilter) ==
-                          6) {
+                      } else if (_filters.indexOf(tappedFilter) == 5) {
                         showModalBottomSheet(
                           context: context,
                           builder: (context) {
-                            List<String> temp = _selectedDietaryOptions ?? [];
+                            List<String> temp = _selectedDietaryOptions;
 
                             return StatefulBuilder(
                                 builder: (context, setState) {
@@ -769,7 +839,8 @@ class _MapScreenState extends State<MapScreen> {
                                           if (temp.isNotEmpty) {
                                             _selectedDietaryOptions = temp;
 
-                                            setStateWithModal(value, newFilter);
+                                            _setStateWithModal(
+                                                value, tappedFilter);
                                           }
                                         },
                                       ),
@@ -780,7 +851,7 @@ class _MapScreenState extends State<MapScreen> {
                                           callback: () {
                                             _selectedDietaryOptions = [];
 
-                                            resetFilter(value, 6);
+                                            _resetFilter(value, 6);
                                           },
                                         ),
                                       ),
@@ -791,98 +862,19 @@ class _MapScreenState extends State<MapScreen> {
                             });
                           },
                         );
-                      } else if (OtherConstants.filters.indexOf(newFilter) ==
-                          7) {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            var temp = _selectedSort;
-
-                            return StatefulBuilder(
-                                builder: (context, setState) {
-                              return Container(
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      // horizontal:
-                                      AppSizes.horizontalPaddingSmall),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Center(
-                                          child: AppText(
-                                        text: 'Sort',
-                                        size: AppSizes.bodySmall,
-                                        weight: FontWeight.w600,
-                                      )),
-                                      ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount:
-                                            OtherConstants.sortOptions.length,
-                                        itemBuilder: (context, index) {
-                                          final sortOption =
-                                              OtherConstants.sortOptions[index];
-                                          return RadioListTile<String>.adaptive(
-                                            value: sortOption,
-                                            title: AppText(text: sortOption),
-                                            groupValue: temp,
-                                            controlAffinity:
-                                                ListTileControlAffinity
-                                                    .trailing,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                temp = value;
-                                              });
-                                            },
-                                          );
-                                          // AppRadioListTile(
-                                          //   groupValue: 'Sort',
-                                          //   value: 'Recommended',
-                                          // ),
-                                          // AppRadioListTile(
-                                          //   groupValue: 'Sort',
-                                          //   value: 'Rating',
-                                          // ),
-                                          // AppRadioListTile(
-                                          //   groupValue: 'Sort',
-                                          //   value: 'Delivery time',
-                                          // ),
-                                        },
-                                      ),
-                                      const Gap(20),
-                                      AppButton(
-                                        text: 'Apply',
-                                        callback: () {
-                                          if (temp != null) {
-                                            _selectedSort = temp;
-
-                                            setStateWithModal(value, newFilter);
-                                          }
-                                        },
-                                      ),
-                                      Center(
-                                        child: AppTextButton(
-                                          size: AppSizes.bodySmall,
-                                          text: 'Reset',
-                                          callback: () {
-                                            _selectedSort = null;
-                                            resetFilter(value, 7);
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            });
-                          },
-                        );
+                      } else {
+                        setState(() {
+                          if (_selectedFilters.contains(tappedFilter)) {
+                            _selectedFilters.remove(tappedFilter);
+                          } else {
+                            _selectedFilters.add(tappedFilter);
+                          }
+                          _getFilterdStores(selectedFilters: _selectedFilters);
+                        });
                       }
                     },
                     choiceItems: C2Choice.listFrom<String, String>(
-                      source: OtherConstants.filters,
+                      source: _filters,
                       value: (i, v) => v,
                       label: (i, v) => v,
                     ),
@@ -896,7 +888,7 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       height: 30,
                       borderRadius: BorderRadius.circular(100),
-                      color: AppColors.neutral200,
+                      color: Colors.white,
                     ),
                   ),
                   const Gap(20),
@@ -905,16 +897,30 @@ class _MapScreenState extends State<MapScreen> {
                         right: AppSizes.horizontalPaddingSmall),
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          color: Colors.white,
-                        ),
-                        child: const Iconify(
-                          Bi.cursor_fill,
-                          size: 15,
-                          color: Colors.black,
+                      child: InkWell(
+                        onTap: () async {
+                          final controller = await _mapController.future;
+
+                          await controller.moveCamera(
+                              CameraUpdate.newCameraPosition(CameraPosition(
+                                  target: LatLng(widget.userLocation.latitude,
+                                      widget.userLocation.longitude),
+                                  zoom: 15)));
+                          setState(() {});
+                        },
+                        child: Ink(
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              color: Colors.white,
+                            ),
+                            child: const Iconify(
+                              Bi.cursor_fill,
+                              size: 15,
+                              color: Colors.black,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -938,63 +944,88 @@ class _MapScreenState extends State<MapScreen> {
                   // const Gap(15),
                   CarouselSlider.builder(
                     carouselController: _carouselController,
-                    itemCount: _stores.length,
+                    itemCount: _filteredStores.length,
                     itemBuilder: (context, index, realIndex) {
-                      final store = _stores[index];
+                      final store = _filteredStores[index];
                       final storelatLng = store.location.latlng as GeoPoint;
 
-                      return Card(
-                        color: Colors.white,
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        child: Column(
-                          children: [
-                            Stack(
-                              alignment: AlignmentDirectional.topEnd,
+                      return InkWell(
+                        onTap: () async {
+                          final controller = await _mapController.future;
+                          final storelatLng = _filteredStores[index]
+                              .location
+                              .latlng as GeoPoint;
+
+                          await controller.moveCamera(
+                              CameraUpdate.newCameraPosition(CameraPosition(
+                                  target: LatLng(storelatLng.latitude,
+                                      storelatLng.longitude),
+                                  zoom: 15)));
+                          await _carouselController.animateToPage(index);
+                          setState(() {
+                            _storeInFocus = _filteredStores[index].name;
+                          });
+                        },
+                        child: Ink(
+                          child: Card(
+                            color: Colors.white,
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(15),
-                                      topRight: Radius.circular(15)),
-                                  child: CachedNetworkImage(
-                                    width: double.infinity,
-                                    imageUrl: store.cardImage,
-                                    fit: BoxFit.cover,
-                                    height: 130,
+                                Stack(
+                                  alignment: AlignmentDirectional.topEnd,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(15),
+                                          topRight: Radius.circular(15)),
+                                      child: AppFunctions.displayNetworkImage(
+                                        width: double.infinity,
+                                        store.cardImage,
+                                        fit: BoxFit.cover,
+                                        height: 105,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: FavouriteButton(store: store),
+                                    )
+                                  ],
+                                ),
+                                ListTile(
+                                  minTileHeight: 60,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal:
+                                          AppSizes.horizontalPaddingSmall),
+                                  dense: true,
+                                  title: AppText(
+                                    text: store.name,
+                                  ),
+                                  subtitle: Row(
+                                    children: [
+                                      if (store.isUberOneShop)
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              AssetNames.uberOneSmall,
+                                              height: 12,
+                                              color: AppColors.uberOneGold,
+                                            ),
+                                            const AppText(text: ' • ')
+                                          ],
+                                        ),
+                                      AppText(
+                                          text:
+                                              '${store.delivery.estimatedDeliveryTime} min • ${_distance.as(lt.LengthUnit.Kilometer, lt.LatLng(storelatLng.latitude, storelatLng.longitude), lt.LatLng(widget.userLocation.latitude, widget.userLocation.longitude))} km'),
+                                    ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: FavouriteButton(store: store),
-                                )
                               ],
                             ),
-                            ListTile(
-                              dense: true,
-                              title: AppText(
-                                text: store.name,
-                              ),
-                              subtitle: Row(
-                                children: [
-                                  if (store.isUberOneShop)
-                                    Row(
-                                      children: [
-                                        Image.asset(
-                                          AssetNames.uberOneSmall,
-                                          height: 12,
-                                          color: AppColors.uberOneGold,
-                                        ),
-                                        const AppText(text: ' • ')
-                                      ],
-                                    ),
-                                  AppText(
-                                      text:
-                                          '${store.delivery.estimatedDeliveryTime} min • ${_distance.as(lt.LengthUnit.Kilometer, lt.LatLng(storelatLng.latitude, storelatLng.longitude), lt.LatLng(widget.userLocation.latitude, widget.userLocation.longitude))} km'),
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       );
 
@@ -1014,14 +1045,18 @@ class _MapScreenState extends State<MapScreen> {
                         enableInfiniteScroll: false,
                         onPageChanged: (index, reason) async {
                           final controller = await _mapController.future;
-                          final storelatLng =
-                              _stores[index].location.latlng as GeoPoint;
-                          _storeInFocus = _stores[index].name;
+                          final storelatLng = _filteredStores[index]
+                              .location
+                              .latlng as GeoPoint;
+
                           await controller.moveCamera(
                               CameraUpdate.newCameraPosition(CameraPosition(
                                   target: LatLng(storelatLng.latitude,
                                       storelatLng.longitude),
                                   zoom: 15)));
+                          setState(() {
+                            _storeInFocus = _filteredStores[index].name;
+                          });
                         },
                         viewportFraction: 0.85),
                   ),
@@ -1035,16 +1070,17 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void setStateWithModal(List<String> value, String newFilter) {
+  void _setStateWithModal(List<String> value, String newFilter) {
     navigatorKey.currentState!.pop();
     setState(() {
       if (!_selectedFilters.contains(newFilter)) {
         _selectedFilters.add(newFilter);
       }
+      _getFilterdStores(selectedFilters: _selectedFilters);
     });
   }
 
-  void resetFilter(
+  void _resetFilter(
     List<String> value,
     int filterIndex,
   ) {
@@ -1053,10 +1089,94 @@ class _MapScreenState extends State<MapScreen> {
       List<String> temp = List<String>.from(value);
 
       temp.removeWhere(
-        (element) => element == OtherConstants.filters[filterIndex],
+        (element) => element == _filters[filterIndex],
       );
 
       _selectedFilters = temp;
+      _getFilterdStores(selectedFilters: _selectedFilters);
     });
+  }
+
+  void _getFilterdStores({required List<String> selectedFilters}) {
+    Iterable<Store> storesIterable = _storesToFilter;
+    storesIterable = storesIterable.where(
+      (element) => element.doesPickup == true,
+    );
+
+    for (var filter in selectedFilters) {
+      if (filter == 'Uber One') {
+        storesIterable = storesIterable.where(
+          (element) => element.isUberOneShop == true,
+        );
+      } else if (filter == 'Offers') {
+        storesIterable = storesIterable.where(
+          (element) => element.offers != null && element.offers!.isNotEmpty,
+        );
+      } else if (filter == 'Rating') {
+        storesIterable = storesIterable.where(
+          (element) {
+            if (_selectedRatingIndex == 0) {
+              return element.rating.averageRating > 3;
+            } else if (_selectedRatingIndex == 1) {
+              return element.rating.averageRating > 3.5;
+            } else if (_selectedRatingIndex == 2) {
+              return element.rating.averageRating > 4;
+            } else if (_selectedRatingIndex == 3) {
+              return element.rating.averageRating > 4.5;
+            } else {
+              return element.rating.averageRating == 5;
+            }
+          },
+        );
+      } else if (filter == 'Price') {
+        storesIterable = storesIterable.where(
+          (element) => element.priceCategory == _selectedPriceCategory,
+        );
+      } else if (filter == 'Dietary') {
+        storesIterable = storesIterable.where(
+          (element) => _selectedDietaryOptions.contains(element.dietary),
+        );
+      } else if (filter == 'Delivery fee' &&
+          _selectedDeliveryFeeIndex !=
+              OtherConstants.deliveryPriceFilters.length - 1) {
+        storesIterable = storesIterable.where(
+          (element) {
+            return element.delivery.fee <
+                int.parse(OtherConstants
+                    .deliveryPriceFilters[_selectedDeliveryFeeIndex!]
+                    .split('\$')
+                    .last);
+          },
+        );
+      }
+    }
+    _markers.clear();
+    if (selectedFilters.isNotEmpty) {
+      for (var i = 0; i < storesIterable.length; i++) {
+        final storeLatlng =
+            storesIterable.elementAt(i).location.latlng as GeoPoint;
+        _markers.add(
+          Marker(
+              onTap: () async {
+                final controller = await _mapController.future;
+
+                await controller.moveCamera(CameraUpdate.newCameraPosition(
+                    CameraPosition(
+                        target:
+                            LatLng(storeLatlng.latitude, storeLatlng.longitude),
+                        zoom: 15)));
+                await _carouselController.animateToPage(i);
+                // setState(() {
+                _storeInFocus = storesIterable.elementAt(i).name;
+                // });
+                // _carouselController.jumpTo(e.)
+              },
+              icon: widget.storeMarkerIcons[i],
+              markerId: MarkerId(storesIterable.elementAt(i).name),
+              position: LatLng(storeLatlng.latitude, storeLatlng.longitude)),
+        );
+      }
+    }
+    _filteredStores = storesIterable.toList();
   }
 }

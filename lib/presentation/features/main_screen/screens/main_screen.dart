@@ -205,7 +205,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                             label: AppText(text: value.length.toString()),
                             child: const Iconify(
                               MaterialSymbols.shopping_cart_rounded,
-                              color: AppColors.neutral500,
                             ));
                   }),
               icon: ValueListenableBuilder(
@@ -214,7 +213,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   builder: (context, value, child) {
                     return value.length == 0
                         ? const Iconify(
-                            MaterialSymbols.shopping_cart_outline_rounded)
+                            MaterialSymbols.shopping_cart_outline_rounded,
+                            color: AppColors.neutral500,
+                          )
                         : Badge(
                             label: AppText(text: value.length.toString()),
                             child: const Iconify(

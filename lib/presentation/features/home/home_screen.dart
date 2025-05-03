@@ -8,10 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ic.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' as lt;
 import 'package:showcaseview/showcaseview.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/hive_adapters/cart_item/cart_item_model.dart';
@@ -29,6 +30,7 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_opt
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import 'package:uber_eats_clone/state/user_location_providers.dart';
+import 'package:widget_to_marker/widget_to_marker.dart';
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
 import '../../../models/store/store_model.dart';
@@ -1122,6 +1124,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               AppSizes.horizontalPaddingSmall),
                                       value: _selectedFilters,
                                       onChanged: (value) {
+                                        logger.d(value);
+                                        logger.d(_selectedFilters);
                                         late String tappedFilter;
                                         if (value.isEmpty) {
                                           tappedFilter = _selectedFilters.first;
@@ -1149,6 +1153,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               break;
                                             }
                                           }
+                                        } else {
+                                          tappedFilter = value.first;
                                         }
 
                                         if (OtherConstants.filters
@@ -1393,9 +1399,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                               //         element == 'Delivery fee',
                                                               //   );
                                                               // });
-                                                              navigatorKey
-                                                                  .currentState!
-                                                                  .pop();
 
                                                               _selectedRatingIndex =
                                                                   null;
@@ -1856,7 +1859,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       ),
                                     ),
                                     _onFilterScreen
-                                        ? FutureBuilder(
+                                        ? FutureBuilder<List<Store>>(
                                             future: _getFilterdStores(
                                                 category:
                                                     _selectedFoodCategory?.name,
@@ -1956,6 +1959,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                   ),
                                                 );
                                               }
+                                              final filteredStores =
+                                                  snapshot.data!;
                                               return SingleChildScrollView(
                                                 child: Padding(
                                                   padding: const EdgeInsets
@@ -1974,7 +1979,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                             size: AppSizes
                                                                 .bodySmall,
                                                             text:
-                                                                '${allStores.length} ${allStores.length == 1 ? 'result' : 'results'}',
+                                                                '${filteredStores.length} ${filteredStores.length == 1 ? 'result' : 'results'}',
                                                             weight:
                                                                 FontWeight.w600,
                                                           ),
@@ -2011,61 +2016,78 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                           ),
                                                         ],
                                                       ),
-                                                      (allStores.isNotEmpty)
+                                                      (filteredStores
+                                                              .isNotEmpty)
                                                           ? Column(
                                                               children: [
                                                                 const Gap(10),
-                                                                InkWell(
-                                                                  onTap:
-                                                                      () async {
-                                                                    final userInfo = Hive.box(AppBoxes
-                                                                            .appState)
-                                                                        .get(BoxKeys
-                                                                            .userInfo);
-                                                                    final HiveGeoPoint
-                                                                        userSelectedGeoPoint =
-                                                                        userInfo['selectedAddress']
-                                                                            [
-                                                                            'latlng'];
-                                                                    await navigatorKey
-                                                                        .currentState!
-                                                                        .push(
-                                                                            MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) =>
-                                                                              MapScreen(
-                                                                        userLocation: GeoPoint(
-                                                                            userSelectedGeoPoint.latitude,
-                                                                            userSelectedGeoPoint.longitude),
-                                                                        filteredStores:
-                                                                            allStores,
-                                                                        selectedFilters:
-                                                                            _selectedFilters,
+                                                                if (_selectedFilters
+                                                                    .contains(
+                                                                        'Pickup'))
+                                                                  Column(
+                                                                    children: [
+                                                                      InkWell(
+                                                                        onTap:
+                                                                            () async {
+                                                                          final userInfo =
+                                                                              Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
+                                                                          final HiveGeoPoint
+                                                                              userSelectedGeoPoint =
+                                                                              userInfo['selectedAddress']['latlng'];
+                                                                          final bitmapDescriptor =
+                                                                              await BitmapDescriptor.asset(
+                                                                            const ImageConfiguration(size: Size(30, 35)),
+                                                                            AssetNames.mapMarker3,
+                                                                          );
+                                                                          final storeMarkerIcons =
+                                                                              <BitmapDescriptor>[];
+                                                                          for (var store
+                                                                              in filteredStores) {
+                                                                            storeMarkerIcons.add(await Transform.flip(
+                                                                                flipY: true,
+                                                                                child: Container(
+                                                                                  padding: const EdgeInsets.all(10),
+                                                                                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(50)),
+                                                                                  child: store.rating.averageRating >= 4
+                                                                                      ? AppText(
+                                                                                          text: store.rating.averageRating.toStringAsFixed(1),
+                                                                                          color: Colors.black,
+                                                                                          weight: FontWeight.bold,
+                                                                                        )
+                                                                                      : Image.asset(width: 25, store.type.toLowerCase().contains('grocery') ? AssetNames.groceryMarker : AssetNames.restaurantMarker),
+                                                                                )).toBitmapDescriptor());
+                                                                          }
+
+                                                                          await navigatorKey
+                                                                              .currentState!
+                                                                              .push(MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                MapScreen(
+                                                                              storeMarkerIcons: storeMarkerIcons,
+                                                                              markerIcon: bitmapDescriptor,
+                                                                              userLocation: GeoPoint(userSelectedGeoPoint.latitude, userSelectedGeoPoint.longitude),
+                                                                              filteredStores: filteredStores,
+                                                                              selectedFilters: _selectedFilters,
+                                                                            ),
+                                                                          ));
+                                                                        },
+                                                                        child:
+                                                                            Ink(
+                                                                          child:
+                                                                              Stack(
+                                                                            alignment:
+                                                                                Alignment.center,
+                                                                            children: [
+                                                                              Image.asset(AssetNames.map, width: double.infinity),
+                                                                              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(50)), child: const AppText(text: 'View map'))
+                                                                            ],
+                                                                          ),
+                                                                        ),
                                                                       ),
-                                                                    ));
-                                                                  },
-                                                                  child: Ink(
-                                                                    child:
-                                                                        Stack(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .center,
-                                                                      children: [
-                                                                        Image.asset(
-                                                                            AssetNames
-                                                                                .map,
-                                                                            width:
-                                                                                double.infinity),
-                                                                        Container(
-                                                                            padding:
-                                                                                const EdgeInsets.all(8),
-                                                                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(50)),
-                                                                            child: const AppText(text: 'View map'))
-                                                                      ],
-                                                                    ),
+                                                                      const Gap(
+                                                                          20),
+                                                                    ],
                                                                   ),
-                                                                ),
-                                                                const Gap(20),
                                                                 ListView
                                                                     .separated(
                                                                         physics:
@@ -2079,7 +2101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                             (context,
                                                                                 index) {
                                                                           final store =
-                                                                              allStores[index];
+                                                                              filteredStores[index];
                                                                           final bool
                                                                               isClosed =
                                                                               dateTimeNow.hour < store.openingTime.hour || (dateTimeNow.hour >= store.closingTime.hour && dateTimeNow.minute >= store.closingTime.minute);
@@ -2204,7 +2226,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                             const Gap(
                                                                                 10),
                                                                         itemCount:
-                                                                            allStores.length),
+                                                                            filteredStores.length),
                                                               ],
                                                             )
                                                           : const Column(
@@ -3406,20 +3428,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ).toList();
   }
 
-  Future<void> _getFilterdStores(
+  Future<List<Store>> _getFilterdStores(
       {required String? category,
       required List<String> selectedFilters}) async {
-    //all stores
     var storesList = <Store>[];
-    final storesSnapshot = await FirebaseFirestore.instance
-        .collection(FirestoreCollections.stores)
-        .get();
 
-    var storesIterable = storesSnapshot.docs.map(
-      (snapshot) {
-        return Store.fromJson(snapshot.data());
-      },
-    );
+    Iterable<Store> storesIterable = allStores;
 
     if (category != null) {
       storesIterable = storesIterable.where(
@@ -3493,7 +3507,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         }
       }
     }
-    allStores = storesList.isEmpty ? storesIterable.toList() : storesList;
+    return storesList.isEmpty ? storesIterable.toList() : storesList;
   }
 
   Future<void> _getFoodCategories() async {
@@ -3615,12 +3629,12 @@ class LocationWidget extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Builder(builder: (context) {
-                              const distance = Distance(roundResult: true);
+                              const distance = lt.Distance(roundResult: true);
                               final distanceResult = distance.as(
-                                  LengthUnit.Meter,
-                                  LatLng(currentLocation!.latitude!,
+                                  lt.LengthUnit.Meter,
+                                  lt.LatLng(currentLocation!.latitude!,
                                       currentLocation.longitude!),
-                                  LatLng(storedGeoPoint.latitude,
+                                  lt.LatLng(storedGeoPoint.latitude,
                                       storedGeoPoint.longitude));
 
                               if (distanceResult > 400) {
