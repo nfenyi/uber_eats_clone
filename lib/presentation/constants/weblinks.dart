@@ -8,6 +8,8 @@ class Weblinks {
   static const String p65Warnings = 'https://www.P65Warnings.ca.gov/restaurant';
   static const String uberEatsWebApp = 'https://www.ubereats.com';
   static const String teens = 'https://www.uber.com/gh/en/ride/teens/';
+  static const String uberEatsFacebookPage =
+      'https://web.facebook.com/UberEats/';
   static const String uberDeliveryWebPage =
       'https://www.uber.com/us/en/deliver/';
   static const String googlePlayUberLink =

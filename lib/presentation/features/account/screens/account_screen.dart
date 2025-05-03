@@ -42,6 +42,7 @@ import '../../main_screen/state/bottom_nav_index_provider.dart';
 import '../../promotion/promo_screen.dart';
 import '../../settings/screens/business_preferences/business_preferences_screen.dart';
 import '../../settings/screens/settings_screen.dart';
+import '../../settings/screens/uber_account_screen.dart';
 import '../../settings/screens/uber_one/uber_one_screen2.dart';
 import 'family_and_teens/family_intro_screen.dart';
 import 'family_and_teens/family_profile_modal.dart';
@@ -601,7 +602,11 @@ class _AccountScreenState extends State<AccountScreen> {
             title: const AppText(text: 'Voice command settings'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () async {
+              await navigatorKey.currentState!.push(MaterialPageRoute(
+                builder: (context) => const UberAccountScreen(),
+              ));
+            },
             leading: const Icon(Icons.person_outline),
             title: const AppText(text: 'Manage Uber account'),
           ),

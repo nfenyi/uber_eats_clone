@@ -56,7 +56,9 @@ class AboutScreen extends StatelessWidget {
                     'Rate us in ${Platform.isAndroid ? 'Google Play' : 'App Store'}'),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () async {
+              await launchUrl(Uri.parse(Weblinks.uberEatsFacebookPage));
+            },
             title: const AppText(text: 'Like us on Facebook'),
           ),
           ListTile(
