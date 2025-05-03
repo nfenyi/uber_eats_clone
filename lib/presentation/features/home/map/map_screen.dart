@@ -101,7 +101,7 @@ class _MapScreenState extends State<MapScreen> {
           (element) => element != 'Pickup' && element != 'Sort',
         )
         .toList();
-    // _storeInFocus =
+    _storeInFocus = _filteredStores.first.name;
     _markers.add(
       Marker(
           icon: widget.markerIcon,
@@ -951,20 +951,24 @@ class _MapScreenState extends State<MapScreen> {
 
                       return InkWell(
                         onTap: () async {
-                          final controller = await _mapController.future;
-                          final storelatLng = _filteredStores[index]
-                              .location
-                              .latlng as GeoPoint;
+                          if (_storeInFocus == store.name) {
+                            await AppFunctions.navigateToStoreScreen(store);
+                          } else {
+                            final controller = await _mapController.future;
+                            final storelatLng = _filteredStores[index]
+                                .location
+                                .latlng as GeoPoint;
 
-                          await controller.moveCamera(
-                              CameraUpdate.newCameraPosition(CameraPosition(
-                                  target: LatLng(storelatLng.latitude,
-                                      storelatLng.longitude),
-                                  zoom: 15)));
-                          await _carouselController.animateToPage(index);
-                          setState(() {
-                            _storeInFocus = _filteredStores[index].name;
-                          });
+                            await controller.moveCamera(
+                                CameraUpdate.newCameraPosition(CameraPosition(
+                                    target: LatLng(storelatLng.latitude,
+                                        storelatLng.longitude),
+                                    zoom: 15)));
+                            await _carouselController.animateToPage(index);
+                            setState(() {
+                              _storeInFocus = _filteredStores[index].name;
+                            });
+                          }
                         },
                         child: Ink(
                           child: Card(
