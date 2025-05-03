@@ -221,14 +221,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   builder: (context) => GroceryGroceryScreen(
                                       stores: _groceryGroceryStores),
                                 ));
-                              } else if (shopNearYou.name == 'Alcohol') {
-                                ref
-                                    .read(bottomNavIndexProvider.notifier)
-                                    .showAlcoholScreen();
-                              } else if (shopNearYou.name == 'Pharmacy') {
-                                ref
-                                    .read(bottomNavIndexProvider.notifier)
-                                    .showPharmacyScreen();
                               } else if (shopNearYou.name == 'Gifts') {
                                 if (Hive.box(AppBoxes.appState).get(
                                     BoxKeys.firstTimeSendingGift,
@@ -247,6 +239,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                 ref
                                     .read(bottomNavIndexProvider.notifier)
                                     .showBoxCateringScreen();
+                              } else {
+                                ref.read(categoryProvider.notifier).state =
+                                    shopNearYou.name;
+                                ref
+                                    .read(bottomNavIndexProvider.notifier)
+                                    .showGenericScreen();
                               }
                             },
                             child: SizedBox(

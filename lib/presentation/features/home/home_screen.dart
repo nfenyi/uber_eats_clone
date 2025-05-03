@@ -1124,8 +1124,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                               AppSizes.horizontalPaddingSmall),
                                       value: _selectedFilters,
                                       onChanged: (value) {
-                                        logger.d(value);
-                                        logger.d(_selectedFilters);
                                         late String tappedFilter;
                                         if (value.isEmpty) {
                                           tappedFilter = _selectedFilters.first;
@@ -1253,7 +1251,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                 temp;
 
                                                             _setStateWithModal(
-                                                                value,
                                                                 tappedFilter);
                                                           },
                                                         ),
@@ -1381,7 +1378,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                             // });
 
                                                             _setStateWithModal(
-                                                                value,
                                                                 tappedFilter);
                                                           },
                                                         ),
@@ -1518,7 +1514,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                   temp;
 
                                                               _setStateWithModal(
-                                                                  value,
                                                                   tappedFilter);
                                                             }
                                                           },
@@ -1686,7 +1681,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                   temp;
 
                                                               _setStateWithModal(
-                                                                  value,
                                                                   tappedFilter);
                                                             }
                                                           },
@@ -1797,7 +1791,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                   temp;
 
                                                               _setStateWithModal(
-                                                                  value,
                                                                   tappedFilter);
                                                             }
                                                           },
@@ -3359,7 +3352,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     });
   }
 
-  void _setStateWithModal(List<String> value, String newFilter) {
+  void _setStateWithModal(String newFilter) {
     navigatorKey.currentState!.pop();
     setState(() {
       if (!_selectedFilters.contains(newFilter)) {

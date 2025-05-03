@@ -15,7 +15,7 @@ class BottomNavIndexNotifier extends StateNotifier<int> {
     state = 7;
   }
 
-  void showPharmacyScreen() {
+  void showGenericScreen() {
     state = 8;
   }
 
@@ -32,3 +32,7 @@ final bottomNavIndexProvider =
     StateNotifierProvider<BottomNavIndexNotifier, int>(
   (ref) => BottomNavIndexNotifier(),
 );
+
+final categoryProvider = StateProvider<String?>((ref) {
+  return null;
+});

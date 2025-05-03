@@ -507,8 +507,7 @@ class _MapScreenState extends State<MapScreen> {
                                         callback: () {
                                           _selectedDeliveryFeeIndex = temp;
 
-                                          _setStateWithModal(
-                                              value, tappedFilter);
+                                          _setStateWithModal(tappedFilter);
                                         },
                                       ),
                                       Center(
@@ -605,8 +604,7 @@ class _MapScreenState extends State<MapScreen> {
                                         callback: () {
                                           _selectedRatingIndex = temp;
 
-                                          _setStateWithModal(
-                                              value, tappedFilter);
+                                          _setStateWithModal(tappedFilter);
                                         },
                                       ),
                                       Center(
@@ -706,8 +704,7 @@ class _MapScreenState extends State<MapScreen> {
                                           if (temp != null) {
                                             _selectedPriceCategory = temp;
 
-                                            _setStateWithModal(
-                                                value, tappedFilter);
+                                            _setStateWithModal(tappedFilter);
                                           }
                                         },
                                       ),
@@ -839,8 +836,7 @@ class _MapScreenState extends State<MapScreen> {
                                           if (temp.isNotEmpty) {
                                             _selectedDietaryOptions = temp;
 
-                                            _setStateWithModal(
-                                                value, tappedFilter);
+                                            _setStateWithModal(tappedFilter);
                                           }
                                         },
                                       ),
@@ -1074,7 +1070,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _setStateWithModal(List<String> value, String newFilter) {
+  void _setStateWithModal(String newFilter) {
     navigatorKey.currentState!.pop();
     setState(() {
       if (!_selectedFilters.contains(newFilter)) {

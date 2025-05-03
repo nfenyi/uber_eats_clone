@@ -29,6 +29,7 @@ import '../../../../state/user_location_providers.dart';
 import '../../../constants/asset_names.dart';
 import '../../../constants/weblinks.dart';
 import '../../../services/sign_in_view_model.dart';
+import '../../gifts/screens/send_gifts_intro_screen.dart';
 import '../../home/home_screen.dart';
 import '../../home/map/map_screen.dart';
 import '../../main_screen/screens/main_screen.dart';
@@ -1383,20 +1384,20 @@ class CategoriesListView extends ConsumerWidget {
                         GroceryGroceryScreen(stores: _groceryGroceryStores),
                   ));
                   break;
-                case 'Alcohol':
-                  ref.read(bottomNavIndexProvider.notifier).showAlcoholScreen();
+
+                case 'Gifts':
+                  if (Hive.box(AppBoxes.appState)
+                      .get(BoxKeys.firstTimeSendingGift, defaultValue: true)) {
+                    navigatorKey.currentState!.push(MaterialPageRoute(
+                      builder: (context) => const SendGiftsIntroScreen(),
+                    ));
+                  } else {
+                    ref.read(bottomNavIndexProvider.notifier).showGiftScreen();
+                  }
                   break;
-                case 'Pharmacy':
-                  ref
-                      .read(bottomNavIndexProvider.notifier)
-                      .showPharmacyScreen();
-                  break;
-                // case 'Gifts':
-                //   navigatorKey.currentState!.push(MaterialPageRoute(
-                //     builder: (context) => Material(child: const GiftScreen()),
-                //   ));
-                //   break;
                 default:
+                  ref.read(categoryProvider.notifier).state = category.name;
+                  ref.read(bottomNavIndexProvider.notifier).showGenericScreen();
                   break;
               }
             },
