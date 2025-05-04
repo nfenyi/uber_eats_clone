@@ -36,12 +36,6 @@ import 'presentation/services/sign_in_view_model.dart';
 
 class AppFunctions {
   AppFunctions._();
-  // static String formatTime(TimeOfDay time) {
-  //   // final formattedHour = time.hourOfPeriod.toString().padLeft(2, '0');
-  //   final formattedMinute = time.minute.toString().padLeft(2, '0');
-  //   final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-  //   return '${time.hourOfPeriod}:$formattedMinute $period';
-  // }
 
   static String formatDate(String date, {String format = 'd/m/Y'}) {
     return date == OtherConstants.na || date == 'null' || date.isEmpty

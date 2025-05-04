@@ -97,10 +97,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _phoneNumber = FirebaseAuth.instance.currentUser!.phoneNumber;
     _cartItem = Hive.box<HiveCartItem>(AppBoxes.carts).get(widget.store.id)!;
     _redeemedPromosCount = userInfo['redeemedPromos'].length;
-    TimeOfDay timeOfDayNow = TimeOfDay.now();
-    _isClosed = timeOfDayNow.hour < widget.store.openingTime.hour ||
-        (timeOfDayNow.hour >= widget.store.closingTime.hour &&
-            timeOfDayNow.minute >= widget.store.closingTime.minute);
+    final dateTimeNow = DateTime.now();
+    _isClosed = dateTimeNow.isBefore(widget.store.openingTime) ||
+        dateTimeNow.isAfter(widget.store.closingTime);
     const distance = lt.Distance(roundResult: true);
     final storeLocation = widget.store.location.latlng as GeoPoint;
     final distanceBetweenShopAndSetLocationResult = distance.as(

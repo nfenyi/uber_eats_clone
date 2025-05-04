@@ -25,12 +25,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    TimeOfDay timeOfDayNow = TimeOfDay.now();
+    final dateTimeNow = DateTime.now();
     for (var store in allStores) {
       if (favoriteStores.any((element) => element.id == store.id)) {
-        if (timeOfDayNow.hour < store.openingTime.hour ||
-            (timeOfDayNow.hour >= store.closingTime.hour &&
-                timeOfDayNow.minute >= store.closingTime.minute)) {
+        if (dateTimeNow.isBefore(store.openingTime) ||
+            dateTimeNow.isAfter(store.closingTime)) {
           _unavailableFavoriteStores.add(store);
         } else {
           _availableFavoriteStores.add(store);
@@ -41,7 +40,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    TimeOfDay timeOfDayNow = TimeOfDay.now();
+    final dateTimeNow = DateTime.now();
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
@@ -186,10 +185,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         children: [
                           AppText(
                             text: favoriteStore.openingTime.hour -
-                                        timeOfDayNow.hour >
+                                        dateTimeNow.hour >
                                     1
                                 ? 'Available at ${AppFunctions.formatDate(favoriteStore.openingTime.toString(), format: 'h:i A')}'
-                                : 'Available in ${favoriteStore.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${favoriteStore.openingTime.minute - timeOfDayNow.minute} mins'}',
+                                : 'Available in ${favoriteStore.openingTime.hour - dateTimeNow.hour == 1 ? '1 hr' : '${favoriteStore.openingTime.minute - dateTimeNow.minute} mins'}',
                             size: AppSizes.bodySmallest,
                           )
                         ],

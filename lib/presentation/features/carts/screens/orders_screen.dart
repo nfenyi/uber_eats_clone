@@ -356,14 +356,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                       'Associated store seems to be removed from Uber Eats');
                                             }
                                             final bool isClosed = dateTimeNow
-                                                        .hour <
-                                                    store.openingTime.hour ||
-                                                (dateTimeNow.hour >=
-                                                        store
-                                                            .closingTime.hour &&
-                                                    dateTimeNow.minute >=
-                                                        store.closingTime
-                                                            .minute);
+                                                    .isBefore(
+                                                        store.openingTime) ||
+                                                dateTimeNow
+                                                    .isAfter(store.closingTime);
                                             return Column(
                                               children: [
                                                 ListTile(

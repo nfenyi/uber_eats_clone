@@ -483,18 +483,13 @@ class _ExploreVideoScreenState extends State<ExploreVideoScreen> {
                                                     ],
                                                   ),
                                                 Builder(builder: (context) {
-                                                  final timeOfDayNow =
-                                                      TimeOfDay.now();
-                                                  final isClosed = timeOfDayNow
-                                                              .hour <
-                                                          store.openingTime
-                                                              .hour ||
-                                                      (timeOfDayNow.hour >=
-                                                              store.closingTime
-                                                                  .hour &&
-                                                          timeOfDayNow.minute >=
-                                                              store.closingTime
-                                                                  .minute);
+                                                  final dateTimeNow =
+                                                      DateTime.now();
+                                                  final isClosed = dateTimeNow
+                                                          .isBefore(store
+                                                              .openingTime) ||
+                                                      dateTimeNow.isAfter(
+                                                          store.closingTime);
                                                   return Container(
                                                     padding:
                                                         const EdgeInsets.all(3),

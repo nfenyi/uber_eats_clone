@@ -394,16 +394,15 @@ class AllStoresSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TimeOfDay timeOfDayNow = TimeOfDay.now();
+    final dateTimeNow = DateTime.now();
     return SliverPadding(
       padding: const EdgeInsets.symmetric(
           horizontal: AppSizes.horizontalPaddingSmall),
       sliver: SliverList.separated(
           itemBuilder: (context, index) {
             final store = stores[index];
-            final bool isClosed = timeOfDayNow.hour < store.openingTime.hour ||
-                (timeOfDayNow.hour >= store.closingTime.hour &&
-                    timeOfDayNow.minute >= store.closingTime.minute);
+            final bool isClosed = dateTimeNow.isBefore(store.openingTime) ||
+                dateTimeNow.isAfter(store.closingTime);
             return ListTile(
                 leading: Container(
                   padding: const EdgeInsets.all(2),
@@ -439,9 +438,9 @@ class AllStoresSliver extends StatelessWidget {
                             )),
                         AppText(
                             text: isClosed
-                                ? store.openingTime.hour - timeOfDayNow.hour > 1
+                                ? store.openingTime.hour - dateTimeNow.hour > 1
                                     ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
-                                    : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
+                                    : 'Available in ${store.openingTime.hour - dateTimeNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - dateTimeNow.minute} mins'}'
                                 : '\$${store.delivery.fee} Delivery Fee',
                             color: store.delivery.fee < 1
                                 ? const Color.fromARGB(255, 163, 133, 42)

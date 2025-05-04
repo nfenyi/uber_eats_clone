@@ -42,10 +42,9 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final timeOfDayNow = TimeOfDay.now();
-    final bool isClosed = timeOfDayNow.hour < _store.openingTime.hour ||
-        (timeOfDayNow.hour >= _store.closingTime.hour &&
-            timeOfDayNow.minute >= _store.closingTime.minute);
+    final dateTimeNow = DateTime.now();
+    final bool isClosed = dateTimeNow.isBefore(_store.openingTime) ||
+        dateTimeNow.isAfter(_store.closingTime);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

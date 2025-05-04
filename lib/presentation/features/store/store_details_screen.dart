@@ -78,7 +78,7 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    TimeOfDay timeOfDayNow = TimeOfDay.now();
+    final dateTimeNow = DateTime.now();
     return Scaffold(
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -220,11 +220,8 @@ class _StoreDetailsScreenState extends State<StoreDetailsScreen> {
                     Icons.watch_later,
                   ),
                   title: AppText(
-                      text: timeOfDayNow.hour < widget.store.openingTime.hour ||
-                              (timeOfDayNow.hour >=
-                                      widget.store.closingTime.hour &&
-                                  timeOfDayNow.minute >=
-                                      widget.store.closingTime.minute)
+                      text: dateTimeNow.isBefore(widget.store.openingTime) ||
+                              dateTimeNow.isAfter(widget.store.closingTime)
                           ? "Opens at ${AppFunctions.formatDate(widget.store.openingTime.toString(), format: 'h:i A')}"
                           : "Opens until ${AppFunctions.formatDate(widget.store.closingTime.toString(), format: 'h:i A')}"),
                   trailing: _timeExpanded

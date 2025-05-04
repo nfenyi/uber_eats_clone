@@ -48,42 +48,44 @@ class _MainScreenWrapperScreenState extends ConsumerState<MainScreenWrapper> {
             backgroundColor: snapshot.hasError
                 ? Colors.white
                 : const Color.fromARGB(255, 3, 189, 106),
-            body: SafeArea(
-              child: Builder(builder: (context) {
-                if (snapshot.hasError) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.horizontalPaddingSmall),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+            body: Builder(builder: (context) {
+              if (snapshot.hasError) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.horizontalPaddingSmall),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      AppText(
+                        text: snapshot.error.toString(),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return Stack(
+                  alignment: AlignmentDirectional.center,
+                  children: [
+                    Image.asset(
+                      AssetNames.appLogo,
+                      width: Adaptive.w(40),
+                    ),
+                    const Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        AppText(
-                          text: snapshot.error.toString(),
+                        SafeArea(
+                          child: LinearProgressIndicator(
+                            color: AppColors.neutral600,
+                            backgroundColor: AppColors.neutral300,
+                          ),
                         ),
                       ],
                     ),
-                  );
-                } else {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const LinearProgressIndicator(
-                        color: AppColors.neutral600,
-                        backgroundColor: AppColors.neutral300,
-                      ),
-                      Image.asset(
-                        AssetNames.appLogo,
-                        width: Adaptive.w(40),
-                      ),
-                      const SizedBox(
-                        height: 1,
-                      ),
-                    ],
-                  );
-                }
-              }),
-            ),
+                  ],
+                );
+              }
+            }),
           );
         });
   }

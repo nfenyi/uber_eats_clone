@@ -29,10 +29,9 @@ class AdvertScreen extends StatefulWidget {
 class _AdvertScreenState extends State<AdvertScreen> {
   @override
   Widget build(BuildContext context) {
-    TimeOfDay timeOfDayNow = TimeOfDay.now();
-    final bool isClosed = timeOfDayNow.hour < widget.store.openingTime.hour ||
-        (timeOfDayNow.hour >= widget.store.closingTime.hour &&
-            timeOfDayNow.minute >= widget.store.closingTime.minute);
+    final dateTimeNow = DateTime.now();
+    final bool isClosed = dateTimeNow.isBefore(widget.store.openingTime) ||
+        dateTimeNow.isAfter(widget.store.closingTime);
     return Scaffold(
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
@@ -88,10 +87,10 @@ class _AdvertScreenState extends State<AdvertScreen> {
                           AppText(
                               text: isClosed
                                   ? widget.store.openingTime.hour -
-                                              timeOfDayNow.hour >
+                                              dateTimeNow.hour >
                                           1
                                       ? 'Available at ${AppFunctions.formatDate(widget.store.openingTime.toString(), format: 'h:i A')}'
-                                      : 'Available in ${widget.store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${widget.store.openingTime.minute - timeOfDayNow.minute} mins'}'
+                                      : 'Available in ${widget.store.openingTime.hour - dateTimeNow.hour == 1 ? '1 hr' : '${widget.store.openingTime.minute - dateTimeNow.minute} mins'}'
                                   : '\$${widget.store.delivery.fee} Delivery Fee',
                               color: widget.store.delivery.fee < 1
                                   ? const Color.fromARGB(255, 163, 133, 42)

@@ -42,7 +42,7 @@ class _BoxCateringScreenState extends ConsumerState<BoxCateringScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final timeOfDayNow = TimeOfDay.now();
+    final dateTimeNow = DateTime.now();
     return Scaffold(
         body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -459,15 +459,11 @@ class _BoxCateringScreenState extends ConsumerState<BoxCateringScreen> {
                                           shrinkWrap: true,
                                           itemBuilder: (context, index) {
                                             final store = filteredStores[index];
-                                            final bool isClosed = timeOfDayNow
-                                                        .hour <
-                                                    store.openingTime.hour ||
-                                                (timeOfDayNow.hour >=
-                                                        store
-                                                            .closingTime.hour &&
-                                                    timeOfDayNow.minute >=
-                                                        store.closingTime
-                                                            .minute);
+                                            final bool isClosed = dateTimeNow
+                                                    .isBefore(
+                                                        store.openingTime) ||
+                                                dateTimeNow
+                                                    .isAfter(store.closingTime);
                                             return Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,

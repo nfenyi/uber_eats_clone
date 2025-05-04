@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import 'package:date_time_format/date_time_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -2095,9 +2096,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                 index) {
                                                                           final store =
                                                                               filteredStores[index];
+
                                                                           final bool
                                                                               isClosed =
-                                                                              dateTimeNow.hour < store.openingTime.hour || (dateTimeNow.hour >= store.closingTime.hour && dateTimeNow.minute >= store.closingTime.minute);
+                                                                              dateTimeNow.isBefore(store.openingTime) || dateTimeNow.isAfter(store.closingTime);
                                                                           return InkWell(
                                                                             onTap:
                                                                                 () async {
@@ -2272,18 +2274,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                       final store =
                                                           _hottestDeals[index];
                                                       final bool isClosed = dateTimeNow
-                                                                  .hour <
-                                                              store.openingTime
-                                                                  .hour ||
-                                                          (dateTimeNow.hour >=
-                                                                  store
-                                                                      .closingTime
-                                                                      .hour &&
-                                                              dateTimeNow
-                                                                      .minute >=
-                                                                  store
-                                                                      .closingTime
-                                                                      .minute);
+                                                              .isBefore(store
+                                                                  .openingTime) ||
+                                                          dateTimeNow.isAfter(
+                                                              store
+                                                                  .closingTime);
                                                       return InkWell(
                                                         borderRadius:
                                                             BorderRadius
@@ -3059,18 +3054,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                       final store =
                                                           allStores[index];
                                                       final bool isClosed = dateTimeNow
-                                                                  .hour <
-                                                              store.openingTime
-                                                                  .hour ||
-                                                          (dateTimeNow.hour >=
-                                                                  store
-                                                                      .closingTime
-                                                                      .hour &&
-                                                              dateTimeNow
-                                                                      .minute >=
-                                                                  store
-                                                                      .closingTime
-                                                                      .minute);
+                                                              .isBefore(store
+                                                                  .openingTime) ||
+                                                          dateTimeNow.isAfter(
+                                                              store
+                                                                  .closingTime);
                                                       return Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -4117,12 +4105,12 @@ class ProductGridTilePriceFirst extends StatelessWidget {
 class AllStoresResultDisplay extends StatelessWidget {
   const AllStoresResultDisplay({
     super.key,
-    required this.timeOfDayNow,
+    required this.dateTimeNow,
     required this.storesWithNameOrProduct,
   });
 
   final List<Store> storesWithNameOrProduct;
-  final TimeOfDay timeOfDayNow;
+  final DateTime dateTimeNow;
 
   @override
   Widget build(BuildContext context) {
@@ -4149,9 +4137,8 @@ class AllStoresResultDisplay extends StatelessWidget {
               // shrinkWrap: true,
               itemBuilder: (context, index) {
                 final store = storesWithNameOrProduct[index];
-                final isClosed = timeOfDayNow.hour < store.openingTime.hour ||
-                    (timeOfDayNow.hour >= store.closingTime.hour &&
-                        timeOfDayNow.minute >= store.closingTime.minute);
+                final isClosed = dateTimeNow.isBefore(store.openingTime) ||
+                    dateTimeNow.isAfter(store.closingTime);
                 return InkWell(
                   onTap: () async {
                     await AppFunctions.navigateToStoreScreen(store);

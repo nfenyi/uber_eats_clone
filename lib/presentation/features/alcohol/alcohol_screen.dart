@@ -68,7 +68,7 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final timeOfDayNow = TimeOfDay.now();
+    final dateTimeNow = DateTime.now();
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -200,10 +200,8 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
                       itemBuilder: (context, index) {
                         final store = allStores[index];
                         final bool isClosed =
-                            timeOfDayNow.hour < store.openingTime.hour ||
-                                (timeOfDayNow.hour >= store.closingTime.hour &&
-                                    timeOfDayNow.minute >=
-                                        store.closingTime.minute);
+                            dateTimeNow.isBefore(store.openingTime) ||
+                                dateTimeNow.isAfter(store.closingTime);
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -404,12 +402,10 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
 
                                       final store = snapshot.data!;
 
-                                      final bool isClosed = timeOfDayNow.hour <
-                                              store.openingTime.hour ||
-                                          (timeOfDayNow.hour >=
-                                                  store.closingTime.hour &&
-                                              timeOfDayNow.minute >=
-                                                  store.closingTime.minute);
+                                      final bool isClosed = dateTimeNow
+                                              .isBefore(store.openingTime) ||
+                                          dateTimeNow
+                                              .isAfter(store.closingTime);
                                       return ClipRRect(
                                         borderRadius: BorderRadius.circular(12),
                                         child: InkWell(
@@ -657,7 +653,6 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
                         return const SizedBox.shrink();
                       }
                     }),
-                //TODO: Add alcohol store to firestore
                 MainScreenTopic(callback: () {}, title: 'All Stores'),
                 ListView.separated(
                     physics: const NeverScrollableScrollPhysics(),
@@ -666,10 +661,9 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       final store = _alcoholStores[index];
-                      final bool isClosed = timeOfDayNow.hour <
-                              store.openingTime.hour ||
-                          (timeOfDayNow.hour >= store.closingTime.hour &&
-                              timeOfDayNow.minute >= store.closingTime.minute);
+                      final bool isClosed =
+                          dateTimeNow.isBefore(store.openingTime) ||
+                              dateTimeNow.isAfter(store.closingTime);
                       return ListTile(
                           leading: Container(
                             padding: const EdgeInsets.all(2),
@@ -707,10 +701,10 @@ class _AlcoholScreenState extends ConsumerState<AlcoholScreen> {
                                   AppText(
                                       text: isClosed
                                           ? store.openingTime.hour -
-                                                      timeOfDayNow.hour >
+                                                      dateTimeNow.hour >
                                                   1
                                               ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
-                                              : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
+                                              : 'Available in ${store.openingTime.hour - dateTimeNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - dateTimeNow.minute} mins'}'
                                           : '\$${store.delivery.fee} Delivery Fee',
                                       color: store.delivery.fee < 1
                                           ? const Color.fromARGB(
