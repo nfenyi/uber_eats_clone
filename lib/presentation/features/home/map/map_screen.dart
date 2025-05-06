@@ -307,11 +307,16 @@ class _MapScreenState extends State<MapScreen> {
                                                     )
                                                   : Image.asset(
                                                       width: 25,
-                                                      _storesToFilter[i]
-                                                              .type
-                                                              .toLowerCase()
-                                                              .contains(
-                                                                  'grocery')
+                                                      (_storesToFilter[i]
+                                                                  .type
+                                                                  .toLowerCase()
+                                                                  .contains(
+                                                                      'grocery') ||
+                                                              _storesToFilter[i]
+                                                                  .type
+                                                                  .toLowerCase()
+                                                                  .contains(
+                                                                      'pharmacy'))
                                                           ? AssetNames
                                                               .groceryMarker
                                                           : AssetNames

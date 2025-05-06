@@ -170,7 +170,8 @@ class _SearchScreenState extends State<SearchScreen>
     _alcoholStoresWithProduct = [];
 
     _stores = widget.stores.where((store) {
-      if (store.type.toLowerCase().contains('grocery')) {
+      if (store.type.toLowerCase().contains('grocery') ||
+          store.type.toLowerCase().contains('pharmacy')) {
         if (store.aisles == null) {
           return false;
         } else {
@@ -311,7 +312,8 @@ class _SearchScreenState extends State<SearchScreen>
                         // logger.d(reference.id);
                         setState(() {
                           _stores = widget.stores.where((store) {
-                            if (store.type.toLowerCase().contains('grocery')) {
+                            if (store.type.toLowerCase().contains('grocery') ||
+                                store.type.toLowerCase().contains('pharmacy')) {
                               if (store.aisles == null) {
                                 return false;
                               } else {

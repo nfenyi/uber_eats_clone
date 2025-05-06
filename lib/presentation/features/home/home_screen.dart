@@ -2371,7 +2371,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                           color: Colors.black,
                                                                                           weight: FontWeight.bold,
                                                                                         )
-                                                                                      : Image.asset(width: 25, store.type.toLowerCase().contains('grocery') ? AssetNames.groceryMarker : AssetNames.restaurantMarker),
+                                                                                      : Image.asset(width: 25, (store.type.toLowerCase().contains('grocery') || store.type.toLowerCase().contains('pharmacy')) ? AssetNames.groceryMarker : AssetNames.restaurantMarker),
                                                                                 )).toBitmapDescriptor());
                                                                           }
 
@@ -4622,7 +4622,8 @@ class SearchResultDisplay extends StatelessWidget {
             itemCount: storesWithProduct.length,
             itemBuilder: (context, index) {
               final store = storesWithProduct[index];
-              if (store.type.toLowerCase().contains('grocery')) {
+              if (store.type.toLowerCase().contains('grocery') ||
+                  store.type.toLowerCase().contains('pharmacy')) {
                 for (var aisle in store.aisles!) {
                   for (var productCategory in aisle.productCategories) {
                     for (var productAndQuantity
