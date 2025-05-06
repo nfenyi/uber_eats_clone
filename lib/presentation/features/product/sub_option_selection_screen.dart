@@ -11,16 +11,17 @@ import '../../constants/app_sizes.dart';
 import '../../core/app_colors.dart';
 
 class SubOptionSelectionScreen extends StatefulWidget {
-  final Option option;
-  final HiveCartProduct? productInbox;
+  final SubOption selectedSubOption;
+  final List<HiveOption> hiveOptions;
 
   final double currentTotal;
 
-  const SubOptionSelectionScreen(
-      {super.key,
-      required this.option,
-      required this.currentTotal,
-      required this.productInbox});
+  const SubOptionSelectionScreen({
+    super.key,
+    required this.selectedSubOption,
+    required this.hiveOptions,
+    required this.currentTotal,
+  });
 
   @override
   State<SubOptionSelectionScreen> createState() =>
@@ -28,62 +29,28 @@ class SubOptionSelectionScreen extends StatefulWidget {
 }
 
 class _SubOptionSelectionScreenState extends State<SubOptionSelectionScreen> {
-  HiveCartProduct? _productInbox;
-
-  final Map<String, List<HiveOption>> _options = {};
-  List<int> _optionQuantities = [];
+  final Map<String, List<HiveOption>> _hiveOptions = {};
+  final List<int> _optionQuantities = [];
 
   // late final List<int> _subOptionQuantities;
   // late final List<bool?> _subOptionalOptions;
-  double _subOptionsTotal = 0;
+
+  final _subOptionsTotalNotifier = ValueNotifier<double>(0);
 
   @override
   void initState() {
     super.initState();
-    final subOptionInBox = _productInbox!.requiredOptions.firstWhereOrNull(
-          (requiredOption) => requiredOption.name == widget.option.name,
-        ) ??
-        _productInbox!.requiredOptions.firstWhere(
-          (optionalOption) => optionalOption.name == widget.option.name,
-        );
-    final options = subOptionInBox.options!;
-    if (_productInbox != null) {
-      for (var storedOptions in options) {
-        if (_options[storedOptions.categoryName] == null) {
-          _options[storedOptions.categoryName] = [storedOptions];
-        } else {
-          _options[storedOptions.categoryName]!.add(storedOptions);
-        }
-        _optionQuantities.add(storedOptions.quantity);
+    // logger.d(widget.hiveOptions.first.categoryName);
+    // logger.d(widget.hiveOptions.first.name);
+    // logger.d(widget.hiveOptions.first.quantity);
+    for (var storedOption in widget.hiveOptions) {
+      if (_hiveOptions[storedOption.categoryName] == null) {
+        _hiveOptions[storedOption.categoryName] = [storedOption];
+      } else {
+        _hiveOptions[storedOption.categoryName]!.add(storedOption);
       }
-    } else {
-      _optionQuantities = List.generate(
-          widget.option.subOptions.length, (index) => 0,
-          growable: false);
+      _optionQuantities.add(storedOption.quantity);
     }
-
-    // //for listtilecheckboxes
-    // _subOptionalOptions = List.generate(
-    //     widget.option.subOptions.length, (index) => false,
-    //     growable: false);
-
-    // if (widget.option.subOptions.any(
-    //   (element) => element.canBeMultiple,
-    // )) {
-    //   //for listtiles with quantity incrementor and decrementor
-    //   _subOptionQuantities = List.generate(
-    //       widget.option.subOptions.length, (index) => 0,
-    //       growable: false);
-    // }
-
-    // for (var i = 0; i < widget.option.subOptions.length; i++) {
-    //   final subOption = widget.option.subOptions[i];
-    //   if (subOption.canBeMultiple) {
-    //     _canBeMultipleOptions.add(subOption);
-    //   } else {
-    //     _singleOptions.add(subOption);
-    //   }
-    // }
   }
 
   @override
@@ -91,585 +58,401 @@ class _SubOptionSelectionScreenState extends State<SubOptionSelectionScreen> {
     return Scaffold(
         appBar: AppBar(
           title: AppText(
-            text: widget.option.name,
+            text: widget.selectedSubOption.name,
             size: AppSizes.heading6,
           ),
           elevation: 0.5,
         ),
         body: Column(
           children: [
-            CustomScrollView(slivers: [
-              //  SingleChildScrollView(
-              //     child: Column(
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //       if (_canBeMultipleOptions.isNotEmpty)
-              //         Column(
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             Padding(
-              //                 padding: const EdgeInsets.symmetric(
-              //                     horizontal: AppSizes.horizontalPaddingSmall),
-              //                 child: Column(
-              //                     crossAxisAlignment: CrossAxisAlignment.start,
-              //                     children: [
-              //                       AppText(
-              //                         text: '${widget.option.name} Comes With',
-              //                         size: AppSizes.heading6,
-              //                         weight: FontWeight.bold,
-              //                       ),
-              //                       ListView.builder(
-              //                         shrinkWrap: true,
-              //                         itemBuilder: (context, index) {
-              //                           final subOption =
-              //                               _canBeMultipleOptions[index];
-              //                           return ListTile(
-              //                             contentPadding: EdgeInsets.zero,
-              //                             trailing: _subOptionQuantities[
-              //                                         index] ==
-              //                                     0
-              //                                 ? TextButton(
-              //                                     style: TextButton.styleFrom(
-              //                                         padding:
-              //                                             const EdgeInsets.all(
-              //                                                 0),
-              //                                         backgroundColor:
-              //                                             AppColors.neutral100,
-              //                                         shape:
-              //                                             const CircleBorder()),
-              //                                     onPressed: () {
-              //                                       setState(() {
-              //                                         _subOptionQuantities[
-              //                                                 index] =
-              //                                             _subOptionQuantities[
-              //                                                     index] +
-              //                                                 1;
-              //                                       });
-              //                                     },
-              //                                     child: const AppText(
-              //                                       text: '+',
-              //                                       size: AppSizes.body,
-              //                                     ))
-              //                                 : Row(
-              //                                     mainAxisSize:
-              //                                         MainAxisSize.min,
-              //                                     children: [
-              //                                         TextButton(
-              //                                             style: TextButton.styleFrom(
-              //                                                 padding:
-              //                                                     const EdgeInsets
-              //                                                         .all(3),
-              //                                                 backgroundColor:
-              //                                                     AppColors
-              //                                                         .neutral100,
-              //                                                 shape:
-              //                                                     const CircleBorder()),
-              //                                             onPressed: () {
-              //                                               if (_subOptionQuantities[
-              //                                                       index] !=
-              //                                                   0) {
-              //                                                 setState(() {
-              //                                                   _subOptionQuantities[
-              //                                                           index] =
-              //                                                       _subOptionQuantities[
-              //                                                               index] -
-              //                                                           1;
-              //                                                   if (subOption
-              //                                                           .price !=
-              //                                                       null) {
-              //                                                     _subOptionsTotal -=
-              //                                                         subOption
-              //                                                             .price!;
-              //                                                   }
-              //                                                 });
-              //                                               }
-              //                                             },
-              //                                             child: const AppText(
-              //                                                 text: '-',
-              //                                                 size: AppSizes
-              //                                                     .body)),
-              //                                         AppText(
-              //                                             text:
-              //                                                 _subOptionQuantities[
-              //                                                         index]
-              //                                                     .toString()),
-              //                                         TextButton(
-              //                                             style: TextButton.styleFrom(
-              //                                                 padding:
-              //                                                     const EdgeInsets
-              //                                                         .all(3),
-              //                                                 backgroundColor:
-              //                                                     AppColors
-              //                                                         .neutral100,
-              //                                                 shape:
-              //                                                     const CircleBorder()),
-              //                                             onPressed: subOption
-              //                                                             .canBeMultipleLimit ==
-              //                                                         null ||
-              //                                                     _subOptionQuantities[
-              //                                                             index] <
-              //                                                         subOption
-              //                                                             .canBeMultipleLimit!
-              //                                                 ? () {
-              //                                                     if (_subOptionQuantities[
-              //                                                             index] !=
-              //                                                         0) {
-              //                                                       setState(
-              //                                                           () {
-              //                                                         _subOptionQuantities[
-              //                                                                 index] =
-              //                                                             _subOptionQuantities[index] +
-              //                                                                 1;
-              //                                                         if (subOption
-              //                                                                 .price !=
-              //                                                             null) {
-              //                                                           _subOptionsTotal +=
-              //                                                               subOption.price!;
-              //                                                         }
-              //                                                       });
-              //                                                     }
-              //                                                   }
-              //                                                 : null,
-              //                                             child: const AppText(
-              //                                                 text: '+',
-              //                                                 size: AppSizes
-              //                                                     .body)),
-              //                                       ]),
-              //                             title: AppText(
-              //                               text: subOption.name,
-              //                             ),
-              //                             subtitle: subOption.price != null ||
-              //                                     subOption.calories != null
-              //                                 ? Column(
-              //                                     crossAxisAlignment:
-              //                                         CrossAxisAlignment.start,
-              //                                     children: [
-              //                                       if (subOption.price != null)
-              //                                         AppText(
-              //                                           text:
-              //                                               '+  ${_subOptionQuantities[index] == 0 ? '\$${subOption.price}' : '\$${subOption.price! * _subOptionQuantities[index]} (\$${subOption.price!.toStringAsFixed(2)} ea)'} ',
-              //                                           color: AppColors
-              //                                               .neutral500,
-              //                                         ),
-              //                                       if (subOption.calories !=
-              //                                           null)
-              //                                         AppText(
-              //                                           text:
-              //                                               '${subOption.calories!.toInt()} Cal.',
-              //                                           color: AppColors
-              //                                               .neutral500,
-              //                                         ),
-              //                                     ],
-              //                                   )
-              //                                 : null,
-              //                           );
-              //                         },
-              //                         itemCount: _canBeMultipleOptions.length,
-              //                       )
-              //                     ])),
-              //             if (_canBeMultipleOptions.isNotEmpty &&
-              //                 _singleOptions.isNotEmpty)
-              //               const Divider(
-              //                 thickness: 3,
-              //               ),
-              //             if (_singleOptions.isNotEmpty)
-              //               Column(
-              //                 crossAxisAlignment: CrossAxisAlignment.start,
-              //                 children: [
-              //                   Padding(
-              //                       padding: const EdgeInsets.symmetric(
-              //                           horizontal:
-              //                               AppSizes.horizontalPaddingSmall),
-              //                       child: Column(
-              //                           crossAxisAlignment:
-              //                               CrossAxisAlignment.start,
-              //                           children: [
-              //                             AppText(
-              //                               text:
-              //                                   '${widget.option.name} Additions',
-              //                               size: AppSizes.heading6,
-              //                               weight: FontWeight.bold,
-              //                             ),
-              //                             ListView.builder(
-              //                               shrinkWrap: true,
-              //                               itemBuilder: (context, index) {
-              //                                 final subOption =
-              //                                     _singleOptions[index];
-              //                                 return CheckboxListTile.adaptive(
-              //                                   contentPadding: EdgeInsets.zero,
-              //                                   controlAffinity:
-              //                                       ListTileControlAffinity
-              //                                           .trailing,
-              //                                   title: AppText(
-              //                                     text: subOption.name,
-              //                                   ),
-              //                                   subtitle: subOption.price !=
-              //                                               null ||
-              //                                           subOption.calories !=
-              //                                               null
-              //                                       ? Column(
-              //                                           crossAxisAlignment:
-              //                                               CrossAxisAlignment
-              //                                                   .start,
-              //                                           children: [
-              //                                             if (subOption.price !=
-              //                                                 null)
-              //                                               AppText(
-              //                                                 text:
-              //                                                     '+ \$${subOption.price}',
-              //                                                 color: AppColors
-              //                                                     .neutral500,
-              //                                               ),
-              //                                             if (subOption
-              //                                                     .calories !=
-              //                                                 null)
-              //                                               AppText(
-              //                                                 text:
-              //                                                     '${subOption.calories!.toInt()} Cal.',
-              //                                                 color: AppColors
-              //                                                     .neutral500,
-              //                                               ),
-              //                                           ],
-              //                                         )
-              //                                       : null,
-              //                                   value:
-              //                                       _subOptionalOptions[index],
-              //                                   onChanged: (value) {
-              //                                     setState(() {
-              //                                       _subOptionalOptions[index] =
-              //                                           value;
-              //                                       if (subOption.price !=
-              //                                           null) {
-              //                                         if (value == true) {
-              //                                           _subOptionsTotal +=
-              //                                               subOption.price!;
-              //                                         } else if (value ==
-              //                                             false) {
-              //                                           _subOptionsTotal -=
-              //                                               subOption.price!;
-              //                                         }
-              //                                       }
-              //                                     });
-              //                                   },
-              //                                 );
-              //                               },
-              //                               itemCount:
-              //                                   _canBeMultipleOptions.length,
-              //                             )
-              //                           ])),
-              //                 ],
-              //               )
-              //           ],
-              //         ),
-              //     ])),
-              SliverList.separated(
-                itemCount: widget.option.subOptions.length,
-                itemBuilder: (context, index) {
-                  final subOption = widget.option.subOptions[index];
+            Expanded(
+              child: CustomScrollView(slivers: [
+                SliverList.separated(
+                  itemCount: widget.selectedSubOption.options.length,
+                  itemBuilder: (context, index) {
+                    final option = widget.selectedSubOption.options[index];
+                    double? valueAddedByRadioButtonSet = option.subOptions
+                        .firstWhereOrNull(
+                          (element) =>
+                              element.name ==
+                              _hiveOptions[option.name]?.first.name,
+                        )
+                        ?.price;
 
-                  return Column(
-                    children: [
-                      subOption.isExclusive == true
-                          ? ListView.builder(
-                              itemCount: subOption.options.length,
-                              itemBuilder: (context, index) {
-                                final option = subOption.options[index];
-                                final selectedSubOption =
-                                    _options[subOption.name]?.firstOrNull;
-                                return Column(
-                                  children: [
-                                    RadioListTile.adaptive(
-                                      title: AppText(text: option.name),
-                                      value: option.name,
-                                      groupValue: selectedSubOption,
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          setState(() {
-                                            _options[subOption.name] = [
-                                              HiveOption(
-                                                  name: option.name,
-                                                  categoryName: subOption.name)
-                                            ];
-                                          });
-                                        }
-                                      },
-                                      controlAffinity:
-                                          ListTileControlAffinity.trailing,
-                                      subtitle: AppText(
-                                          text: subOption.price.toString()),
-                                    ),
-                                    if (_options[subOption.name] != null &&
-                                        subOption.options.isNotEmpty)
-                                      Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                            color: AppColors.neutral100,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: Column(
-                                          children: [
-                                            if (selectedSubOption != null)
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  AppText(
-                                                    text:
-                                                        '${subOption.name} Additions',
-                                                    weight: FontWeight.bold,
-                                                    size: AppSizes.body,
-                                                  ),
-                                                  AppText(
-                                                    text:
-                                                        selectedSubOption.name,
-                                                    color: AppColors.neutral500,
-                                                  )
-                                                ],
-                                              ),
-                                            const ListTile(
-                                              // onTap: () => navigatorKey
-                                              //     .currentState!
-                                              //     .push(MaterialPageRoute(
-                                              //   builder: (context) =>
-                                              //       SubOptionSelectionScreen(
-                                              //     option: subOption,
-                                              //   ),
-                                              // )),
-                                              title: AppText(
-                                                text: 'Edit selections',
-                                                weight: FontWeight.bold,
-                                              ),
-                                              trailing: Icon(
-                                                Icons.keyboard_arrow_right,
-                                                color: AppColors.neutral500,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                  ],
-                                );
-                              },
-                            )
-                          : Builder(builder: (context) {
-                              int chosenQuantity = 0;
-                              return ListView.builder(
-                                  itemCount: subOption.options.length,
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
+                          child: AppText(
+                            text: option.name,
+                            weight: FontWeight.bold,
+                            size: AppSizes.body,
+                          ),
+                        ),
+                        option.isExclusive == true
+                            ? StatefulBuilder(builder: (context, setState) {
+                                return ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: option.subOptions.length,
                                   itemBuilder: (context, index) {
-                                    final option = subOption.options[index];
-
-                                    return subOption.canBeMultiple
-                                        ? ListTile(
-                                            trailing: _optionQuantities[
-                                                        index] ==
-                                                    0
-                                                ? TextButton(
-                                                    style: TextButton.styleFrom(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(0),
-                                                        backgroundColor:
-                                                            AppColors
-                                                                .neutral100,
-                                                        shape:
-                                                            const CircleBorder()),
-                                                    onPressed: chosenQuantity ==
-                                                            option
-                                                                .canBeMultipleLimit
-                                                        ? null
-                                                        : () {
-                                                            setState(() {
-                                                              _optionQuantities[
-                                                                  index] = 1;
-                                                            });
-                                                          },
-                                                    child: const AppText(
-                                                      text: '+',
-                                                      size: AppSizes.body,
-                                                    ))
-                                                : Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                        TextButton(
-                                                            style: TextButton.styleFrom(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(3),
-                                                                backgroundColor:
-                                                                    AppColors
-                                                                        .neutral100,
-                                                                shape:
-                                                                    const CircleBorder()),
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                _optionQuantities[
-                                                                    index] -= 1;
-                                                                chosenQuantity -=
-                                                                    1;
-                                                              });
-                                                            },
-                                                            child: const AppText(
-                                                                text: '-',
-                                                                size: AppSizes
-                                                                    .body)),
-                                                        AppText(
-                                                            text:
-                                                                _optionQuantities[
-                                                                        index]
-                                                                    .toString()),
-                                                        TextButton(
-                                                            style: TextButton.styleFrom(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(3),
-                                                                backgroundColor:
-                                                                    AppColors
-                                                                        .neutral100,
-                                                                shape:
-                                                                    const CircleBorder()),
-                                                            onPressed: _optionQuantities[
-                                                                        index] <=
-                                                                    option
-                                                                        .canBeMultipleLimit!
-                                                                ? () {
-                                                                    setState(
-                                                                        () {
-                                                                      _optionQuantities[
-                                                                          index] += 1;
-                                                                      chosenQuantity +=
-                                                                          1;
-                                                                    });
-                                                                  }
-                                                                : null,
-                                                            child: const AppText(
-                                                                text: '+',
-                                                                size: AppSizes
-                                                                    .body)),
-                                                      ]),
-                                            title: AppText(
-                                              text: subOption.name,
-                                            ),
-                                            subtitle: subOption.price != null ||
-                                                    subOption.calories != null
-                                                ? Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      if (subOption.price !=
-                                                          null)
-                                                        AppText(
-                                                          text:
-                                                              '+  ${_optionQuantities[index] == 0 ? '\$${subOption.price}' : '\$${subOption.price! * _optionQuantities[index]} (\$${subOption.price!.toStringAsFixed(2)} ea)'} ',
-                                                          color: AppColors
-                                                              .neutral500,
-                                                        ),
-                                                      if (subOption.calories !=
-                                                          null)
-                                                        AppText(
-                                                          text:
-                                                              '${subOption.calories!.toInt()} Cal.',
-                                                          color: AppColors
-                                                              .neutral500,
-                                                        ),
-                                                    ],
-                                                  )
-                                                : null,
-                                          )
-                                        : CheckboxListTile.adaptive(
-                                            controlAffinity:
-                                                ListTileControlAffinity
-                                                    .trailing,
-                                            title: AppText(
-                                              text: subOption.name,
-                                            ),
-                                            subtitle: subOption.price != null ||
-                                                    subOption.calories != null
-                                                ? Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      if (subOption.price !=
-                                                          null)
-                                                        AppText(
-                                                          text:
-                                                              '+ \$${subOption.price}',
-                                                          color: AppColors
-                                                              .neutral500,
-                                                        ),
-                                                      if (subOption.calories !=
-                                                          null)
-                                                        AppText(
-                                                          text:
-                                                              '${subOption.calories!.toInt()} Cal.',
-                                                          color: AppColors
-                                                              .neutral500,
-                                                        ),
-                                                    ],
-                                                  )
-                                                : null,
-                                            value: _options[subOption.name] !=
-                                                    null &&
-                                                _options[subOption.name]!.any(
-                                                  (option) =>
-                                                      option.name ==
-                                                      subOption.name,
-                                                ),
-                                            onChanged: (value) {
+                                    final subOption = option.subOptions[index];
+                                    final selectedSubOption =
+                                        _hiveOptions[option.name]?.firstOrNull
+                                        // TODO: so that a radio is selected by default for required options if
+                                        // this is the first time the user is on this screen and hasn't selected anything yet
+                                        // ?? option.subOptions.first
+                                        ;
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        RadioListTile.adaptive(
+                                          title: AppText(text: subOption.name),
+                                          value: subOption.name,
+                                          groupValue: selectedSubOption?.name,
+                                          onChanged: (value) {
+                                            if (value != null) {
                                               setState(() {
-                                                if (_options[subOption.name] ==
+                                                _hiveOptions[option.name] = [
+                                                  HiveOption(
+                                                      name: subOption.name,
+                                                      categoryName: option.name)
+                                                ];
+
+                                                if (valueAddedByRadioButtonSet !=
                                                     null) {
-                                                  _options[subOption.name] = [
-                                                    HiveOption(
-                                                        name: subOption.name,
-                                                        categoryName:
-                                                            subOption.name)
-                                                  ];
-                                                } else {
-                                                  if (_options[subOption.name]!
-                                                          .firstWhereOrNull(
-                                                        (option) =>
-                                                            option.name ==
-                                                            subOption.name,
-                                                      ) ==
-                                                      null) {
-                                                    _options[subOption.name]!
-                                                        .add(HiveOption(
-                                                            name:
-                                                                subOption.name,
-                                                            categoryName:
-                                                                subOption
-                                                                    .name));
+                                                  _subOptionsTotalNotifier
+                                                          .value -=
+                                                      valueAddedByRadioButtonSet!;
+                                                  if (subOption.price != null) {
+                                                    valueAddedByRadioButtonSet =
+                                                        subOption.price!;
+                                                    _subOptionsTotalNotifier
+                                                            .value +=
+                                                        subOption.price!;
                                                   } else {
-                                                    _options[subOption.name]!
-                                                        .removeWhere(
-                                                      (option) =>
-                                                          option.name ==
-                                                          subOption.name,
-                                                    );
+                                                    valueAddedByRadioButtonSet =
+                                                        null;
+                                                  }
+                                                } else {
+                                                  if (subOption.price != null) {
+                                                    _subOptionsTotalNotifier
+                                                            .value +=
+                                                        subOption.price!;
+                                                    valueAddedByRadioButtonSet =
+                                                        subOption.price!;
                                                   }
                                                 }
                                               });
-                                            },
-                                          );
-                                  });
-                            })
-                    ],
-                  );
-                },
-                separatorBuilder: (context, index) => const Divider(),
-              ),
-            ]),
+                                            }
+                                          },
+                                          controlAffinity:
+                                              ListTileControlAffinity.trailing,
+                                          subtitle: subOption.price == null
+                                              ? null
+                                              : AppText(
+                                                  text:
+                                                      '\$${subOption.price!.toStringAsFixed(2)}'),
+                                        ),
+                                        if (_hiveOptions[subOption.name] !=
+                                                null &&
+                                            subOption.options.isNotEmpty)
+                                          Container(
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                                color: AppColors.neutral100,
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            child: Column(
+                                              children: [
+                                                if (selectedSubOption != null)
+                                                  const ListTile(
+                                                    // onTap: () => navigatorKey
+                                                    //     .currentState!
+                                                    //     .push(MaterialPageRoute(
+                                                    //   builder: (context) =>
+                                                    //       SubOptionSelectionScreen(
+                                                    //     option: subOption,
+                                                    //   ),
+                                                    // )),
+                                                    title: AppText(
+                                                      text: 'Edit selections',
+                                                      weight: FontWeight.bold,
+                                                    ),
+                                                    trailing: Icon(
+                                                      Icons
+                                                          .keyboard_arrow_right,
+                                                      color:
+                                                          AppColors.neutral500,
+                                                    ),
+                                                  )
+                                              ],
+                                            ),
+                                          )
+                                      ],
+                                    );
+                                  },
+                                );
+                              })
+                            : StatefulBuilder(builder: (context, setState) {
+                                int chosenQuantity = 0;
+                                // return ListView.builder(
+                                //     shrinkWrap: true,
+                                //     itemCount: option.options.length,
+                                //     itemBuilder: (context, index) {
+                                //       final innerOption =
+                                //           initialSelectedSubOption.options[index];
+
+                                return ListView.builder(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: option.subOptions.length,
+                                    itemBuilder: (context, index) {
+                                      final innerOption =
+                                          option.subOptions[index];
+
+                                      return innerOption.canBeMultiple
+                                          ? ListTile(
+                                              trailing: _optionQuantities[index] ==
+                                                      0
+                                                  ? TextButton(
+                                                      style: TextButton.styleFrom(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(0),
+                                                          backgroundColor:
+                                                              AppColors
+                                                                  .neutral100,
+                                                          shape:
+                                                              const CircleBorder()),
+                                                      onPressed: chosenQuantity ==
+                                                              option
+                                                                  .canBeMultipleLimit
+                                                          ? null
+                                                          : () {
+                                                              setState(() {
+                                                                _optionQuantities[
+                                                                    index] = 1;
+                                                              });
+                                                            },
+                                                      child: const AppText(
+                                                        text: '+',
+                                                        size: AppSizes.body,
+                                                      ))
+                                                  : Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                          TextButton(
+                                                              style: TextButton.styleFrom(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          3),
+                                                                  backgroundColor:
+                                                                      AppColors
+                                                                          .neutral100,
+                                                                  shape:
+                                                                      const CircleBorder()),
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  _optionQuantities[
+                                                                      index] -= 1;
+                                                                  chosenQuantity -=
+                                                                      1;
+                                                                });
+                                                              },
+                                                              child: const AppText(
+                                                                  text: '-',
+                                                                  size: AppSizes
+                                                                      .body)),
+                                                          AppText(
+                                                              text: _optionQuantities[
+                                                                      index]
+                                                                  .toString()),
+                                                          TextButton(
+                                                              style: TextButton.styleFrom(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          3),
+                                                                  backgroundColor:
+                                                                      AppColors
+                                                                          .neutral100,
+                                                                  shape:
+                                                                      const CircleBorder()),
+                                                              onPressed: _optionQuantities[
+                                                                          index] <=
+                                                                      option
+                                                                          .canBeMultipleLimit!
+                                                                  ? () {
+                                                                      setState(
+                                                                          () {
+                                                                        _optionQuantities[
+                                                                            index] += 1;
+                                                                        chosenQuantity +=
+                                                                            1;
+                                                                      });
+                                                                    }
+                                                                  : null,
+                                                              child: const AppText(
+                                                                  text: '+',
+                                                                  size: AppSizes
+                                                                      .body)),
+                                                        ]),
+                                              title: AppText(
+                                                text: innerOption.name,
+                                              ),
+                                              subtitle: innerOption.price !=
+                                                          null ||
+                                                      innerOption.calories !=
+                                                          null
+                                                  ? Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        if (innerOption.price !=
+                                                            null)
+                                                          AppText(
+                                                            text:
+                                                                '+  ${_optionQuantities[index] == 0 ? '\$${innerOption.price!.toStringAsFixed(2)}' : '\$${innerOption.price! * _optionQuantities[index]} (\$${innerOption.price!.toStringAsFixed(2)} ea)'} ',
+                                                            color: AppColors
+                                                                .neutral500,
+                                                          ),
+                                                        if (innerOption
+                                                                .calories !=
+                                                            null)
+                                                          AppText(
+                                                            text:
+                                                                '${innerOption.calories!.toInt()} Cal.',
+                                                            color: AppColors
+                                                                .neutral500,
+                                                          ),
+                                                      ],
+                                                    )
+                                                  : null,
+                                            )
+                                          : CheckboxListTile.adaptive(
+                                              controlAffinity:
+                                                  ListTileControlAffinity
+                                                      .trailing,
+                                              title: AppText(
+                                                text: innerOption.name,
+                                              ),
+                                              subtitle: innerOption.price !=
+                                                          null ||
+                                                      innerOption.calories !=
+                                                          null
+                                                  ? Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        if (innerOption.price !=
+                                                            null)
+                                                          AppText(
+                                                            text:
+                                                                '+ \$${innerOption.price}',
+                                                            color: AppColors
+                                                                .neutral500,
+                                                          ),
+                                                        if (innerOption
+                                                                .calories !=
+                                                            null)
+                                                          AppText(
+                                                            text:
+                                                                '${innerOption.calories!.toInt()} Cal.',
+                                                            color: AppColors
+                                                                .neutral500,
+                                                          ),
+                                                      ],
+                                                    )
+                                                  : null,
+                                              value:
+                                                  _hiveOptions[option.name] !=
+                                                          null &&
+                                                      _hiveOptions[option.name]!
+                                                          .any(
+                                                        (option) =>
+                                                            option.name ==
+                                                            option.name,
+                                                      ),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  if (_hiveOptions[
+                                                          innerOption.name] ==
+                                                      null) {
+                                                    _hiveOptions[
+                                                        innerOption.name] = [
+                                                      HiveOption(
+                                                          name:
+                                                              innerOption.name,
+                                                          categoryName:
+                                                              option.name)
+                                                    ];
+                                                  } else {
+                                                    if (_hiveOptions[innerOption
+                                                                .name]!
+                                                            .firstWhereOrNull(
+                                                          (option) =>
+                                                              option.name ==
+                                                              option.name,
+                                                        ) ==
+                                                        null) {
+                                                      _hiveOptions[
+                                                              innerOption.name]!
+                                                          .add(HiveOption(
+                                                              name: innerOption
+                                                                  .name,
+                                                              categoryName:
+                                                                  option.name));
+                                                    } else {
+                                                      _hiveOptions[
+                                                              innerOption.name]!
+                                                          .removeWhere(
+                                                        (option) =>
+                                                            option.name ==
+                                                            option.name,
+                                                      );
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                            );
+                                    });
+                              })
+                      ],
+                    );
+                  },
+                  separatorBuilder: (context, index) => const Divider(),
+                )
+              ]),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.horizontalPaddingSmall),
-              child: AppButton(
-                  callback: () {
-                    navigatorKey.currentState!.pop();
-                  },
-                  text: 'Done • \$${widget.currentTotal + _subOptionsTotal}'),
+              child: ValueListenableBuilder(
+                  valueListenable: _subOptionsTotalNotifier,
+                  builder: (context, value, child) {
+                    final sum = widget.currentTotal + value;
+                    return AppButton(
+                        callback: () {
+                          // final allHiveOptionLists = <List<HiveOption>>[];
+                          // for (var key in _hiveOptions.keys) {
+                          //   allHiveOptionLists.add(_hiveOptions[key]!);
+                          // }
+                          // final temp = _hiveOptions.values.toList();
+
+                          // logger.d(allHiveOptionLists);
+                          navigatorKey.currentState!.pop(
+                              [value, _hiveOptions.values.flattened.toList()]);
+                        },
+                        text: 'Done • \$${sum.toStringAsFixed(2)}');
+                  }),
             ),
             const Gap(10),
           ],

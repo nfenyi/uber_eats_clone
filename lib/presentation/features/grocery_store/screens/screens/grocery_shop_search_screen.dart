@@ -11,8 +11,6 @@ import 'package:iconify_flutter/icons/ant_design.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
-import 'package:uber_eats_clone/presentation/features/product/product_screen.dart';
-
 import '../../../../../main.dart';
 import '../../../../../models/store/store_model.dart';
 import '../../../../constants/app_sizes.dart';
@@ -32,8 +30,8 @@ class GroceryShopSearchScreen extends StatefulWidget {
 
 class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
   late List<String> _searchHistory;
-  List<Map> _searchResults = [];
-  List<Map> _filteredSearchResults = [];
+  List<ProductAndQuantity> _searchResults = [];
+  List<ProductAndQuantity> _filteredSearchResults = [];
   final _searchController = TextEditingController();
   Timer? _debounce;
   final List<String> _searchFilters = ['Sort', 'Aisle', 'Brand', 'Deals'];
@@ -105,10 +103,9 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                     for (var productAndQuantity
                         in productCategory.productsAndQuantities) {
                       // logger.d(productAndQuantity);
-                      if (productAndQuantity.isNotEmpty &&
-                          productAndQuantity['name']
-                              .toLowerCase()
-                              .contains(value.toLowerCase())) {
+                      if (productAndQuantity.name
+                          .toLowerCase()
+                          .contains(value.toLowerCase())) {
                         _mayAlsoLikeAisles.add(aisle);
                         // logger.d('yes');
                         _searchResults.add(productAndQuantity);
@@ -459,7 +456,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                     crossAxisCount: 2),
                 itemCount: _searchResults.length,
                 itemBuilder: (context, index) {
-                  final reference = _searchResults[index]['product'];
+                  final reference = _searchResults[index].product;
                   return FutureBuilder<Product>(
                       future: AppFunctions.loadProductReference(
                           reference as DocumentReference),
@@ -519,11 +516,12 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                           child: ListView.separated(
                             itemBuilder: (context, index) {
                               final reference = mayAlsoLikeCategory
-                                      .productsAndQuantities[index
-                                  // Random().nextInt(mayAlsoLikeCategory
-                                  //     .productsAndQuantities
-                                  //     .length)
-                                  ]['product'];
+                                  .productsAndQuantities[index
+                                      // Random().nextInt(mayAlsoLikeCategory
+                                      //     .productsAndQuantities
+                                      //     .length)
+                                      ]
+                                  .product;
                               return FutureBuilder<Product>(
                                   future: AppFunctions.loadProductReference(
                                       reference as DocumentReference),
@@ -598,7 +596,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: const Icon(Icons.search),
-                          title: AppText(text: _searchResults[index]['name']),
+                          title: AppText(text: _searchResults[index].name),
                         );
                       },
                       itemCount: _searchResults.length < 10
@@ -617,7 +615,7 @@ class _GroceryShopSearchScreenState extends State<GroceryShopSearchScreen> {
       for (var aisle in widget.store.aisles!) {
         for (var productCat in aisle.productCategories) {
           for (var productAndQuantity in productCat.productsAndQuantities) {
-            if (productAndQuantity['name']
+            if (productAndQuantity.name
                 .toLowerCase()
                 .contains(query.toLowerCase())) {
               _searchResults.add(productAndQuantity);

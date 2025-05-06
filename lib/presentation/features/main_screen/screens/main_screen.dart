@@ -26,7 +26,6 @@ import '../../../../hive_adapters/cart_item/cart_item_model.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../alcohol/alcohol_screen.dart';
 import '../../gifts/screens/gift_screen.dart';
 import '../../gifts/screens/redeem_gift_card_screen.dart';
 import '../../generic_category/screens/generic_category_screen.dart';
@@ -129,9 +128,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                     ? const GiftCategoryScreen()
                     : bottomNavIndex == 8
                         ? const GenericCategoryScreen()
-                        : bottomNavIndex == 9
-                            ? const BoxCateringScreen()
-                            : const AlcoholScreen(),
+                        : const BoxCateringScreen(),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentScreen,
           onTap: (value) {

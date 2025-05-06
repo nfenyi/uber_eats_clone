@@ -292,6 +292,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                         : '${_selectedCountry?.dialCode}${_phoneNumberController.text}',
                                     verificationCompleted:
                                         (PhoneAuthCredential credential) async {
+                                      //WARNING: phone number change not implemented by firebase
                                       await FirebaseAuth.instance.currentUser!
                                           .updatePhoneNumber(credential);
                                       await navigatorKey.currentState!

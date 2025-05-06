@@ -33,7 +33,7 @@ class _BackUpOptionScreenState extends State<BackUpOptionScreen> {
       (productCategory) {
         return productCategory.productsAndQuantities.any(
           (product) {
-            return product['id'] == widget.product.id;
+            return product.id == widget.product.id;
           },
         );
       },

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,12 +13,9 @@ import 'package:latlong2/latlong.dart' as lt;
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/hive_adapters/cart_item/cart_item_model.dart';
-import 'package:uber_eats_clone/models/order/order_model.dart';
-import 'package:uber_eats_clone/models/payment/payment_model.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/other_constants.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/carts/screens/orders_screen.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 

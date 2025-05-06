@@ -69,6 +69,24 @@ Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
       'closingTime': instance.closingTime.toIso8601String(),
     };
 
+_$ProductAndQuantityImpl _$$ProductAndQuantityImplFromJson(
+        Map<String, dynamic> json) =>
+    _$ProductAndQuantityImpl(
+      name: json['name'] as String? ?? '',
+      id: json['id'] as String? ?? '',
+      product: json['product'],
+      quantity: (json['quantity'] as num?)?.toInt(),
+    );
+
+Map<String, dynamic> _$$ProductAndQuantityImplToJson(
+        _$ProductAndQuantityImpl instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'id': instance.id,
+      'product': instance.product,
+      'quantity': instance.quantity,
+    };
+
 _$StoreScheduleImpl _$$StoreScheduleImplFromJson(Map<String, dynamic> json) =>
     _$StoreScheduleImpl(
       name: json['name'] as String,
@@ -125,7 +143,7 @@ _$ProductCategoryImpl _$$ProductCategoryImplFromJson(
     _$ProductCategoryImpl(
       name: json['name'] as String,
       productsAndQuantities: (json['productsAndQuantities'] as List<dynamic>)
-          .map((e) => e as Map<String, dynamic>)
+          .map((e) => ProductAndQuantity.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -133,7 +151,8 @@ Map<String, dynamic> _$$ProductCategoryImplToJson(
         _$ProductCategoryImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
-      'productsAndQuantities': instance.productsAndQuantities,
+      'productsAndQuantities':
+          instance.productsAndQuantities.map((e) => e.toJson()).toList(),
     };
 
 _$DeliveryImpl _$$DeliveryImplFromJson(Map<String, dynamic> json) =>
@@ -235,7 +254,7 @@ Map<String, dynamic> _$$OptionImplToJson(_$OptionImpl instance) =>
 _$SubOptionImpl _$$SubOptionImplFromJson(Map<String, dynamic> json) =>
     _$SubOptionImpl(
       name: json['name'] as String,
-      canBeMultiple: json['canBeMultiple'] as bool,
+      canBeMultiple: json['canBeMultiple'] as bool? ?? false,
       isExclusive: json['isExclusive'] as bool? ?? true,
       calories: (json['calories'] as num?)?.toDouble(),
       price: (json['price'] as num?)?.toDouble(),

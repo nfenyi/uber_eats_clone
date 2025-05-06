@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
@@ -17,9 +16,7 @@ import '../../../../../models/store/store_model.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../core/app_colors.dart';
 import '../../../../core/widgets.dart';
-import '../../../address/screens/addresses_screen.dart';
 import '../../../product/product_screen.dart';
-import '../../../uber_one/join_uber_one_screen.dart';
 
 class AislesScreen extends ConsumerStatefulWidget {
   final Store groceryStore;
@@ -124,15 +121,14 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                                       itemCount: productCategory
                                           .productsAndQuantities.length,
                                       itemBuilder: (context, index) {
-                                        final DocumentReference productRef =
-                                            productCategory
-                                                    .productsAndQuantities[
-                                                index]['product'];
+                                        final productRef = productCategory
+                                            .productsAndQuantities[index]
+                                            .product;
 
                                         return FutureBuilder<Product>(
                                             future: AppFunctions
-                                                .loadProductReference(
-                                                    productRef),
+                                                .loadProductReference(productRef
+                                                    as DocumentReference),
                                             builder: (context, snapshot) {
                                               if (snapshot.connectionState ==
                                                   ConnectionState.waiting) {
@@ -427,12 +423,12 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                                   fit: BoxFit.cover,
                                 );
                               } else {
-                                final firstProduct = firstProductCats.first
-                                    .productsAndQuantities.first['product'];
+                                final firstProduct = firstProductCats
+                                    .first.productsAndQuantities.first.product;
 
                                 return FutureBuilder(
                                     future: AppFunctions.loadProductReference(
-                                        firstProduct),
+                                        firstProduct as DocumentReference),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {

@@ -68,10 +68,10 @@ class _SearchMenuScreenState extends ConsumerState<SearchMenuScreen> {
                                 category.name != 'Most Popular' &&
                                 category.name != 'Featured items' &&
                                 category.productsAndQuantities.any(
-                                  (productAndQuantity) =>
-                                      productAndQuantity['name']
-                                          .toLowerCase()
-                                          .contains(value.toLowerCase()),
+                                  (productAndQuantity) => productAndQuantity
+                                      .name
+                                      .toLowerCase()
+                                      .contains(value.toLowerCase()),
                                 ),
                           )
                           .toList();
@@ -125,11 +125,12 @@ class _SearchMenuScreenState extends ConsumerState<SearchMenuScreen> {
                                           matchingProductsRefs = [];
                                       for (var productAndQuantity
                                           in result.productsAndQuantities) {
-                                        if (productAndQuantity['name']
+                                        if (productAndQuantity.name
                                             .toLowerCase()
                                             .contains(_query.toLowerCase())) {
                                           matchingProductsRefs.add(
-                                              productAndQuantity['product']);
+                                              productAndQuantity.product
+                                                  as DocumentReference);
                                         }
                                       }
                                       return ListView.separated(

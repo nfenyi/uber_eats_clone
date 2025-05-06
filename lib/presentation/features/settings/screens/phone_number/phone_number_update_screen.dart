@@ -235,6 +235,7 @@ class _PhoneNumberUpdateScreenState extends State<PhoneNumberUpdateScreen> {
                           phoneNumber: phoneNumber,
                           verificationCompleted:
                               (PhoneAuthCredential credential) async {
+                            //WARNING: phone number change not implemented by firebase
                             await FirebaseAuth.instance.currentUser!
                                 .updatePhoneNumber(credential);
                             _isPhoneNumberUpdated = true;

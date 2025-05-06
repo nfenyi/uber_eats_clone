@@ -20,7 +20,6 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/carts/screens/carts_screen.dart';
 import 'package:uber_eats_clone/presentation/features/product/back_up_option_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
-import 'package:uber_eats_clone/state/user_location_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app_functions.dart';
@@ -45,8 +44,7 @@ class ProductScreen extends ConsumerStatefulWidget {
 class _ProductScreenState extends ConsumerState<ProductScreen> {
   late final Product _product;
   final _cart = Hive.box<HiveCartItem>(AppBoxes.carts);
-  late double initialSubTotal;
-  late double initialInitialPricesTotal;
+  late double _initialSubTotal;
   String? _backupInstruction = 'Best match';
   int _activeIndex = 0;
   int _quantity = 1;
@@ -57,12 +55,12 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   HiveCartItem? _cartItemInBox;
   final Map<String, List<HiveOption>> _requiredOptions = {};
   final Map<String, List<HiveOption>> _optionalOptions = {};
-  // List<String?> _optionalOptions = [];
-
-  // List<String> _requiredOptions = [];
+  final _currentTotalNotifier = ValueNotifier<double>(0);
   List<int> _optionQuantities = [];
 
   final _productsBox = Hive.box<HiveCartProduct>(AppBoxes.storedProducts);
+  final _isOptionsAlteredNotifier = ValueNotifier<bool>(false);
+
   // String? _selectedSubOption;
 
   @override
@@ -96,18 +94,35 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
         _quantity = _productInbox!.quantity;
         _noteController.text = _productInbox!.note;
         _backupInstruction = _productInbox!.backupInstruction;
-        _quantity = _productInbox!.quantity;
 
         _selectedReplacementId = _productInbox?.productReplacementId;
       } else {
+        int numberOfQuantitiesToCreate = 0;
+        for (var reqOption in _product.requiredOptions) {
+          numberOfQuantitiesToCreate += reqOption.subOptions.length;
+        }
+        for (var opOption in _product.optionalOptions) {
+          numberOfQuantitiesToCreate += opOption.subOptions.length;
+        }
         _optionQuantities = List.generate(
-            _product.requiredOptions.length + _product.optionalOptions.length,
-            (index) => 0,
+            numberOfQuantitiesToCreate, (index) => 0,
             growable: false);
       }
+    } else {
+      int numberOfQuantitiesToCreate = 0;
+      for (var reqOption in _product.requiredOptions) {
+        numberOfQuantitiesToCreate += reqOption.subOptions.length;
+      }
+      for (var opOption in _product.optionalOptions) {
+        numberOfQuantitiesToCreate += opOption.subOptions.length;
+      }
+      _optionQuantities = List.generate(
+          numberOfQuantitiesToCreate, (index) => 0,
+          growable: false);
     }
-    initialSubTotal = _cartItemInBox?.subtotal ?? 0;
-    // initialInitialPricesTotal = _cartItemInBox?.initialPricesTotal ?? 0;
+    _initialSubTotal = _cartItemInBox?.subtotal ?? 0;
+    _currentTotalNotifier.value =
+        _quantity * (_product.promoPrice ?? _product.initialPrice);
   }
 
   @override
@@ -118,8 +133,6 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double currentTotal =
-        ((_product.promoPrice ?? _product.initialPrice) * _quantity);
     return Scaffold(
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
@@ -298,6 +311,18 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                 itemCount: _product.requiredOptions.length,
                 itemBuilder: (context, optionIndex) {
                   final option = _product.requiredOptions[optionIndex];
+                  final isRequirementSatisfied =
+                      _requiredOptions[option.name] != null &&
+                          (option.canBeMultipleLimit == null ||
+                              _requiredOptions[option.name]!.length ==
+                                  option.canBeMultipleLimit!);
+                  double? valueAddedByRadioButtonSet = option.subOptions
+                      .firstWhereOrNull(
+                        (element) =>
+                            element.name ==
+                            _requiredOptions[option.name]?.first.name,
+                      )
+                      ?.price;
 
                   return Column(
                     children: [
@@ -316,25 +341,26 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                               padding: const EdgeInsets.all(3),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5),
-                                color: _requiredOptions[option.name] != null
+                                color: isRequirementSatisfied
                                     ? const Color.fromARGB(255, 206, 232, 221)
                                     : AppColors.neutral100,
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  if (_requiredOptions[option.name] != null)
+                                  if (isRequirementSatisfied)
                                     const Icon(
                                       Icons.check,
                                       color: AppColors.primary2,
+                                      size: 15,
                                     ),
                                   const Gap(3),
                                   AppText(
                                       text: 'Required',
-                                      color:
-                                          _requiredOptions[option.name] != null
-                                              ? AppColors.primary2
-                                              : null)
+                                      size: AppSizes.bodySmallest,
+                                      color: isRequirementSatisfied
+                                          ? AppColors.primary2
+                                          : null)
                                 ],
                               ),
                             ),
@@ -342,94 +368,167 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ],
                       ),
                       option.isExclusive == true
-                          ? ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: option.subOptions.length,
-                              itemBuilder: (context, subOptionIndex) {
-                                final subOption =
-                                    option.subOptions[subOptionIndex];
-                                final selectedSubOption =
-                                    _requiredOptions[option.name]?.firstOrNull;
-                                return Column(
-                                  children: [
-                                    RadioListTile.adaptive(
-                                      title: AppText(text: subOption.name),
-                                      value: subOption.name,
-                                      groupValue: selectedSubOption,
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          setState(() {
-                                            _requiredOptions[option.name] = [
-                                              HiveOption(
-                                                  name: subOption.name,
-                                                  categoryName: option.name)
-                                            ];
-                                          });
-                                        }
-                                      },
-                                      controlAffinity:
-                                          ListTileControlAffinity.trailing,
-                                      subtitle: AppText(
-                                          text: subOption.price.toString()),
-                                    ),
-                                    if (_requiredOptions[option.name] != null &&
-                                        option.subOptions.isNotEmpty)
-                                      Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                            color: AppColors.neutral100,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: Column(
-                                          children: [
-                                            if (selectedSubOption != null)
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  AppText(
-                                                    text:
-                                                        '${option.name} Additions',
-                                                    weight: FontWeight.bold,
-                                                    size: AppSizes.body,
-                                                  ),
-                                                  AppText(
-                                                    text:
-                                                        selectedSubOption.name,
-                                                    color: AppColors.neutral500,
+                          ? StatefulBuilder(builder: (context, setState) {
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: option.subOptions.length,
+                                itemBuilder: (context, subOptionIndex) {
+                                  final subOption =
+                                      option.subOptions[subOptionIndex];
+                                  final selectedSubOption =
+                                      _requiredOptions[option.name]
+                                          ?.firstOrNull;
+
+                                  return Column(
+                                    children: [
+                                      RadioListTile.adaptive(
+                                        title: AppText(text: subOption.name),
+                                        value: subOption.name,
+                                        groupValue: selectedSubOption?.name,
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            setState(() {
+                                              if (!_isOptionsAlteredNotifier
+                                                  .value) {
+                                                _isOptionsAlteredNotifier
+                                                    .value = true;
+                                              }
+                                              _requiredOptions[option.name] = [
+                                                HiveOption(
+                                                    name: subOption.name,
+                                                    categoryName: option.name)
+                                              ];
+                                              if (valueAddedByRadioButtonSet !=
+                                                  null) {
+                                                _currentTotalNotifier.value -=
+                                                    valueAddedByRadioButtonSet!;
+                                                if (subOption.price != null) {
+                                                  valueAddedByRadioButtonSet =
+                                                      subOption.price!;
+                                                  _currentTotalNotifier.value +=
+                                                      subOption.price!;
+                                                } else {
+                                                  valueAddedByRadioButtonSet =
+                                                      null;
+                                                }
+                                              } else {
+                                                if (subOption.price != null) {
+                                                  _currentTotalNotifier.value +=
+                                                      subOption.price!;
+                                                  valueAddedByRadioButtonSet =
+                                                      subOption.price!;
+                                                }
+                                              }
+                                            });
+                                          }
+                                        },
+                                        controlAffinity:
+                                            ListTileControlAffinity.trailing,
+                                        subtitle: subOption.price == null
+                                            ? null
+                                            : AppText(
+                                                text:
+                                                    '\$${subOption.price!.toStringAsFixed(2)}'),
+                                      ),
+                                      if (
+                                          // _requiredOptions[option.name] != null &&
+                                          subOption.name ==
+                                                  selectedSubOption?.name &&
+                                              subOption.options.isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: AppSizes
+                                                  .horizontalPaddingSmall),
+                                          child: Container(
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                                color: AppColors.neutral100,
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                if (selectedSubOption != null)
+                                                  // Column(
+                                                  //   crossAxisAlignment:
+                                                  //       CrossAxisAlignment.start,
+                                                  //   children: [
+                                                  //     const AppText(
+                                                  //       text: 'Additions',
+                                                  //       weight: FontWeight.bold,
+                                                  //       size: AppSizes.body,
+                                                  //     ),
+                                                  //     AppText(
+                                                  //       text:
+                                                  //           selectedSubOption.name,
+                                                  //       color: AppColors.neutral500,
+                                                  //     )
+                                                  //   ],
+                                                  // ),
+                                                  ListTile(
+                                                    onTap: () async {
+                                                      final result =
+                                                          await navigatorKey
+                                                              .currentState!
+                                                              .push(
+                                                                  MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SubOptionSelectionScreen(
+                                                          hiveOptions:
+                                                              _requiredOptions[
+                                                                          option
+                                                                              .name]
+                                                                      ?.first
+                                                                      .options ??
+                                                                  [],
+                                                          currentTotal:
+                                                              _currentTotalNotifier
+                                                                  .value,
+                                                          selectedSubOption:
+                                                              subOption,
+                                                        ),
+                                                      ));
+                                                      if (result != null) {
+                                                        _currentTotalNotifier
+                                                            .value += result[0];
+                                                        valueAddedByRadioButtonSet =
+                                                            result[0] +
+                                                                (subOption
+                                                                        .price ??
+                                                                    0);
+                                                        _requiredOptions[option
+                                                                    .name]!
+                                                                .first
+                                                                .options =
+                                                            result[1];
+                                                      }
+                                                    },
+                                                    title: const AppText(
+                                                      text: 'Edit selections',
+                                                      weight: FontWeight.bold,
+                                                    ),
+                                                    trailing: const Icon(
+                                                      Icons
+                                                          .keyboard_arrow_right,
+                                                      color:
+                                                          AppColors.neutral500,
+                                                    ),
                                                   )
-                                                ],
-                                              ),
-                                            ListTile(
-                                              onTap: () => navigatorKey
-                                                  .currentState!
-                                                  .push(MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SubOptionSelectionScreen(
-                                                  currentTotal: currentTotal,
-                                                  productInbox: _productInbox,
-                                                  option: option,
-                                                ),
-                                              )),
-                                              title: const AppText(
-                                                text: 'Edit selections',
-                                                weight: FontWeight.bold,
-                                              ),
-                                              trailing: const Icon(
-                                                Icons.keyboard_arrow_right,
-                                                color: AppColors.neutral500,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                  ],
-                                );
-                              },
-                            )
-                          : Builder(builder: (context) {
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                    ],
+                                  );
+                                },
+                              );
+                            })
+                          : StatefulBuilder(builder: (context, setState) {
                               int chosenQuantity = 0;
                               return ListView.builder(
+                                  shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount: option.subOptions.length,
                                   itemBuilder: (context, subOptionIndex) {
@@ -600,6 +699,11 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                 ),
                                             onChanged: (value) {
                                               setState(() {
+                                                if (!_isOptionsAlteredNotifier
+                                                    .value) {
+                                                  _isOptionsAlteredNotifier
+                                                      .value = true;
+                                                }
                                                 if (_requiredOptions[
                                                         option.name] ==
                                                     null) {
@@ -610,6 +714,12 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                         categoryName:
                                                             option.name)
                                                   ];
+                                                  if (subOption.price != null) {
+                                                    _currentTotalNotifier
+                                                            .value +=
+                                                        (subOption.price! *
+                                                            _quantity);
+                                                  }
                                                 } else {
                                                   if (_requiredOptions[
                                                               option.name]!
@@ -626,6 +736,13 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                                 subOption.name,
                                                             categoryName:
                                                                 option.name));
+                                                    if (subOption.price !=
+                                                        null) {
+                                                      _currentTotalNotifier
+                                                              .value +=
+                                                          (subOption.price! *
+                                                              _quantity);
+                                                    }
                                                   } else {
                                                     _requiredOptions[
                                                             option.name]!
@@ -634,6 +751,13 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                           option.name ==
                                                           subOption.name,
                                                     );
+                                                    if (subOption.price !=
+                                                        null) {
+                                                      _currentTotalNotifier
+                                                              .value -=
+                                                          (subOption.price! *
+                                                              _quantity);
+                                                    }
                                                   }
                                                 }
                                               });
@@ -650,97 +774,247 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                 itemCount: _product.optionalOptions.length,
                 itemBuilder: (context, index) {
                   final option = _product.optionalOptions[index];
+                  double? valueAddedByRadioButtonSet = option.subOptions
+                      .firstWhereOrNull(
+                        (element) =>
+                            element.name ==
+                            _optionalOptions[option.name]?.first.name,
+                      )
+                      ?.price;
 
                   return Column(
                     children: [
                       option.isExclusive == true
-                          ? ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: option.subOptions.length,
-                              itemBuilder: (context, index) {
-                                final subOption = option.subOptions[index];
-                                final selectedSubOption =
-                                    _optionalOptions[option.name]?.firstOrNull;
-                                return Column(
-                                  children: [
-                                    RadioListTile.adaptive(
-                                      title: AppText(text: subOption.name),
-                                      value: subOption.name,
-                                      groupValue: selectedSubOption,
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          setState(() {
-                                            _optionalOptions[option.name] = [
-                                              HiveOption(
-                                                  name: subOption.name,
-                                                  categoryName: option.name)
-                                            ];
-                                          });
-                                        }
-                                      },
-                                      controlAffinity:
-                                          ListTileControlAffinity.trailing,
-                                      subtitle: AppText(
-                                          text: subOption.price.toString()),
-                                    ),
-                                    if (_optionalOptions[option.name] != null &&
-                                        option.subOptions.isNotEmpty)
-                                      Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                            color: AppColors.neutral100,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: Column(
-                                          children: [
-                                            if (selectedSubOption != null)
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  AppText(
-                                                    text:
-                                                        '${option.name} Additions',
-                                                    weight: FontWeight.bold,
-                                                    size: AppSizes.body,
+                          ? StatefulBuilder(builder: (context, setState) {
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: option.subOptions.length,
+                                itemBuilder: (context, index) {
+                                  final subOption = option.subOptions[index];
+                                  final selectedSubOption =
+                                      _optionalOptions[option.name]
+                                          ?.firstOrNull;
+                                  return Column(
+                                    children: [
+                                      RadioListTile.adaptive(
+                                        title: AppText(text: subOption.name),
+                                        value: subOption.name,
+                                        groupValue: selectedSubOption?.name,
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            setState(() {
+                                              if (!_isOptionsAlteredNotifier
+                                                  .value) {
+                                                _isOptionsAlteredNotifier
+                                                    .value = true;
+                                              }
+                                              _optionalOptions[option.name] = [
+                                                HiveOption(
+                                                    name: subOption.name,
+                                                    categoryName: option.name)
+                                              ];
+
+                                              if (valueAddedByRadioButtonSet !=
+                                                  null) {
+                                                _currentTotalNotifier.value -=
+                                                    valueAddedByRadioButtonSet!;
+                                                if (subOption.price != null) {
+                                                  valueAddedByRadioButtonSet =
+                                                      subOption.price!;
+                                                  _currentTotalNotifier.value +=
+                                                      subOption.price!;
+                                                } else {
+                                                  valueAddedByRadioButtonSet =
+                                                      null;
+                                                }
+                                              } else {
+                                                if (subOption.price != null) {
+                                                  _currentTotalNotifier.value +=
+                                                      subOption.price!;
+                                                  valueAddedByRadioButtonSet =
+                                                      subOption.price!;
+                                                }
+                                              }
+                                            });
+                                          }
+                                        },
+                                        controlAffinity:
+                                            ListTileControlAffinity.trailing,
+                                        subtitle: subOption.price == null
+                                            ? null
+                                            : AppText(
+                                                text:
+                                                    '\$${subOption.price!.toStringAsFixed(2)}'),
+                                      ),
+                                      if (_optionalOptions[option.name] !=
+                                              null &&
+                                          option.subOptions.isNotEmpty)
+                                        Container(
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                              color: AppColors.neutral100,
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          child: Column(
+                                            children: [
+                                              if (
+                                                  // _requiredOptions[option.name] != null &&
+                                                  subOption.name ==
+                                                          selectedSubOption
+                                                              ?.name &&
+                                                      subOption
+                                                          .options.isNotEmpty)
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: AppSizes
+                                                          .horizontalPaddingSmall),
+                                                  child: Container(
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                        color: AppColors
+                                                            .neutral100,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10)),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        if (selectedSubOption !=
+                                                            null)
+                                                          // Column(
+                                                          //   crossAxisAlignment:
+                                                          //       CrossAxisAlignment.start,
+                                                          //   children: [
+                                                          //     const AppText(
+                                                          //       text: 'Additions',
+                                                          //       weight: FontWeight.bold,
+                                                          //       size: AppSizes.body,
+                                                          //     ),
+                                                          //     AppText(
+                                                          //       text:
+                                                          //           selectedSubOption.name,
+                                                          //       color: AppColors.neutral500,
+                                                          //     )
+                                                          //   ],
+                                                          // ),
+                                                          ListTile(
+                                                            onTap: () async {
+                                                              final result =
+                                                                  await navigatorKey
+                                                                      .currentState!
+                                                                      .push(
+                                                                          MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        SubOptionSelectionScreen(
+                                                                  hiveOptions: _requiredOptions[
+                                                                              option.name]
+                                                                          ?.first
+                                                                          .options ??
+                                                                      [],
+                                                                  currentTotal:
+                                                                      _currentTotalNotifier
+                                                                          .value,
+                                                                  selectedSubOption:
+                                                                      subOption,
+                                                                ),
+                                                              ));
+                                                              if (result !=
+                                                                  null) {
+                                                                _currentTotalNotifier
+                                                                        .value +=
+                                                                    result[0];
+                                                                valueAddedByRadioButtonSet =
+                                                                    result[0] +
+                                                                        (subOption.price ??
+                                                                            0);
+                                                                _requiredOptions[option
+                                                                            .name]!
+                                                                        .first
+                                                                        .options =
+                                                                    result[1];
+                                                              }
+                                                            },
+                                                            title:
+                                                                const AppText(
+                                                              text:
+                                                                  'Edit selections',
+                                                              weight: FontWeight
+                                                                  .bold,
+                                                            ),
+                                                            trailing:
+                                                                const Icon(
+                                                              Icons
+                                                                  .keyboard_arrow_right,
+                                                              color: AppColors
+                                                                  .neutral500,
+                                                            ),
+                                                          )
+                                                      ],
+                                                    ),
                                                   ),
-                                                  AppText(
-                                                    text:
-                                                        selectedSubOption.name,
-                                                    color: AppColors.neutral500,
-                                                  )
-                                                ],
-                                              ),
-                                            ListTile(
-                                              onTap: () => navigatorKey
-                                                  .currentState!
-                                                  .push(MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SubOptionSelectionScreen(
-                                                  currentTotal: currentTotal,
-                                                  productInbox: _productInbox,
-                                                  option: option,
                                                 ),
-                                              )),
-                                              title: const AppText(
-                                                text: 'Edit selections',
-                                                weight: FontWeight.bold,
-                                              ),
-                                              trailing: const Icon(
-                                                Icons.keyboard_arrow_right,
-                                                color: AppColors.neutral500,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                  ],
-                                );
-                              },
-                            )
-                          : Builder(builder: (context) {
+                                              ListTile(
+                                                onTap: () async {
+                                                  final result =
+                                                      await navigatorKey
+                                                          .currentState!
+                                                          .push(
+                                                              MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SubOptionSelectionScreen(
+                                                      hiveOptions:
+                                                          _requiredOptions[
+                                                                      option
+                                                                          .name]
+                                                                  ?.first
+                                                                  .options ??
+                                                              [],
+                                                      currentTotal:
+                                                          _currentTotalNotifier
+                                                              .value,
+                                                      selectedSubOption:
+                                                          subOption,
+                                                    ),
+                                                  ));
+                                                  if (result != null) {
+                                                    _currentTotalNotifier
+                                                        .value += result[0];
+                                                    valueAddedByRadioButtonSet =
+                                                        result[0] +
+                                                            (subOption.price ??
+                                                                0);
+                                                    _requiredOptions[
+                                                            option.name]!
+                                                        .first
+                                                        .options = result[1];
+                                                  }
+                                                },
+                                                title: const AppText(
+                                                  text: 'Edit selections',
+                                                  weight: FontWeight.bold,
+                                                ),
+                                                trailing: const Icon(
+                                                  Icons.keyboard_arrow_right,
+                                                  color: AppColors.neutral500,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                    ],
+                                  );
+                                },
+                              );
+                            })
+                          : StatefulBuilder(builder: (context, setState) {
                               int chosenQuantity = 0;
                               return ListView.builder(
+                                  shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount: option.subOptions.length,
                                   itemBuilder: (context, index) {
@@ -769,6 +1043,12 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                         ? null
                                                         : () {
                                                             setState(() {
+                                                              if (!_isOptionsAlteredNotifier
+                                                                  .value) {
+                                                                _isOptionsAlteredNotifier
+                                                                        .value =
+                                                                    true;
+                                                              }
                                                               _optionQuantities[_product
                                                                       .requiredOptions
                                                                       .length +
@@ -795,6 +1075,12 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                                     const CircleBorder()),
                                                             onPressed: () {
                                                               setState(() {
+                                                                if (!_isOptionsAlteredNotifier
+                                                                    .value) {
+                                                                  _isOptionsAlteredNotifier
+                                                                          .value =
+                                                                      true;
+                                                                }
                                                                 _optionQuantities[_product
                                                                         .requiredOptions
                                                                         .length +
@@ -832,6 +1118,11 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                                 ? () {
                                                                     setState(
                                                                         () {
+                                                                      if (!_isOptionsAlteredNotifier
+                                                                          .value) {
+                                                                        _isOptionsAlteredNotifier.value =
+                                                                            true;
+                                                                      }
                                                                       _optionQuantities[_product
                                                                               .requiredOptions
                                                                               .length +
@@ -920,6 +1211,11 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                 ),
                                             onChanged: (value) {
                                               setState(() {
+                                                if (!_isOptionsAlteredNotifier
+                                                    .value) {
+                                                  _isOptionsAlteredNotifier
+                                                      .value = true;
+                                                }
                                                 if (_optionalOptions[
                                                         option.name] ==
                                                     null) {
@@ -956,6 +1252,31 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                     );
                                                   }
                                                 }
+                                                //TODO:
+                                                // if (value ==
+                                                //                                                 selectedSubOption?.name) {
+                                                //                                               if (subOption.price != null) {
+                                                //                                                 _subOptionsTotal -=
+                                                //                                                     valueAddedByRadioButtonSet!;
+                                                //                                                 valueAddedByRadioButtonSet =
+                                                //                                                     null;
+                                                //                                               }
+                                                //                                             } else if (valueAddedByRadioButtonSet !=
+                                                //                                                 null) {
+                                                //                                               _subOptionsTotal -=
+                                                //                                                   valueAddedByRadioButtonSet!;
+                                                //                                               if (subOption.price != null) {
+                                                //                                                 valueAddedByRadioButtonSet =
+                                                //                                                     subOption.price!;
+                                                //                                                 _subOptionsTotal +=
+                                                //                                                     subOption.price!;
+                                                //                                               }
+                                                //                                             } else {
+                                                //                                               if (subOption.price != null) {
+                                                //                                                 _subOptionsTotal +=
+                                                //                                                     subOption.price!;
+                                                //                                               }
+                                                //                                             }
                                               });
                                             },
                                           );
@@ -973,6 +1294,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                   child: Column(
                     children: [
                       const Gap(15),
+                      // TODO: wrap this addorsubtract widget with a valuelistenable so when quantity is changed in the view cart screen when navigating
+                      //with the view cart appbutton below the set quantity reflects on the previous screen(this screen) when the cart screen is popped
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
@@ -1009,6 +1332,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                     } else {
                                       if (_quantity != 1) {
                                         setState(() {
+                                          _currentTotalNotifier.value -=
+                                              _currentTotalNotifier.value /
+                                                  _quantity;
                                           _quantity -= 1;
                                         });
                                       }
@@ -1030,6 +1356,9 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                               InkWell(
                                   onTap: () {
                                     setState(() {
+                                      _currentTotalNotifier.value +=
+                                          _currentTotalNotifier.value /
+                                              _quantity;
                                       _quantity += 1;
                                     });
                                   },
@@ -1617,6 +1946,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                     children: [
                       if (_product.description != null)
                         ExpansionTile(
+                          childrenPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
                           title: const AppText(
                             text: 'Description',
                             weight: FontWeight.w600,
@@ -1630,6 +1961,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ),
                       if (_product.nutritionFacts != null)
                         ExpansionTile(
+                          childrenPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
                           title: const AppText(
                             text: 'Nutrition Facts',
                             weight: FontWeight.w600,
@@ -1660,6 +1993,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ),
                       if (_product.ingredients != null)
                         ExpansionTile(
+                          childrenPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
                           title: const AppText(
                             text: 'Ingredients',
                             weight: FontWeight.w600,
@@ -1673,6 +2008,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                         ),
                       if (_product.directions != null)
                         ExpansionTile(
+                          childrenPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.horizontalPaddingSmall),
                           title: const AppText(
                             text: 'Directions',
                             weight: FontWeight.w600,
@@ -1748,122 +2085,145 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
             ],
           )),
       persistentFooterButtons: [
-        if (_productInbox?.quantity != _quantity)
-          AppButton(
-            isLoading: _isLoading,
-            text:
-                'Add ($_quantity) to cart • \$${currentTotal.toStringAsFixed(2)}',
-            callback: () async {
-              if (_requiredOptions.length != _product.requiredOptions.length) {
-                showInfoToast('Select an option',
-                    context: navigatorKey.currentContext);
+        ValueListenableBuilder(
+            valueListenable: _isOptionsAlteredNotifier,
+            builder: (context, isOptionsAltered, child) {
+              if (_productInbox?.quantity != _quantity || isOptionsAltered) {
+                return ValueListenableBuilder(
+                    valueListenable: _currentTotalNotifier,
+                    builder: (context, value, child) {
+                      return AppButton(
+                        isLoading: _isLoading,
+                        text: isOptionsAltered &&
+                                _productInbox?.quantity == _quantity
+                            ? 'Update cart'
+                            : 'Add ($_quantity) to cart • \$${_currentTotalNotifier.value.toStringAsFixed(2)}',
+                        callback: (_product.requiredOptions.length !=
+                                    _requiredOptions.length) ||
+                                _product.requiredOptions.any((element) =>
+                                    element.canBeMultipleLimit != null &&
+                                    _requiredOptions[element.name]!.length !=
+                                        element.canBeMultipleLimit)
+                            ? () {
+                                showInfoToast(
+                                    'Some requirements need attention!',
+                                    context: context);
+                              }
+                            : () async {
+                                _isOptionsAlteredNotifier.value = false;
+                                setState(() {
+                                  _isLoading = true;
+                                });
+
+                                List<HiveOption> requiredOptionsForSubmission =
+                                    [];
+                                for (var i = 0;
+                                    i < _requiredOptions.values.length;
+                                    i++) {
+                                  var option =
+                                      _requiredOptions.values.elementAt(i);
+                                  for (var j = 0; j < option.length; j++) {
+                                    var subOption = option[j];
+                                    subOption.quantity =
+                                        _optionQuantities[i + j];
+                                    requiredOptionsForSubmission.add(subOption);
+                                  }
+                                }
+
+                                List<HiveOption> optionalOptionsForSubmission =
+                                    [];
+                                for (var i = _product.requiredOptions.length;
+                                    i <
+                                        _product.requiredOptions.length +
+                                            _optionalOptions.values.length;
+                                    i++) {
+                                  var options =
+                                      _optionalOptions.values.elementAt(i);
+                                  for (var j = 0; j < options.length; j++) {
+                                    var option = options[j];
+                                    option.quantity = _optionQuantities[i + j];
+                                    optionalOptionsForSubmission.add(option);
+                                  }
+                                }
+                                if (_productInbox == null) {
+                                  final newProduct = HiveCartProduct(
+                                    name: widget.product.name,
+                                    purchasePrice: widget.product.promoPrice ??
+                                        widget.product.initialPrice,
+                                    id: _product.id,
+                                    quantity: _quantity,
+                                    backupInstruction: _backupInstruction,
+                                    note: _noteController.text,
+                                    requiredOptions:
+                                        requiredOptionsForSubmission,
+                                    optionalOptions:
+                                        optionalOptionsForSubmission,
+                                    productReplacementId:
+                                        _selectedReplacementId,
+                                  );
+                                  await _productsBox.add(newProduct);
+                                  if (_cartItemInBox == null) {
+                                    final userInfo = Hive.box(AppBoxes.appState)
+                                        .get(BoxKeys.userInfo);
+                                    final String selectedPlaceDescription =
+                                        userInfo['selectedAddress']
+                                            ['placeDescription'];
+                                    var temp = HiveCartItem(
+                                      deliveryDate:
+                                          ref.read(deliveryScheduleProvider),
+                                      placeDescription:
+                                          selectedPlaceDescription,
+                                      products: HiveList(_productsBox),
+                                      subtotal: _currentTotalNotifier.value,
+                                      storeId: widget.store.id,
+                                    );
+                                    temp.products.add(_productsBox.values.last);
+                                    await Hive.box<HiveCartItem>(AppBoxes.carts)
+                                        .put(widget.store.id, temp);
+                                    _cartItemInBox = _cart.get(widget.store.id);
+                                  } else {
+                                    _cartItemInBox!.products
+                                        .add(_productsBox.values.last);
+                                    _cartItemInBox!.subtotal =
+                                        _initialSubTotal +
+                                            _currentTotalNotifier.value;
+
+                                    await _cartItemInBox!.save();
+                                  }
+                                  _productInbox = _productsBox.values.last;
+                                } else {
+                                  _productInbox!.quantity = _quantity;
+                                  await _productInbox!.save();
+                                  _cartItemInBox!.subtotal = _initialSubTotal +
+                                      _currentTotalNotifier.value;
+
+                                  await _cartItemInBox!.save();
+                                }
+
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              },
+                      );
+                    });
               } else {
-                setState(() {
-                  _isLoading = true;
-                });
-
-                List<HiveOption> requiredOptions = [];
-                for (var i = 0; i < _requiredOptions.values.length; i++) {
-                  var options = _requiredOptions.values.elementAt(i);
-                  for (var j = 0; i < options.length; i++) {
-                    var option = options[j];
-                    option.quantity = _optionQuantities[i + j];
-                    requiredOptions.add(option);
-                  }
-                }
-
-                List<HiveOption> optionalOptions = [];
-                for (var i = _product.requiredOptions.length;
-                    i <
-                        _product.requiredOptions.length +
-                            _optionalOptions.values.length;
-                    i++) {
-                  var options = _optionalOptions.values.elementAt(i);
-                  for (var j = 0; i < options.length; i++) {
-                    var option = options[j];
-                    option.quantity = _optionQuantities[i + j];
-                    optionalOptions.add(option);
-                  }
-                }
-                if (_productInbox == null) {
-                  final newProduct = HiveCartProduct(
-                    name: widget.product.name,
-                    purchasePrice: widget.product.promoPrice ??
-                        widget.product.initialPrice,
-                    id: _product.id,
-                    quantity: _quantity,
-                    backupInstruction: _backupInstruction,
-                    note: _noteController.text,
-                    requiredOptions: requiredOptions,
-                    optionalOptions: optionalOptions,
-                    productReplacementId: _selectedReplacementId,
-                  );
-                  await _productsBox.add(newProduct);
-                  if (_cartItemInBox == null) {
-                    final userInfo =
-                        Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
-                    final String selectedPlaceDescription =
-                        userInfo['selectedAddress']['placeDescription'];
-                    var temp = HiveCartItem(
-                      deliveryDate: ref.read(deliveryScheduleProvider),
-                      placeDescription: selectedPlaceDescription,
-                      products: HiveList(_productsBox),
-                      // initialPricesTotal: _product.initialPrice * _quantity,
-                      subtotal: _product.promoPrice ??
-                          _product.initialPrice * _quantity,
-                      storeId: widget.store.id,
-                    );
-                    temp.products.add(_productsBox.values.last);
-                    await Hive.box<HiveCartItem>(AppBoxes.carts).add(temp);
-                    _cartItemInBox = _cart.values.firstWhere(
-                      (element) => element.storeId == widget.store.id,
-                    );
-                  } else {
-                    _cartItemInBox!.products.add(_productsBox.values.last);
-                    _cartItemInBox!.subtotal = initialSubTotal +
-                        (_product.promoPrice ??
-                            _product.initialPrice * _quantity);
-                    // _cartItemInBox!.initialPricesTotal =
-                    //     initialInitialPricesTotal +
-                    //         _product.initialPrice * _quantity;
-
-                    await _cartItemInBox!.save();
-                  }
-                  _productInbox = _productsBox.values.last;
-                } else {
-                  _productInbox!.quantity = _quantity;
-                  await _productInbox!.save();
-                  _cartItemInBox!.subtotal = initialSubTotal +
-                      (_product.promoPrice ??
-                          _product.initialPrice * _quantity);
-                  // _cartItemInBox!.initialPricesTotal =
-                  //     initialInitialPricesTotal +
-                  //         _product.initialPrice * _quantity;
-                  await _cartItemInBox!.save();
-                }
-
-                setState(() {
-                  _isLoading = false;
-                });
+                return AppButton(
+                    callback: () {
+                      showModalBottomSheet(
+                        isScrollControlled: true,
+                        useSafeArea: true,
+                        context: context,
+                        builder: (context) {
+                          return CartSheet(
+                            store: widget.store,
+                            cartItem: _cartItemInBox!,
+                          );
+                        },
+                      );
+                    },
+                    text: 'View cart ($_quantity)');
               }
-            },
-          )
-        else
-          AppButton(
-              callback: () {
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  useSafeArea: true,
-                  context: context,
-                  builder: (context) {
-                    return CartSheet(
-                      store: widget.store,
-                      cartItem: _cartItemInBox!,
-                    );
-                  },
-                );
-              },
-              text: 'View cart ($_quantity)')
+            })
       ],
     );
   }

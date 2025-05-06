@@ -125,6 +125,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                           verificationId: widget.verificationId,
                           smsCode: value);
                       if (widget.justUpdatingPhoneNumber) {
+                        //WARNING: phone number change not implemented by firebase
                         await FirebaseAuth.instance.currentUser!
                             .updatePhoneNumber(credential);
                         if (context.mounted) {
@@ -134,6 +135,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                       }
 
                       if (widget.signedInWithEmail) {
+                        //WARNING: phone number change not implemented by firebase
                         await FirebaseAuth.instance.currentUser!
                             .updatePhoneNumber(credential);
                         await navigatorKey.currentState!

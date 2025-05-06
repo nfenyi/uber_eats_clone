@@ -740,6 +740,220 @@ abstract class _Store implements Store {
       throw _privateConstructorUsedError;
 }
 
+ProductAndQuantity _$ProductAndQuantityFromJson(Map<String, dynamic> json) {
+  return _ProductAndQuantity.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ProductAndQuantity {
+  String get name => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError;
+  Object? get product => throw _privateConstructorUsedError;
+  int? get quantity => throw _privateConstructorUsedError;
+
+  /// Serializes this ProductAndQuantity to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ProductAndQuantity
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ProductAndQuantityCopyWith<ProductAndQuantity> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ProductAndQuantityCopyWith<$Res> {
+  factory $ProductAndQuantityCopyWith(
+          ProductAndQuantity value, $Res Function(ProductAndQuantity) then) =
+      _$ProductAndQuantityCopyWithImpl<$Res, ProductAndQuantity>;
+  @useResult
+  $Res call({String name, String id, Object? product, int? quantity});
+}
+
+/// @nodoc
+class _$ProductAndQuantityCopyWithImpl<$Res, $Val extends ProductAndQuantity>
+    implements $ProductAndQuantityCopyWith<$Res> {
+  _$ProductAndQuantityCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ProductAndQuantity
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? id = null,
+    Object? product = freezed,
+    Object? quantity = freezed,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      product: freezed == product ? _value.product : product,
+      quantity: freezed == quantity
+          ? _value.quantity
+          : quantity // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ProductAndQuantityImplCopyWith<$Res>
+    implements $ProductAndQuantityCopyWith<$Res> {
+  factory _$$ProductAndQuantityImplCopyWith(_$ProductAndQuantityImpl value,
+          $Res Function(_$ProductAndQuantityImpl) then) =
+      __$$ProductAndQuantityImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String name, String id, Object? product, int? quantity});
+}
+
+/// @nodoc
+class __$$ProductAndQuantityImplCopyWithImpl<$Res>
+    extends _$ProductAndQuantityCopyWithImpl<$Res, _$ProductAndQuantityImpl>
+    implements _$$ProductAndQuantityImplCopyWith<$Res> {
+  __$$ProductAndQuantityImplCopyWithImpl(_$ProductAndQuantityImpl _value,
+      $Res Function(_$ProductAndQuantityImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ProductAndQuantity
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? id = null,
+    Object? product = freezed,
+    Object? quantity = freezed,
+  }) {
+    return _then(_$ProductAndQuantityImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      product: freezed == product ? _value.product : product,
+      quantity: freezed == quantity
+          ? _value.quantity
+          : quantity // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ProductAndQuantityImpl
+    with DiagnosticableTreeMixin
+    implements _ProductAndQuantity {
+  _$ProductAndQuantityImpl(
+      {this.name = '', this.id = '', required this.product, this.quantity});
+
+  factory _$ProductAndQuantityImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ProductAndQuantityImplFromJson(json);
+
+  @override
+  @JsonKey()
+  final String name;
+  @override
+  @JsonKey()
+  final String id;
+  @override
+  final Object? product;
+  @override
+  final int? quantity;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ProductAndQuantity(name: $name, id: $id, product: $product, quantity: $quantity)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ProductAndQuantity'))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('product', product))
+      ..add(DiagnosticsProperty('quantity', quantity));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ProductAndQuantityImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.id, id) || other.id == id) &&
+            const DeepCollectionEquality().equals(other.product, product) &&
+            (identical(other.quantity, quantity) ||
+                other.quantity == quantity));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, name, id,
+      const DeepCollectionEquality().hash(product), quantity);
+
+  /// Create a copy of ProductAndQuantity
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ProductAndQuantityImplCopyWith<_$ProductAndQuantityImpl> get copyWith =>
+      __$$ProductAndQuantityImplCopyWithImpl<_$ProductAndQuantityImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ProductAndQuantityImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ProductAndQuantity implements ProductAndQuantity {
+  factory _ProductAndQuantity(
+      {final String name,
+      final String id,
+      required final Object? product,
+      final int? quantity}) = _$ProductAndQuantityImpl;
+
+  factory _ProductAndQuantity.fromJson(Map<String, dynamic> json) =
+      _$ProductAndQuantityImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String get id;
+  @override
+  Object? get product;
+  @override
+  int? get quantity;
+
+  /// Create a copy of ProductAndQuantity
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ProductAndQuantityImplCopyWith<_$ProductAndQuantityImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 StoreSchedule _$StoreScheduleFromJson(Map<String, dynamic> json) {
   return _StoreSchedule.fromJson(json);
 }
@@ -1481,7 +1695,7 @@ ProductCategory _$ProductCategoryFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$ProductCategory {
   String get name => throw _privateConstructorUsedError;
-  List<Map<String, dynamic>> get productsAndQuantities =>
+  List<ProductAndQuantity> get productsAndQuantities =>
       throw _privateConstructorUsedError;
 
   /// Serializes this ProductCategory to a JSON map.
@@ -1500,7 +1714,7 @@ abstract class $ProductCategoryCopyWith<$Res> {
           ProductCategory value, $Res Function(ProductCategory) then) =
       _$ProductCategoryCopyWithImpl<$Res, ProductCategory>;
   @useResult
-  $Res call({String name, List<Map<String, dynamic>> productsAndQuantities});
+  $Res call({String name, List<ProductAndQuantity> productsAndQuantities});
 }
 
 /// @nodoc
@@ -1529,7 +1743,7 @@ class _$ProductCategoryCopyWithImpl<$Res, $Val extends ProductCategory>
       productsAndQuantities: null == productsAndQuantities
           ? _value.productsAndQuantities
           : productsAndQuantities // ignore: cast_nullable_to_non_nullable
-              as List<Map<String, dynamic>>,
+              as List<ProductAndQuantity>,
     ) as $Val);
   }
 }
@@ -1542,7 +1756,7 @@ abstract class _$$ProductCategoryImplCopyWith<$Res>
       __$$ProductCategoryImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, List<Map<String, dynamic>> productsAndQuantities});
+  $Res call({String name, List<ProductAndQuantity> productsAndQuantities});
 }
 
 /// @nodoc
@@ -1569,7 +1783,7 @@ class __$$ProductCategoryImplCopyWithImpl<$Res>
       productsAndQuantities: null == productsAndQuantities
           ? _value._productsAndQuantities
           : productsAndQuantities // ignore: cast_nullable_to_non_nullable
-              as List<Map<String, dynamic>>,
+              as List<ProductAndQuantity>,
     ));
   }
 }
@@ -1581,7 +1795,7 @@ class _$ProductCategoryImpl
     implements _ProductCategory {
   _$ProductCategoryImpl(
       {required this.name,
-      required final List<Map<String, dynamic>> productsAndQuantities})
+      required final List<ProductAndQuantity> productsAndQuantities})
       : _productsAndQuantities = productsAndQuantities;
 
   factory _$ProductCategoryImpl.fromJson(Map<String, dynamic> json) =>
@@ -1589,9 +1803,9 @@ class _$ProductCategoryImpl
 
   @override
   final String name;
-  final List<Map<String, dynamic>> _productsAndQuantities;
+  final List<ProductAndQuantity> _productsAndQuantities;
   @override
-  List<Map<String, dynamic>> get productsAndQuantities {
+  List<ProductAndQuantity> get productsAndQuantities {
     if (_productsAndQuantities is EqualUnmodifiableListView)
       return _productsAndQuantities;
     // ignore: implicit_dynamic_type
@@ -1648,7 +1862,7 @@ class _$ProductCategoryImpl
 abstract class _ProductCategory implements ProductCategory {
   factory _ProductCategory(
           {required final String name,
-          required final List<Map<String, dynamic>> productsAndQuantities}) =
+          required final List<ProductAndQuantity> productsAndQuantities}) =
       _$ProductCategoryImpl;
 
   factory _ProductCategory.fromJson(Map<String, dynamic> json) =
@@ -1657,7 +1871,7 @@ abstract class _ProductCategory implements ProductCategory {
   @override
   String get name;
   @override
-  List<Map<String, dynamic>> get productsAndQuantities;
+  List<ProductAndQuantity> get productsAndQuantities;
 
   /// Create a copy of ProductCategory
   /// with the given fields replaced by the non-null parameter values.
@@ -2882,7 +3096,7 @@ class __$$SubOptionImplCopyWithImpl<$Res>
 class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
   _$SubOptionImpl(
       {required this.name,
-      required this.canBeMultiple,
+      this.canBeMultiple = false,
       this.isExclusive = true,
       this.calories,
       this.price,
@@ -2895,6 +3109,7 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
   @override
   final String name;
   @override
+  @JsonKey()
   final bool canBeMultiple;
   @override
   @JsonKey()
@@ -2970,7 +3185,7 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
 abstract class _SubOption implements SubOption {
   factory _SubOption(
       {required final String name,
-      required final bool canBeMultiple,
+      final bool canBeMultiple,
       final bool isExclusive,
       final double? calories,
       final double? price,

@@ -231,7 +231,8 @@ class AppFunctions {
     }
     await navigatorKey.currentState!.push(MaterialPageRoute(
       builder: (context) {
-        if (store.type.toLowerCase().contains('grocery')) {
+        if (store.type.toLowerCase().contains('grocery') ||
+            store.type.toLowerCase().contains('pharmacy')) {
           return GroceryStoreMainScreen(store);
         } else {
           return StoreScreen(

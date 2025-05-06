@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
-import 'package:date_time_format/date_time_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -24,13 +23,13 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/alcohol/alcohol_screen.dart';
 import 'package:uber_eats_clone/presentation/features/home/screens/search_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import 'package:uber_eats_clone/state/user_location_providers.dart';
+import 'package:uuid/uuid.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
@@ -277,8 +276,7 @@ Map<String, Product> products = {};
 //     productCategories: [],
 //     isGroupFriendly: true,
 //     location: Location(
-//         countryOfOrigin: 'Ghanaian',
-//         streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
+//         countryOfOrigin: 'Ghanaian',//         streetAddress: '1100 El Camino Real, MENLO PARK, CA 94025-4308'),
 //     priceCategory: '\$',
 //     type: 'Fast Food',
 //     cardImage:
@@ -311,6 +309,329 @@ Map<String, Product> products = {};
 //   ),
 // ];
 // List<FavouriteStore> favoriteStores = [];
+
+// List<ProductCategory> productCategories = [
+//   ProductCategory(name: 'Featured Items', productsAndQuantities: [ProductAndQuantity(name: 'Breakfast Baconator Combo', id: ,product: ,)])
+// ];
+
+List<Product> productsForFirestore = [
+  Product(
+      name: 'Breakfast Baconator Combo',
+      id: const Uuid().v4(),
+      initialPrice: 9.81,
+      requiredOptions: [
+        Option(name: 'Choose Your Combo', isExclusive: true, subOptions: [
+          SubOption(name: 'Small Combo', isExclusive: true, options: [
+            Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
+              SubOption(
+                name: 'Apple Bites',
+                isExclusive: true,
+              ),
+              SubOption(
+                name: 'Fresh Baked Oatmeal Bar',
+                isExclusive: true,
+              ),
+              SubOption(
+                name: 'Small Seasoned Potatoes',
+                isExclusive: true,
+              ),
+            ]),
+            Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+              SubOption(
+                name: 'Small All-Natural Lemonage',
+                isExclusive: true,
+              ),
+              SubOption(
+                  name: 'Small Strawberry Lemonade',
+                  isExclusive: true,
+                  price: 0.85),
+              SubOption(
+                name: 'Small Diet Coke',
+                isExclusive: true,
+              ),
+            ]),
+          ]),
+          SubOption(
+              name: 'Medium Combo',
+              price: 0.97,
+              isExclusive: true,
+              options: [
+                Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
+                  SubOption(
+                    name: 'Apple Bites',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                    name: 'Fresh Baked Oatmeal Bar',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                    name: 'Small Seasoned Potatoes',
+                    isExclusive: true,
+                  ),
+                ]),
+                Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+                  SubOption(
+                    name: 'Small All-Natural Lemonage',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                      name: 'Small Strawberry Lemonade',
+                      isExclusive: true,
+                      price: 0.85),
+                  SubOption(
+                    name: 'Small Diet Coke',
+                    isExclusive: true,
+                  ),
+                ]),
+              ]),
+          SubOption(
+              name: 'Large Combo',
+              price: 1.58,
+              isExclusive: true,
+              options: [
+                Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
+                  SubOption(
+                    name: 'Apple Bites',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                    name: 'Fresh Baked Oatmeal Bar',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                    name: 'Small Seasoned Potatoes',
+                    isExclusive: true,
+                  ),
+                ]),
+                Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+                  SubOption(
+                    name: 'Small All-Natural Lemonage',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                      name: 'Small Strawberry Lemonade',
+                      isExclusive: true,
+                      price: 0.85),
+                  SubOption(
+                    name: 'Small Diet Coke',
+                    isExclusive: true,
+                  ),
+                ]),
+              ])
+        ])
+      ],
+      description:
+          'Grilled sausage, American cheese, Applewood smoked bacon, a fresh-cracked grade A egg, (deep breath) more cheese and more bacon all covered in swiss cheese sauce. Don\'t just break your fast. Destroy it',
+      imageUrls: [
+        'https://img.cdn4dd.com/p/fit=cover,width=1200,height=600,format=auto,quality=90/media/photosV2/5c0db706-4e3f-43bf-8a15-d72f0f006a20-retina-large.jpg'
+      ]),
+  Product(
+      name: 'Chocolate Chunk Cookie',
+      id: const Uuid().v4(),
+      initialPrice: 2.43,
+      description:
+          'A rich, soft, fresh-baked cookie full of semi-sweet chunks of chocolate, baked in-house. Grandma would love them.',
+      imageUrls: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFBgqM23nztByZzDqbhdp6tkj22SdQbQAzqbweKC0t3A&s&ec=72940543'
+      ]),
+  Product(
+      name: '10 pc. Crispy Chicken Nuggets',
+      id: const Uuid().v4(),
+      initialPrice: 9.81,
+      requiredOptions: [
+        Option(name: 'Sauce (Choose 2)', canBeMultipleLimit: 2, subOptions: [
+          SubOption(name: 'Barbecue Sauce', price: 0.35),
+          SubOption(name: 'Buttermilk Ranch Sauce', price: 0.35),
+          SubOption(name: 'Ketchup'),
+        ])
+      ],
+      description:
+          '100% white- meat chicken breaded to crispy perfection and served with your choice of 6 dipping sauces including Buttermilk Ranch, BBQ. Sweet & Sour, Honey Mustard, or Ghost Pepper Ranch. They\'re trending in our restaurants and Twitter feed alike.',
+      imageUrls: [
+        'https://img.cdn4dd.com/p/fit=cover,width=1200,height=600,format=auto,quality=90/media/photosV2/5c0db706-4e3f-43bf-8a15-d72f0f006a20-retina-large.jpg'
+      ]),
+  Product(
+      name: 'Grilled Chicken Wrap Combo',
+      id: const Uuid().v4(),
+      initialPrice: 15.03,
+      requiredOptions: [
+        Option(name: 'Choose Your Combo', isExclusive: true, subOptions: [
+          SubOption(name: 'Small Combo', isExclusive: true, options: [
+            Option(name: 'Choose Side - Small', isExclusive: true, subOptions: [
+              SubOption(
+                name: 'Small Natural-Cut Fries',
+                isExclusive: true,
+              ),
+              SubOption(
+                name: 'Small Chilli',
+                isExclusive: true,
+              ),
+              SubOption(name: 'Large Chilli', isExclusive: true, price: 0.92),
+            ]),
+            Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+              SubOption(
+                name: 'Small All-Natural Lemonade',
+                isExclusive: true,
+              ),
+              SubOption(
+                  name: 'Small Strawberry Lemonade',
+                  isExclusive: true,
+                  price: 0.85),
+              SubOption(
+                name: 'Small Diet Coke',
+                isExclusive: true,
+              ),
+            ]),
+          ]),
+          SubOption(
+              name: 'Medium Combo',
+              price: 1.10,
+              isExclusive: true,
+              options: [
+                Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
+                  SubOption(
+                    name: 'Small Natural-Cut Fries',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                    name: 'Small Chilli',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                      name: 'Large Chilli', isExclusive: true, price: 0.92),
+                ]),
+                Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+                  SubOption(
+                    name: 'Small All-Natural Lemonade',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                      name: 'Small Strawberry Lemonade',
+                      isExclusive: true,
+                      price: 0.85),
+                  SubOption(
+                    name: 'Small Diet Coke',
+                    isExclusive: true,
+                  ),
+                ]),
+              ]),
+          SubOption(
+              name: 'Large Combo',
+              price: 1.10,
+              isExclusive: true,
+              options: [
+                Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
+                  SubOption(
+                    name: 'Small Natural-Cut Fries',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                    name: 'Small Chilli',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                      name: 'Large Chilli', isExclusive: true, price: 0.92),
+                ]),
+                Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+                  SubOption(
+                    name: 'Small All-Natural Lemonage',
+                    isExclusive: true,
+                  ),
+                  SubOption(
+                      name: 'Small Strawberry Lemonade',
+                      isExclusive: true,
+                      price: 0.85),
+                  SubOption(
+                    name: 'Small Diet Coke',
+                    isExclusive: true,
+                  ),
+                ]),
+              ])
+        ])
+      ],
+      ingredients:
+          'Juicy, herb-marinated grilled chicken breast: shredded cheddar cheese and crispy romaine drizzled with a creamy ranch sauce and all wrapped up in a warm tortilla.',
+      imageUrls: [
+        'https://tb-static.uber.com/prod/image-proc/processed_images/035d8502d749d3de663955d1eda8b0e1/0fb376d1da56c05644450062d25c5c84.jpeg'
+      ]),
+];
+
+List<ProductCategory> prodCats = [
+  ProductCategory(
+    name: 'Featured items',
+    productsAndQuantities: [
+      ProductAndQuantity(
+          id: 'dc9d53ab-2acd-4716-b283-be6c7d759d4d',
+          name: 'Breakfast Baconator Combo',
+          product: FirebaseFirestore.instance
+              .collection(FirestoreCollections.products)
+              .doc('dc9d53ab-2acd-4716-b283-be6c7d759d4d')),
+      ProductAndQuantity(
+          id: '6d244c64-d1b4-4917-94cb-098533d4134a',
+          name: 'Chocolate Chunk Cookie',
+          product: FirebaseFirestore.instance
+              .collection(FirestoreCollections.products)
+              .doc('6d244c64-d1b4-4917-94cb-098533d4134a')),
+      ProductAndQuantity(
+          id: '7453794a-93e0-43b9-a2e9-1c8516598645',
+          name: '10 pc. Crispy Chicken Nuggets',
+          product: FirebaseFirestore.instance
+              .collection(FirestoreCollections.products)
+              .doc('7453794a-93e0-43b9-a2e9-1c8516598645')),
+    ],
+  ),
+  ProductCategory(
+    name: 'Picked for you',
+    productsAndQuantities: [
+      ProductAndQuantity(
+          id: '3873bda5-acb5-4a19-bec0-2c281490a7cc',
+          name: 'Grilled Chicken Wrap Combo',
+          product: FirebaseFirestore.instance
+              .collection(FirestoreCollections.products)
+              .doc('3873bda5-acb5-4a19-bec0-2c281490a7cc'))
+    ],
+  ),
+  ProductCategory(
+    name: 'Hamburgers',
+    productsAndQuantities: [
+      ProductAndQuantity(
+          id: 'dc9d53ab-2acd-4716-b283-be6c7d759d4d',
+          name: 'Breakfast Baconator Combo',
+          product: FirebaseFirestore.instance
+              .collection(FirestoreCollections.products)
+              .doc('dc9d53ab-2acd-4716-b283-be6c7d759d4d'))
+    ],
+  ),
+  ProductCategory(
+    name: 'Bakery',
+    productsAndQuantities: [
+      ProductAndQuantity(
+          id: '6d244c64-d1b4-4917-94cb-098533d4134a',
+          name: 'Chocolate Chunk Cookie',
+          product: FirebaseFirestore.instance
+              .collection(FirestoreCollections.products)
+              .doc('6d244c64-d1b4-4917-94cb-098533d4134a')),
+    ],
+  ),
+  ProductCategory(
+    name: 'Chicken, Nuggets & More',
+    productsAndQuantities: [
+      ProductAndQuantity(
+          id: '7453794a-93e0-43b9-a2e9-1c8516598645',
+          name: '10 pc. Crispy Chicken Nuggets',
+          product: FirebaseFirestore.instance
+              .collection(FirestoreCollections.products)
+              .doc('7453794a-93e0-43b9-a2e9-1c8516598645')),
+      ProductAndQuantity(
+          id: '3873bda5-acb5-4a19-bec0-2c281490a7cc',
+          name: 'Grilled Chicken Wrap Combo',
+          product: FirebaseFirestore.instance
+              .collection(FirestoreCollections.products)
+              .doc('3873bda5-acb5-4a19-bec0-2c281490a7cc'))
+    ],
+  ),
+];
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -699,18 +1020,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     //       type: 'sweets gift advert'),
     // ];
 
-    // for (var vid in _exploreVideos) {
+    // for (var cat in prodCats) {
     //   FirebaseFirestore.instance
-    //       .collection(FirestoreCollections.exploreVideos)
-    //       .doc(vid.id)
-    //       .set(vid.toJson());
+    //       .collection(FirestoreCollections.stores)
+    //       .doc('5h0ZS1joJ4Yzjjwvebb0')
+    //       .update({
+    //     'productCategories': FieldValue.arrayUnion([cat.toJson()])
+    //   });
     // }
 
-    // for (var advert in newAdverts) {
+    // for (var product in productsForFirestore) {
     //   FirebaseFirestore.instance
-    //       .collection(FirestoreCollections.adverts)
-    //       .doc()
-    //       .set(advert.toJson());
+    //       .collection(FirestoreCollections.products)
+    //       .doc(product.id)
+    //       .set(product.toJson());
     // }
 
     DateTime dateTimeNow = DateTime.now();
@@ -2258,7 +2581,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                 SizedBox(
                                                   height: 200,
                                                   child: ListView.separated(
-                                                    cacheExtent: 300,
                                                     padding: const EdgeInsets
                                                         .symmetric(
                                                         horizontal: AppSizes
@@ -2268,7 +2590,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                             const Gap(10),
                                                     scrollDirection:
                                                         Axis.horizontal,
-                                                    itemCount: 10,
+                                                    itemCount: _hottestDeals
+                                                                .length <
+                                                            10
+                                                        ? _hottestDeals.length
+                                                        : 10,
                                                     itemBuilder:
                                                         (context, index) {
                                                       final store =
@@ -3853,7 +4179,8 @@ class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
           final product = productsBox.values.firstWhereOrNull(
             (element) => element.id == widget.product.id,
           );
-          return Container(
+          return AnimatedContainer(
+            duration: const Duration(microseconds: 400),
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
                 boxShadow: widget.removeShadow
@@ -3904,6 +4231,8 @@ class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
                         await cartBox.put(widget.store.id, newCartItem);
                       } else {
                         cartItemInBox.products.add(productsBox.values.last);
+                        cartItemInBox.subtotal += widget.product.promoPrice ??
+                            widget.product.initialPrice;
                         await cartItemInBox.save();
                       }
 
@@ -3935,10 +4264,9 @@ class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
                                 },
                               );
                             } else {
-                              product.quantity -= 1;
                               cartItemInBox.subtotal -=
-                                  widget.product.promoPrice ??
-                                      widget.product.initialPrice;
+                                  (cartItemInBox.subtotal / product.quantity);
+                              product.quantity -= 1;
                               // cartItemInBox.initialPricesTotal -=
                               //     widget.product.initialPrice;
                               await product.save();
@@ -3976,10 +4304,10 @@ class _AddToCartButtonState extends ConsumerState<AddToCartButton> {
                             setState(() {
                               _isLoading = true;
                             });
-                            product.quantity += 1;
                             cartItemInBox.subtotal +=
-                                widget.product.promoPrice ??
-                                    widget.product.initialPrice;
+                                (cartItemInBox.subtotal / product.quantity);
+                            product.quantity += 1;
+
                             // cartItemInBox.initialPricesTotal +=
                             //     widget.product.initialPrice;
                             await product.save();
@@ -4299,12 +4627,11 @@ class SearchResultDisplay extends StatelessWidget {
                   for (var productCategory in aisle.productCategories) {
                     for (var productAndQuantity
                         in productCategory.productsAndQuantities) {
-                      if (productAndQuantity['name']
+                      if (productAndQuantity.name
                           .toLowerCase()
                           .contains(query)) {
-                        if (productAndQuantity['product'] != null) {
-                          matchingProducts.add(productAndQuantity['product']);
-                        }
+                        matchingProducts.add(
+                            productAndQuantity.product as DocumentReference);
                       }
                     }
                   }
@@ -4313,12 +4640,9 @@ class SearchResultDisplay extends StatelessWidget {
                 for (var productCategory in store.productCategories!) {
                   for (var productAndQuantity
                       in productCategory.productsAndQuantities) {
-                    if (productAndQuantity['name']
-                        .toLowerCase()
-                        .contains(query)) {
-                      if (productAndQuantity['product'] != null) {
-                        matchingProducts.add(productAndQuantity['product']);
-                      }
+                    if (productAndQuantity.name.toLowerCase().contains(query)) {
+                      matchingProducts
+                          .add(productAndQuantity.product as DocumentReference);
                     }
                   }
                 }
@@ -4941,5 +5265,55 @@ class _ScrollResponsiveSearchFieldState
             ),
           );
         });
+  }
+}
+
+class PersonalizedRecommendationsWidget extends StatelessWidget {
+  const PersonalizedRecommendationsWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSizes.horizontalPaddingSmall),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+                child: AppText(
+              text: 'Recommendations and Promotions',
+              size: AppSizes.bodySmall,
+              weight: FontWeight.w600,
+            )),
+            const Gap(10),
+            const Divider(),
+            const Gap(10),
+            const AppText(
+                text:
+                    'We are paid by merchants, brands and other partners to advertise and promote their products and services in the Uber Eats and Postmates apps. These are indicated by a "Sponsored" or "Ad" tag.\n\nWe may use information such as your location and user profile, as well as your trip, order and search history, to personalise the ads you see.\n\n'),
+            InkWell(
+              onTap: () {},
+              child: Ink(
+                child: const AppText(
+                  text:
+                      'You can opt out of this personalisation in your Recommendations and Promos settings.',
+                  decoration: TextDecoration.underline,
+                  weight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Gap(10),
+            AppButton(
+              text: 'OK',
+              callback: navigatorKey.currentState!.pop,
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

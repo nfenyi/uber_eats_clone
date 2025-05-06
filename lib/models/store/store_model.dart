@@ -36,6 +36,18 @@ class Store with _$Store {
 }
 
 @freezed
+class ProductAndQuantity with _$ProductAndQuantity {
+  factory ProductAndQuantity({
+    @Default('') String name,
+    @Default('') String id,
+    required Object? product,
+    int? quantity,
+  }) = _ProductAndQuantity;
+  factory ProductAndQuantity.fromJson(Map<String, Object?> json) =>
+      _$ProductAndQuantityFromJson(json);
+}
+
+@freezed
 class StoreSchedule with _$StoreSchedule {
   factory StoreSchedule({
     required String name,
@@ -97,7 +109,7 @@ class GeoPointConverter
 class ProductCategory with _$ProductCategory {
   factory ProductCategory({
     required String name,
-    required List<Map<String, dynamic>> productsAndQuantities,
+    required List<ProductAndQuantity> productsAndQuantities,
   }) = _ProductCategory;
 
   factory ProductCategory.fromJson(Map<String, Object?> json) =>
@@ -160,7 +172,7 @@ class Option with _$Option {
 class SubOption with _$SubOption {
   factory SubOption({
     required String name,
-    required bool canBeMultiple,
+    @Default(false) bool canBeMultiple,
     @Default(true) bool isExclusive,
     double? calories,
     double? price,

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
@@ -874,6 +873,7 @@ class CartSheet extends StatelessWidget {
                     ],
                     body: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SingleChildScrollView(
                           child: Column(
@@ -925,121 +925,195 @@ class CartSheet extends StatelessWidget {
                                                 weight: FontWeight.w600,
                                               ),
                                               subtitle: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children:
-                                                        cartProduct
-                                                            .requiredOptions
-                                                            .map(
-                                                              (e) => Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      AppText(
-                                                                        text:
-                                                                            '${e.name}:',
-                                                                        weight:
-                                                                            FontWeight.w600,
-                                                                      ),
-                                                                      if (e
-                                                                          .options
-                                                                          .isNotEmpty)
-                                                                        Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: e
-                                                                              .options
-                                                                              .map(
-                                                                                (e) => Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                  children: [
-                                                                                    AppText(
-                                                                                      text: e.name,
-                                                                                    ),
-                                                                                    Column(
-                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                        children: e.options
-                                                                                            .map(
-                                                                                              (e) => AppText(
-                                                                                                text: e.name,
-                                                                                              ),
-                                                                                            )
-                                                                                            .toList()),
-                                                                                  ],
+                                                  if (cartProduct
+                                                      .requiredOptions
+                                                      .isNotEmpty)
+                                                    Builder(builder: (context) {
+                                                      final groupedReqOptions =
+                                                          cartProduct
+                                                              .requiredOptions
+                                                              .groupListsBy(
+                                                                  (element) =>
+                                                                      element
+                                                                          .categoryName);
+
+                                                      return ListView.builder(
+                                                          shrinkWrap: true,
+                                                          itemCount:
+                                                              groupedReqOptions
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            final reqOption =
+                                                                groupedReqOptions
+                                                                    .values
+                                                                    .elementAt(
+                                                                        index);
+                                                            return Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                AppText(
+                                                                  text:
+                                                                      '${groupedReqOptions.keys.elementAt(index)}:',
+                                                                  weight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                                Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children:
+                                                                      reqOption
+                                                                          .map(
+                                                                            (e) =>
+                                                                                Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                AppText(
+                                                                                  text: e.name,
                                                                                 ),
-                                                                              )
-                                                                              .toList(),
-                                                                        ),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )
-                                                            .toList(),
-                                                  ),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children:
-                                                        cartProduct
-                                                            .optionalOptions
-                                                            .map(
-                                                              (e) => Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      AppText(
-                                                                        text:
-                                                                            '${e.name}:',
-                                                                        weight:
-                                                                            FontWeight.w600,
-                                                                      ),
-                                                                      if (e
-                                                                          .options
-                                                                          .isNotEmpty)
-                                                                        Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: e
-                                                                              .options
-                                                                              .map(
-                                                                                (e) => Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                  children: [
-                                                                                    AppText(
-                                                                                      text: e.name,
-                                                                                    ),
-                                                                                    Column(
-                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                        children: e.options
-                                                                                            .map(
-                                                                                              (e) => AppText(
-                                                                                                text: e.name,
+                                                                                if (e.options.isNotEmpty)
+                                                                                  Builder(builder: (context) {
+                                                                                    final groupedOptions = e.options.groupListsBy(
+                                                                                      (element) => element.categoryName,
+                                                                                    );
+
+                                                                                    return ListView.builder(
+                                                                                        shrinkWrap: true,
+                                                                                        itemCount: groupedOptions.length,
+                                                                                        itemBuilder: (context, index) {
+                                                                                          return Column(
+                                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                            children: [
+                                                                                              AppText(text: '${groupedOptions.keys.elementAt(index)}:'),
+                                                                                              Column(
+                                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                children: groupedOptions.values
+                                                                                                    .elementAt(index)
+                                                                                                    .map(
+                                                                                                      (e) => Column(
+                                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                        children: [
+                                                                                                          AppText(
+                                                                                                            text: e.name,
+                                                                                                          ),
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    )
+                                                                                                    .toList(),
                                                                                               ),
-                                                                                            )
-                                                                                            .toList()),
-                                                                                  ],
+                                                                                            ],
+                                                                                          );
+                                                                                        });
+                                                                                  }),
+                                                                              ],
+                                                                            ),
+                                                                          )
+                                                                          .toList(),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          });
+                                                    }),
+                                                  if (cartProduct
+                                                      .optionalOptions
+                                                      .isNotEmpty)
+                                                    Builder(builder: (context) {
+                                                      final groupedOptOptions =
+                                                          cartProduct
+                                                              .optionalOptions
+                                                              .groupListsBy(
+                                                                  (element) =>
+                                                                      element
+                                                                          .categoryName);
+
+                                                      return ListView.builder(
+                                                          shrinkWrap: true,
+                                                          itemCount:
+                                                              groupedOptOptions
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            final optOption =
+                                                                groupedOptOptions
+                                                                    .values
+                                                                    .elementAt(
+                                                                        index);
+                                                            return Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                AppText(
+                                                                  text:
+                                                                      '${groupedOptOptions.keys.elementAt(index)}:',
+                                                                  weight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                                Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children:
+                                                                      optOption
+                                                                          .map(
+                                                                            (e) =>
+                                                                                Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                AppText(
+                                                                                  text: e.name,
                                                                                 ),
-                                                                              )
-                                                                              .toList(),
-                                                                        ),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )
-                                                            .toList(),
-                                                  ),
+                                                                                if (e.options.isNotEmpty)
+                                                                                  Builder(builder: (context) {
+                                                                                    final groupedOptions = e.options.groupListsBy(
+                                                                                      (element) => element.categoryName,
+                                                                                    );
+
+                                                                                    return ListView.builder(
+                                                                                        shrinkWrap: true,
+                                                                                        itemCount: groupedOptions.length,
+                                                                                        itemBuilder: (context, index) {
+                                                                                          return Column(
+                                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                            children: [
+                                                                                              AppText(text: '${groupedOptions.keys.elementAt(index)}:'),
+                                                                                              Column(
+                                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                children: groupedOptions.values
+                                                                                                    .elementAt(index)
+                                                                                                    .map(
+                                                                                                      (e) => Column(
+                                                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                        children: [
+                                                                                                          AppText(
+                                                                                                            text: e.name,
+                                                                                                          ),
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    )
+                                                                                                    .toList(),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        });
+                                                                                  }),
+                                                                              ],
+                                                                            ),
+                                                                          )
+                                                                          .toList(),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          });
+                                                    }),
                                                   if (product.similarProducts
                                                       .isNotEmpty)
                                                     Row(
@@ -1251,7 +1325,7 @@ class CartSheet extends StatelessWidget {
                                           size: AppSizes.bodySmall,
                                           weight: FontWeight.w600,
                                           text:
-                                              ' \$${(cartItem.subtotal - (promo != null ? promo!.discount : 0) - (hasUberOne ? OtherConstants.uberOneDiscount : 0)).toStringAsFixed(2)}'),
+                                              ' \$${(cartItem.subtotal - (promo != null ? promo.discount : 0) - (hasUberOne ? OtherConstants.uberOneDiscount : 0)).toStringAsFixed(2)}'),
                                   ],
                                 ),
                               ),
@@ -1262,8 +1336,8 @@ class CartSheet extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             if (promo != null &&
-                                (promo!.minimumOrder == null ||
-                                    promo!.minimumOrder! <= cartItem.subtotal))
+                                (promo.minimumOrder == null ||
+                                    promo.minimumOrder! <= cartItem.subtotal))
                               Container(
                                 width: double.infinity,
                                 decoration: BoxDecoration(
@@ -1289,7 +1363,7 @@ class CartSheet extends StatelessWidget {
                                       color: Colors.brown.shade500,
                                       size: AppSizes.bodySmallest,
                                       text:
-                                          'Saving \$${(promo!.discount).toStringAsFixed(2)} with promotions'),
+                                          'Saving \$${(promo.discount).toStringAsFixed(2)} with promotions'),
                                 ),
                               ),
                             if (hasUberOne && cartItem.subtotal >= 30)

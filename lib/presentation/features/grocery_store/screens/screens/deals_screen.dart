@@ -114,7 +114,7 @@ class _DealsScreenState extends State<DealsScreen> {
             for (var productCategory in aisle.productCategories) {
               for (var prodAndQuant in productCategory.productsAndQuantities) {
                 final castedProductRef =
-                    prodAndQuant['product'] as DocumentReference;
+                    prodAndQuant.product as DocumentReference;
                 for (var product in products) {
                   if (castedProductRef.path.contains(product.id)) {
                     if (_aislesAndProducts[aisle.name] == null) {

@@ -177,9 +177,7 @@ class _SearchScreenState extends State<SearchScreen>
           return store.aisles!.any((aisle) {
             return aisle.productCategories.any((productCategory) =>
                 productCategory.productsAndQuantities.any((productAndQuantity) {
-                  if (productAndQuantity['name']
-                      .toLowerCase()
-                      .contains(query)) {
+                  if (productAndQuantity.name.toLowerCase().contains(query)) {
                     _groceryStoresWithProduct.add(store);
                     return true;
                   }
@@ -190,7 +188,7 @@ class _SearchScreenState extends State<SearchScreen>
       } else {
         return store.productCategories!.any((productCategory) =>
             productCategory.productsAndQuantities.any((productAndQuantity) {
-              if (productAndQuantity['name'].toLowerCase().contains(query)) {
+              if (productAndQuantity.name.toLowerCase().contains(query)) {
                 if (store.type.toLowerCase().contains('restaurant')) {
                   _restaurantsWithProduct.add(store);
                 } else if (store.type.toLowerCase().contains('alcohol')) {
@@ -322,7 +320,7 @@ class _SearchScreenState extends State<SearchScreen>
                                       (productCategory) => productCategory
                                               .productsAndQuantities
                                               .any((productAndQuantity) {
-                                            if (productAndQuantity['name']
+                                            if (productAndQuantity.name
                                                 .toLowerCase()
                                                 .contains(value)) {
                                               _groceryStoresWithProduct
@@ -338,7 +336,7 @@ class _SearchScreenState extends State<SearchScreen>
                                   (productCategory) => productCategory
                                           .productsAndQuantities
                                           .any((productAndQuantity) {
-                                        if (productAndQuantity['name']
+                                        if (productAndQuantity.name
                                             .toLowerCase()
                                             .contains(value)) {
                                           if (store.type

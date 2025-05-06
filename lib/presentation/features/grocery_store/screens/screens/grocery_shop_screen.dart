@@ -939,8 +939,8 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                           const Gap(15),
                                       itemBuilder: (context, index) {
                                         final productReference = category
-                                                .productsAndQuantities[index]
-                                            ['product'] as DocumentReference;
+                                            .productsAndQuantities[index]
+                                            .product as DocumentReference;
 
                                         return FutureBuilder<Product>(
                                             future: AppFunctions

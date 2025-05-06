@@ -22,10 +22,6 @@ class BottomNavIndexNotifier extends StateNotifier<int> {
   void showBoxCateringScreen() {
     state = 9;
   }
-
-  void showAlcoholScreen() {
-    state = 10;
-  }
 }
 
 final bottomNavIndexProvider =

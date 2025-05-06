@@ -1,13 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chips_choice/chips_choice.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:deepcopy/deepcopy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
-import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../main.dart';

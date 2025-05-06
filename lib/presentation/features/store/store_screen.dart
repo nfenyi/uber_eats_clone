@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,6 +28,7 @@ import '../../constants/asset_names.dart';
 import '../../services/google_maps_services.dart';
 import '../../services/place_detail_model.dart';
 import '../../services/sign_in_view_model.dart';
+import '../home/home_screen.dart';
 import '../main_screen/screens/main_screen.dart';
 
 class StoreScreen extends ConsumerStatefulWidget {
@@ -223,8 +222,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                                       .productsAndQuantities.length,
                                   itemBuilder: (context, index) {
                                     final productReference = productCategory
-                                            .productsAndQuantities[index]
-                                        ['product'];
+                                        .productsAndQuantities[index].product;
                                     return FutureBuilder<Product>(
                                         future:
                                             AppFunctions.loadProductReference(
@@ -406,100 +404,27 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                                                                 BorderRadius
                                                                     .circular(
                                                                         12),
-                                                            child: Builder(
-                                                              builder:
-                                                                  (context) {
-                                                                if (product
-                                                                    .imageUrls
-                                                                    .first
-                                                                    .startsWith(
-                                                                        'http')) {
-                                                                  return CachedNetworkImage(
-                                                                    imageUrl: product
+                                                            child: AppFunctions
+                                                                .displayNetworkImage(
+                                                                    product
                                                                         .imageUrls
                                                                         .first,
                                                                     width: 100,
                                                                     height: 100,
                                                                     fit: BoxFit
-                                                                        .fill,
-                                                                  );
-                                                                } else if (product
-                                                                    .imageUrls
-                                                                    .first
-                                                                    .startsWith(
-                                                                        'data:image')) {
-                                                                  // It's a base64 string
-                                                                  try {
-                                                                    String base64String = product
-                                                                        .imageUrls
-                                                                        .first
-                                                                        .split(
-                                                                            ',')
-                                                                        .last;
-                                                                    Uint8List
-                                                                        bytes =
-                                                                        base64Decode(
-                                                                            base64String);
-                                                                    return Image.memory(
-                                                                        width:
-                                                                            100,
-                                                                        height:
-                                                                            100,
-                                                                        fit: BoxFit
-                                                                            .fill,
-                                                                        bytes);
-                                                                  } catch (e) {
-                                                                    // logger.d(
-                                                                    //     'Error decoding base64 image: $e');
-                                                                    return const AppText(
-                                                                        text:
-                                                                            'Error loading image');
-                                                                  }
-                                                                } else {
-                                                                  // Handle invalid image source (neither URL nor base64)
-                                                                  return const AppText(
-                                                                      text:
-                                                                          'Invalid image source');
-                                                                }
-                                                              },
-                                                            )),
+                                                                        .fill)),
                                                         Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  right: 8.0,
-                                                                  top: 8.0),
-                                                          child: InkWell(
-                                                            onTap: () {},
-                                                            child: Ink(
-                                                              child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(5),
-                                                                decoration: BoxDecoration(
-                                                                    boxShadow: const [
-                                                                      BoxShadow(
-                                                                        color: Colors
-                                                                            .black12,
-                                                                        offset: Offset(
-                                                                            2,
-                                                                            2),
-                                                                      )
-                                                                    ],
-                                                                    color: Colors
-                                                                        .white,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            50)),
-                                                                child:
-                                                                    //Implement add button
-                                                                    const Icon(
-                                                                  Icons.add,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        )
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    right: 8.0,
+                                                                    top: 8.0),
+                                                            child:
+                                                                AddToCartButton(
+                                                                    product:
+                                                                        product,
+                                                                    store: widget
+                                                                        .store))
                                                       ],
                                                     ),
                                                   ],
@@ -516,8 +441,8 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                                       scrollDirection: Axis.horizontal,
                                       itemBuilder: (context, index) {
                                         final productReference = productCategory
-                                                .productsAndQuantities[index]
-                                            ['product'];
+                                            .productsAndQuantities[index]
+                                            .product;
                                         return FutureBuilder<Product>(
                                             future: AppFunctions
                                                 .loadProductReference(
@@ -594,77 +519,30 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                                                                       borderRadius:
                                                                           BorderRadius.circular(
                                                                               5),
-                                                                      child:
-                                                                          Builder(
-                                                                        builder:
-                                                                            (context) {
-                                                                          if (product
+                                                                      child: AppFunctions.displayNetworkImage(
+                                                                          product
                                                                               .imageUrls
-                                                                              .first
-                                                                              .startsWith(
-                                                                                  'http')) {
-                                                                            return CachedNetworkImage(
-                                                                              imageUrl: product.imageUrls.first,
-                                                                              width: 100,
-                                                                              height: 100,
-                                                                              fit: BoxFit.fill,
-                                                                            );
-                                                                          } else if (product
-                                                                              .imageUrls
-                                                                              .first
-                                                                              .startsWith('data:image')) {
-                                                                            // It's a base64 string
-                                                                            try {
-                                                                              String base64String = product.imageUrls.first.split(',').last;
-                                                                              Uint8List bytes = base64Decode(base64String);
-                                                                              return Image.memory(width: 100, height: 100, fit: BoxFit.fill, bytes);
-                                                                            } catch (e) {
-                                                                              // logger.d(
-                                                                              //     'Error decoding base64 image: $e');
-                                                                              return const AppText(text: 'Error loading image');
-                                                                            }
-                                                                          } else {
-                                                                            // Handle invalid image source (neither URL nor base64)
-                                                                            return const AppText(text: 'Invalid image source');
-                                                                          }
-                                                                        },
-                                                                      )),
+                                                                              .first,
+                                                                          fit: BoxFit
+                                                                              .fill,
+                                                                          width:
+                                                                              100,
+                                                                          height:
+                                                                              100)),
                                                                   Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            8.0,
-                                                                        top:
-                                                                            8.0),
-                                                                    child:
-                                                                        InkWell(
-                                                                      onTap:
-                                                                          () {},
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              8.0,
+                                                                          top:
+                                                                              8.0),
                                                                       child:
-                                                                          Ink(
-                                                                        child:
-                                                                            Container(
-                                                                          padding: const EdgeInsets
-                                                                              .all(
-                                                                              5),
-                                                                          decoration: BoxDecoration(
-                                                                              boxShadow: const [
-                                                                                BoxShadow(
-                                                                                  color: Colors.black12,
-                                                                                  offset: Offset(2, 2),
-                                                                                )
-                                                                              ],
-                                                                              color: Colors.white,
-                                                                              borderRadius: BorderRadius.circular(50)),
-                                                                          child:
-                                                                              //Implement add button
-                                                                              const Icon(
-                                                                            Icons.add,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
+                                                                          AddToCartButton(
+                                                                        store: widget
+                                                                            .store,
+                                                                        product:
+                                                                            product,
+                                                                      )),
                                                                 ],
                                                               ),
                                                               if (index < 3)
@@ -1264,11 +1142,6 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                                       if (_store.doesPickup) {
                                         setState(() {
                                           _retrievalFilter = value;
-                                          // if (value == 0) {
-                                          //   _retrievalFilter = 'Delivery';
-                                          // } else {
-                                          //   _retrievalFilter = 'Pickup';
-                                          // }
                                         });
                                       }
                                     },
