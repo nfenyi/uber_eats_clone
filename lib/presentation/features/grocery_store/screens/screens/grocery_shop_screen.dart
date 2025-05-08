@@ -491,7 +491,8 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(50),
                                       child: SizedBox(
-                                        height: 60,
+                                        height: 70,
+                                        width: 70,
                                         child: image!,
                                       ),
                                     ),
@@ -579,13 +580,12 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
               children: [
                 Image.asset(
                   // fit: BoxFit.fitHeight,
-                  AssetNames.store,
+                  AssetNames.storeBNW,
                   height: 100,
-                  color: Colors.black,
                 ),
                 const Gap(10),
                 const AppText(
-                  text: 'Stores coming soon',
+                  text: 'Products coming soon',
                 ),
               ],
             ),

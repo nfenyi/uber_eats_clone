@@ -76,7 +76,7 @@ class _GenericCategoryScreenState extends ConsumerState<GenericCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dateTimeNow = DateTime.now();
+    final timeOfDayNow = TimeOfDay.now();
     return SafeArea(
       child: PopScope(
         canPop: false,
@@ -830,9 +830,9 @@ class _GenericCategoryScreenState extends ConsumerState<GenericCategoryScreen> {
                                 itemCount: _filteredStores.length,
                                 itemBuilder: (context, index) {
                                   final categoryStore = _filteredStores[index];
-                                  final bool isClosed = dateTimeNow.isBefore(
+                                  final bool isClosed = timeOfDayNow.isBefore(
                                           categoryStore.openingTime) ||
-                                      dateTimeNow
+                                      timeOfDayNow
                                           .isAfter(categoryStore.closingTime);
                                   return ListTile(
                                       titleAlignment:
@@ -908,11 +908,11 @@ class _GenericCategoryScreenState extends ConsumerState<GenericCategoryScreen> {
                                                   text: isClosed
                                                       ? categoryStore.openingTime
                                                                       .hour -
-                                                                  dateTimeNow
+                                                                  timeOfDayNow
                                                                       .hour >
                                                               1
                                                           ? 'Available at ${AppFunctions.formatDate(categoryStore.openingTime.toString(), format: 'h:i A')}'
-                                                          : 'Available in ${categoryStore.openingTime.hour - dateTimeNow.hour == 1 ? '1 hr' : '${(categoryStore.openingTime.minute - dateTimeNow.minute).abs()} mins'}'
+                                                          : 'Available in ${categoryStore.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${(categoryStore.openingTime.minute - timeOfDayNow.minute).abs()} mins'}'
                                                       : '\$${categoryStore.delivery.fee} Delivery Fee',
                                                   color: categoryStore.delivery
                                                                   .fee <

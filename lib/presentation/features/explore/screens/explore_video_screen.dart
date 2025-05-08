@@ -483,12 +483,12 @@ class _ExploreVideoScreenState extends State<ExploreVideoScreen> {
                                                     ],
                                                   ),
                                                 Builder(builder: (context) {
-                                                  final dateTimeNow =
-                                                      DateTime.now();
-                                                  final isClosed = dateTimeNow
+                                                  final timeOfDayNow =
+                                                      TimeOfDay.now();
+                                                  final isClosed = timeOfDayNow
                                                           .isBefore(store
                                                               .openingTime) ||
-                                                      dateTimeNow.isAfter(
+                                                      timeOfDayNow.isAfter(
                                                           store.closingTime);
                                                   return Container(
                                                     padding:

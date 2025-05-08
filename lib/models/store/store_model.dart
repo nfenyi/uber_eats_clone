@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -28,8 +28,8 @@ class Store with _$Store {
     required String cardImage,
     @Default(false) bool bestOverall,
     @Default(0) int visits,
-    required DateTime openingTime,
-    required DateTime closingTime,
+    @TimeOfDayConverter() required TimeOfDay openingTime,
+    @TimeOfDayConverter() required TimeOfDay closingTime,
   }) = _Store;
 
   factory Store.fromJson(Map<String, Object?> json) => _$StoreFromJson(json);
@@ -90,18 +90,45 @@ class StoreLocation with _$StoreLocation {
       _$StoreLocationFromJson(json);
 }
 
-class GeoPointConverter
-    implements JsonConverter<GeoPoint, Map<String, dynamic>> {
-  const GeoPointConverter();
+// class GeoPointConverter
+//     implements JsonConverter<GeoPoint, Map<String, dynamic>> {
+//   const GeoPointConverter();
+
+//   @override
+//   GeoPoint fromJson(Map<String, dynamic> json) {
+//     return GeoPoint(json['latitude'] as double, json['longitude'] as double);
+//   }
+
+//   @override
+//   Map<String, dynamic> toJson(GeoPoint geoPoint) {
+//     return {'latitude': geoPoint.latitude, 'longitude': geoPoint.longitude};
+//   }
+// }
+
+class TimeOfDayConverter implements JsonConverter<TimeOfDay, String> {
+  const TimeOfDayConverter();
 
   @override
-  GeoPoint fromJson(Map<String, dynamic> json) {
-    return GeoPoint(json['latitude'] as double, json['longitude'] as double);
+  TimeOfDay fromJson(String json) {
+    // Attempt to parse the time from the provided string.
+    try {
+      final dateTime = DateTime.parse(json);
+      return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+    } catch (e) {
+      // Handle the case where the string is not in the expected format.
+      // You might want to log an error, throw an exception, or return a default value.
+      // Here, we're returning TimeOfDay.now() as a fallback, but you should adapt this
+      // to your specific error handling needs.  A common alternative is to throw:
+      // throw FormatException('Invalid date format: $json');
+      print("Error parsing TimeOfDay from JSON: $e, returning TimeOfDay.now()");
+      return TimeOfDay.now(); // Or throw an exception, or handle as needed.
+    }
   }
 
   @override
-  Map<String, dynamic> toJson(GeoPoint geoPoint) {
-    return {'latitude': geoPoint.latitude, 'longitude': geoPoint.longitude};
+  String toJson(TimeOfDay timeOfDay) {
+    // Format the TimeOfDay object into a string, consistently.
+    return "2000-01-01T${timeOfDay.hour.toString().padLeft(2, '0')}:${timeOfDay.minute.toString().padLeft(2, '0')}:00.000";
   }
 }
 

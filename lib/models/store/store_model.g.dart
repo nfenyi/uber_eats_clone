@@ -37,8 +37,10 @@ _$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
       cardImage: json['cardImage'] as String,
       bestOverall: json['bestOverall'] as bool? ?? false,
       visits: (json['visits'] as num?)?.toInt() ?? 0,
-      openingTime: DateTime.parse(json['openingTime'] as String),
-      closingTime: DateTime.parse(json['closingTime'] as String),
+      openingTime:
+          const TimeOfDayConverter().fromJson(json['openingTime'] as String),
+      closingTime:
+          const TimeOfDayConverter().fromJson(json['closingTime'] as String),
     );
 
 Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
@@ -65,8 +67,8 @@ Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
       'cardImage': instance.cardImage,
       'bestOverall': instance.bestOverall,
       'visits': instance.visits,
-      'openingTime': instance.openingTime.toIso8601String(),
-      'closingTime': instance.closingTime.toIso8601String(),
+      'openingTime': const TimeOfDayConverter().toJson(instance.openingTime),
+      'closingTime': const TimeOfDayConverter().toJson(instance.closingTime),
     };
 
 _$ProductAndQuantityImpl _$$ProductAndQuantityImplFromJson(

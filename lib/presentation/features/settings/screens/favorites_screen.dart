@@ -25,11 +25,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    final dateTimeNow = DateTime.now();
+    final timeOfDayNow = TimeOfDay.now();
     for (var store in allStores) {
       if (favoriteStores.any((element) => element.id == store.id)) {
-        if (dateTimeNow.isBefore(store.openingTime) ||
-            dateTimeNow.isAfter(store.closingTime)) {
+        if (timeOfDayNow.isBefore(store.openingTime) ||
+            timeOfDayNow.isAfter(store.closingTime)) {
           _unavailableFavoriteStores.add(store);
         } else {
           _availableFavoriteStores.add(store);

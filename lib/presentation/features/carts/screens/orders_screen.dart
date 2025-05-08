@@ -34,6 +34,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     AppFunctions.getAllIndividualOrders();
+    final timeOfDayNow = TimeOfDay.now();
     final dateTimeNow = DateTime.now();
     return Scaffold(
       body: DefaultTabController(
@@ -86,6 +87,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final allOrders = snapshot.data!;
+
                   final partitionedOrderItems = groupBy(allOrders,
                       (order) => order.deliveryDate.isAfter(dateTimeNow));
                   _ongoingOrders = partitionedOrderItems[true] ?? [];
@@ -355,10 +357,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                                   text:
                                                       'Associated store seems to be removed from Uber Eats');
                                             }
-                                            final bool isClosed = dateTimeNow
+                                            final bool isClosed = timeOfDayNow
                                                     .isBefore(
                                                         store.openingTime) ||
-                                                dateTimeNow
+                                                timeOfDayNow
                                                     .isAfter(store.closingTime);
                                             return Column(
                                               children: [

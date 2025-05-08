@@ -275,7 +275,7 @@ class _SearchScreenState extends State<SearchScreen>
 
   @override
   Widget build(BuildContext context) {
-    final dateTimeNow = DateTime.now();
+    final timeOfDayNow = TimeOfDay.now();
 
     return Scaffold(
       body: SafeArea(
@@ -500,7 +500,7 @@ class _SearchScreenState extends State<SearchScreen>
                           ? NoSearchResult(tabController: _tabController)
                           //all stores
                           : AllStoresResultDisplay(
-                              dateTimeNow: dateTimeNow,
+                              timeOfDayNow: timeOfDayNow,
                               storesWithNameOrProduct: _stores),
                   _searchController.text.isEmpty
                       ? InitialSearchPage2(

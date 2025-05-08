@@ -62,7 +62,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
   final List<Store> _flowerStores = [];
   final List<Store> _retailStores = [];
 
-  final _dateTimeNow = DateTime.now();
+  final _timeOfDayNow = TimeOfDay.now();
 
   Future<List<Advert>> _getGroceryAdverts() async {
     final advertsSnapshot = await FirebaseFirestore.instance
@@ -325,8 +325,8 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                       itemBuilder: (context, index) {
                         final store = allStores[index];
                         final bool isClosed =
-                            _dateTimeNow.isBefore(store.openingTime) ||
-                                _dateTimeNow.isAfter(store.closingTime);
+                            _timeOfDayNow.isBefore(store.openingTime) ||
+                                _timeOfDayNow.isAfter(store.closingTime);
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -540,9 +540,9 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                       }
 
                                       final store = snapshot.data!;
-                                      final bool isClosed = _dateTimeNow
+                                      final bool isClosed = _timeOfDayNow
                                               .isBefore(store.openingTime) ||
-                                          _dateTimeNow
+                                          _timeOfDayNow
                                               .isAfter(store.closingTime);
                                       return ClipRRect(
                                         borderRadius: BorderRadius.circular(12),
@@ -760,9 +760,9 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                 ],
                                               ),
                                             )),
-                                      (_dateTimeNow.isBefore(groceryScreenStore
+                                      (_timeOfDayNow.isBefore(groceryScreenStore
                                                   .openingTime) ||
-                                              _dateTimeNow.isAfter(
+                                              _timeOfDayNow.isAfter(
                                                   groceryScreenStore
                                                       .closingTime))
                                           ? Container(
@@ -948,10 +948,10 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                                     ],
                                                   ),
                                                 )),
-                                          (_dateTimeNow.isBefore(
+                                          (_timeOfDayNow.isBefore(
                                                       groceryScreenStore
                                                           .openingTime) ||
-                                                  _dateTimeNow.isAfter(
+                                                  _timeOfDayNow.isAfter(
                                                       groceryScreenStore
                                                           .closingTime))
                                               ? Container(
@@ -1253,7 +1253,7 @@ class AllStoresListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _dateTimeNow = DateTime.now();
+    final timeOfDayNow = TimeOfDay.now();
     return Column(
       children: [
         MainScreenTopic(callback: () {}, title: 'All Stores'),
@@ -1264,8 +1264,8 @@ class AllStoresListView extends StatelessWidget {
             shrinkWrap: true,
             itemBuilder: (context, index) {
               final store = _groceryScreenStores[index];
-              final bool isClosed = _dateTimeNow.isBefore(store.openingTime) ||
-                  _dateTimeNow.isAfter(store.closingTime);
+              final bool isClosed = timeOfDayNow.isBefore(store.openingTime) ||
+                  timeOfDayNow.isAfter(store.closingTime);
               return ListTile(
                   onTap: () async => AppFunctions.navigateToStoreScreen(store),
                   leading: Container(
@@ -1302,10 +1302,10 @@ class AllStoresListView extends StatelessWidget {
                               )),
                           AppText(
                               text: isClosed
-                                  ? store.openingTime.hour - _dateTimeNow.hour >
+                                  ? store.openingTime.hour - timeOfDayNow.hour >
                                           1
                                       ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
-                                      : 'Available in ${store.openingTime.hour - _dateTimeNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - _dateTimeNow.minute} mins'}'
+                                      : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
                                   : '\$${store.delivery.fee} Delivery Fee',
                               color: store.delivery.fee < 1
                                   ? const Color.fromARGB(255, 163, 133, 42)

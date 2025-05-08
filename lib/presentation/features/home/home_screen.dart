@@ -314,323 +314,359 @@ Map<String, Product> products = {};
 //   ProductCategory(name: 'Featured Items', productsAndQuantities: [ProductAndQuantity(name: 'Breakfast Baconator Combo', id: ,product: ,)])
 // ];
 
-List<Product> productsForFirestore = [
-  Product(
-      name: 'Breakfast Baconator Combo',
-      id: const Uuid().v4(),
-      initialPrice: 9.81,
-      requiredOptions: [
-        Option(name: 'Choose Your Combo', isExclusive: true, subOptions: [
-          SubOption(name: 'Small Combo', isExclusive: true, options: [
-            Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
-              SubOption(
-                name: 'Apple Bites',
-                isExclusive: true,
-              ),
-              SubOption(
-                name: 'Fresh Baked Oatmeal Bar',
-                isExclusive: true,
-              ),
-              SubOption(
-                name: 'Small Seasoned Potatoes',
-                isExclusive: true,
-              ),
-            ]),
-            Option(name: 'Choose Drink', isExclusive: true, subOptions: [
-              SubOption(
-                name: 'Small All-Natural Lemonage',
-                isExclusive: true,
-              ),
-              SubOption(
-                  name: 'Small Strawberry Lemonade',
+List<Option> requiredOptions = [
+  Option(name: 'Select Option', isExclusive: true, subOptions: [
+    SubOption(
+        name: 'Medium French Fries',
+        isExclusive: true,
+        calories: 320,
+        options: [
+          Option(
+              name: 'Medium French Fries Comes With',
+              canBeMultipleLimit: 2,
+              subOptions: [
+                SubOption(
+                  canBeMultiple: true,
+                  name: 'Salt',
                   isExclusive: true,
-                  price: 0.85),
-              SubOption(
-                name: 'Small Diet Coke',
-                isExclusive: true,
-              ),
-            ]),
-          ]),
-          SubOption(
-              name: 'Medium Combo',
-              price: 0.97,
-              isExclusive: true,
-              options: [
-                Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
-                  SubOption(
-                    name: 'Apple Bites',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                    name: 'Fresh Baked Oatmeal Bar',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                    name: 'Small Seasoned Potatoes',
-                    isExclusive: true,
-                  ),
-                ]),
-                Option(name: 'Choose Drink', isExclusive: true, subOptions: [
-                  SubOption(
-                    name: 'Small All-Natural Lemonage',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                      name: 'Small Strawberry Lemonade',
-                      isExclusive: true,
-                      price: 0.85),
-                  SubOption(
-                    name: 'Small Diet Coke',
-                    isExclusive: true,
-                  ),
-                ]),
+                ),
               ]),
-          SubOption(
-              name: 'Large Combo',
-              price: 1.58,
-              isExclusive: true,
-              options: [
-                Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
-                  SubOption(
-                    name: 'Apple Bites',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                    name: 'Fresh Baked Oatmeal Bar',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                    name: 'Small Seasoned Potatoes',
-                    isExclusive: true,
-                  ),
-                ]),
-                Option(name: 'Choose Drink', isExclusive: true, subOptions: [
-                  SubOption(
-                    name: 'Small All-Natural Lemonage',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                      name: 'Small Strawberry Lemonade',
-                      isExclusive: true,
-                      price: 0.85),
-                  SubOption(
-                    name: 'Small Diet Coke',
-                    isExclusive: true,
-                  ),
-                ]),
-              ])
-        ])
-      ],
-      description:
-          'Grilled sausage, American cheese, Applewood smoked bacon, a fresh-cracked grade A egg, (deep breath) more cheese and more bacon all covered in swiss cheese sauce. Don\'t just break your fast. Destroy it',
-      imageUrls: [
-        'https://img.cdn4dd.com/p/fit=cover,width=1200,height=600,format=auto,quality=90/media/photosV2/5c0db706-4e3f-43bf-8a15-d72f0f006a20-retina-large.jpg'
-      ]),
-  Product(
-      name: 'Chocolate Chunk Cookie',
-      id: const Uuid().v4(),
-      initialPrice: 2.43,
-      description:
-          'A rich, soft, fresh-baked cookie full of semi-sweet chunks of chocolate, baked in-house. Grandma would love them.',
-      imageUrls: [
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFBgqM23nztByZzDqbhdp6tkj22SdQbQAzqbweKC0t3A&s&ec=72940543'
-      ]),
-  Product(
-      name: '10 pc. Crispy Chicken Nuggets',
-      id: const Uuid().v4(),
-      initialPrice: 9.81,
-      requiredOptions: [
-        Option(name: 'Sauce (Choose 2)', canBeMultipleLimit: 2, subOptions: [
-          SubOption(name: 'Barbecue Sauce', price: 0.35),
-          SubOption(name: 'Buttermilk Ranch Sauce', price: 0.35),
-          SubOption(name: 'Ketchup'),
-        ])
-      ],
-      description:
-          '100% white- meat chicken breaded to crispy perfection and served with your choice of 6 dipping sauces including Buttermilk Ranch, BBQ. Sweet & Sour, Honey Mustard, or Ghost Pepper Ranch. They\'re trending in our restaurants and Twitter feed alike.',
-      imageUrls: [
-        'https://img.cdn4dd.com/p/fit=cover,width=1200,height=600,format=auto,quality=90/media/photosV2/5c0db706-4e3f-43bf-8a15-d72f0f006a20-retina-large.jpg'
-      ]),
-  Product(
-      name: 'Grilled Chicken Wrap Combo',
-      id: const Uuid().v4(),
-      initialPrice: 15.03,
-      requiredOptions: [
-        Option(name: 'Choose Your Combo', isExclusive: true, subOptions: [
-          SubOption(name: 'Small Combo', isExclusive: true, options: [
-            Option(name: 'Choose Side - Small', isExclusive: true, subOptions: [
-              SubOption(
-                name: 'Small Natural-Cut Fries',
-                isExclusive: true,
-              ),
-              SubOption(
-                name: 'Small Chilli',
-                isExclusive: true,
-              ),
-              SubOption(name: 'Large Chilli', isExclusive: true, price: 0.92),
-            ]),
-            Option(name: 'Choose Drink', isExclusive: true, subOptions: [
-              SubOption(
-                name: 'Small All-Natural Lemonade',
-                isExclusive: true,
-              ),
-              SubOption(
-                  name: 'Small Strawberry Lemonade',
+        ]),
+    SubOption(
+        name: 'Large French Fries',
+        isExclusive: true,
+        calories: 480,
+        price: 0.80,
+        options: [
+          Option(
+              name: 'Large French Fries Comes With',
+              canBeMultipleLimit: 2,
+              subOptions: [
+                SubOption(
+                  canBeMultiple: true,
+                  name: 'Salt',
                   isExclusive: true,
-                  price: 0.85),
-              SubOption(
-                name: 'Small Diet Coke',
-                isExclusive: true,
-              ),
-            ]),
-          ]),
-          SubOption(
-              name: 'Medium Combo',
-              price: 1.10,
-              isExclusive: true,
-              options: [
-                Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
-                  SubOption(
-                    name: 'Small Natural-Cut Fries',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                    name: 'Small Chilli',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                      name: 'Large Chilli', isExclusive: true, price: 0.92),
-                ]),
-                Option(name: 'Choose Drink', isExclusive: true, subOptions: [
-                  SubOption(
-                    name: 'Small All-Natural Lemonade',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                      name: 'Small Strawberry Lemonade',
-                      isExclusive: true,
-                      price: 0.85),
-                  SubOption(
-                    name: 'Small Diet Coke',
-                    isExclusive: true,
-                  ),
-                ]),
+                ),
               ]),
-          SubOption(
-              name: 'Large Combo',
-              price: 1.10,
-              isExclusive: true,
-              options: [
-                Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
-                  SubOption(
-                    name: 'Small Natural-Cut Fries',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                    name: 'Small Chilli',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                      name: 'Large Chilli', isExclusive: true, price: 0.92),
-                ]),
-                Option(name: 'Choose Drink', isExclusive: true, subOptions: [
-                  SubOption(
-                    name: 'Small All-Natural Lemonage',
-                    isExclusive: true,
-                  ),
-                  SubOption(
-                      name: 'Small Strawberry Lemonade',
-                      isExclusive: true,
-                      price: 0.85),
-                  SubOption(
-                    name: 'Small Diet Coke',
-                    isExclusive: true,
-                  ),
-                ]),
-              ])
-        ])
-      ],
-      ingredients:
-          'Juicy, herb-marinated grilled chicken breast: shredded cheddar cheese and crispy romaine drizzled with a creamy ranch sauce and all wrapped up in a warm tortilla.',
-      imageUrls: [
-        'https://tb-static.uber.com/prod/image-proc/processed_images/035d8502d749d3de663955d1eda8b0e1/0fb376d1da56c05644450062d25c5c84.jpeg'
-      ]),
+        ]),
+    SubOption(
+        name: 'Small French Fries',
+        isExclusive: true,
+        calories: 230,
+        price: -1.70,
+        options: [
+          Option(
+              name: 'Small French Fries Comes With',
+              canBeMultipleLimit: 2,
+              subOptions: [
+                SubOption(
+                  canBeMultiple: true,
+                  name: 'Salt',
+                  isExclusive: true,
+                ),
+              ]),
+        ]),
+  ])
 ];
+
+// List<Product> productsForFirestore = [
+//   Product(
+//       name: 'Nissin Top Ramen Noodles, Chicken',
+//       quantity: '18 oz',
+//       id: const Uuid().v4(),
+//       initialPrice: 3.29,
+//       ingredients:
+//           'Ingredients: Enriched Flour (Wheat Flour Niacin Reduced Iron Thiamine Mononitrate Riboflavin Folic Acid), Palm Oil, Salt, Contains Less than 2% of Autolyzed Yeast Extract, Calcium Silicate, Citric Acid, Disodium Guanylate, Disodium Inosinate, Dried Leek Flake, Garlic Powder, Hydrolyzed Corn Protein, Hydrolyzed Soy Protein, Maltodextrin, Monosodium Glutamate, Natural and Artificial Flavor, Onion Powder, Potassium Carbonate, Powdered Chicken, Rendered Chicken Fat, Sodium Alginate, Sodium Carbonate, Sodium Tripolyphosphate, Soybean, Spice and Color, Sugar, TBHO (Preservative), Wheat\n\nContains: Soybeans, Fish, Tree Nuts, Peanuts, Eggs, Milk, Wheat',
+//       // requiredOptions: [
+//       //   Option(name: 'Choose Your Combo', isExclusive: true, subOptions: [
+//       //     SubOption(name: 'Small Combo', isExclusive: true, options: [
+//       //       Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
+//       //         SubOption(
+//       //           name: 'Apple Bites',
+//       //           isExclusive: true,
+//       //         ),
+//       //         SubOption(
+//       //           name: 'Fresh Baked Oatmeal Bar',
+//       //           isExclusive: true,
+//       //         ),
+//       //         SubOption(
+//       //           name: 'Small Seasoned Potatoes',
+//       //           isExclusive: true,
+//       //         ),
+//       //       ]),
+//       //       Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+//       //         SubOption(
+//       //           name: 'Small All-Natural Lemonage',
+//       //           isExclusive: true,
+//       //         ),
+//       //         SubOption(
+//       //             name: 'Small Strawberry Lemonade',
+//       //             isExclusive: true,
+//       //             price: 0.85),
+//       //         SubOption(
+//       //           name: 'Small Diet Coke',
+//       //           isExclusive: true,
+//       //         ),
+//       //       ]),
+//       //     ]),
+//       //     SubOption(
+//       //         name: 'Medium Combo',
+//       //         price: 0.97,
+//       //         isExclusive: true,
+//       //         options: [
+//       //           Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
+//       //             SubOption(
+//       //               name: 'Apple Bites',
+//       //               isExclusive: true,
+//       //             ),
+//       //             SubOption(
+//       //               name: 'Fresh Baked Oatmeal Bar',
+//       //               isExclusive: true,
+//       //             ),
+//       //             SubOption(
+//       //               name: 'Small Seasoned Potatoes',
+//       //               isExclusive: true,
+//       //             ),
+//       //           ]),
+//       //           Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+//       //             SubOption(
+//       //               name: 'Small All-Natural Lemonage',
+//       //               isExclusive: true,
+//       //             ),
+//       //             SubOption(
+//       //                 name: 'Small Strawberry Lemonade',
+//       //                 isExclusive: true,
+//       //                 price: 0.85),
+//       //             SubOption(
+//       //               name: 'Small Diet Coke',
+//       //               isExclusive: true,
+//       //             ),
+//       //           ]),
+//       //         ]),
+//       //     SubOption(
+//       //         name: 'Large Combo',
+//       //         price: 1.58,
+//       //         isExclusive: true,
+//       //         options: [
+//       //           Option(name: 'Breakfast Side', isExclusive: true, subOptions: [
+//       //             SubOption(
+//       //               name: 'Apple Bites',
+//       //               isExclusive: true,
+//       //             ),
+//       //             SubOption(
+//       //               name: 'Fresh Baked Oatmeal Bar',
+//       //               isExclusive: true,
+//       //             ),
+//       //             SubOption(
+//       //               name: 'Small Seasoned Potatoes',
+//       //               isExclusive: true,
+//       //             ),
+//       //           ]),
+//       //           Option(name: 'Choose Drink', isExclusive: true, subOptions: [
+//       //             SubOption(
+//       //               name: 'Small All-Natural Lemonage',
+//       //               isExclusive: true,
+//       //             ),
+//       //             SubOption(
+//       //                 name: 'Small Strawberry Lemonade',
+//       //                 isExclusive: true,
+//       //                 price: 0.85),
+//       //             SubOption(
+//       //               name: 'Small Diet Coke',
+//       //               isExclusive: true,
+//       //             ),
+//       //           ]),
+//       //         ])
+//       //   ])
+//       // ],
+//       nutritionFacts: {'Serving Size': '1.5oz'},
+//       description:
+//           'Cooks in 3 minutes. O g trans fat. See nutrition information for sodium content. For the very best in Ramen Noodle Soup. Top Ramen: Oodles of Noodles. Family favorite since 1970. www.nissinfoods.com.\n\n• Flavour: Chicken\n• Nissin, 2001 W. Rosecrans Ave, Gardena, CA 90249',
+//       imageUrls: [
+//         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGqA4-NrWZDv7NLGMaH-3HVk_ukZI_9aDe3BakdMye0A&s&ec=72940543',
+//         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTajedSH_WXu6kf8tKDd8PUhv1g26agn6vgoe0EaAF5xQ&s&ec=72940543'
+//       ]),
+//   // Product(
+//   //     name: 'Lean Body Protein Shake, Vanilla',
+//   //     id: const Uuid().v4(),
+//   //     initialPrice: 47.99,
+//   //     ingredients:
+//   //         "Ingredients: Filtered Water, Milk Protein Isolate„ Less than 2% of: Calcium Caseinate„ Whey Protein Concentrate, Sunflower Oil, Inulin„ Cellulose Gel, Cellulose Gum, Carrageenan„ Natural Flavors, Vitamin and Mineral Blend (Potassium Phosphate„ Potassium Citrate, Magnesium Phosphate„ Sodium Ascorbate, Zinc Sulfate, Tocopherol Acetate, Biotin„ Vitamin A Palmitate, Niacinamide, Phytonadione, Potassium Iodide, D-Calcium Pantothenate„ Chromium Chloride, Copper Sulfate, Cyanocobalamin, Sodium Molybdate„ Sodium Selenite, Folic Acid, Cholecalciferol, Pyridoxine Hydrochloride, Riboflavin„ Thiamin Mononitrate, Manganese Soy Lecithin, Sucralose, Salt, Acesulfame Potassium.\n\nContains: Milk, Soy",
+//   //     directions:
+//   //         'Directions for use: Shake well & serve cold. - Directions:\nShake well & serve cold.\nRefrigerate after opening.\nStorage recommendation: Refrigerate after opening.',
+//   //     description:
+//   //         "To many people, a \"Lean Body\" means better health, more energy, strength, and an improved sense of self confidence. Whatever goal drives you, Lean Body Ready-to-Drink (RTD) Shakes can help you reach it. Formulated with 40 grams of high-quality protein and zero sugar per serving, Lean Body RTDs support muscle tone and recovery, all in one delicious, convenient shake. Of course, what's not in your RTD is just as important as what's in it. That's why Lean Body RTDs are sugar free, gluten free, lactose free and trans fat free. All these \"free-froms• are paired with a delicious, creamy taste that hits the spot every time. Ask anyone who's tried them, and you'll hear how Lean Body RTDs are the most delicious protein drinks on the market; the hands-down winner enjoyed by RTD fans for over 13 years! Lean Body RTDs also contain 25% more protein and 50% less fat than the leading brand of aseptic RTD. It's the kind of quality you can expect from Labrada Nutrition. After all, all Labrada products are developed in conjunction with food scientists to ensure unparalleled quality and taste. If you're following a carbohydrate-restricted diet and need help staying on track, Lean Body RTDs have you covered by helping to curb appetite and reduce food cravings. The Lean Body protein blend helps you feel more full and satisfied throughout your day. And when you feel satisfied, you're less likely to over-indulge in unhealthy snacks — leading to better results. Lean Body RTDs also make it easy to reach your goals because of their convenient, take-anywhere format. After all, when it comes to shaping up, being prepared is half the battle. If you always have great nutrition at your fingertips, you'll be less tempted to hit those fast food drive-thrus on every corner. At home or on the go, Lean Body RTDs have you covered with high- protein, ready-made essential nutrition at your fingertips.\n\n• Flavour: Vanilla\n• Pack size: 12\n•Labrada Nutrition, TX, 77086\n•Packaging: Reusable",
+//   //     imageUrls: [
+//   //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPrlhEQUHMYS4bFS1XHcbMR9FqrOocj8RUXlJejeD1tg&s&ec=72940543',
+//   //       'https://d2iiahg0ip5afn.cloudfront.net/media/lean_body/images/240444624.leanbody-8oz-proteinshake-vanilla-facts.jpg',
+//   //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCWqeDPgGZuiVTpu1FdLXjLmH74gVHP_pZ7l5846OrwQ&s&ec=72940543'
+//   //     ]),
+//   Product(
+//       name: 'Signature Farms Ground Beef 90% Lean 10% Fat -1 Lb',
+//       id: const Uuid().v4(),
+//       initialPrice: 8.84,
+//       // requiredOptions: [
+//       //   Option(name: 'Sauce (Choose 2)', canBeMultipleLimit: 2, subOptions: [
+//       //     SubOption(name: 'Barbecue Sauce', price: 0.35),
+//       //     SubOption(name: 'Buttermilk Ranch Sauce', price: 0.35),
+//       //     SubOption(name: 'Ketchup'),
+//       //   ])
+//       // ],
+
+//       imageUrls: [
+//         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNqlayJby2LfLDEUJndKlXds4FPVzcM-pcGjwtpvLLTw&s&ec=72940543'
+//       ]),
+
+//   // Product(
+//   //     name: 'Bucked Up Stag Multivitamin',
+//   //     id: const Uuid().v4(),
+//   //     initialPrice: 29.99,
+//   //     description:
+//   //         "More often than not, multivitamins carry the stigma of just 'flushing money down the toilet', (bright and expensive pee) This may be true of other brands, which have focused on cutting costs by under dosing ingredients that already have little to zero bioavailability. At Das Labs, we have invested in the highest quality ingredients to promote absorption at the reccomended clinical dose, Stag is the perfect foundation for men living and pursuing a healthy lifestyle.The least visually appealing, and least immediately gratifying portion of building a house is the foundation excavation process. Of a 15 week timeline project, 6 weeks can be excavation: foundation. However, anyone who knows anything about construction knows this is the most critical step for longevity. After all, you wouldn't want to have the fam over for a party and have the place collapse with",
+//   //     imageUrls: [
+//   //       'https://www.ubuy.com.gh/productimg/?image=aHR0cHM6Ly9tLm1lZGlhLWFtYXpvbi5jb20vaW1hZ2VzL0kvNjFjem1Ya21TRkwuX0FDX1NMMTAwMF8uanBn.jpg'
+//   //     ]),
+//   // Product(
+//   //     quantity: '100 ct',
+//   //     name:
+//   //         'The Vitamin Shoppe Pygeum Extract For Prostate Health Dietary Supplement',
+//   //     id: const Uuid().v4(),
+//   //     initialPrice: 10.99,
+//   //     description:
+//   //         "Supports prostate health Free of gluten, dairy, soy, nuts, sugar, salt, and artificial colors or flavors Pygeum is the bark extract derived from an African evergreen tree called Prunus africana. It's a phytosterol—or plant extract—that contains various active compounds believed to support prostate health. The Vitamin Shoppe brand Pygeum Extract capsules contain 25mg of pygeum bark extract standardized to 25% phytosterols to help you support a healthy prostate.",
+//   //     imageUrls: [
+//   //       'https://www.ubuy.com.gh/productimg/?image=aHR0cHM6Ly9tLm1lZGlhLWFtYXpvbi5jb20vaW1hZ2VzL0kvNjFjem1Ya21TRkwuX0FDX1NMMTAwMF8uanBn.jpg'
+//   //     ]),
+// ];
+
+// List<Aisle> aisles = [
+//   Aisle(
+//     name: 'Home, Apparel & Lifestyle',
+//     productCategories: [
+//       ProductCategory(
+//         name: 'Flowers & Plants',
+//         productsAndQuantities: [
+//           ProductAndQuantity(
+//               id: '0e7d1c02-dfeb-447a-8c93-98b4978f9a10',
+//               name: 'Debi Lilly Bouquet Extending Smiles',
+//               product: FirebaseFirestore.instance
+//                   .collection(FirestoreCollections.products)
+//                   .doc('0e7d1c02-dfeb-447a-8c93-98b4978f9a10')),
+//           ProductAndQuantity(
+//               id: '3bed4545-6230-4d77-a055-b043d37b7624',
+//               name: 'Debi Lilly Perfect Fresh Flowers Gift Luxe',
+//               product: FirebaseFirestore.instance
+//                   .collection(FirestoreCollections.products)
+//                   .doc('3bed4545-6230-4d77-a055-b043d37b7624')),
+//           ProductAndQuantity(
+//               id: 'af460542-d9ee-4bd9-b096-fd36fcfda341',
+//               name: 'Rose 50/50 Dozens - Each',
+//               product: FirebaseFirestore.instance
+//                   .collection(FirestoreCollections.products)
+//                   .doc('af460542-d9ee-4bd9-b096-fd36fcfda341')),
+//         ],
+//       ),
+//     ],
+//   ),
+//   Aisle(
+//     name: 'Pets',
+//     productCategories: [
+//       ProductCategory(
+//         name: 'Toys',
+//         productsAndQuantities: [
+//           ProductAndQuantity(
+//               id: '175ea35a-70c3-4fe7-ab08-2e5e0bcb1dc8',
+//               name: 'Multipet Lamb Chop Plush Dog Toy (1 toy)',
+//               product: FirebaseFirestore.instance
+//                   .collection(FirestoreCollections.products)
+//                   .doc('175ea35a-70c3-4fe7-ab08-2e5e0bcb1dc8')),
+//         ],
+//       ),
+//       // ProductCategory(
+//       //   name: 'Fit Lifestyle',
+//       //   productsAndQuantities: [
+//       //     ProductAndQuantity(
+//       //         id: 'e893364e-541f-417d-b2c3-178efbae5a93',
+//       //         name: 'Bucked Up Stag Multivitamin',
+//       //         product: FirebaseFirestore.instance
+//       //             .collection(FirestoreCollections.products)
+//       //             .doc('e893364e-541f-417d-b2c3-178efbae5a93')),
+//       //   ],
+//       // ),
+//     ],
+//   ),
+// ];
 
 List<ProductCategory> prodCats = [
   ProductCategory(
-    name: 'Featured items',
+    name: 'Soup & Broths',
     productsAndQuantities: [
       ProductAndQuantity(
-          id: 'dc9d53ab-2acd-4716-b283-be6c7d759d4d',
-          name: 'Breakfast Baconator Combo',
+          id: '273073e3-8fb2-4104-9889-f4125c0bcb30',
+          name: 'Nissin Top Ramen Noodles, Chicken',
           product: FirebaseFirestore.instance
               .collection(FirestoreCollections.products)
-              .doc('dc9d53ab-2acd-4716-b283-be6c7d759d4d')),
-      ProductAndQuantity(
-          id: '6d244c64-d1b4-4917-94cb-098533d4134a',
-          name: 'Chocolate Chunk Cookie',
-          product: FirebaseFirestore.instance
-              .collection(FirestoreCollections.products)
-              .doc('6d244c64-d1b4-4917-94cb-098533d4134a')),
-      ProductAndQuantity(
-          id: '7453794a-93e0-43b9-a2e9-1c8516598645',
-          name: '10 pc. Crispy Chicken Nuggets',
-          product: FirebaseFirestore.instance
-              .collection(FirestoreCollections.products)
-              .doc('7453794a-93e0-43b9-a2e9-1c8516598645')),
+              .doc('273073e3-8fb2-4104-9889-f4125c0bcb30')),
     ],
   ),
   ProductCategory(
-    name: 'Picked for you',
+    name: 'Beef',
     productsAndQuantities: [
       ProductAndQuantity(
-          id: '3873bda5-acb5-4a19-bec0-2c281490a7cc',
-          name: 'Grilled Chicken Wrap Combo',
+          id: '16452c49-84c0-4928-a3ec-14f1d26421c0',
+          name: 'Signature Farms Ground Beef 90% Lean 10% Fat -1 Lb',
           product: FirebaseFirestore.instance
               .collection(FirestoreCollections.products)
-              .doc('3873bda5-acb5-4a19-bec0-2c281490a7cc'))
+              .doc('16452c49-84c0-4928-a3ec-14f1d26421c0')),
     ],
   ),
-  ProductCategory(
-    name: 'Hamburgers',
-    productsAndQuantities: [
-      ProductAndQuantity(
-          id: 'dc9d53ab-2acd-4716-b283-be6c7d759d4d',
-          name: 'Breakfast Baconator Combo',
-          product: FirebaseFirestore.instance
-              .collection(FirestoreCollections.products)
-              .doc('dc9d53ab-2acd-4716-b283-be6c7d759d4d'))
-    ],
-  ),
-  ProductCategory(
-    name: 'Bakery',
-    productsAndQuantities: [
-      ProductAndQuantity(
-          id: '6d244c64-d1b4-4917-94cb-098533d4134a',
-          name: 'Chocolate Chunk Cookie',
-          product: FirebaseFirestore.instance
-              .collection(FirestoreCollections.products)
-              .doc('6d244c64-d1b4-4917-94cb-098533d4134a')),
-    ],
-  ),
-  ProductCategory(
-    name: 'Chicken, Nuggets & More',
-    productsAndQuantities: [
-      ProductAndQuantity(
-          id: '7453794a-93e0-43b9-a2e9-1c8516598645',
-          name: '10 pc. Crispy Chicken Nuggets',
-          product: FirebaseFirestore.instance
-              .collection(FirestoreCollections.products)
-              .doc('7453794a-93e0-43b9-a2e9-1c8516598645')),
-      ProductAndQuantity(
-          id: '3873bda5-acb5-4a19-bec0-2c281490a7cc',
-          name: 'Grilled Chicken Wrap Combo',
-          product: FirebaseFirestore.instance
-              .collection(FirestoreCollections.products)
-              .doc('3873bda5-acb5-4a19-bec0-2c281490a7cc'))
-    ],
-  ),
+  // ProductCategory(
+  //   name: 'Drinks',
+  //   productsAndQuantities: [
+  //     ProductAndQuantity(
+  //         id: 'd0961a8bd-65a1-40c4-a83b-9e8b4aafaec8',
+  //         name: 'Alani Nu Pink Slush Energy Drink',
+  //         product: FirebaseFirestore.instance
+  //             .collection(FirestoreCollections.products)
+  //             .doc('0961a8bd-65a1-40c4-a83b-9e8b4aafaec8')),
+  //     ProductAndQuantity(
+  //         id: '1a07c1d3-466d-46bf-b6f6-a0ef1aafecce',
+  //         name: 'Lean Body Protein Shake, Vanilla',
+  //         product: FirebaseFirestore.instance
+  //             .collection(FirestoreCollections.products)
+  //             .doc('1a07c1d3-466d-46bf-b6f6-a0ef1aafecce')),
+  //     ProductAndQuantity(
+  //         id: 'd3040000-954e-4902-8ae9-a8de1e99c31b',
+  //         name: 'The Vitamin Shoppe Iceland Natural Spring Water',
+  //         product: FirebaseFirestore.instance
+  //             .collection(FirestoreCollections.products)
+  //             .doc('d3040000-954e-4902-8ae9-a8de1e99c31b')),
+  //   ],
+  // ),
+
+  // ProductCategory(
+  //   name: 'Bakery',
+  //   productsAndQuantities: [
+  //   ],
+  // ),
+
+  // ProductCategory(
+  //   name: 'Chicken, Nuggets & More',
+  //   productsAndQuantities: [
+  //     ProductAndQuantity(
+  //         id: '7453794a-93e0-43b9-a2e9-1c8516598645',
+  //         name: '10 pc. Crispy Chicken Nuggets',
+  //         product: FirebaseFirestore.instance
+  //             .collection(FirestoreCollections.products)
+  //             .doc('7453794a-93e0-43b9-a2e9-1c8516598645')),
+  //     ProductAndQuantity(
+  //         id: '3873bda5-acb5-4a19-bec0-2c281490a7cc',
+  //         name: 'Grilled Chicken Wrap Combo',
+  //         product: FirebaseFirestore.instance
+  //             .collection(FirestoreCollections.products)
+  //             .doc('3873bda5-acb5-4a19-bec0-2c281490a7cc'))
+  //   ],
+  // ),
 ];
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -1020,12 +1056,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     //       type: 'sweets gift advert'),
     // ];
 
-    // for (var cat in prodCats) {
+    // for (var aisle in aisles) {
     //   FirebaseFirestore.instance
     //       .collection(FirestoreCollections.stores)
-    //       .doc('5h0ZS1joJ4Yzjjwvebb0')
+    //       .doc('NazJMIA9yaUsLRjLxBGa')
     //       .update({
-    //     'productCategories': FieldValue.arrayUnion([cat.toJson()])
+    //     'aisles': FieldValue.arrayUnion([aisle.toJson()])
+    //   });
+    // }
+
+    // for (var prodCat in prodCats) {
+    //   FirebaseFirestore.instance
+    //       .collection(FirestoreCollections.stores)
+    //       .doc('NazJMIA9yaUsLRjLxBGa')
+    //       .update({
+    //     'productCategories': FieldValue.arrayUnion([prodCat.toJson()])
     //   });
     // }
 
@@ -1036,7 +1081,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     //       .set(product.toJson());
     // }
 
-    DateTime dateTimeNow = DateTime.now();
+    // for (var reqOption in requiredOptions) {
+    //   FirebaseFirestore.instance
+    //       .collection(FirestoreCollections.products)
+    //       .doc('50a8ee43-c715-4d0f-afbe-67b717d48cad')
+    //       .update({
+    //     'requiredOptions': FieldValue.arrayUnion([reqOption.toJson()])
+    //   });
+    // }
+
+    final timeOfDayNow = TimeOfDay.now();
     return SafeArea(
       child: NestedScrollView(
         key: _nestedScrollViewKey,
@@ -2422,7 +2476,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
                                                                           final bool
                                                                               isClosed =
-                                                                              dateTimeNow.isBefore(store.openingTime) || dateTimeNow.isAfter(store.closingTime);
+                                                                              timeOfDayNow.isBefore(store.openingTime) || timeOfDayNow.isAfter(store.closingTime);
                                                                           return InkWell(
                                                                             onTap:
                                                                                 () async {
@@ -2599,10 +2653,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                         (context, index) {
                                                       final store =
                                                           _hottestDeals[index];
-                                                      final bool isClosed = dateTimeNow
+                                                      final bool isClosed = timeOfDayNow
                                                               .isBefore(store
                                                                   .openingTime) ||
-                                                          dateTimeNow.isAfter(
+                                                          timeOfDayNow.isAfter(
                                                               store
                                                                   .closingTime);
                                                       return InkWell(
@@ -2670,8 +2724,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                       isClosed
                                                                           ? Container(
                                                                               color: Colors.black.withOpacity(0.5),
-                                                                              width: 200,
-                                                                              height: 120,
+                                                                              width: double.infinity,
+                                                                              height: 170,
                                                                               child: const Column(
                                                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -2960,8 +3014,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                 ))
                                                                         ],
                                                                       ),
-                                                                      (dateTimeNow.hour < nationalBrand.openingTime.hour ||
-                                                                              (dateTimeNow.hour >= nationalBrand.closingTime.hour && dateTimeNow.minute >= nationalBrand.closingTime.minute))
+                                                                      (timeOfDayNow.hour < nationalBrand.openingTime.hour ||
+                                                                              (timeOfDayNow.hour >= nationalBrand.closingTime.hour && timeOfDayNow.minute >= nationalBrand.closingTime.minute))
                                                                           ? Container(
                                                                               color: Colors.black.withOpacity(0.5),
                                                                               width: 200,
@@ -3145,8 +3199,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                 ))
                                                                         ],
                                                                       ),
-                                                                      (dateTimeNow.hour < popularStore.openingTime.hour ||
-                                                                              (dateTimeNow.hour >= popularStore.closingTime.hour && dateTimeNow.minute >= popularStore.closingTime.minute))
+                                                                      (timeOfDayNow.hour < popularStore.openingTime.hour ||
+                                                                              (timeOfDayNow.hour >= popularStore.closingTime.hour && timeOfDayNow.minute >= popularStore.closingTime.minute))
                                                                           ? Container(
                                                                               color: Colors.black.withOpacity(0.5),
                                                                               width: 200,
@@ -3379,10 +3433,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                         (context, index) {
                                                       final store =
                                                           allStores[index];
-                                                      final bool isClosed = dateTimeNow
+                                                      final bool isClosed = timeOfDayNow
                                                               .isBefore(store
                                                                   .openingTime) ||
-                                                          dateTimeNow.isAfter(
+                                                          timeOfDayNow.isAfter(
                                                               store
                                                                   .closingTime);
                                                       return Column(
@@ -3405,10 +3459,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                       Alignment
                                                                           .topLeft,
                                                                   children: [
-                                                                    CachedNetworkImage(
-                                                                      imageUrl:
-                                                                          store
-                                                                              .cardImage,
+                                                                    AppFunctions
+                                                                        .displayNetworkImage(
+                                                                      store
+                                                                          .cardImage,
                                                                       width: double
                                                                           .infinity,
                                                                       height:
@@ -4433,12 +4487,12 @@ class ProductGridTilePriceFirst extends StatelessWidget {
 class AllStoresResultDisplay extends StatelessWidget {
   const AllStoresResultDisplay({
     super.key,
-    required this.dateTimeNow,
+    required this.timeOfDayNow,
     required this.storesWithNameOrProduct,
   });
 
   final List<Store> storesWithNameOrProduct;
-  final DateTime dateTimeNow;
+  final TimeOfDay timeOfDayNow;
 
   @override
   Widget build(BuildContext context) {
@@ -4465,8 +4519,8 @@ class AllStoresResultDisplay extends StatelessWidget {
               // shrinkWrap: true,
               itemBuilder: (context, index) {
                 final store = storesWithNameOrProduct[index];
-                final isClosed = dateTimeNow.isBefore(store.openingTime) ||
-                    dateTimeNow.isAfter(store.closingTime);
+                final isClosed = timeOfDayNow.isBefore(store.openingTime) ||
+                    timeOfDayNow.isAfter(store.closingTime);
                 return InkWell(
                   onTap: () async {
                     await AppFunctions.navigateToStoreScreen(store);

@@ -41,8 +41,10 @@ mixin _$Store {
   String get cardImage => throw _privateConstructorUsedError;
   bool get bestOverall => throw _privateConstructorUsedError;
   int get visits => throw _privateConstructorUsedError;
-  DateTime get openingTime => throw _privateConstructorUsedError;
-  DateTime get closingTime => throw _privateConstructorUsedError;
+  @TimeOfDayConverter()
+  TimeOfDay get openingTime => throw _privateConstructorUsedError;
+  @TimeOfDayConverter()
+  TimeOfDay get closingTime => throw _privateConstructorUsedError;
 
   /// Serializes this Store to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -79,8 +81,8 @@ abstract class $StoreCopyWith<$Res> {
       String cardImage,
       bool bestOverall,
       int visits,
-      DateTime openingTime,
-      DateTime closingTime});
+      @TimeOfDayConverter() TimeOfDay openingTime,
+      @TimeOfDayConverter() TimeOfDay closingTime});
 
   $StoreLocationCopyWith<$Res> get location;
   $DeliveryCopyWith<$Res> get delivery;
@@ -209,11 +211,11 @@ class _$StoreCopyWithImpl<$Res, $Val extends Store>
       openingTime: null == openingTime
           ? _value.openingTime
           : openingTime // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as TimeOfDay,
       closingTime: null == closingTime
           ? _value.closingTime
           : closingTime // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as TimeOfDay,
     ) as $Val);
   }
 
@@ -276,8 +278,8 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
       String cardImage,
       bool bestOverall,
       int visits,
-      DateTime openingTime,
-      DateTime closingTime});
+      @TimeOfDayConverter() TimeOfDay openingTime,
+      @TimeOfDayConverter() TimeOfDay closingTime});
 
   @override
   $StoreLocationCopyWith<$Res> get location;
@@ -407,18 +409,18 @@ class __$$StoreImplCopyWithImpl<$Res>
       openingTime: null == openingTime
           ? _value.openingTime
           : openingTime // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as TimeOfDay,
       closingTime: null == closingTime
           ? _value.closingTime
           : closingTime // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as TimeOfDay,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
+class _$StoreImpl implements _Store {
   _$StoreImpl(
       {this.isUberOneShop = false,
       required this.location,
@@ -440,8 +442,8 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
       required this.cardImage,
       this.bestOverall = false,
       this.visits = 0,
-      required this.openingTime,
-      required this.closingTime})
+      @TimeOfDayConverter() required this.openingTime,
+      @TimeOfDayConverter() required this.closingTime})
       : _storeSchedules = storeSchedules,
         _featuredItems = featuredItems,
         _offers = offers,
@@ -536,42 +538,15 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
   @JsonKey()
   final int visits;
   @override
-  final DateTime openingTime;
+  @TimeOfDayConverter()
+  final TimeOfDay openingTime;
   @override
-  final DateTime closingTime;
+  @TimeOfDayConverter()
+  final TimeOfDay closingTime;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'Store(isUberOneShop: $isUberOneShop, location: $location, id: $id, storeSchedules: $storeSchedules, dietary: $dietary, featuredItems: $featuredItems, priceCategory: $priceCategory, groupSize: $groupSize, type: $type, offers: $offers, aisles: $aisles, name: $name, logo: $logo, doesPickup: $doesPickup, productCategories: $productCategories, delivery: $delivery, rating: $rating, cardImage: $cardImage, bestOverall: $bestOverall, visits: $visits, openingTime: $openingTime, closingTime: $closingTime)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'Store'))
-      ..add(DiagnosticsProperty('isUberOneShop', isUberOneShop))
-      ..add(DiagnosticsProperty('location', location))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('storeSchedules', storeSchedules))
-      ..add(DiagnosticsProperty('dietary', dietary))
-      ..add(DiagnosticsProperty('featuredItems', featuredItems))
-      ..add(DiagnosticsProperty('priceCategory', priceCategory))
-      ..add(DiagnosticsProperty('groupSize', groupSize))
-      ..add(DiagnosticsProperty('type', type))
-      ..add(DiagnosticsProperty('offers', offers))
-      ..add(DiagnosticsProperty('aisles', aisles))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('logo', logo))
-      ..add(DiagnosticsProperty('doesPickup', doesPickup))
-      ..add(DiagnosticsProperty('productCategories', productCategories))
-      ..add(DiagnosticsProperty('delivery', delivery))
-      ..add(DiagnosticsProperty('rating', rating))
-      ..add(DiagnosticsProperty('cardImage', cardImage))
-      ..add(DiagnosticsProperty('bestOverall', bestOverall))
-      ..add(DiagnosticsProperty('visits', visits))
-      ..add(DiagnosticsProperty('openingTime', openingTime))
-      ..add(DiagnosticsProperty('closingTime', closingTime));
   }
 
   @override
@@ -662,28 +637,29 @@ class _$StoreImpl with DiagnosticableTreeMixin implements _Store {
 
 abstract class _Store implements Store {
   factory _Store(
-      {final bool isUberOneShop,
-      required final StoreLocation location,
-      required final String id,
-      final List<StoreSchedule>? storeSchedules,
-      final String? dietary,
-      final List<Product>? featuredItems,
-      required final String priceCategory,
-      final int? groupSize,
-      required final String type,
-      final List<Object>? offers,
-      final List<Aisle>? aisles,
-      required final String name,
-      required final String logo,
-      required final bool doesPickup,
-      final List<ProductCategory>? productCategories,
-      required final Delivery delivery,
-      required final Rating rating,
-      required final String cardImage,
-      final bool bestOverall,
-      final int visits,
-      required final DateTime openingTime,
-      required final DateTime closingTime}) = _$StoreImpl;
+          {final bool isUberOneShop,
+          required final StoreLocation location,
+          required final String id,
+          final List<StoreSchedule>? storeSchedules,
+          final String? dietary,
+          final List<Product>? featuredItems,
+          required final String priceCategory,
+          final int? groupSize,
+          required final String type,
+          final List<Object>? offers,
+          final List<Aisle>? aisles,
+          required final String name,
+          required final String logo,
+          required final bool doesPickup,
+          final List<ProductCategory>? productCategories,
+          required final Delivery delivery,
+          required final Rating rating,
+          required final String cardImage,
+          final bool bestOverall,
+          final int visits,
+          @TimeOfDayConverter() required final TimeOfDay openingTime,
+          @TimeOfDayConverter() required final TimeOfDay closingTime}) =
+      _$StoreImpl;
 
   factory _Store.fromJson(Map<String, dynamic> json) = _$StoreImpl.fromJson;
 
@@ -728,9 +704,11 @@ abstract class _Store implements Store {
   @override
   int get visits;
   @override
-  DateTime get openingTime;
+  @TimeOfDayConverter()
+  TimeOfDay get openingTime;
   @override
-  DateTime get closingTime;
+  @TimeOfDayConverter()
+  TimeOfDay get closingTime;
 
   /// Create a copy of Store
   /// with the given fields replaced by the non-null parameter values.
@@ -857,9 +835,7 @@ class __$$ProductAndQuantityImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ProductAndQuantityImpl
-    with DiagnosticableTreeMixin
-    implements _ProductAndQuantity {
+class _$ProductAndQuantityImpl implements _ProductAndQuantity {
   _$ProductAndQuantityImpl(
       {this.name = '', this.id = '', required this.product, this.quantity});
 
@@ -878,19 +854,8 @@ class _$ProductAndQuantityImpl
   final int? quantity;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'ProductAndQuantity(name: $name, id: $id, product: $product, quantity: $quantity)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'ProductAndQuantity'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('product', product))
-      ..add(DiagnosticsProperty('quantity', quantity));
   }
 
   @override
@@ -1055,9 +1020,7 @@ class __$$StoreScheduleImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$StoreScheduleImpl
-    with DiagnosticableTreeMixin
-    implements _StoreSchedule {
+class _$StoreScheduleImpl implements _StoreSchedule {
   _$StoreScheduleImpl({required this.name, required this.duration});
 
   factory _$StoreScheduleImpl.fromJson(Map<String, dynamic> json) =>
@@ -1069,17 +1032,8 @@ class _$StoreScheduleImpl
   final String duration;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'StoreSchedule(name: $name, duration: $duration)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'StoreSchedule'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('duration', duration));
   }
 
   @override
@@ -1232,7 +1186,7 @@ class __$$AisleImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$AisleImpl with DiagnosticableTreeMixin implements _Aisle {
+class _$AisleImpl implements _Aisle {
   _$AisleImpl(
       {required this.name,
       required final List<ProductCategory> productCategories})
@@ -1253,17 +1207,8 @@ class _$AisleImpl with DiagnosticableTreeMixin implements _Aisle {
   }
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'Aisle(name: $name, productCategories: $productCategories)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'Aisle'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('productCategories', productCategories));
   }
 
   @override
@@ -1415,7 +1360,7 @@ class __$$RatingImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RatingImpl with DiagnosticableTreeMixin implements _Rating {
+class _$RatingImpl implements _Rating {
   _$RatingImpl({required this.averageRating, required this.ratings});
 
   factory _$RatingImpl.fromJson(Map<String, dynamic> json) =>
@@ -1427,17 +1372,8 @@ class _$RatingImpl with DiagnosticableTreeMixin implements _Rating {
   final int ratings;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'Rating(averageRating: $averageRating, ratings: $ratings)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'Rating'))
-      ..add(DiagnosticsProperty('averageRating', averageRating))
-      ..add(DiagnosticsProperty('ratings', ratings));
   }
 
   @override
@@ -1597,9 +1533,7 @@ class __$$StoreLocationImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$StoreLocationImpl
-    with DiagnosticableTreeMixin
-    implements _StoreLocation {
+class _$StoreLocationImpl implements _StoreLocation {
   _$StoreLocationImpl(
       {required this.countryOfOrigin,
       required this.streetAddress,
@@ -1617,18 +1551,8 @@ class _$StoreLocationImpl
   final Object latlng;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'StoreLocation(countryOfOrigin: $countryOfOrigin, streetAddress: $streetAddress, latlng: $latlng)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'StoreLocation'))
-      ..add(DiagnosticsProperty('countryOfOrigin', countryOfOrigin))
-      ..add(DiagnosticsProperty('streetAddress', streetAddress))
-      ..add(DiagnosticsProperty('latlng', latlng));
   }
 
   @override
@@ -1790,9 +1714,7 @@ class __$$ProductCategoryImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ProductCategoryImpl
-    with DiagnosticableTreeMixin
-    implements _ProductCategory {
+class _$ProductCategoryImpl implements _ProductCategory {
   _$ProductCategoryImpl(
       {required this.name,
       required final List<ProductAndQuantity> productsAndQuantities})
@@ -1813,18 +1735,8 @@ class _$ProductCategoryImpl
   }
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'ProductCategory(name: $name, productsAndQuantities: $productsAndQuantities)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'ProductCategory'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(
-          DiagnosticsProperty('productsAndQuantities', productsAndQuantities));
   }
 
   @override
@@ -1992,7 +1904,7 @@ class __$$DeliveryImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$DeliveryImpl with DiagnosticableTreeMixin implements _Delivery {
+class _$DeliveryImpl implements _Delivery {
   _$DeliveryImpl(
       {required this.canDeliver,
       required this.estimatedDeliveryTime,
@@ -2009,18 +1921,8 @@ class _$DeliveryImpl with DiagnosticableTreeMixin implements _Delivery {
   final double fee;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'Delivery(canDeliver: $canDeliver, estimatedDeliveryTime: $estimatedDeliveryTime, fee: $fee)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'Delivery'))
-      ..add(DiagnosticsProperty('canDeliver', canDeliver))
-      ..add(DiagnosticsProperty('estimatedDeliveryTime', estimatedDeliveryTime))
-      ..add(DiagnosticsProperty('fee', fee));
   }
 
   @override
@@ -2398,7 +2300,7 @@ class __$$ProductImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
+class _$ProductImpl implements _Product {
   _$ProductImpl(
       {required this.name,
       required this.id,
@@ -2521,35 +2423,8 @@ class _$ProductImpl with DiagnosticableTreeMixin implements _Product {
   }
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'Product(name: $name, id: $id, initialPrice: $initialPrice, promoPrice: $promoPrice, imageUrls: $imageUrls, frequentlyBoughtTogether: $frequentlyBoughtTogether, nutritionFacts: $nutritionFacts, ingredients: $ingredients, directions: $directions, quantity: $quantity, description: $description, optionalOptions: $optionalOptions, requiredOptions: $requiredOptions, calories: $calories, isSoldOut: $isSoldOut, isSponsored: $isSponsored, offer: $offer, stores: $stores, similarProducts: $similarProducts)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'Product'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('initialPrice', initialPrice))
-      ..add(DiagnosticsProperty('promoPrice', promoPrice))
-      ..add(DiagnosticsProperty('imageUrls', imageUrls))
-      ..add(DiagnosticsProperty(
-          'frequentlyBoughtTogether', frequentlyBoughtTogether))
-      ..add(DiagnosticsProperty('nutritionFacts', nutritionFacts))
-      ..add(DiagnosticsProperty('ingredients', ingredients))
-      ..add(DiagnosticsProperty('directions', directions))
-      ..add(DiagnosticsProperty('quantity', quantity))
-      ..add(DiagnosticsProperty('description', description))
-      ..add(DiagnosticsProperty('optionalOptions', optionalOptions))
-      ..add(DiagnosticsProperty('requiredOptions', requiredOptions))
-      ..add(DiagnosticsProperty('calories', calories))
-      ..add(DiagnosticsProperty('isSoldOut', isSoldOut))
-      ..add(DiagnosticsProperty('isSponsored', isSponsored))
-      ..add(DiagnosticsProperty('offer', offer))
-      ..add(DiagnosticsProperty('stores', stores))
-      ..add(DiagnosticsProperty('similarProducts', similarProducts));
   }
 
   @override
@@ -2833,7 +2708,7 @@ class __$$OptionImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
+class _$OptionImpl implements _Option {
   _$OptionImpl(
       {required this.name,
       this.canBeMultipleLimit,
@@ -2861,19 +2736,8 @@ class _$OptionImpl with DiagnosticableTreeMixin implements _Option {
   }
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'Option(name: $name, canBeMultipleLimit: $canBeMultipleLimit, isExclusive: $isExclusive, subOptions: $subOptions)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'Option'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('canBeMultipleLimit', canBeMultipleLimit))
-      ..add(DiagnosticsProperty('isExclusive', isExclusive))
-      ..add(DiagnosticsProperty('subOptions', subOptions));
   }
 
   @override
@@ -3093,7 +2957,7 @@ class __$$SubOptionImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
+class _$SubOptionImpl implements _SubOption {
   _$SubOptionImpl(
       {required this.name,
       this.canBeMultiple = false,
@@ -3128,21 +2992,8 @@ class _$SubOptionImpl with DiagnosticableTreeMixin implements _SubOption {
   }
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'SubOption(name: $name, canBeMultiple: $canBeMultiple, isExclusive: $isExclusive, calories: $calories, price: $price, options: $options)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'SubOption'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('canBeMultiple', canBeMultiple))
-      ..add(DiagnosticsProperty('isExclusive', isExclusive))
-      ..add(DiagnosticsProperty('calories', calories))
-      ..add(DiagnosticsProperty('price', price))
-      ..add(DiagnosticsProperty('options', options));
   }
 
   @override
@@ -3316,7 +3167,7 @@ class __$$FoodCategoryImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$FoodCategoryImpl with DiagnosticableTreeMixin implements _FoodCategory {
+class _$FoodCategoryImpl implements _FoodCategory {
   _$FoodCategoryImpl(this.name, this.image);
 
   factory _$FoodCategoryImpl.fromJson(Map<String, dynamic> json) =>
@@ -3328,17 +3179,8 @@ class _$FoodCategoryImpl with DiagnosticableTreeMixin implements _FoodCategory {
   final String image;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'FoodCategory(name: $name, image: $image)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'FoodCategory'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('image', image));
   }
 
   @override

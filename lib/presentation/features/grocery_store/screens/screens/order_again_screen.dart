@@ -49,10 +49,28 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
         ),
       ),
       body: FutureBuilder<List<IndividualOrder>>(
-        future: _getOrders(),
+        future: _getOrdersFromStore(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final orders = snapshot.data!;
+            if (orders.isEmpty) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSizes.horizontalPaddingSmall),
+                    child: Center(
+                        child: AppText(
+                            size: AppSizes.bodySmall,
+                            textAlign: TextAlign.center,
+                            // weight: FontWeight.bold,
+                            text:
+                                'You have not made any orders from ${widget.store.name} yet')),
+                  )
+                ],
+              );
+            }
             return ListView.separated(
               separatorBuilder: (context, index) => const Gap(20),
               itemCount: orders.length,
@@ -142,11 +160,12 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
     );
   }
 
-  Future<List<IndividualOrder>> _getOrders() async {
+  Future<List<IndividualOrder>> _getOrdersFromStore() async {
     final List<IndividualOrder> individualOrders = [];
     final querySnapshot = await FirebaseFirestore.instance
         .collection(FirestoreCollections.individualOrders)
         .where('userUid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .where('storeId', isEqualTo: widget.store.id)
         .get();
     for (var doc in querySnapshot.docs) {
       individualOrders.add(IndividualOrder.fromJson(doc.data()));

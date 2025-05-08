@@ -20,6 +20,7 @@ class GroceryGroceryScreen extends StatefulWidget {
 class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
   @override
   Widget build(BuildContext context) {
+    final timeOfDayNow = TimeOfDay.now();
     return Scaffold(
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -40,11 +41,11 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
             itemCount: widget.stores.length,
             itemBuilder: (context, index) {
               final groceryStore = widget.stores[index];
-              final dateTimeNow = DateTime.now();
+
               final bool isClosed =
-                  dateTimeNow.isBefore(groceryStore.openingTime) ||
-                      dateTimeNow.isAfter(groceryStore.closingTime);
-              ;
+                  timeOfDayNow.isBefore(groceryStore.openingTime) ||
+                      timeOfDayNow.isAfter(groceryStore.closingTime);
+
               return ListTile(
                   onTap: () async {
                     await AppFunctions.navigateToStoreScreen(groceryStore);
@@ -88,10 +89,10 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                           AppText(
                               text: isClosed
                                   ? groceryStore.openingTime.hour -
-                                              dateTimeNow.hour >
+                                              timeOfDayNow.hour >
                                           1
                                       ? 'Available at ${AppFunctions.formatDate(groceryStore.openingTime.toString(), format: 'h:i A')}'
-                                      : 'Available in ${groceryStore.openingTime.hour - dateTimeNow.hour == 1 ? '1 hr' : '${groceryStore.openingTime.minute - dateTimeNow.minute} mins'}'
+                                      : 'Available in ${groceryStore.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${groceryStore.openingTime.minute - timeOfDayNow.minute} mins'}'
                                   : '\$${groceryStore.delivery.fee} Delivery Fee',
                               color: groceryStore.delivery.fee < 1
                                   ? const Color.fromARGB(255, 163, 133, 42)

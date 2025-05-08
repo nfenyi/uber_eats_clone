@@ -179,7 +179,7 @@ class _SubOptionSelectionScreenState extends State<SubOptionSelectionScreen> {
                                                     //   ),
                                                     // )),
                                                     title: AppText(
-                                                      text: 'Edit selections',
+                                                      text: 'Choose selections',
                                                       weight: FontWeight.bold,
                                                     ),
                                                     trailing: Icon(

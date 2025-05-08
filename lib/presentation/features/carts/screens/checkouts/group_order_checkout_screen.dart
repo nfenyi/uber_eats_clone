@@ -94,9 +94,9 @@ class _GroupOrderCheckoutScreenState
     _phoneNumber = FirebaseAuth.instance.currentUser!.phoneNumber;
     _cartItem = Hive.box<HiveCartItem>(AppBoxes.carts).get(widget.store.id)!;
     _redeemedPromosCount = userInfo['redeemedPromos'].length;
-    final dateTimeNow = DateTime.now();
-    _isClosed = dateTimeNow.isBefore(widget.store.openingTime) ||
-        dateTimeNow.isAfter(widget.store.closingTime);
+    final timeOfDayNow = TimeOfDay.now();
+    _isClosed = timeOfDayNow.isBefore(widget.store.openingTime) ||
+        timeOfDayNow.isAfter(widget.store.closingTime);
     const distance = lt.Distance(roundResult: true);
     final storeLocation = widget.store.location.latlng as GeoPoint;
     final distanceBetweenShopAndSetLocationResult = distance.as(

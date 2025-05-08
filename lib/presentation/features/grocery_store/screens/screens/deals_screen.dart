@@ -142,7 +142,8 @@ class _DealsScreenState extends State<DealsScreen> {
                     child: Center(
                         child: AppText(
                             size: AppSizes.bodySmall,
-                            weight: FontWeight.bold,
+                            textAlign: TextAlign.center,
+                            // weight: FontWeight.bold,
                             text:
                                 'No deals from ${widget.groceryStore.name} yet')),
                   )

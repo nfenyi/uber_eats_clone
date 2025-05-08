@@ -506,7 +506,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                       }
                                                     },
                                                     title: const AppText(
-                                                      text: 'Edit selections',
+                                                      text: 'Choose selections',
                                                       weight: FontWeight.bold,
                                                     ),
                                                     trailing: const Icon(
@@ -942,7 +942,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                             title:
                                                                 const AppText(
                                                               text:
-                                                                  'Edit selections',
+                                                                  'Choose selections',
                                                               weight: FontWeight
                                                                   .bold,
                                                             ),
@@ -995,7 +995,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
                                                   }
                                                 },
                                                 title: const AppText(
-                                                  text: 'Edit selections',
+                                                  text: 'Choose selections',
                                                   weight: FontWeight.bold,
                                                 ),
                                                 trailing: const Icon(
