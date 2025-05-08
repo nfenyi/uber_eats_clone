@@ -47,7 +47,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
   late final GeoPoint _storeLatLng;
 
   late lt.Distance _distance;
-  int? _retrievalFilter = 0;
+  late int? _retrievalFilter;
   late bool _isFavorite;
   late final HiveGeoPoint _selectedGeoPoint;
 
@@ -120,6 +120,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
     ));
 
     _store = widget.store;
+    _retrievalFilter = _store.delivery.canDeliver ? 0 : 1;
     _storeLatLng = _store.location.latlng as GeoPoint;
     if (_store.productCategories != null) {
       _categoryKeys = _store.productCategories!

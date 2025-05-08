@@ -2544,7 +2544,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                                       crossAxisAlignment: CrossAxisAlignment.center,
                                                                                                       children: [
                                                                                                         AppText(
-                                                                                                          text: 'Pick up',
+                                                                                                          text: 'Pick up only',
                                                                                                           color: Colors.white,
                                                                                                         ),
                                                                                                       ],
@@ -2747,7 +2747,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                                                     children: [
                                                                                       AppText(
-                                                                                        text: 'Pick up',
+                                                                                        text: 'Pick up only',
                                                                                         color: Colors.white,
                                                                                       ),
                                                                                     ],
@@ -3041,7 +3041,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                                                     children: [
                                                                                       AppText(
-                                                                                        text: 'Pick up',
+                                                                                        text: 'Pick up only',
                                                                                         color: Colors.white,
                                                                                       ),
                                                                                     ],
@@ -3226,7 +3226,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                                                     children: [
                                                                                       AppText(
-                                                                                        text: 'Pick up',
+                                                                                        text: 'Pick up only',
                                                                                         color: Colors.white,
                                                                                       ),
                                                                                     ],
@@ -3439,94 +3439,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                           timeOfDayNow.isAfter(
                                                               store
                                                                   .closingTime);
-                                                      return Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12),
-                                                            child: Stack(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topRight,
-                                                              children: [
-                                                                Stack(
+                                                      return InkWell(
+                                                        onTap: () async =>
+                                                            AppFunctions
+                                                                .navigateToStoreScreen(
+                                                                    store),
+                                                        child: Ink(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12),
+                                                                child: Stack(
                                                                   alignment:
                                                                       Alignment
-                                                                          .topLeft,
+                                                                          .topRight,
                                                                   children: [
-                                                                    AppFunctions
-                                                                        .displayNetworkImage(
-                                                                      store
-                                                                          .cardImage,
-                                                                      width: double
-                                                                          .infinity,
-                                                                      height:
-                                                                          170,
-                                                                      fit: BoxFit
-                                                                          .fill,
-                                                                    ),
-                                                                    if (store.offers !=
-                                                                            null &&
-                                                                        store
-                                                                            .offers!
-                                                                            .isNotEmpty)
-                                                                      Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              left:
-                                                                                  8.0,
-                                                                              top:
-                                                                                  8.0),
-                                                                          child:
-                                                                              Container(
-                                                                            decoration:
-                                                                                BoxDecoration(
-                                                                              borderRadius: BorderRadius.circular(5),
-                                                                              color: Colors.green.shade900,
-                                                                            ),
-                                                                            padding:
-                                                                                const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                                                            child:
-                                                                                Row(
-                                                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                                                              mainAxisSize: MainAxisSize.min,
-                                                                              children: [
-                                                                                StoreOffersText(store)
-                                                                              ],
-                                                                            ),
-                                                                          ))
-                                                                  ],
-                                                                ),
-                                                                isClosed
-                                                                    ? Container(
-                                                                        color: Colors
-                                                                            .black
-                                                                            .withOpacity(0.5),
-                                                                        width: double
-                                                                            .infinity,
-                                                                        height:
-                                                                            170,
-                                                                        child:
-                                                                            const Column(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.center,
-                                                                          children: [
-                                                                            AppText(
-                                                                              text: 'Closed',
-                                                                              color: Colors.white,
-                                                                            ),
-                                                                          ],
+                                                                    Stack(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .topLeft,
+                                                                      children: [
+                                                                        AppFunctions
+                                                                            .displayNetworkImage(
+                                                                          store
+                                                                              .cardImage,
+                                                                          width:
+                                                                              double.infinity,
+                                                                          height:
+                                                                              170,
+                                                                          fit: BoxFit
+                                                                              .fill,
                                                                         ),
-                                                                      )
-                                                                    : !store.delivery
-                                                                            .canDeliver
+                                                                        if (store.offers !=
+                                                                                null &&
+                                                                            store.offers!.isNotEmpty)
+                                                                          Padding(
+                                                                              padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                                                                              child: Container(
+                                                                                decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(5),
+                                                                                  color: Colors.green.shade900,
+                                                                                ),
+                                                                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                                                                child: Row(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                  mainAxisSize: MainAxisSize.min,
+                                                                                  children: [
+                                                                                    StoreOffersText(store)
+                                                                                  ],
+                                                                                ),
+                                                                              ))
+                                                                      ],
+                                                                    ),
+                                                                    isClosed
                                                                         ? Container(
                                                                             color:
                                                                                 Colors.black.withOpacity(0.5),
@@ -3540,97 +3511,114 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                               crossAxisAlignment: CrossAxisAlignment.center,
                                                                               children: [
                                                                                 AppText(
-                                                                                  text: 'Pick up',
+                                                                                  text: 'Closed',
                                                                                   color: Colors.white,
                                                                                 ),
                                                                               ],
                                                                             ),
                                                                           )
-                                                                        : const SizedBox
-                                                                            .shrink(),
-                                                                Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            8.0,
-                                                                        top:
-                                                                            8.0),
-                                                                    child: FavouriteButton(
-                                                                        store:
-                                                                            store))
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          const Gap(5),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              AppText(
-                                                                text:
-                                                                    store.name,
-                                                                weight:
-                                                                    FontWeight
-                                                                        .w600,
+                                                                        : !store.delivery.canDeliver
+                                                                            ? Container(
+                                                                                color: Colors.black.withOpacity(0.5),
+                                                                                width: double.infinity,
+                                                                                height: 170,
+                                                                                child: const Column(
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                  children: [
+                                                                                    AppText(
+                                                                                      text: 'Pick up only',
+                                                                                      color: Colors.white,
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              )
+                                                                            : const SizedBox.shrink(),
+                                                                    Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            right:
+                                                                                8.0,
+                                                                            top:
+                                                                                8.0),
+                                                                        child: FavouriteButton(
+                                                                            store:
+                                                                                store))
+                                                                  ],
+                                                                ),
                                                               ),
-                                                              Container(
-                                                                  decoration: BoxDecoration(
-                                                                      color: AppColors
-                                                                          .neutral200,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
+                                                              const Gap(5),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  AppText(
+                                                                    text: store
+                                                                        .name,
+                                                                    weight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                  ),
+                                                                  Container(
+                                                                      decoration: BoxDecoration(
+                                                                          color: AppColors
+                                                                              .neutral200,
+                                                                          borderRadius: BorderRadius.circular(
                                                                               20)),
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          5,
-                                                                      vertical:
-                                                                          2),
-                                                                  child: AppText(
-                                                                      text: store
-                                                                          .rating
-                                                                          .averageRating
-                                                                          .toString()))
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          horizontal:
+                                                                              5,
+                                                                          vertical:
+                                                                              2),
+                                                                      child: AppText(
+                                                                          text: store
+                                                                              .rating
+                                                                              .averageRating
+                                                                              .toString()))
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  Visibility(
+                                                                      visible: store
+                                                                          .isUberOneShop,
+                                                                      child: Image
+                                                                          .asset(
+                                                                        AssetNames
+                                                                            .uberOneSmall,
+                                                                        height:
+                                                                            10,
+                                                                        color: AppColors
+                                                                            .uberOneGold,
+                                                                      )),
+                                                                  AppText(
+                                                                    text: isClosed
+                                                                        ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                                                        : '\$${store.delivery.fee} Delivery Fee',
+                                                                    color: store
+                                                                            .isUberOneShop
+                                                                        ? const Color
+                                                                            .fromARGB(
+                                                                            255,
+                                                                            163,
+                                                                            133,
+                                                                            42)
+                                                                        : AppColors
+                                                                            .neutral500,
+                                                                  ),
+                                                                  AppText(
+                                                                    text:
+                                                                        ' • ${store.delivery.estimatedDeliveryTime} min',
+                                                                    color: AppColors
+                                                                        .neutral500,
+                                                                  ),
+                                                                ],
+                                                              )
                                                             ],
                                                           ),
-                                                          Row(
-                                                            children: [
-                                                              Visibility(
-                                                                  visible: store
-                                                                      .isUberOneShop,
-                                                                  child: Image
-                                                                      .asset(
-                                                                    AssetNames
-                                                                        .uberOneSmall,
-                                                                    height: 10,
-                                                                    color: AppColors
-                                                                        .uberOneGold,
-                                                                  )),
-                                                              AppText(
-                                                                text: isClosed
-                                                                    ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
-                                                                    : '\$${store.delivery.fee} Delivery Fee',
-                                                                color: store
-                                                                        .isUberOneShop
-                                                                    ? const Color
-                                                                        .fromARGB(
-                                                                        255,
-                                                                        163,
-                                                                        133,
-                                                                        42)
-                                                                    : AppColors
-                                                                        .neutral500,
-                                                              ),
-                                                              AppText(
-                                                                text:
-                                                                    ' • ${store.delivery.estimatedDeliveryTime} min',
-                                                                color: AppColors
-                                                                    .neutral500,
-                                                              ),
-                                                            ],
-                                                          )
-                                                        ],
+                                                        ),
                                                       );
                                                     },
                                                     separatorBuilder:
@@ -4570,7 +4558,7 @@ class AllStoresResultDisplay extends StatelessWidget {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               AppText(
-                                                text: 'Pick up',
+                                                text: 'Pick up only',
                                                 color: Colors.white,
                                               ),
                                             ],
