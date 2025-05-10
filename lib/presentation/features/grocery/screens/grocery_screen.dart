@@ -264,33 +264,54 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                             AssetNames.mapMarker3,
                           );
                           final storeMarkerIcons = <BitmapDescriptor>[];
+                          final selectedMarkerIcons = <BitmapDescriptor>[];
                           for (var store in allStores) {
-                            storeMarkerIcons.add(await Transform.flip(
-                                flipY: true,
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
+                            storeMarkerIcons.add(await Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: store.rating.averageRating >= 4
+                                  ? AppText(
+                                      text: store.rating.averageRating
+                                          .toStringAsFixed(1),
+                                      color: Colors.black,
+                                      weight: FontWeight.bold,
+                                    )
+                                  : Image.asset(
+                                      width: 25,
+                                      store.type
+                                              .toLowerCase()
+                                              .contains('grocery')
+                                          ? AssetNames.groceryMarker
+                                          : AssetNames.restaurantMarker),
+                            ).toBitmapDescriptor());
+                            selectedMarkerIcons.add(await Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: store.rating.averageRating >= 4
+                                  ? AppText(
+                                      text: store.rating.averageRating
+                                          .toStringAsFixed(1),
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(50)),
-                                  child: store.rating.averageRating >= 4
-                                      ? AppText(
-                                          text: store.rating.averageRating
-                                              .toStringAsFixed(1),
-                                          color: Colors.black,
-                                          weight: FontWeight.bold,
-                                        )
-                                      : Image.asset(
-                                          width: 25,
-                                          store.type
-                                                  .toLowerCase()
-                                                  .contains('grocery')
-                                              ? AssetNames.groceryMarker
-                                              : AssetNames.restaurantMarker),
-                                )).toBitmapDescriptor());
+                                      weight: FontWeight.bold,
+                                    )
+                                  : Image.asset(
+                                      width: 25,
+                                      store.type
+                                              .toLowerCase()
+                                              .contains('grocery')
+                                          ? AssetNames.selectedGroceryIcon
+                                          : AssetNames
+                                              .selectedRestaurantMarker),
+                            ).toBitmapDescriptor());
                           }
                           await navigatorKey.currentState!
                               .push(MaterialPageRoute(
                             builder: (context) => MapScreen(
+                              selectedMarkerIcons: selectedMarkerIcons,
                               storeMarkerIcons: storeMarkerIcons,
                               markerIcon: bitmapDescriptor,
                               userLocation: GeoPoint(selectedGeoPoint.latitude,

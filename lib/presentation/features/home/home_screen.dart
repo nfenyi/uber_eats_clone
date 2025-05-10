@@ -2411,21 +2411,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                           );
                                                                           final storeMarkerIcons =
                                                                               <BitmapDescriptor>[];
+                                                                          final selectedMarkerIcons =
+                                                                              <BitmapDescriptor>[];
                                                                           for (var store
                                                                               in filteredStores) {
-                                                                            storeMarkerIcons.add(await Transform.flip(
-                                                                                flipY: true,
-                                                                                child: Container(
-                                                                                  padding: const EdgeInsets.all(10),
-                                                                                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(50)),
-                                                                                  child: store.rating.averageRating >= 4
-                                                                                      ? AppText(
-                                                                                          text: store.rating.averageRating.toStringAsFixed(1),
-                                                                                          color: Colors.black,
-                                                                                          weight: FontWeight.bold,
-                                                                                        )
-                                                                                      : Image.asset(width: 25, (store.type.toLowerCase().contains('grocery') || store.type.toLowerCase().contains('pharmacy')) ? AssetNames.groceryMarker : AssetNames.restaurantMarker),
-                                                                                )).toBitmapDescriptor());
+                                                                            storeMarkerIcons.add(await Container(
+                                                                              padding: const EdgeInsets.all(10),
+                                                                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(50)),
+                                                                              child: store.rating.averageRating >= 4
+                                                                                  ? AppText(
+                                                                                      text: store.rating.averageRating.toStringAsFixed(1),
+                                                                                      color: Colors.black,
+                                                                                      weight: FontWeight.bold,
+                                                                                    )
+                                                                                  : Image.asset(width: 25, (store.type.toLowerCase().contains('grocery') || store.type.toLowerCase().contains('pharmacy')) ? AssetNames.groceryMarker : AssetNames.restaurantMarker),
+                                                                            ).toBitmapDescriptor());
+                                                                            selectedMarkerIcons.add(await Container(
+                                                                              padding: const EdgeInsets.all(10),
+                                                                              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(50)),
+                                                                              child: store.rating.averageRating >= 4
+                                                                                  ? AppText(
+                                                                                      text: store.rating.averageRating.toStringAsFixed(1),
+                                                                                      color: Colors.white,
+                                                                                      weight: FontWeight.bold,
+                                                                                    )
+                                                                                  : Image.asset(width: 25, (store.type.toLowerCase().contains('grocery') || store.type.toLowerCase().contains('pharmacy')) ? AssetNames.selectedGroceryIcon : AssetNames.selectedRestaurantMarker),
+                                                                            ).toBitmapDescriptor());
                                                                           }
 
                                                                           await navigatorKey
@@ -2433,6 +2444,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                               .push(MaterialPageRoute(
                                                                             builder: (context) =>
                                                                                 MapScreen(
+                                                                              selectedMarkerIcons: selectedMarkerIcons,
                                                                               storeMarkerIcons: storeMarkerIcons,
                                                                               markerIcon: bitmapDescriptor,
                                                                               userLocation: GeoPoint(userSelectedGeoPoint.latitude, userSelectedGeoPoint.longitude),

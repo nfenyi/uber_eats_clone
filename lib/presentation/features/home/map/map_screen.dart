@@ -30,6 +30,7 @@ class MapScreen extends StatefulWidget {
   final List<Store> filteredStores;
   final List<String> selectedFilters;
   final List<BitmapDescriptor> storeMarkerIcons;
+  final List<BitmapDescriptor> selectedMarkerIcons;
   final int? selectedDeliveryFeeIndex;
   final int? selectedRatingIndex;
   final String? selectedPriceCategory;
@@ -40,6 +41,7 @@ class MapScreen extends StatefulWidget {
       {super.key,
       required this.filteredStores,
       required this.storeMarkerIcons,
+      required this.selectedMarkerIcons,
       required this.userLocation,
       required this.markerIcon,
       this.selectedFilters = const [],
@@ -63,6 +65,7 @@ class _MapScreenState extends State<MapScreen> {
   late lt.Distance _distance;
   List<Store> _filteredStores = [];
   late final Set<Marker> _markers = {};
+  late final Set<Marker> _selectedMarkers = {};
 
   final _carouselController = CarouselSliderController();
 
@@ -71,6 +74,7 @@ class _MapScreenState extends State<MapScreen> {
   late List<String> _filters = [];
 
   late String _storeInFocus;
+  // late final fm.MapController _mapController2;
 
   @override
   void initState() {
@@ -80,7 +84,8 @@ class _MapScreenState extends State<MapScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarColor: Colors.transparent,
     ));
-
+    // _mapController2 = fm.MapController();
+    // _mapController2.
     _selectedPriceCategory = widget.selectedPriceCategory;
 
     _selectedDeliveryFeeIndex = widget.selectedDeliveryFeeIndex;
@@ -131,6 +136,26 @@ class _MapScreenState extends State<MapScreen> {
             markerId: MarkerId(_filteredStores[i].name),
             position: LatLng(storeLatlng.latitude, storeLatlng.longitude)),
       );
+      _selectedMarkers.add(
+        Marker(
+            // onTap: () async {
+            //   final controller = await _mapController.future;
+
+            //   await controller.moveCamera(CameraUpdate.newCameraPosition(
+            //       CameraPosition(
+            //           target:
+            //               LatLng(storeLatlng.latitude, storeLatlng.longitude),
+            //           zoom: 15)));
+            //   await _carouselController.animateToPage(i);
+            //   // setState(() {
+            //   _storeInFocus = _filteredStores[i].name;
+            //   // });
+            //   // _carouselController.jumpTo(e.)
+            // },
+            icon: widget.selectedMarkerIcons[i],
+            markerId: MarkerId(_filteredStores[i].name),
+            position: LatLng(storeLatlng.latitude, storeLatlng.longitude)),
+      );
     }
   }
 
@@ -146,63 +171,13 @@ class _MapScreenState extends State<MapScreen> {
               buildingsEnabled: false,
               markers: _markers.map(
                 (e) {
-                  //                 logger.d(e.markerId.value == _storeInFocus);
-                  //                 if (e.markerId.value == _storeInFocus) {
-                  //                   final store = _storesToFilter.firstWhere((element) => element.name == e.markerId.value,);
-                  //                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                  // final selectedMarker =  await Transform.flip(
-                  //                                             flipY: true,
-                  //                                             child: Container(
-                  //                                               padding:
-                  //                                                   const EdgeInsets.all(10),
-                  //                                               decoration: BoxDecoration(
-                  //                                                   color: AppColors.neutral300,
-                  //                                                   borderRadius:
-                  //                                                       BorderRadius.circular(
-                  //                                                           50)),
-                  //                                               child:
-                  //                                                          store .rating
-                  //                                                           .averageRating >=
-                  //                                                       4
-                  //                                                   ? AppText(
-                  //                                                       text: store
-                  //                                                           .rating
-                  //                                                           .averageRating
-                  //                                                           .toStringAsFixed(1),
-                  //                                                       color: Colors.black,
-                  //                                                       weight: FontWeight.bold,
-                  //                                                     )
-                  //                                                   : Image.asset(
-                  //                                                       width: 25,
-                  //                                                       store
-                  //                                                               .type
-                  //                                                               .toLowerCase()
-                  //                                                               .contains(
-                  //                                                                   'grocery')
-                  //                                                           ? AssetNames
-                  //                                                               .groceryMarker
-                  //                                                           : AssetNames
-                  //                                                               .restaurantMarker),
-                  //                                             )).toBitmapDescriptor();
-
-                  //   });
-
-                  //                   return Marker(
-                  //                       icon: selectedMarker,  onTap: () async {
-                  //                         final controller = await _mapController.future;
-
-                  //                         await controller.moveCamera(
-                  //                             CameraUpdate.newCameraPosition(CameraPosition(
-                  //                                 target: LatLng(storeLatlng.latitude,
-                  //                                     storeLatlng.longitude),
-                  //                                 zoom: 15)));
-                  //                       },
-                  //                       markerId: MarkerId(_storeInFocus),
-                  //                       position: LatLng(
-                  //                           storeLatlng.latitude, storeLatlng.longitude));
-                  //                 } else {
-                  return e;
-                  // }
+                  if (e.markerId.value == _storeInFocus) {
+                    return _selectedMarkers.firstWhere(
+                      (element) => element.mapsId.value == e.mapsId.value,
+                    );
+                  } else {
+                    return e;
+                  }
                 },
               ).toSet(),
               zoomControlsEnabled: false,
@@ -211,10 +186,18 @@ class _MapScreenState extends State<MapScreen> {
               onMapCreated: (controller) {
                 _mapController.complete(controller);
               },
-              initialCameraPosition: CameraPosition(
-                  target: LatLng(widget.userLocation.latitude,
-                      widget.userLocation.longitude),
-                  zoom: 15),
+              initialCameraPosition: _filteredStores.isNotEmpty
+                  ? CameraPosition(
+                      target: LatLng(
+                          (_filteredStores.first.location.latlng as GeoPoint)
+                              .latitude,
+                          (_filteredStores.first.location.latlng as GeoPoint)
+                              .longitude),
+                      zoom: 15)
+                  : CameraPosition(
+                      target: LatLng(widget.userLocation.latitude,
+                          widget.userLocation.latitude),
+                      zoom: 15),
             );
           }),
           SafeArea(
@@ -256,6 +239,7 @@ class _MapScreenState extends State<MapScreen> {
                                     )
                                     .toList();
                                 _markers.clear();
+                                _selectedMarkers.clear();
                                 for (var i = 0;
                                     i < _storesToFilter.length;
                                     i++) {
@@ -284,44 +268,102 @@ class _MapScreenState extends State<MapScreen> {
                                           // });
                                           // _carouselController.jumpTo(e.)
                                         },
-                                        icon: await Transform.flip(
-                                            flipY: true,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
+                                        icon: await Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(50)),
+                                          child: _storesToFilter[i]
+                                                      .rating
+                                                      .averageRating >=
+                                                  4
+                                              ? AppText(
+                                                  text: _storesToFilter[i]
+                                                      .rating
+                                                      .averageRating
+                                                      .toStringAsFixed(1),
+                                                  color: Colors.black,
+                                                  weight: FontWeight.bold,
+                                                )
+                                              : Image.asset(
+                                                  width: 25,
+                                                  (_storesToFilter[i]
+                                                              .type
+                                                              .toLowerCase()
+                                                              .contains(
+                                                                  'grocery') ||
+                                                          _storesToFilter[i]
+                                                              .type
+                                                              .toLowerCase()
+                                                              .contains(
+                                                                  'pharmacy'))
+                                                      ? AssetNames.groceryMarker
+                                                      : AssetNames
+                                                          .restaurantMarker),
+                                        ).toBitmapDescriptor(),
+                                        markerId:
+                                            MarkerId(_storesToFilter[i].name),
+                                        position: LatLng(storeLatlng.latitude,
+                                            storeLatlng.longitude)),
+                                  );
+                                  _selectedMarkers.add(
+                                    Marker(
+                                        // onTap: () async {
+                                        //   final controller =
+                                        //       await _mapController.future;
+
+                                        //   await controller.moveCamera(
+                                        //       CameraUpdate.newCameraPosition(
+                                        //           CameraPosition(
+                                        //               target: LatLng(
+                                        //                   storeLatlng.latitude,
+                                        //                   storeLatlng
+                                        //                       .longitude),
+                                        //               zoom: 15)));
+                                        //   await _carouselController
+                                        //       .animateToPage(i);
+                                        //   // setState(() {
+                                        //   _storeInFocus =
+                                        //       _storesToFilter[i].name;
+                                        //   // });
+                                        //   // _carouselController.jumpTo(e.)
+                                        // },
+                                        icon: await Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              color: Colors.black,
+                                              borderRadius:
+                                                  BorderRadius.circular(50)),
+                                          child: _storesToFilter[i]
+                                                      .rating
+                                                      .averageRating >=
+                                                  4
+                                              ? AppText(
+                                                  text: _storesToFilter[i]
+                                                      .rating
+                                                      .averageRating
+                                                      .toStringAsFixed(1),
                                                   color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50)),
-                                              child: _storesToFilter[i]
-                                                          .rating
-                                                          .averageRating >=
-                                                      4
-                                                  ? AppText(
-                                                      text: _storesToFilter[i]
-                                                          .rating
-                                                          .averageRating
-                                                          .toStringAsFixed(1),
-                                                      color: Colors.black,
-                                                      weight: FontWeight.bold,
-                                                    )
-                                                  : Image.asset(
-                                                      width: 25,
-                                                      (_storesToFilter[i]
-                                                                  .type
-                                                                  .toLowerCase()
-                                                                  .contains(
-                                                                      'grocery') ||
-                                                              _storesToFilter[i]
-                                                                  .type
-                                                                  .toLowerCase()
-                                                                  .contains(
-                                                                      'pharmacy'))
-                                                          ? AssetNames
-                                                              .groceryMarker
-                                                          : AssetNames
-                                                              .restaurantMarker),
-                                            )).toBitmapDescriptor(),
+                                                  weight: FontWeight.bold,
+                                                )
+                                              : Image.asset(
+                                                  width: 25,
+                                                  (_storesToFilter[i]
+                                                              .type
+                                                              .toLowerCase()
+                                                              .contains(
+                                                                  'grocery') ||
+                                                          _storesToFilter[i]
+                                                              .type
+                                                              .toLowerCase()
+                                                              .contains(
+                                                                  'pharmacy'))
+                                                      ? AssetNames
+                                                          .selectedGroceryIcon
+                                                      : AssetNames
+                                                          .selectedRestaurantMarker),
+                                        ).toBitmapDescriptor(),
                                         markerId:
                                             MarkerId(_storesToFilter[i].name),
                                         position: LatLng(storeLatlng.latitude,
@@ -952,24 +994,20 @@ class _MapScreenState extends State<MapScreen> {
 
                       return InkWell(
                         onTap: () async {
-                          if (_storeInFocus == store.name) {
-                            await AppFunctions.navigateToStoreScreen(store);
-                          } else {
-                            final controller = await _mapController.future;
-                            final storelatLng = _filteredStores[index]
-                                .location
-                                .latlng as GeoPoint;
+                          final controller = await _mapController.future;
+                          final storelatLng = _filteredStores[index]
+                              .location
+                              .latlng as GeoPoint;
 
-                            await controller.moveCamera(
-                                CameraUpdate.newCameraPosition(CameraPosition(
-                                    target: LatLng(storelatLng.latitude,
-                                        storelatLng.longitude),
-                                    zoom: 15)));
-                            await _carouselController.animateToPage(index);
-                            setState(() {
-                              _storeInFocus = _filteredStores[index].name;
-                            });
-                          }
+                          await controller.moveCamera(
+                              CameraUpdate.newCameraPosition(CameraPosition(
+                                  target: LatLng(storelatLng.latitude,
+                                      storelatLng.longitude),
+                                  zoom: 15)));
+                          await _carouselController.animateToPage(index);
+                          setState(() {
+                            _storeInFocus = _filteredStores[index].name;
+                          });
                         },
                         child: Ink(
                           child: Card(
@@ -1006,26 +1044,43 @@ class _MapScreenState extends State<MapScreen> {
                                       horizontal:
                                           AppSizes.horizontalPaddingSmall),
                                   dense: true,
-                                  title: AppText(
-                                    text: store.name,
+                                  title: InkWell(
+                                    onTap: () async {
+                                      if (_storeInFocus == store.name) {
+                                        await AppFunctions
+                                            .navigateToStoreScreen(store);
+                                      }
+                                    },
+                                    child: AppText(
+                                      text: store.name,
+                                    ),
                                   ),
-                                  subtitle: Row(
-                                    children: [
-                                      if (store.isUberOneShop)
-                                        Row(
-                                          children: [
-                                            Image.asset(
-                                              AssetNames.uberOneSmall,
-                                              height: 12,
-                                              color: AppColors.uberOneGold,
-                                            ),
-                                            const AppText(text: ' • ')
-                                          ],
-                                        ),
-                                      AppText(
-                                          text:
-                                              '${store.delivery.estimatedDeliveryTime} min • ${_distance.as(lt.LengthUnit.Kilometer, lt.LatLng(storelatLng.latitude, storelatLng.longitude), lt.LatLng(widget.userLocation.latitude, widget.userLocation.longitude))} km'),
-                                    ],
+                                  subtitle: InkWell(
+                                    onTap: () async {
+                                      if (_storeInFocus == store.name) {
+                                        await AppFunctions
+                                            .navigateToStoreScreen(store);
+                                      }
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (store.isUberOneShop)
+                                          Row(
+                                            children: [
+                                              Image.asset(
+                                                AssetNames.uberOneSmall,
+                                                height: 12,
+                                                color: AppColors.uberOneGold,
+                                              ),
+                                              const AppText(text: ' • ')
+                                            ],
+                                          ),
+                                        AppText(
+                                            text:
+                                                '${store.delivery.estimatedDeliveryTime} min • ${_distance.as(lt.LengthUnit.Kilometer, lt.LatLng(storelatLng.latitude, storelatLng.longitude), lt.LatLng(widget.userLocation.latitude, widget.userLocation.longitude))} km'),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],

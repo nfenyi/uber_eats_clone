@@ -145,6 +145,9 @@ class AssetNames {
   static const mapMarker3 = 'assets/images/marker_3.png';
   static const groceryMarker = 'assets/images/grocery_marker.png';
   static const restaurantMarker = 'assets/images/restaurant_marker.png';
+  static const selectedRestaurantMarker =
+      'assets/images/selected_restaurant.png';
+  static const selectedGroceryIcon = 'assets/images/selected_grocery_icon.jpg';
 
   //jpg
   static const carrierBag = 'assets/images/carrier_bag.jpg';

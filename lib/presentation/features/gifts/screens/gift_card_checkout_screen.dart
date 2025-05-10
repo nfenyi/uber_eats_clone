@@ -476,15 +476,15 @@ class _GiftCardCheckoutScreenState
                             .collection(FirestoreCollections.giftCardsAnkasa)
                             .doc(widget.giftCard.id)
                             .set(widget.giftCard.toJson());
-                        //
-                        // final shareResult =
+                        
+                        final shareResult =
                         await Share.share(dynamicLink.toString(),
                             subject:
                                 '${FirebaseAuth.instance.currentUser!.displayName} sent you a gift card!');
-                        // if (shareResult.status == ShareResultStatus.success) {
+                        if (shareResult.status == ShareResultStatus.success) {
                         navigatorKey.currentState!.popUntil((route) =>
                             route.settings.name == '/giftCardScreen');
-                        // }
+                        }
                       } else {
                         final giftCardWithEmailProperties = widget.giftCard
                             .copyWith(
