@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/octicon.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/octicon.dart';
+
 import 'package:maps_curved_line/maps_curved_line.dart';
 import 'package:marquee_list/marquee_list.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';

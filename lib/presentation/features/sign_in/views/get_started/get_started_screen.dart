@@ -84,7 +84,7 @@ class _GetStartedScreenState extends ConsumerState<GetStartedScreen> {
                             MaterialPageRoute(
                                 builder: (context) => const SignInScreen()));
                       } on Exception catch (e) {
-                        await showAppInfoDialog(context,
+                        await showAppInfoDialog(navigatorKey.currentContext!,
                             description: e.toString());
                       }
                     },

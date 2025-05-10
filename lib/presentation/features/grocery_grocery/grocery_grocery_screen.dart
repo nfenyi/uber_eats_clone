@@ -91,7 +91,7 @@ class _GroceryGroceryScreenState extends State<GroceryGroceryScreen> {
                                   ? groceryStore.openingTime.hour -
                                               timeOfDayNow.hour >
                                           1
-                                      ? 'Available at ${AppFunctions.formatDate(groceryStore.openingTime.toString(), format: 'h:i A')}'
+                                      ? 'Available at ${AppFunctions.formatTimeOFDay(groceryStore.openingTime)}'
                                       : 'Available in ${groceryStore.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${groceryStore.openingTime.minute - timeOfDayNow.minute} mins'}'
                                   : '\$${groceryStore.delivery.fee} Delivery Fee',
                               color: groceryStore.delivery.fee < 1

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'dart:math' as math;
 
 import 'package:camera/camera.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:uber_eats_clone/main.dart';
-import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../../constants/app_sizes.dart';
 import '../../../../core/app_text.dart';
@@ -48,10 +46,12 @@ class _AddACardCameraViewState extends State<AddACardCameraView>
   @override
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final CameraController? cameraController = widget.controller;
+    final CameraController cameraController = widget.controller;
 
     // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
+    if (
+        // cameraController == null ||
+        !cameraController.value.isInitialized) {
       return;
     }
 

@@ -2,7 +2,6 @@ import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:phonecodes/phonecodes.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
-import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../../../main.dart';
 import '../../../../constants/app_sizes.dart';

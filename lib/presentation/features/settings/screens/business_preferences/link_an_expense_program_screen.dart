@@ -20,7 +20,7 @@ class LinkAnExpenseProgramScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final _expensePrograms = <ExpenseProgram>[
+    final expensePrograms = <ExpenseProgram>[
       ExpenseProgram(
           imageUrl:
               'https://cdn6.aptoide.com/imgs/b/d/2/bd25bfdd2ddb8f893e0b785883589e8b_icon.png',
@@ -51,7 +51,7 @@ class LinkAnExpenseProgramScreen extends ConsumerWidget {
             Expanded(
               child: ListView.builder(
                 itemBuilder: (context, index) {
-                  final expenseProgram = _expensePrograms[index];
+                  final expenseProgram = expensePrograms[index];
                   return ListTile(
                     onTap: () async {
                       try {
@@ -92,7 +92,7 @@ class LinkAnExpenseProgramScreen extends ConsumerWidget {
                     title: AppText(text: expenseProgram.name),
                   );
                 },
-                itemCount: _expensePrograms.length,
+                itemCount: expensePrograms.length,
               ),
             )
           ],

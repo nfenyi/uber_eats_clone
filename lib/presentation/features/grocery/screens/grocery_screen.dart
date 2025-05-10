@@ -417,7 +417,7 @@ class _GroceryScreenState extends ConsumerState<GroceryScreen> {
                                     )),
                                 AppText(
                                     text: isClosed
-                                        ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                        ? 'Closed • Available at ${AppFunctions.formatTimeOFDay(store.openingTime)}'
                                         : '\$${store.delivery.fee} Delivery Fee',
                                     color: store.delivery.fee < 1
                                         ? const Color.fromARGB(
@@ -1304,7 +1304,7 @@ class AllStoresListView extends StatelessWidget {
                               text: isClosed
                                   ? store.openingTime.hour - timeOfDayNow.hour >
                                           1
-                                      ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                      ? 'Available at ${AppFunctions.formatTimeOFDay(store.openingTime)}'
                                       : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
                                   : '\$${store.delivery.fee} Delivery Fee',
                               color: store.delivery.fee < 1

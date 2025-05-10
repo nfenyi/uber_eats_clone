@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/ant_design.dart';
-import 'package:iconify_flutter/icons/icon_park_solid.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ant_design.dart';
+import 'package:iconify_flutter_plus/icons/icon_park_solid.dart';
 import 'package:iconify_flutter_plus/icons/mdi.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';

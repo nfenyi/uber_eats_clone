@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/features/home/home_screen.dart';
-import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
 import '../../../../../main.dart';
 import '../../../../../models/store/store_model.dart';

@@ -11,9 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/bx.dart';
-import 'package:iconify_flutter/icons/mdi.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/bx.dart';
+import 'package:iconify_flutter_plus/icons/mdi.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
@@ -32,7 +32,6 @@ import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/widgets.dart';
 import '../../sign_in/views/add_a_credit_card/add_a_credit_card_screen.dart';
-import '../../webview/webview_screen.dart';
 
 class GiftCardCheckoutScreen extends ConsumerStatefulWidget {
   final GiftCard giftCard;
@@ -478,14 +477,14 @@ class _GiftCardCheckoutScreenState
                             .doc(widget.giftCard.id)
                             .set(widget.giftCard.toJson());
                         //
-                        final shareResult = await Share.share(
-                            dynamicLink.toString(),
+                        // final shareResult =
+                        await Share.share(dynamicLink.toString(),
                             subject:
                                 '${FirebaseAuth.instance.currentUser!.displayName} sent you a gift card!');
-                        if (shareResult.status == ShareResultStatus.success) {
-                          navigatorKey.currentState!.popUntil((route) =>
-                              route.settings.name == '/giftCardScreen');
-                        }
+                        // if (shareResult.status == ShareResultStatus.success) {
+                        navigatorKey.currentState!.popUntil((route) =>
+                            route.settings.name == '/giftCardScreen');
+                        // }
                       } else {
                         final giftCardWithEmailProperties = widget.giftCard
                             .copyWith(

@@ -187,7 +187,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             text: favoriteStore.openingTime.hour -
                                         dateTimeNow.hour >
                                     1
-                                ? 'Available at ${AppFunctions.formatDate(favoriteStore.openingTime.toString(), format: 'h:i A')}'
+                                ? 'Available at ${AppFunctions.formatTimeOFDay(favoriteStore.openingTime)}'
                                 : 'Available in ${favoriteStore.openingTime.hour - dateTimeNow.hour == 1 ? '1 hr' : '${favoriteStore.openingTime.minute - dateTimeNow.minute} mins'}',
                             size: AppSizes.bodySmallest,
                           )

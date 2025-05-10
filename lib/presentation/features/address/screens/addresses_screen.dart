@@ -10,11 +10,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:iconify_flutter/icons/mdi.dart';
 // import 'package:google_places_autocomplete/google_places_autocomplete.dart';
-import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:iconify_flutter_plus/icons/bi.dart';
+import 'package:iconify_flutter_plus/icons/mdi.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:location/location.dart';
 import 'package:uber_eats_clone/hive_adapters/geopoint/geopoint_adapter.dart';
 import 'package:uber_eats_clone/main.dart';
@@ -523,7 +523,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                       (element) =>
                           element.addressLabel == _selectedAddressLabel,
                     ),
-                    onPopInvokedWithResult: (didPop, result) {
+                    onPopInvoked: (didPop) {
                       if (!didPop) {
                         showInfoToast(
                             seconds: 5,

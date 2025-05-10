@@ -118,7 +118,7 @@ class AppTextFormField extends ConsumerWidget {
       readOnly: readOnly,
       enabled: enabled,
       maxLengthEnforcement: MaxLengthEnforcement.enforced,
-      autovalidateMode: autovalidateMode ?? AutovalidateMode.onUnfocus,
+      autovalidateMode: autovalidateMode ?? AutovalidateMode.onUserInteraction,
       maxLength: maxLength,
       maxLines: maxLines,
       minLines: minLines,

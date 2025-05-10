@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
+
+import '../../main.dart';
 
 part 'store_model.freezed.dart';
 part 'store_model.g.dart';
@@ -120,7 +121,8 @@ class TimeOfDayConverter implements JsonConverter<TimeOfDay, String> {
       // Here, we're returning TimeOfDay.now() as a fallback, but you should adapt this
       // to your specific error handling needs.  A common alternative is to throw:
       // throw FormatException('Invalid date format: $json');
-      print("Error parsing TimeOfDay from JSON: $e, returning TimeOfDay.now()");
+      logger.d(
+          "Error parsing TimeOfDay from JSON: $e, returning TimeOfDay.now()");
       return TimeOfDay.now(); // Or throw an exception, or handle as needed.
     }
   }

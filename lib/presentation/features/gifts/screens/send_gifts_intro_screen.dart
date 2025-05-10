@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+
 import 'package:iconify_flutter_plus/icons/ic.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';

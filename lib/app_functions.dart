@@ -45,6 +45,17 @@ class AppFunctions {
             : DateTimeFormat.format(DateTime.parse(date), format: format);
   }
 
+  static String formatTimeOFDay(TimeOfDay? timeOfDay) {
+    if (timeOfDay == null) {
+      return OtherConstants.na;
+    }
+
+    String hourString = timeOfDay.hour.toString().padLeft(2, '0');
+    String minuteString = timeOfDay.minute.toString().padLeft(2, '0');
+
+    return '$hourString:$minuteString';
+  }
+
   static Future<Map<String, dynamic>> loadDocReference(
       DocumentReference reference) async {
     final snapshot = await reference.get();
@@ -600,4 +611,11 @@ class AppFunctions {
     }
     return businessProfiles;
   }
+}
+
+extension TimeOfDayExtension on TimeOfDay {
+  bool isBefore(TimeOfDay other) =>
+      hour < other.hour || (hour == other.hour && minute < other.minute);
+  bool isAfter(TimeOfDay other) =>
+      hour > other.hour || (hour == other.hour && minute > other.minute);
 }

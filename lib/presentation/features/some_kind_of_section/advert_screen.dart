@@ -89,7 +89,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
                                   ? widget.store.openingTime.hour -
                                               timeOfDayNow.hour >
                                           1
-                                      ? 'Available at ${AppFunctions.formatDate(widget.store.openingTime.toString(), format: 'h:i A')}'
+                                      ? ' Available at ${AppFunctions.formatTimeOFDay(widget.store.openingTime)}'
                                       : 'Available in ${widget.store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${widget.store.openingTime.minute - timeOfDayNow.minute} mins'}'
                                   : '\$${widget.store.delivery.fee} Delivery Fee',
                               color: widget.store.delivery.fee < 1

@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/entypo.dart';
-import 'package:iconify_flutter/icons/ph.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/entypo.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
 import 'package:uber_eats_clone/presentation/services/sign_in_view_model.dart';
 
@@ -608,7 +608,7 @@ class _BoxCateringScreenState extends ConsumerState<BoxCateringScreen> {
                                                         )),
                                                     AppText(
                                                       text: isClosed
-                                                          ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                                          ? 'Closed • Available at ${AppFunctions.formatTimeOFDay(store.openingTime)}'
                                                           : '\$${store.delivery.fee} Delivery Fee',
                                                       // color: store.delivery.fee < 1
                                                       //     ? const Color.fromARGB(

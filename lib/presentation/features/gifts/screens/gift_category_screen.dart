@@ -38,7 +38,7 @@ class _GiftCategoryScreenState extends ConsumerState<GiftCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvokedWithResult: (didPop, result) =>
+      onPopInvoked: (didPop) =>
           ref.read(bottomNavIndexProvider.notifier).showGiftScreen(),
       child: SafeArea(
         child: NestedScrollView(

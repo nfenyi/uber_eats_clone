@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../../main.dart';
 import '../../../../constants/app_sizes.dart';
 import '../../../../constants/weblinks.dart';
-import '../../../webview/webview_screen.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});

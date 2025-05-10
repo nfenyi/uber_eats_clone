@@ -136,7 +136,8 @@ class _DropOffOptionsScreenState extends ConsumerState<DropOffOptionsScreen> {
                           initiallyExpanded: _selectedOption == _option1,
                           childrenPadding:
                               const EdgeInsets.symmetric(horizontal: 15),
-                          showTrailingIcon: false,
+                          trailing: const SizedBox.shrink(),
+                          // showTrailingIcon: false,
                           // tilePadding: EdgeInsets.zero,
                           title: AppText(
                             text: _option1,
@@ -193,7 +194,8 @@ class _DropOffOptionsScreenState extends ConsumerState<DropOffOptionsScreen> {
                           controller: _group2Controller,
                           childrenPadding:
                               const EdgeInsets.symmetric(horizontal: 15),
-                          showTrailingIcon: false,
+                          trailing: const SizedBox.shrink(),
+                          // showTrailingIcon: false,
                           // tilePadding: EdgeInsets.zero,
                           title: AppText(
                             text: _option2,

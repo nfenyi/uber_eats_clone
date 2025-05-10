@@ -1,0 +1,2 @@
+-keep class com.google_mlkit_text_recognition.** { *; }
+-dontwarn com.google.mlkit.vision.text.**

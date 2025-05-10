@@ -17,7 +17,6 @@ import '../../../../models/gift_card/gift_card_model.dart';
 import '../../../constants/weblinks.dart';
 import '../../../core/app_colors.dart';
 import '../../../services/sign_in_view_model.dart';
-import '../../webview/webview_screen.dart';
 import 'recorded_message_player_screen.dart';
 
 class RedeemGiftCardScreen extends StatefulWidget {

@@ -80,7 +80,7 @@ class _GenericCategoryScreenState extends ConsumerState<GenericCategoryScreen> {
     return SafeArea(
       child: PopScope(
         canPop: false,
-        onPopInvokedWithResult: (didPop, result) {
+        onPopInvoked: (didPop) {
           ref.read(bottomNavIndexProvider.notifier).updateIndex(1);
         },
         child: NestedScrollView(
@@ -911,7 +911,7 @@ class _GenericCategoryScreenState extends ConsumerState<GenericCategoryScreen> {
                                                                   timeOfDayNow
                                                                       .hour >
                                                               1
-                                                          ? 'Available at ${AppFunctions.formatDate(categoryStore.openingTime.toString(), format: 'h:i A')}'
+                                                          ? 'Available at ${AppFunctions.formatTimeOFDay(categoryStore.openingTime)}'
                                                           : 'Available in ${categoryStore.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${(categoryStore.openingTime.minute - timeOfDayNow.minute).abs()} mins'}'
                                                       : '\$${categoryStore.delivery.fee} Delivery Fee',
                                                   color: categoryStore.delivery

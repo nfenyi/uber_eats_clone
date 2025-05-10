@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/mdi.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/mdi.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';

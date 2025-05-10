@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/services/google_location_model.dart';
 import 'package:uber_eats_clone/presentation/services/place_detail_model.dart';
 import 'package:uber_eats_clone/presentation/services/service_model.dart';

@@ -163,7 +163,7 @@ class UberEatsClone extends StatelessWidget {
             color: Colors.black,
             linearTrackColor: AppColors.neutral100,
           ),
-          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+          dialogTheme: const DialogTheme(backgroundColor: Colors.white),
           sliderTheme:
               const SliderThemeData(inactiveTrackColor: AppColors.neutral100),
           dividerTheme: const DividerThemeData(color: AppColors.neutral300),

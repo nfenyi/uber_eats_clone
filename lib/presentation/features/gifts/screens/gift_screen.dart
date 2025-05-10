@@ -71,7 +71,7 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
     }
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) =>
+      onPopInvoked: (didPop) =>
           ref.read(bottomNavIndexProvider.notifier).updateIndex(2),
       child: SafeArea(
         child: NestedScrollView(
@@ -439,7 +439,7 @@ class AllStoresSliver extends StatelessWidget {
                         AppText(
                             text: isClosed
                                 ? store.openingTime.hour - timeOfDayNow.hour > 1
-                                    ? 'Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                    ? 'Available at ${AppFunctions.formatTimeOFDay(store.openingTime)}'
                                     : 'Available in ${store.openingTime.hour - timeOfDayNow.hour == 1 ? '1 hr' : '${store.openingTime.minute - timeOfDayNow.minute} mins'}'
                                 : '\$${store.delivery.fee} Delivery Fee',
                             color: store.delivery.fee < 1

@@ -10,8 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/ic.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ic.dart';
 import 'package:latlong2/latlong.dart' as lt;
 import 'package:showcaseview/showcaseview.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -29,7 +29,6 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_opt
 import 'package:uber_eats_clone/presentation/features/some_kind_of_section/advert_screen.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 import 'package:uber_eats_clone/state/user_location_providers.dart';
-import 'package:uuid/uuid.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 import '../../../app_functions.dart';
 import '../../../models/advert/advert_model.dart';
@@ -2579,7 +2578,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                                             color: AppColors.uberOneGold,
                                                                                           )),
                                                                                       AppText(
-                                                                                        text: isClosed ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}' : '\$${store.delivery.fee} Delivery Fee',
+                                                                                        text: isClosed ? 'Closed • Available at ${AppFunctions.formatTimeOFDay(store.openingTime)}' : '\$${store.delivery.fee} Delivery Fee',
                                                                                         color: AppColors.neutral500,
                                                                                       ),
                                                                                       AppText(
@@ -2659,6 +2658,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                           timeOfDayNow.isAfter(
                                                               store
                                                                   .closingTime);
+                                                      logger
+                                                          .d(store.closingTime);
+                                                      logger.d(TimeOfDay.now());
                                                       return InkWell(
                                                         borderRadius:
                                                             BorderRadius
@@ -2689,9 +2691,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                         Alignment
                                                                             .topLeft,
                                                                     children: [
-                                                                      CachedNetworkImage(
-                                                                        imageUrl:
-                                                                            store.cardImage,
+                                                                      AppFunctions
+                                                                          .displayNetworkImage(
+                                                                        store
+                                                                            .cardImage,
                                                                         width:
                                                                             200,
                                                                         height:
@@ -2725,7 +2728,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                           ? Container(
                                                                               color: Colors.black.withOpacity(0.5),
                                                                               width: double.infinity,
-                                                                              height: 170,
+                                                                              height: 120,
                                                                               child: const Column(
                                                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -3595,7 +3598,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                                       )),
                                                                   AppText(
                                                                     text: isClosed
-                                                                        ? 'Closed • Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                                                        ? 'Closed • Available at ${AppFunctions.formatTimeOFDay(store.openingTime)}'
                                                                         : '\$${store.delivery.fee} Delivery Fee',
                                                                     color: store
                                                                             .isUberOneShop

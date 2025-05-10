@@ -509,7 +509,7 @@ class _ExploreVideoScreenState extends State<ExploreVideoScreen> {
                                                         AppText(
                                                             color: Colors.white,
                                                             text: isClosed
-                                                                ? ' Available at ${AppFunctions.formatDate(store.openingTime.toString(), format: 'h:i A')}'
+                                                                ? 'Closed • Available at ${AppFunctions.formatTimeOFDay(store.openingTime)}'
                                                                 : " ${store.delivery.estimatedDeliveryTime} min")
                                                       ],
                                                     ),

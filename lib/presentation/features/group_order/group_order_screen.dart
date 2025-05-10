@@ -14,7 +14,6 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/order/order_model.dart';
 import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:collection/collection.dart';
-import 'package:uber_eats_clone/presentation/features/group_order/order_deadline_screen.dart';
 import '../../../app_functions.dart';
 import '../../../models/group_order/group_order_model.dart';
 import '../../../models/store/store_model.dart';

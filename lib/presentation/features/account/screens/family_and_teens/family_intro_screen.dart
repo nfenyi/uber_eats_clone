@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/mdi.dart';
-import 'package:iconify_flutter/icons/uil.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/mdi.dart';
+import 'package:iconify_flutter_plus/icons/uil.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/family_and_teens/teen/add_teen_screen.dart';
 import 'package:uber_eats_clone/presentation/features/account/screens/family_and_teens/teen/select_a_member_screen.dart';
@@ -229,7 +229,7 @@ class FamilyIntroScreen extends StatelessWidget {
                                     familyProfileSnapshot.data()!);
                                 await showModalBottomSheet(
                                   isScrollControlled: false,
-                                  context: context,
+                                  context: navigatorKey.currentContext!,
                                   builder: (context) {
                                     return AddAdultOrTeenModal(familyProfile);
                                   },

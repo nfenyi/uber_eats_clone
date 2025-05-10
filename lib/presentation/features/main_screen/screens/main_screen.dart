@@ -4,9 +4,9 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:iconify_flutter/icons/material_symbols.dart';
-import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/material_symbols.dart';
+import 'package:iconify_flutter_plus/icons/mdi.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/favourite/favourite_model.dart';
 import 'package:uber_eats_clone/models/store/store_model.dart';
@@ -114,7 +114,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     }
     return PopScope(
       canPop: bottomNavIndex == 0,
-      onPopInvokedWithResult: (didPop, result) {
+      onPopInvoked: (didPop) {
         if (bottomNavIndex != 0) {
           ref.read(bottomNavIndexProvider.notifier).updateIndex(0);
         }
