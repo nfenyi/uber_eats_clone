@@ -35,7 +35,8 @@
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
              <!-- TDOD: Hide api key -->
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyD0RD3-1CW7alhs03RMBLPhv8TdiwDKeyQ" />
+         <meta-data android:name="com.google.android.geo.API_KEY"
+                android:value="${mapsApiKey}"/>
         <meta-data
         android:name="io.flutter.embedding.android.EnableImpeller"
         android:value="false" />

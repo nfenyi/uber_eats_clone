@@ -13,6 +13,10 @@ import UIKit
     GMSServices provideAPIKey:("AIzaSyD0RD3-1CW7alhs03RMBLPhv8TdiwDKeyQ")
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+
+//     NSString* mapsApiKey = [[NSProcessInfo processInfo] environment[@"MAPS_API_KEY"];
+
+// [GMSServices provideAPIKey:mapsApiKey];
   }
 }
 
