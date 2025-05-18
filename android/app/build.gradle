@@ -38,7 +38,7 @@ android {
         // versionName = "1.0"
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        // manifestPlaceholders = [enable_impeller: "false", applicationName: "android.app.Application"]
+        manifestPlaceholders += [mapsApiKey: "${System.env.MAPS_API_KEY}"]        
     }
 
     buildTypes {

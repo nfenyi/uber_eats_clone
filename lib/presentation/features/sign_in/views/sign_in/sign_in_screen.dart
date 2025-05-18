@@ -267,6 +267,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       },
                       // autoRetrievedSmsCodeForTesting: '',
                       verificationFailed: (FirebaseAuthException e) {
+                        logger.d(e);
                         showAppInfoDialog(
                           context,
                           description: '${e.code}${e.message}',
