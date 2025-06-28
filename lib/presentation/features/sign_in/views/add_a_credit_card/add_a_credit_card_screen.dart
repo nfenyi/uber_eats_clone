@@ -145,19 +145,26 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                           ),
                           suffixIcon: GestureDetector(
                               onTap: () async {
-                                // List<CameraDescription> cameras =
-                                //     await availableCameras();
-                                const mainCamera = CameraDescription(
-                                    name: 'Main Camera',
-                                    lensDirection: CameraLensDirection.back,
-                                    sensorOrientation: 0);
+                                List<CameraDescription> cameras =
+                                    await availableCameras();
                                 // logger.d(cameras);
+
+                                // const mainCamera = CameraDescription(
+                                //     name: 'Main Camera',
+                                //     lensDirection: CameraLensDirection.back,
+                                //     sensorOrientation: 0);
+
                                 final controller = CameraController(
-                                    mainCamera, ResolutionPreset.max);
+                                    cameras.firstWhere(
+                                      (element) =>
+                                          element.lensDirection ==
+                                          CameraLensDirection.back,
+                                    ),
+                                    ResolutionPreset.max);
+                                // logger.d('3');
                                 await controller.initialize().then((_) async {
                                   await controller.lockCaptureOrientation(
                                       DeviceOrientation.portraitUp);
-                                  //TODO: complete camera capture
                                   if (context.mounted) {
                                     final result = await navigatorKey
                                         .currentState!
@@ -180,12 +187,13 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                                   } else {
                                     await controller.dispose();
                                   }
-                                }).catchError((Object e) {
+                                }).catchError((Object e) async {
+                                  await controller.dispose();
                                   if (e is CameraException) {
                                     switch (e.code) {
                                       case 'CameraAccessDenied':
                                         if (context.mounted) {
-                                          showAppInfoDialog(
+                                          await showAppInfoDialog(
                                               title: 'Camera access denied',
                                               description:
                                                   'Grant camera access in order to read credit card',
@@ -193,8 +201,17 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                                         }
                                         break;
                                       default:
-                                        // Handle other errors here.
+                                        await showAppInfoDialog(context,
+                                            description:
+                                                e.description ?? e.code);
                                         break;
+                                    }
+                                  } else {
+                                    if (context.mounted) {
+                                      // throw e;
+                                      logger.d(e.toString());
+                                      await showAppInfoDialog(context,
+                                          description: e.toString());
                                     }
                                   }
                                 });

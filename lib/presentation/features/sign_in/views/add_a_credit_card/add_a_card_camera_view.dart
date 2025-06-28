@@ -69,6 +69,7 @@ class _AddACardCameraViewState extends State<AddACardCameraView>
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        foregroundColor: Colors.white,
         backgroundColor: Colors.black,
       ),
       body: Column(
@@ -80,11 +81,9 @@ class _AddACardCameraViewState extends State<AddACardCameraView>
                 Column(
                   children: [
                     Expanded(
-                      child: Transform.rotate(
-                          angle: math.pi / 2,
-                          child: AspectRatio(
-                              aspectRatio: 1,
-                              child: widget.controller.buildPreview())),
+                      child: AspectRatio(
+                          aspectRatio: 1,
+                          child: widget.controller.buildPreview()),
                     ),
                   ],
                 ),
