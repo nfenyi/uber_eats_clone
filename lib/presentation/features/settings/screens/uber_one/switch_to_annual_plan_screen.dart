@@ -49,7 +49,7 @@ class _SwitchToAnnualPlanScreenState extends State<SwitchToAnnualPlanScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         // SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         //   statusBarIconBrightness: Brightness.dark,
         //   statusBarColor: Colors.white,

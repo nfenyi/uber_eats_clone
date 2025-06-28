@@ -25,9 +25,7 @@ import '../../../models/favourite/favourite_model.dart';
 import '../../../models/store/store_model.dart';
 import '../../constants/app_sizes.dart';
 import '../../constants/asset_names.dart';
-import '../../services/google_maps_services.dart';
-import '../../services/place_detail_model.dart';
-import '../../services/sign_in_view_model.dart';
+import '../../../models/place_detail/place_detail_model.dart';
 import '../home/home_screen.dart';
 import '../main_screen/screens/main_screen.dart';
 

@@ -10,9 +10,9 @@ import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../main.dart';
-import '../../../constants/asset_names.dart';
-import '../../../core/app_colors.dart';
+import '../../../../../main.dart';
+import '../../../../constants/asset_names.dart';
+import '../../../../core/app_colors.dart';
 
 class TermsNPrivacyNoticeScreen extends ConsumerStatefulWidget {
   const TermsNPrivacyNoticeScreen({super.key});

@@ -114,7 +114,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     }
     return PopScope(
       canPop: bottomNavIndex == 0,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (bottomNavIndex != 0) {
           ref.read(bottomNavIndexProvider.notifier).updateIndex(0);
         }

@@ -29,7 +29,7 @@ class _HelpScreenState extends State<HelpScreen> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: _selectedOptions.isEmpty,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
           setState(() {
             _selectedOptions.removeLast();

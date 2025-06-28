@@ -1,19 +1,19 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/sign_in/sign_in_view_model.dart';
 
-import '../../../core/app_colors.dart';
-import '../../../core/app_text.dart';
-import 'email_sent_screen.dart';
+import '../../../../../utils/result.dart';
+import '../../../../core/app_colors.dart';
+import '../../../../core/app_text.dart';
+import '../email_sent_screen.dart';
 
 class EmailAddressScreen extends ConsumerStatefulWidget {
   const EmailAddressScreen({super.key});
@@ -114,52 +114,25 @@ class _EmailAddressScreenState extends ConsumerState<EmailAddressScreen> {
                           ? null
                           : () async {
                               if (_formKey.currentState!.validate()) {
-                                await FirebaseAuth.instance
+                                final result = await ref
+                                    .read(signInViewModel.notifier)
                                     .sendSignInLinkToEmail(
-                                        email: _emailController.text,
-                                        actionCodeSettings: ActionCodeSettings(
-                                            // URL you want to redirect back to. The domain (www.example.com) for this
-                                            // URL must be whitelisted in the Firebase Console.
-                                            url:
-                                                'https://ubereatsclone.page.link/email-link-login',
-                                            // This must be true
-                                            handleCodeInApp: true,
-                                            iOSBundleId:
-                                                'com.example.uberEatsClone',
-                                            androidPackageName:
-                                                'com.example.uber_eats_clone',
-                                            // installIfNotAvailable
-                                            androidInstallApp: true,
-                                            // minimumVersion
-                                            androidMinimumVersion: '12'))
-                                    .then((value) async {
-                                  await Hive.box(AppBoxes.appState).put(
-                                      BoxKeys.email,
-                                      _emailController.text.trim());
-                                  await Hive.box(AppBoxes.appState).put(
-                                      BoxKeys.addedEmailToPhoneNumber, true);
+                                        _emailController.text.trim());
 
+                                if (result is RError) {
+                                  return showAppInfoDialog(
+                                      title:
+                                          'Error sending email verification:',
+                                      description: '${(result).errorMessage}',
+                                      navigatorKey.currentContext!);
+                                } else {
                                   await navigatorKey.currentState!
                                       .push(MaterialPageRoute(
                                     builder: (context) => EmailSentScreen(
                                       email: _emailController.text.trim(),
                                     ),
                                   ));
-                                }, onError: (e) {
-                                  if (e is FirebaseAuthException) {
-                                    return showAppInfoDialog(
-                                        title:
-                                            'Error sending email verification:',
-                                        description: '${e.message}',
-                                        context);
-                                  } else {
-                                    return showAppInfoDialog(
-                                        title:
-                                            'Error sending email verification:',
-                                        description: '$e',
-                                        context);
-                                  }
-                                });
+                                }
                               }
                             },
                       child: Ink(

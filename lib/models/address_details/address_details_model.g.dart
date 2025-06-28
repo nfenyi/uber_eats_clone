@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'onboarding_state_model.dart';
+part of 'address_details_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

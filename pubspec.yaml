@@ -43,7 +43,9 @@ dependencies:
   credit_card_type_detector: ^3.0.0
   credit_card_validator: ^2.1.0
   cupertino_icons: ^1.0.8
+  # could be removed?:
   custom_timer: ^0.2.3
+  dartz: ^0.10.1
   date_time_format: ^2.0.1
   deepcopy: ^1.1.2
   dh_slider: ^1.0.3
@@ -63,8 +65,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   flutter_staggered_grid_view: ^0.4.1
   flutter_svg: ^2.0.9
+  # could be removed?:
   flutter_timer_countdown: ^1.0.7
-  flutter_typeahead: ^5.2.0
   flutter_udid: ^4.0.0
   fluttertoast: ^8.2.10
   font_awesome_flutter: ^10.8.0
@@ -78,7 +80,6 @@ dependencies:
   google_sign_in: ^6.2.2
   hive_flutter: ^1.1.0
   hive_generator: ^2.0.1
-  iconify_flutter: ^0.0.7
   iconify_flutter_plus: ^1.0.4
   image_color_builder: ^1.0.4
   json_annotation: ^4.9.0

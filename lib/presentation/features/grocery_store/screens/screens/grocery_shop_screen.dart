@@ -26,7 +26,7 @@ import '../../../../core/app_text.dart';
 
 import '../../../../core/widgets.dart';
 import '../../../../services/google_maps_services.dart';
-import '../../../../services/place_detail_model.dart';
+import '../../../../../models/place_detail/place_detail_model.dart';
 import '../../../address/screens/addresses_screen.dart';
 import '../../../store/store_details_screen.dart';
 import 'grocery_shop_search_screen.dart';

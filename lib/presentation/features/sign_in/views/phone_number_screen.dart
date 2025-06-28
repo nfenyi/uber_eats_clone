@@ -9,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:iconify_flutter_plus/icons/ic.dart';
 import 'package:phonecodes/phonecodes.dart';
@@ -18,8 +17,9 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/name_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/verify_phone_number.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/name/name_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/verify_phone_number/verify_phone_number_screen.dart';
+import 'package:uber_eats_clone/services/hive_services.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
@@ -47,8 +47,7 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
           country.name.toLowerCase().contains('network')),
     );
     _selectedCountry = _countries.firstWhereOrNull(
-          (country) =>
-              country.code == Hive.box(AppBoxes.appState).get('country')!.code,
+          (country) => country.code == HiveServices.getCountry()?.code,
         ) ??
         _countries.first;
   }

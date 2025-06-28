@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,9 +8,11 @@ import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
-import '../../../core/app_colors.dart';
-import '../../../core/app_text.dart';
-import 'terms_and_privacy_notice_screen.dart';
+import '../../../../../utils/result.dart';
+import '../../../../core/app_colors.dart';
+import '../../../../core/app_text.dart';
+import '../terms_and_privacy_notice/terms_and_privacy_notice_screen.dart';
+import 'name_view_model.dart';
 
 class NameScreen extends ConsumerStatefulWidget {
   const NameScreen({super.key});
@@ -107,40 +107,46 @@ class _NameScreenState extends ConsumerState<NameScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      onTap: () => navigatorKey.currentState!.pop(),
-                      child: Ink(
-                        child: Container(
-                          padding: const EdgeInsets.all(AppSizes.bodySmallest),
-                          decoration: const BoxDecoration(
-                            color: AppColors.neutral200,
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.arrowLeft,
-                            size: 15,
+                    if (navigatorKey.currentState!.canPop())
+                      InkWell(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        onTap: () => navigatorKey.currentState!.pop(),
+                        child: Ink(
+                          child: Container(
+                            padding:
+                                const EdgeInsets.all(AppSizes.bodySmallest),
+                            decoration: const BoxDecoration(
+                              color: AppColors.neutral200,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: const Icon(
+                              FontAwesomeIcons.arrowLeft,
+                              size: 15,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     InkWell(
                       onTap: () async {
                         if (_formKey.currentState!.validate()) {
-                          try {
-                            await FirebaseAuth.instance.currentUser!
-                                .updateDisplayName(
-                                    '${_firstNameController.text} ${_lastNameController.text}');
+                          await ref.read(nameProvider.notifier).updateName(
+                              '${_firstNameController.text} ${_lastNameController.text}');
+                          final nameProviderState = ref.read(nameProvider);
+                          if (nameProviderState.result is RError) {
+                            await showAppInfoDialog(
+                                description:
+                                    (nameProviderState.result as RError)
+                                        .errorMessage
+                                        .toString(),
+                                navigatorKey.currentContext!);
+                          } else {
                             await navigatorKey.currentState!
                                 .push(MaterialPageRoute(
                               builder: (context) =>
                                   const TermsNPrivacyNoticeScreen(),
                             ));
-                          } on Exception catch (e) {
-                            if (context.mounted) {
-                              await showAppInfoDialog(
-                                  description: e.toString(), context);
-                            }
                           }
                         }
                       },

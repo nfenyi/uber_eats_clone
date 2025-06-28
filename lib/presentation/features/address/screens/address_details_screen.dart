@@ -13,15 +13,14 @@ import 'package:uber_eats_clone/presentation/constants/asset_names.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/states/onboarding_state_model.dart';
+import 'package:uber_eats_clone/models/address_details/address_details_model.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/confirm_location.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/drop_off_options_screen.dart';
-import 'package:uber_eats_clone/presentation/services/place_detail_model.dart';
+import 'package:uber_eats_clone/models/place_detail/place_detail_model.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../hive_adapters/geopoint/geopoint_adapter.dart';
 import '../../../constants/app_sizes.dart';
-import '../../../services/sign_in_view_model.dart';
 import '../../sign_in/views/payment_method_screen.dart';
 
 class AddressDetailsScreen extends ConsumerStatefulWidget {

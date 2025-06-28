@@ -20,11 +20,11 @@ import 'package:uber_eats_clone/presentation/core/app_text.dart';
 
 import '../../../../core/app_colors.dart';
 import '../../../../core/widgets.dart';
-import '../../../../services/sign_in_view_model.dart';
-import '../../../sign_in/views/verify_phone_number.dart';
+import '../../../sign_in/views/verify_phone_number/verify_phone_number_screen.dart';
 
 class PhoneNumberUpdateScreen extends StatefulWidget {
-  const PhoneNumberUpdateScreen({super.key});
+  String? countryCode;
+  PhoneNumberUpdateScreen(this.countryCode, {super.key});
 
   @override
   State<PhoneNumberUpdateScreen> createState() =>
@@ -57,8 +57,7 @@ class _PhoneNumberUpdateScreenState extends State<PhoneNumberUpdateScreen> {
           country.name.toLowerCase().contains('network')),
     );
     _selectedCountry = _countries.firstWhereOrNull(
-          (country) =>
-              country.code == Hive.box(AppBoxes.appState).get('country')!.code,
+          (country) => country.code == widget.countryCode,
         ) ??
         _countries.first;
   }

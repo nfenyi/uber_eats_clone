@@ -1,23 +1,23 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
-import 'package:flutter_udid/flutter_udid.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pinput/pinput.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/email_address_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/views/name_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/email_address/email_address_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/name/name_screen.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/sign_in/sign_in_view_model.dart';
+import 'package:uber_eats_clone/presentation/features/sign_in/views/verify_phone_number/verify_phone_number_view_model.dart';
+import 'package:uber_eats_clone/utils/result.dart';
 
-import '../../../../main.dart';
-import '../../../core/app_colors.dart';
-import '../../../services/sign_in_view_model.dart';
-import '../../main_screen/screens/main_screen_wrapper.dart';
+import '../../../../../main.dart';
+import '../../../../../utils/enums.dart';
+import '../../../../core/app_colors.dart';
+import '../../../main_screen/screens/main_screen_wrapper.dart';
 
 class VerifyPhoneNumberScreen extends ConsumerStatefulWidget {
   final String verificationId;
@@ -38,6 +38,7 @@ class VerifyPhoneNumberScreen extends ConsumerStatefulWidget {
 }
 
 class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
+  late String _verificationId;
   final TextEditingController _pinController = TextEditingController();
   final _defaultPinTheme = PinTheme(
     width: 56,
@@ -72,6 +73,14 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
       border: Border.all(color: AppColors.primary));
 
   bool _hasTimedOut = false;
+
+  final _viewModel = VerifyPhoneNumberViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    _verificationId = widget.verificationId;
+  }
 
   @override
   void dispose() {
@@ -120,82 +129,48 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                   submittedPinTheme: _followingPinTheme,
                   controller: _pinController,
                   onCompleted: (value) async {
-                    try {
-                      final credential = PhoneAuthProvider.credential(
-                          verificationId: widget.verificationId,
-                          smsCode: value);
-                      if (widget.justUpdatingPhoneNumber) {
-                        //WARNING: phone number change not implemented by firebase
-                        await FirebaseAuth.instance.currentUser!
-                            .updatePhoneNumber(credential);
-                        if (context.mounted) {
-                          navigatorKey.currentState!.pop(true);
-                        }
-                        return;
+                    if (widget.justUpdatingPhoneNumber) {
+                      await _viewModel.updatePhoneNumber(
+                          _verificationId, value);
+                      if (context.mounted) {
+                        navigatorKey.currentState!.pop(true);
                       }
+                      return;
+                    }
 
-                      if (widget.signedInWithEmail) {
-                        //WARNING: phone number change not implemented by firebase
-                        await FirebaseAuth.instance.currentUser!
-                            .updatePhoneNumber(credential);
-                        await navigatorKey.currentState!
-                            .pushReplacement(MaterialPageRoute(
-                          builder: (context) => const NameScreen(),
-                        ));
+                    if (widget.signedInWithEmail) {
+                      await _viewModel.updatePhoneNumber(
+                          _verificationId, value);
+                      await navigatorKey.currentState!
+                          .pushReplacement(MaterialPageRoute(
+                        builder: (context) => const NameScreen(),
+                      ));
+                    } else {
+                      final signInResult =
+                          await _viewModel.signInWithPhoneNumber(
+                              _verificationId, _pinController.text);
+
+                      if (signInResult is RError) {
+                        await showAppInfoDialog(
+                            description: (signInResult as RError).errorMessage,
+                            navigatorKey.currentContext!);
                       } else {
-                        await FirebaseAuth.instance
-                            .signInWithCredential(credential);
-                        final userCredential =
-                            FirebaseAuth.instance.currentUser!;
-                        final snapshot = await FirebaseFirestore.instance
-                            .collection(FirestoreCollections.users)
-                            .doc(userCredential.uid)
-                            .get();
-                        if (snapshot.exists &&
-                            snapshot.data() != null &&
-                            snapshot.data()!['onboarded'] == true) {
-                          String udid = await FlutterUdid.consistentUdid;
-                          var deviceRef = FirebaseFirestore.instance
-                              .collection(FirestoreCollections.devices)
-                              .doc(udid);
-                          var deviceSnapshot = await deviceRef.get();
-                          final info = <String, dynamic>{
-                            userCredential.uid: {
-                              'name': userCredential.displayName,
-                              'profilePic': userCredential.photoURL,
-                              "email": userCredential.email,
-                              "phoneNumber": userCredential.phoneNumber
-                            }
-                          };
-                          if (!deviceSnapshot.exists) {
-                            await deviceRef.set(info);
-                          } else {
-                            if (deviceSnapshot[userCredential.uid] == null) {
-                              await deviceRef.update(info);
-                            }
-                          }
-                          await Hive.box(AppBoxes.appState)
-                              .put(BoxKeys.authenticated, true);
+                        signInResult as Ok<AuthState>;
+                        if (signInResult.value == AuthState.authenticated) {
                           await navigatorKey.currentState!.pushAndRemoveUntil(
                               MaterialPageRoute(
                                   builder: (context) =>
                                       const MainScreenWrapper()), (r) {
                             return false;
                           });
-                        } else {
+                        } else if (signInResult.value ==
+                            AuthState.registeringWithPhoneNumber) {
                           await navigatorKey.currentState!.pushReplacement(
                               MaterialPageRoute(
                                   builder: (context) =>
                                       const EmailAddressScreen()));
                         }
                       }
-                    } on FirebaseAuthException catch (e) {
-                      await showAppInfoDialog(
-                          description: e.code, navigatorKey.currentContext!);
-                    } on Exception catch (e) {
-                      await showAppInfoDialog(
-                          description: e.toString(),
-                          navigatorKey.currentContext!);
                     }
                   },
                 ),
@@ -203,12 +178,22 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                 InkWell(
                   onTap: _hasTimedOut
                       ? () async {
-                          await FirebaseAuth.instance.verifyPhoneNumber(
-                            phoneNumber: widget.phoneNumber,
-                            verificationCompleted:
-                                (PhoneAuthCredential credential) async {
-                              await Hive.box(AppBoxes.appState)
-                                  .put(BoxKeys.authenticated, true);
+                          final signInViewModel = SignInViewModel();
+                          final signInResult = await signInViewModel
+                              .verifyPhoneNumber(widget.phoneNumber);
+                          if (signInResult is RError) {
+                            await showAppInfoDialog(
+                                description: signInResult.errorMessage,
+                                navigatorKey.currentContext!);
+                            return;
+                          } else if ((signInResult as Ok).value ==
+                              AuthState.authenticated) {
+                            await navigatorKey.currentState!
+                                .push(MaterialPageRoute(
+                              builder: (context) => const MainScreenWrapper(),
+                            ));
+                          } else {
+                            if (signInResult.value == AuthState.authenticated) {
                               await navigatorKey.currentState!
                                   .pushAndRemoveUntil(
                                       MaterialPageRoute(
@@ -216,25 +201,14 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                                               const MainScreenWrapper()), (r) {
                                 return false;
                               });
-                            },
-                            // autoRetrievedSmsCodeForTesting: '',
-                            verificationFailed: (FirebaseAuthException e) {
-                              showAppInfoDialog(
-                                context,
-                                description: '${e.code}${e.message}',
+                            } else {
+                              await showAppInfoDialog(
+                                navigatorKey.currentContext!,
+                                description: 'Code resent',
                               );
-                            },
-                            codeSent:
-                                (String verificationId, int? resendToken) {
-                              showInfoToast('Code resent', context: context);
-                              setState(() {
-                                _hasTimedOut = false;
-                              });
-                            },
-                            timeout: const Duration(minutes: 2),
-                            codeAutoRetrievalTimeout:
-                                (String verificationId) {},
-                          );
+                              _verificationId = signInResult.value;
+                            }
+                          }
                         }
                       : null,
                   child: Ink(

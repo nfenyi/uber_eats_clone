@@ -80,7 +80,7 @@ class _GenericCategoryScreenState extends ConsumerState<GenericCategoryScreen> {
     return SafeArea(
       child: PopScope(
         canPop: false,
-        onPopInvoked: (didPop) {
+        onPopInvokedWithResult: (didPop, result) {
           ref.read(bottomNavIndexProvider.notifier).updateIndex(1);
         },
         child: NestedScrollView(

@@ -20,7 +20,7 @@ import '../../../models/store/store_model.dart';
 import '../../constants/asset_names.dart';
 import '../../constants/weblinks.dart';
 import '../../core/app_text.dart';
-import '../../services/place_detail_model.dart';
+import '../../../models/place_detail/place_detail_model.dart';
 
 class StoreDetailsScreen extends StatefulWidget {
   final Store store;

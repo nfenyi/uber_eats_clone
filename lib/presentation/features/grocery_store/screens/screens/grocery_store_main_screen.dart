@@ -49,9 +49,8 @@ class _GroceryStoreMainScreenState
     final int bottomNavIndex = ref.watch(groceryStoreBottomNavIndexProvider);
     return PopScope(
       canPop: ref.watch(groceryStoreBottomNavIndexProvider) == 0,
-      onPopInvoked: (didPop) {
-        ref.invalidate(groceryStoreBottomNavIndexProvider);
-      },
+      onPopInvokedWithResult: (didPop, result) =>
+          ref.invalidate(groceryStoreBottomNavIndexProvider),
       child: Scaffold(
         body: _screens[bottomNavIndex],
         bottomNavigationBar: BottomNavigationBar(

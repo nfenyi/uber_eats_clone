@@ -12,7 +12,7 @@ import 'package:uber_eats_clone/presentation/features/gifts/screens/gift_card_on
 import 'package:uber_eats_clone/presentation/features/gifts/state/gift_type_state.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/state/bottom_nav_index_provider.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/states/onboarding_state_model.dart';
+import 'package:uber_eats_clone/models/address_details/address_details_model.dart';
 import 'package:uber_eats_clone/state/delivery_schedule_provider.dart';
 
 import '../../../../main.dart';
@@ -71,7 +71,7 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
     }
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) =>
+      onPopInvokedWithResult: (didPop, result) =>
           ref.read(bottomNavIndexProvider.notifier).updateIndex(2),
       child: SafeArea(
         child: NestedScrollView(

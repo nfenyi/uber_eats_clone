@@ -14,7 +14,7 @@ import 'package:latlong2/latlong.dart' as lt;
 
 import '../../../../app_functions.dart';
 import '../../../constants/asset_names.dart';
-import '../../../services/place_detail_model.dart';
+import '../../../../models/place_detail/place_detail_model.dart';
 
 class ConfirmLocationScreen extends ConsumerStatefulWidget {
   final LatLng initialLocation;

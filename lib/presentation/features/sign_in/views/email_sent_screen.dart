@@ -15,9 +15,9 @@ import 'package:uber_eats_clone/presentation/features/sign_in/views/phone_number
 import '../../../../main.dart';
 import '../../../constants/app_sizes.dart';
 import '../../../core/app_colors.dart';
-import '../../../services/sign_in_view_model.dart';
+
 import '../../main_screen/screens/main_screen_wrapper.dart';
-import 'name_screen.dart';
+import 'name/name_screen.dart';
 
 class EmailSentScreen extends StatefulWidget {
   final String email;

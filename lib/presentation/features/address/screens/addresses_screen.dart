@@ -5,12 +5,10 @@ import 'package:deepcopy/deepcopy.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-// import 'package:google_places_autocomplete/google_places_autocomplete.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:iconify_flutter_plus/icons/bi.dart';
 import 'package:iconify_flutter_plus/icons/mdi.dart';
@@ -22,17 +20,18 @@ import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
 import 'package:uber_eats_clone/presentation/features/payment_options/payment_options_screen.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/schedule_delivery_screen.dart';
-import 'package:uber_eats_clone/presentation/features/sign_in/states/onboarding_state_model.dart';
-import 'package:uber_eats_clone/presentation/services/google_location_model.dart';
-import 'package:uber_eats_clone/presentation/services/google_maps_services.dart';
-import 'package:uber_eats_clone/presentation/services/place_detail_model.dart';
+import 'package:uber_eats_clone/models/address_details/address_details_model.dart';
+import 'package:uber_eats_clone/models/google_location/google_location_model.dart';
+import 'package:uber_eats_clone/models/place_detail/place_detail_model.dart';
 
 import '../../../../app_functions.dart';
 import '../../../../state/delivery_schedule_provider.dart';
+import '../../../../utils/result.dart';
 import '../../../constants/asset_names.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/app_text.dart';
 import 'address_details_screen.dart';
+import 'addresses_viewmodel.dart';
 
 class AddressesScreen extends ConsumerStatefulWidget {
   final bool isFromGiftScreen;
@@ -123,7 +122,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
       ),
       body: ValueListenableBuilder(
           valueListenable:
-              Hive.box(AppBoxes.appState).listenable(keys: [BoxKeys.userInfo]),
+              ref.read(addressesViewmodel.notifier).getUserInfoListenable(),
           builder: (context, value, child) {
             Map? storedUserInfo =
                 Hive.box(AppBoxes.appState).get(BoxKeys.userInfo);
@@ -184,12 +183,19 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                           if (_debounce?.isActive ?? false) _debounce?.cancel();
                           _debounce = Timer(const Duration(milliseconds: 500),
                               () async {
-                            final result = await GoogleMapsServices()
-                                .fetchPredictions(
-                                    query: value, location: _userLocationData);
-                            _predictions = result.payload;
-
-                            setState(() {});
+                            final result = await ref
+                                .read(addressesViewmodel.notifier)
+                                .fetchPredictions(value, _userLocationData);
+                            if (result is RError) {
+                              if (context.mounted) {
+                                showInfoToast((result as RError).errorMessage,
+                                    context: context);
+                              }
+                            } else {
+                              _predictions =
+                                  (result as Ok<List<Prediction>>).value;
+                              setState(() {});
+                            }
                           });
                         },
                         decoration: InputDecoration(
@@ -523,7 +529,7 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                       (element) =>
                           element.addressLabel == _selectedAddressLabel,
                     ),
-                    onPopInvoked: (didPop) {
+                    onPopInvokedWithResult: (didPop, result) {
                       if (!didPop) {
                         showInfoToast(
                             seconds: 5,

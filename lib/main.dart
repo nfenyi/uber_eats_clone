@@ -15,14 +15,18 @@ import 'package:uber_eats_clone/hive_adapters/hive_credit_card/hive_credit_card_
 import 'package:uber_eats_clone/presentation/core/app_colors.dart';
 import 'package:uber_eats_clone/presentation/features/main_screen/screens/main_screen_wrapper.dart';
 import 'package:uber_eats_clone/presentation/features/sign_in/views/payment_method_screen.dart';
+import 'package:uber_eats_clone/services/hive_services.dart';
+import 'package:uber_eats_clone/utils/enums.dart';
 import 'hive_adapters/cart_item/cart_item_model.dart';
 import 'hive_adapters/country/country_ip_model.dart';
 import 'presentation/constants/app_sizes.dart';
+import 'presentation/features/sign_in/views/email_address/email_address_screen.dart';
 import 'presentation/features/sign_in/views/get_started/get_started_screen.dart';
-import 'presentation/features/sign_in/views/name_screen.dart';
+import 'presentation/features/sign_in/views/name/name_screen.dart';
 import 'presentation/features/sign_in/views/phone_number_screen.dart';
 import 'presentation/features/sign_in/views/sign_in/sign_in_screen.dart';
-import 'presentation/services/sign_in_view_model.dart';
+import 'presentation/features/sign_in/views/sign_in/sign_in_view_model.dart';
+import 'repositories/user_auth/user_auth_repository_remote.dart';
 
 final Logger logger = Logger();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -130,16 +134,10 @@ Future<void> registerHiveAdpapters() async {
   Hive.registerAdapter(HiveOptionAdapter());
   Hive.registerAdapter(CartProductAdapter());
   Hive.registerAdapter(HiveCreditCardAdapter());
-  // Hive.registerAdapter(NotificationAdapter());
 }
 
 Future<void> openBoxes() async {
-  await Hive.openBox(AppBoxes.appState);
-  await Hive.openBox<String>(AppBoxes.recentSearches);
-  await Hive.openBox<HiveCartItem>(AppBoxes.carts);
-  await Hive.openBox<HiveCartProduct>(AppBoxes.storedProducts);
-  // await Hive.openBox<TransactionCategory>(AppBoxes.transactionsCategories);
-  // await Hive.openBox<Goal>(AppBoxes.goals);
+  await HiveServices.openBoxes();
 }
 
 class UberEatsClone extends StatelessWidget {
@@ -280,73 +278,52 @@ class Wrapper extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ValueListenableBuilder(
-        valueListenable: Hive.box(AppBoxes.appState)
-            .listenable(keys: [BoxKeys.authenticated]),
+        valueListenable: HiveServices.getAuthenticationListenable,
         builder: (context, appStateBox, child) {
-          bool showGetStarted =
-              appStateBox.get(BoxKeys.showGetStarted, defaultValue: true);
-          if (showGetStarted) {
-            return const GetStartedScreen();
-          }
-          if (Hive.box(AppBoxes.appState).get(BoxKeys.signedInWithEmail) ==
-              true) {
-            return const PhoneNumberScreen();
-          }
-          if (Hive.box(AppBoxes.appState)
-                  .get(BoxKeys.addedEmailToPhoneNumber) ==
-              true) {
-            return const NameScreen();
-          }
+          // switch (UserAuthRepositoryRemote().authenticationState){
 
-          if (Hive.box(AppBoxes.appState).get(BoxKeys.addressDetailsSaved) ==
-              true) {
+          //   case AuthState.gettingStarted:
+          //     // TODO: Handle this case.
+          //     throw UnimplementedError();
+          //   case AuthState.registeringWithEmail:
+          //     // TODO: Handle this case.
+          //     throw UnimplementedError();
+          //   case AuthState.registeringWithPhoneNumber:
+          //     // TODO: Handle this case.
+          //     throw UnimplementedError();
+          //   case AuthState.addedEmailToPhoneNumber:
+          //     // TODO: Handle this case.
+          //     throw UnimplementedError();
+          //   case AuthState.addressDetailsSaved:
+          //     // TODO: Handle this case.
+          //     throw UnimplementedError();
+          //   case AuthState.authenticated:
+          //     // TODO: Handle this case.
+          //     throw UnimplementedError();
+          //   case AuthState.unAuthenticated:
+          //     // TODO: Handle this case.
+          //     throw UnimplementedError();
+          //   case AuthState.federatedRegistration:
+          //     // TODO: Handle this case.
+          //     throw UnimplementedError();
+          // }
+          if (HiveServices.shouldShowGetStarted) {
+            return const GetStartedScreen();
+          } else if (HiveServices.userIsRegisteringWithEmail) {
+            return const PhoneNumberScreen();
+          } else if (HiveServices.userAddedEmailToPhoneNumber) {
+            return const NameScreen();
+          } else if (HiveServices.isUserAddressDetailsSaved) {
             return const PaymentMethodScreen(
               isOnboarding: true,
             );
-          }
-
-          bool authenticated =
-              appStateBox.get('authenticated', defaultValue: false);
-
-          if (!authenticated) {
-            return const SignInScreen();
           } else {
-            return const MainScreenWrapper();
+            if (HiveServices.isUserAuthenticated) {
+              return const SignInScreen();
+            } else {
+              return const MainScreenWrapper();
+            }
           }
         });
   }
-}
-
-class AppBoxes {
-  static const String appState = 'app_state';
-  static const String recentSearches = 'recent_searches';
-  static const String carts = 'cart';
-
-  static const String storedProducts = 'stored_products';
-  // static const String groupOrder = 'group_orders';
-
-  const AppBoxes._();
-}
-
-class BoxKeys {
-  static const String signedInWithEmail = 'signedInWithEmail';
-  static const String addedEmailToPhoneNumber = 'addedEmailToPhoneNumber';
-  static const String authenticated = 'authenticated';
-  static const String addressDetailsSaved = 'addressDetailsSaved';
-  static const String email = 'email';
-  static const String showGetStarted = 'showGetStarted';
-  static const String onboarded = 'onboarded';
-  static const String country = 'country';
-  static const String userInfo = 'userInfo';
-  static const String activatedPromoId = 'activatedPromoPath';
-  static const String recentlyViewed = 'recentlyViewed';
-  static const String firstTimeSendingGift = 'firstTimeSendingGift';
-  static const String firstTimeAddingTeen = 'firstTimeAddingTeen';
-
-  static const String isOnboardedToUberGifts = 'isOnboardedToUberGifts';
-  static const String creditCardInUse = 'creditCardInUse';
-
-  static const String newGiftCardId = 'newGiftCardId';
-
-  const BoxKeys._();
 }
