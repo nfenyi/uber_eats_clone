@@ -2670,9 +2670,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                           timeOfDayNow.isAfter(
                                                               store
                                                                   .closingTime);
-                                                      logger
-                                                          .d(store.closingTime);
-                                                      logger.d(TimeOfDay.now());
+
                                                       return InkWell(
                                                         borderRadius:
                                                             BorderRadius

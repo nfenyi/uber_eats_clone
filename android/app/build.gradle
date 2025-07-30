@@ -9,6 +9,27 @@ plugins {
 
 }
 
+// --- Start: Read local.properties for API Key ---
+def flutterProjectRoot = rootProject.projectDir.parentFile
+def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
+def properties = new Properties()
+
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        properties.load(reader)
+    }
+} else {
+    // Handle case where local.properties is missing
+    // For development, you might just print a warning.
+    // For CI/CD, you might want to throw an error to ensure key is present.
+    println "WARNING: 'local.properties' not found at ${localPropertiesFile.absolutePath}. " +
+            "Google Maps API key might be missing."
+}
+
+// Get the API key, providing an empty string as a default if not found
+def googleMapsKey = properties.getProperty('MAPS_API_KEY', '')
+
+
 android {
     namespace = "com.example.uber_eats_clone"
     compileSdk = flutter.compileSdkVersion
@@ -38,7 +59,7 @@ android {
         // versionName = "1.0"
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders += [mapsApiKey: "${System.env.MAPS_API_KEY}"]        
+        manifestPlaceholders += [googleMapsKey: googleMapsKey]        
     }
 
     buildTypes {

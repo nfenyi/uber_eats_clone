@@ -25,7 +25,7 @@ import 'presentation/features/sign_in/views/sign_in/sign_in_screen.dart';
 import 'presentation/services/sign_in_view_model.dart';
 
 final Logger logger = Logger();
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
