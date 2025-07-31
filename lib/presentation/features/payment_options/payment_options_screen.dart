@@ -1,11 +1,12 @@
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
-import 'package:credit_card_validator/credit_card_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/mdi.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/models/credit_card_details/credit_card_details_model.dart';
@@ -110,8 +111,8 @@ class _PaymentOptionsScreenState extends ConsumerState<PaymentOptionsScreen> {
                           buttonColor: accountType == 'Business'
                               ? Colors.green
                               : AppColors.neutral200,
-                          icon: Icon(
-                            FontAwesomeIcons.briefcase,
+                          icon: Iconify(
+                            Mdi.briefcase,
                             color: accountType == 'Business'
                                 ? Colors.white
                                 : Colors.black,

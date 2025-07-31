@@ -5,6 +5,8 @@ import 'package:uber_eats_clone/presentation/services/google_location_model.dart
 import 'package:uber_eats_clone/presentation/services/place_detail_model.dart';
 import 'package:uber_eats_clone/presentation/services/service_model.dart';
 
+import '../../env/env.dart';
+
 class GoogleMapsServices {
   final Dio _dio = Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 30),
@@ -12,7 +14,7 @@ class GoogleMapsServices {
     receiveTimeout: const Duration(seconds: 30),
     contentType: "application/json",
   ));
-  final _apiKey = "AIzaSyD0RD3-1CW7alhs03RMBLPhv8TdiwDKeyQ";
+  final _apiKey = Env.mapsApiKey;
   Future<ServiceResponse> fetchPredictions({
     required String query,
     required LocationData? location,

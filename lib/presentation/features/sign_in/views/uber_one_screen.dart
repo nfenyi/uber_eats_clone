@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_udid/flutter_udid.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ic.dart';
+import 'package:iconify_flutter_plus/icons/mdi.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -89,8 +91,8 @@ class _UberOneScreenState extends State<UberOneScreen> {
                     ),
                     const ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        FontAwesomeIcons.tag,
+                      leading: Iconify(
+                        Mdi.tag,
                       ),
                       title: AppText(
                         text:
@@ -99,8 +101,8 @@ class _UberOneScreenState extends State<UberOneScreen> {
                     ),
                     const ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        FontAwesomeIcons.car,
+                      leading: Iconify(
+                        Ic.baseline_directions_car_filled,
                       ),
                       title: AppText(
                         text:

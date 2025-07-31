@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -749,8 +748,8 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                               Icons.person,
                                               color: Colors.white,
                                             ),
-                                            1: Icon(
-                                              FontAwesomeIcons.briefcase,
+                                            1: Iconify(
+                                              Mdi.briefcase,
                                               size: 12,
                                             )
                                           }
@@ -762,8 +761,8 @@ class _AddressesScreenState extends ConsumerState<AddressesScreen> {
                                             1: Padding(
                                                 padding: EdgeInsets.symmetric(
                                                     vertical: 3),
-                                                child: Icon(
-                                                  FontAwesomeIcons.briefcase,
+                                                child: Iconify(
+                                                  Mdi.briefcase,
                                                   color: Colors.white,
                                                   size: 20,
                                                 ))

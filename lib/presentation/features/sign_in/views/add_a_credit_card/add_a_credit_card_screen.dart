@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'dart:math';
-
-import 'package:camera/camera.dart';
 import 'package:colorful_iconify_flutter/icons/logos.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:credit_card_type_detector/credit_card_type_detector.dart';
 import 'package:credit_card_type_detector/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:iconify_flutter_plus/icons/cib.dart';
+import 'package:ml_card_scanner/ml_card_scanner.dart';
 import 'package:phonecodes/phonecodes.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/hive_adapters/country/country_ip_model.dart';
@@ -39,11 +39,6 @@ class AddCardScreen extends ConsumerStatefulWidget {
 
 class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
   Timer? _debounce;
-  // final List<CountryCode> _countryCodes = [
-  //   CountryCode(flag: AssetNames.ghanaFlag, countryName: "Ghana", code: '+233'),
-  //   CountryCode(flag: AssetNames.usaFlag, countryName: "USA", code: '+1'),
-  // ];
-  // late CountryCode? _selectedCountryCode;
 
   final _cardNumberController = TextEditingController();
   final _expController = TextEditingController();
@@ -145,8 +140,8 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                           ),
                           suffixIcon: GestureDetector(
                               onTap: () async {
-                                List<CameraDescription> cameras =
-                                    await availableCameras();
+                                // List<CameraDescription> cameras =
+                                //     await availableCameras();
                                 // logger.d(cameras);
 
                                 // const mainCamera = CameraDescription(
@@ -154,67 +149,78 @@ class _AddressDetailsScreenState extends ConsumerState<AddCardScreen> {
                                 //     lensDirection: CameraLensDirection.back,
                                 //     sensorOrientation: 0);
 
-                                final controller = CameraController(
-                                    cameras.firstWhere(
-                                      (element) =>
-                                          element.lensDirection ==
-                                          CameraLensDirection.back,
-                                    ),
-                                    ResolutionPreset.max);
+                                // final controller = CameraController(
+                                //     cameras.firstWhere(
+                                //       (element) =>
+                                //           element.lensDirection ==
+                                //           CameraLensDirection.back,
+                                //     ),
+                                //     ResolutionPreset.max);
                                 // logger.d('3');
-                                await controller.initialize().then((_) async {
-                                  await controller.lockCaptureOrientation(
-                                      DeviceOrientation.portraitUp);
-                                  if (context.mounted) {
-                                    final result = await navigatorKey
-                                        .currentState!
-                                        .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddACardCameraView(controller),
-                                    ));
+                                // await controller.initialize().then((_) async {
+                                //   await controller.lockCaptureOrientation(
+                                //       DeviceOrientation.portraitUp);
+                                //   if (context.mounted) {
+                                //     final CreditCardModel? result =
+                                //         await navigatorKey.currentState!
+                                //             .push(MaterialPageRoute(
+                                //       builder: (context) =>
+                                //           const AddACardCameraView(),
+                                //     ));
 
-                                    if (result != null) {
-                                      result as String;
-                                      setState(() {
-                                        final formattedText =
-                                            result.replaceAll(' ', '');
-                                        _cardNumberController.text =
-                                            formattedText;
-                                        _cardNumberNotifier.value =
-                                            formattedText;
-                                      });
-                                    }
-                                  } else {
-                                    await controller.dispose();
-                                  }
-                                }).catchError((Object e) async {
-                                  await controller.dispose();
-                                  if (e is CameraException) {
-                                    switch (e.code) {
-                                      case 'CameraAccessDenied':
-                                        if (context.mounted) {
-                                          await showAppInfoDialog(
-                                              title: 'Camera access denied',
-                                              description:
-                                                  'Grant camera access in order to read credit card',
-                                              context);
-                                        }
-                                        break;
-                                      default:
-                                        await showAppInfoDialog(context,
-                                            description:
-                                                e.description ?? e.code);
-                                        break;
-                                    }
-                                  } else {
-                                    if (context.mounted) {
-                                      // throw e;
-                                      logger.d(e.toString());
-                                      await showAppInfoDialog(context,
-                                          description: e.toString());
-                                    }
-                                  }
-                                });
+                                //     if (result != null) {
+                                //       setState(() {
+                                //         _cardNumberController.text =
+                                //             result.number;
+                                //         _cardNumberNotifier.value =
+                                //             result.number;
+                                //         _expController.text =
+                                //             '${result.expirationMonth}/${result.expirationYear}';
+                                //       });
+                                //     }
+                                //   } else {
+                                //     await controller.dispose();
+                                //   }
+                                // }).catchError((Object e) async {
+                                //   await controller.dispose();
+                                //   if (e is CameraException) {
+                                //     switch (e.code) {
+                                //       case 'CameraAccessDenied':
+                                //         if (context.mounted) {
+                                //           await showAppInfoDialog(
+                                //               title: 'Camera access denied',
+                                //               description:
+                                //                   'Grant camera access in order to read credit card',
+                                //               context);
+                                //         }
+                                //         break;
+                                //       default:
+                                //         await showAppInfoDialog(context,
+                                //             description:
+                                //                 e.description ?? e.code);
+                                //         break;
+                                //     }
+                                //   } else {
+                                //     if (context.mounted) {
+                                //       // throw e;
+                                //       logger.d(e.toString());
+                                //       await showAppInfoDialog(context,
+                                //           description: e.toString());
+                                //     }
+                                //   }
+                                // });
+                                final CardInfo? result = await navigatorKey
+                                    .currentState!
+                                    .push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            const AddACardCameraView()));
+                                if (result != null) {
+                                  setState(() {
+                                    _cardNumberController.text = result.number;
+                                    _cardNumberNotifier.value = result.number;
+                                    _expController.text = result.expiry;
+                                  });
+                                }
                               },
                               child: const Icon(Icons.camera_alt)),
                         ),

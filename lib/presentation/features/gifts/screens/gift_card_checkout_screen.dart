@@ -8,7 +8,6 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
@@ -225,18 +224,18 @@ class _GiftCardCheckoutScreenState
                             children: [
                               Row(
                                 children: [
-                                  Icon(
-                                    FontAwesomeIcons.whatsapp,
+                                  Iconify(
+                                    Mdi.whatsapp,
                                     size: 20,
                                   ),
                                   Gap(5),
-                                  Icon(
-                                    FontAwesomeIcons.facebookMessenger,
+                                  Iconify(
+                                    Mdi.facebook_messenger,
                                     size: 20,
                                   ),
                                   Gap(5),
-                                  FaIcon(
-                                    FontAwesomeIcons.telegram,
+                                  Iconify(
+                                    Mdi.telegram,
                                     size: 20,
                                   ),
                                   Gap(5),
@@ -245,8 +244,8 @@ class _GiftCardCheckoutScreenState
                                     size: 20,
                                   ),
                                   Gap(5),
-                                  FaIcon(
-                                    FontAwesomeIcons.instagram,
+                                  Iconify(
+                                    Mdi.instagram,
                                     size: 20,
                                   )
                                 ],
@@ -476,14 +475,14 @@ class _GiftCardCheckoutScreenState
                             .collection(FirestoreCollections.giftCardsAnkasa)
                             .doc(widget.giftCard.id)
                             .set(widget.giftCard.toJson());
-                        
-                        final shareResult =
-                        await Share.share(dynamicLink.toString(),
+
+                        final shareResult = await Share.share(
+                            dynamicLink.toString(),
                             subject:
                                 '${FirebaseAuth.instance.currentUser!.displayName} sent you a gift card!');
                         if (shareResult.status == ShareResultStatus.success) {
-                        navigatorKey.currentState!.popUntil((route) =>
-                            route.settings.name == '/giftCardScreen');
+                          navigatorKey.currentState!.popUntil((route) =>
+                              route.settings.name == '/giftCardScreen');
                         }
                       } else {
                         final giftCardWithEmailProperties = widget.giftCard

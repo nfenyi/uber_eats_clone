@@ -1392,7 +1392,7 @@ class CartSheet extends StatelessWidget {
                                   final BitmapDescriptor bitmapDescriptor =
                                       await BitmapDescriptor.asset(
                                     const ImageConfiguration(
-                                        size: Size(30, 46)),
+                                        size: Size(13, 13)),
                                     AssetNames.mapMarker2,
                                   );
 

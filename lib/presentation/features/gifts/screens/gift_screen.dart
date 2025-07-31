@@ -2,9 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/features/address/screens/addresses_screen.dart';
@@ -104,7 +105,10 @@ class _GiftScreenState extends ConsumerState<GiftScreen> {
                     ref.read(bottomNavIndexProvider.notifier).updateIndex(2);
                   },
                   child: Ink(
-                    child: const Icon(FontAwesomeIcons.arrowLeft),
+                    child: const Iconify(
+                      Ph.arrow_left,
+                      size: 15,
+                    ),
                   ),
                 ),
                 flexibleSpace: FlexibleSpaceBar(

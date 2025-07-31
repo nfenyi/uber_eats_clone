@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:custom_timer/custom_timer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:flutter_udid/flutter_udid.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:pinput/pinput.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -37,7 +38,8 @@ class VerifyPhoneNumberScreen extends ConsumerStatefulWidget {
       _VerifyPhoneNumberState();
 }
 
-class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
+class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _pinController = TextEditingController();
   final _defaultPinTheme = PinTheme(
     width: 56,
@@ -73,9 +75,34 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
 
   bool _hasTimedOut = false;
 
+  late final _timerController = CustomTimerController(
+      vsync: this,
+      begin: const Duration(minutes: 4),
+      end: const Duration(),
+      initialState: CustomTimerState.reset,
+      interval: CustomTimerInterval.milliseconds);
+
+  @override
+  void initState() {
+    super.initState();
+    _timerController.addListener(() {
+      if (_timerController.remaining.value.duration == const Duration()) {
+        setState(() {
+          _hasTimedOut = true;
+        });
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        _timerController.start();
+      },
+    );
+  }
+
   @override
   void dispose() {
     _pinController.dispose();
+    _timerController.dispose();
     super.dispose();
   }
 
@@ -230,6 +257,7 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                               setState(() {
                                 _hasTimedOut = false;
                               });
+                              _timerController.start();
                             },
                             timeout: const Duration(minutes: 2),
                             codeAutoRetrievalTimeout:
@@ -256,23 +284,32 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                           ),
                           if (!_hasTimedOut) const Text('('),
                           if (!_hasTimedOut)
-                            TimerCountdown(
-                              spacerWidth: 0,
-                              enableDescriptions: false,
-                              timeTextStyle:
-                                  const TextStyle(color: AppColors.neutral500),
-                              format: CountDownTimerFormat.minutesSeconds,
-                              endTime: DateTime.now().add(
-                                const Duration(
-                                  minutes: 4,
-                                ),
-                              ),
-                              onEnd: () {
-                                setState(() {
-                                  _hasTimedOut = true;
-                                });
-                              },
-                            ),
+                            CustomTimer(
+                                controller: _timerController,
+                                builder: (state, time) {
+                                  // Build the widget you want!🎉
+                                  return AppText(
+                                    text: "${time.minutes}:${time.seconds}",
+                                    color: AppColors.neutral500,
+                                  );
+                                }),
+                          // TimerCountdown(
+                          //   spacerWidth: 0,
+                          //   enableDescriptions: false,
+                          //   timeTextStyle:
+                          //       const TextStyle(color: AppColors.neutral500),
+                          //   format: CountDownTimerFormat.minutesSeconds,
+                          //   endTime: DateTime.now().add(
+                          //     const Duration(
+                          //       minutes: 4,
+                          //     ),
+                          //   ),
+                          //   onEnd: () {
+                          //     setState(() {
+                          //       _hasTimedOut = true;
+                          //     });
+                          //   },
+                          // ),
                           if (!_hasTimedOut) const Text(')'),
                         ],
                       ),
@@ -296,8 +333,8 @@ class _VerifyPhoneNumberState extends ConsumerState<VerifyPhoneNumberScreen> {
                               color: AppColors.neutral100,
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
-                          child: const Icon(
-                            FontAwesomeIcons.arrowLeft,
+                          child: const Iconify(
+                            Ph.arrow_left,
                             size: 15,
                           ),
                         ),

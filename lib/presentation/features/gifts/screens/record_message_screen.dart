@@ -4,8 +4,9 @@ import 'package:camera/camera.dart';
 import 'package:custom_timer/custom_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/charm.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -265,8 +266,8 @@ class _RecordMessageScreenState extends State<RecordMessageScreen>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Icon(
-                                      FontAwesomeIcons.arrowRotateLeft,
+                                    Iconify(
+                                      Charm.rotate_anti_clockwise,
                                       color: Colors.white,
                                     ),
                                     Gap(10),

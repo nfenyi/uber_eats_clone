@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/bi.dart';
 import 'package:iconify_flutter_plus/icons/bx.dart';
 
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
@@ -30,8 +30,8 @@ class GiftCardOnboardingScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const ListTile(
-                  leading: Icon(
-                    FontAwesomeIcons.gift,
+                  leading: Iconify(
+                    Bi.gift_fill,
                     size: 15,
                   ),
                   title: AppText(

@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:custom_timer/custom_timer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:flutter_udid/flutter_udid.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
@@ -28,9 +29,18 @@ class EmailSentScreen extends StatefulWidget {
   State<EmailSentScreen> createState() => _EmailSentScreenState();
 }
 
-class _EmailSentScreenState extends State<EmailSentScreen> {
+class _EmailSentScreenState extends State<EmailSentScreen>
+    with SingleTickerProviderStateMixin {
   bool _hasTimedOut = false;
   late PendingDynamicLinkData dld;
+
+  late final _timerController = CustomTimerController(
+      vsync: this,
+      begin: const Duration(minutes: 2),
+      end: const Duration(),
+      initialState: CustomTimerState.reset,
+      interval: CustomTimerInterval.milliseconds);
+
   @override
   void initState() {
     super.initState();
@@ -176,6 +186,24 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
             description: e.toString());
       }
     });
+    _timerController.addListener(() {
+      if (_timerController.remaining.value.duration == const Duration()) {
+        setState(() {
+          _hasTimedOut = true;
+        });
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        _timerController.start();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _timerController.dispose();
+    super.dispose();
   }
 
   @override
@@ -250,6 +278,7 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                                   setState(() {
                                     _hasTimedOut = false;
                                   });
+                                  _timerController.start();
                                   showInfoToast(
                                       'Email has been resent. Please check your mail',
                                       context: navigatorKey.currentContext);
@@ -289,23 +318,32 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                               ),
                               if (!_hasTimedOut) const Text('('),
                               if (!_hasTimedOut)
-                                TimerCountdown(
-                                  spacerWidth: 0,
-                                  enableDescriptions: false,
-                                  timeTextStyle: const TextStyle(
-                                      color: AppColors.neutral500),
-                                  format: CountDownTimerFormat.minutesSeconds,
-                                  endTime: DateTime.now().add(
-                                    const Duration(
-                                      minutes: 2,
-                                    ),
-                                  ),
-                                  onEnd: () {
-                                    setState(() {
-                                      _hasTimedOut = true;
-                                    });
-                                  },
-                                ),
+                                CustomTimer(
+                                    controller: _timerController,
+                                    builder: (state, time) {
+                                      // Build the widget you want!🎉
+                                      return AppText(
+                                        text: "${time.minutes}:${time.seconds}",
+                                        color: AppColors.neutral500,
+                                      );
+                                    }),
+                              // TimerCountdown(
+                              //   spacerWidth: 0,
+                              //   enableDescriptions: false,
+                              //   timeTextStyle: const TextStyle(
+                              //       color: AppColors.neutral500),
+                              //   format: CountDownTimerFormat.minutesSeconds,
+                              //   endTime: DateTime.now().add(
+                              //     const Duration(
+                              //       minutes: 2,
+                              //     ),
+                              //   ),
+                              //   onEnd: () {
+                              //     setState(() {
+                              //       _hasTimedOut = true;
+                              //     });
+                              //   },
+                              // ),
                               if (!_hasTimedOut) const Text(')'),
                             ],
                           ),
@@ -337,8 +375,8 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                             ),
                             child: const Row(
                               children: [
-                                Icon(
-                                  FontAwesomeIcons.arrowLeft,
+                                Iconify(
+                                  Ph.arrow_left,
                                   size: 15,
                                 ),
                                 AppText(text: '  Wrong email ?')

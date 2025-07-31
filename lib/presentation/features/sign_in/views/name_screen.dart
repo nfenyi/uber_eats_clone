@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:uber_eats_clone/main.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/core/widgets.dart';
@@ -117,8 +118,8 @@ class _NameScreenState extends ConsumerState<NameScreen> {
                             color: AppColors.neutral200,
                             borderRadius: BorderRadius.all(Radius.circular(20)),
                           ),
-                          child: const Icon(
-                            FontAwesomeIcons.arrowLeft,
+                          child: const Iconify(
+                            Ph.arrow_left,
                             size: 15,
                           ),
                         ),
@@ -164,8 +165,8 @@ class _NameScreenState extends ConsumerState<NameScreen> {
                                     : Colors.white,
                               ),
                               const Gap(5),
-                              Icon(
-                                FontAwesomeIcons.arrowRight,
+                              Iconify(
+                                Ph.arrow_right,
                                 color: _firstNameController.text.isEmpty ||
                                         _lastNameController.text.isEmpty
                                     ? null

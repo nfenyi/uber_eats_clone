@@ -6,12 +6,12 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
 import 'package:iconify_flutter_plus/icons/ic.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:phonecodes/phonecodes.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:uber_eats_clone/main.dart';
@@ -273,8 +273,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20)),
                             ),
-                            child: const Icon(
-                              FontAwesomeIcons.arrowLeft,
+                            child: const Iconify(
+                              Ph.arrow_left,
                               size: 15,
                             ),
                           ),
@@ -347,8 +347,8 @@ class _PhoneNumberScreenState extends ConsumerState<PhoneNumberScreen> {
                                       : Colors.white,
                                 ),
                                 const Gap(5),
-                                Icon(
-                                  FontAwesomeIcons.arrowRight,
+                                Iconify(
+                                  Ph.arrow_right,
                                   color: _phoneNumberController.text.isEmpty
                                       ? null
                                       : Colors.white,

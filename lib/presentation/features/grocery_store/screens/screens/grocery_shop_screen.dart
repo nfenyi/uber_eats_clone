@@ -4,10 +4,11 @@ import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:image_color_builder/image_color_builder.dart';
 import 'package:marquee_list/marquee_list.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -246,7 +247,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                                   bitmapDescriptor =
                                                   await BitmapDescriptor.asset(
                                                 const ImageConfiguration(
-                                                    size: Size(15, 15)),
+                                                    size: Size(13, 13)),
                                                 AssetNames.mapMarker2,
                                               );
                                               navigatorKey.currentState!.pop();
@@ -314,8 +315,8 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                 color: Colors.black38,
                                 borderRadius: BorderRadius.circular(50)),
                             padding: const EdgeInsets.all(1),
-                            child: const Icon(
-                              FontAwesomeIcons.arrowLeft,
+                            child: const Iconify(
+                              Ph.arrow_left,
                               color: Colors.white,
                               size: 20,
                             ),
@@ -380,7 +381,7 @@ class _GroceryShopScreenState extends State<GroceryShopScreen> {
                                       final BitmapDescriptor bitmapDescriptor =
                                           await BitmapDescriptor.asset(
                                         const ImageConfiguration(
-                                            size: Size(15, 15)),
+                                            size: Size(13, 13)),
                                         AssetNames.mapMarker2,
                                       );
 

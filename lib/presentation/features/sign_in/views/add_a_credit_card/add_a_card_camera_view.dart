@@ -1,21 +1,16 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:math' as math;
 
-import 'package:camera/camera.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:ml_card_scanner/ml_card_scanner.dart';
 import 'package:uber_eats_clone/main.dart';
+import 'package:uber_eats_clone/presentation/core/widgets.dart';
 
 import '../../../../constants/app_sizes.dart';
 import '../../../../core/app_text.dart';
 
 class AddACardCameraView extends StatefulWidget {
-  final CameraController controller;
-  const AddACardCameraView(
-    this.controller, {
+  const AddACardCameraView({
     super.key,
   });
 
@@ -23,45 +18,55 @@ class AddACardCameraView extends StatefulWidget {
   State<AddACardCameraView> createState() => _AddACardCameraViewState();
 }
 
-class _AddACardCameraViewState extends State<AddACardCameraView>
-    with WidgetsBindingObserver {
-  final _textRecognizer = TextRecognizer();
+class _AddACardCameraViewState extends State<AddACardCameraView> {
+  final _controller = ScannerWidgetController();
+  late final Timer _timer;
+
+  void _onListenCard(CardInfo? value) {
+    if (value != null) {
+      Navigator.of(context).pop(value);
+    }
+  }
+
+  void _onError(ScannerException exception) {
+    showAppInfoDialog(
+      context,
+      description: 'Error: ${exception.message}',
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    // Future.delayed()
-    _scanImage();
+    _timer = Timer(
+      const Duration(minutes: 7),
+      () async {
+        showInfoToast('Closing camera soon...', context: context);
+        await Future.delayed(
+          const Duration(seconds: 20),
+          () {
+            navigatorKey.currentState!.pop();
+          },
+        );
+      },
+    );
+    _controller
+      ..setCardListener(_onListenCard)
+      ..setErrorListener(_onError);
   }
 
   @override
   void dispose() {
-    widget.controller.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-    _textRecognizer.close();
+    if (_timer.isActive) {
+      _timer.cancel();
+    }
+
+    _controller
+      ..removeCardListeners(_onListenCard)
+      ..removeErrorListener(_onError)
+      ..dispose();
+
     super.dispose();
-  }
-
-  @override
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final CameraController cameraController = widget.controller;
-
-    // App state changed before we got the chance to initialize.
-    if (
-        // cameraController == null ||
-        !cameraController.value.isInitialized) {
-      return;
-    }
-
-    if (state == AppLifecycleState.inactive) {
-      cameraController.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      if (context.mounted) {
-        navigatorKey.currentState!.pop();
-      }
-    }
   }
 
   @override
@@ -81,9 +86,23 @@ class _AddACardCameraViewState extends State<AddACardCameraView>
                 Column(
                   children: [
                     Expanded(
-                      child: AspectRatio(
-                          aspectRatio: 1,
-                          child: widget.controller.buildPreview()),
+                      child: ScannerWidget(
+                        // cameraPreviewBuilder: (context, preview, previewSize) {
+                        //   return SizedBox(
+                        //       height: double.infinity, child: preview);
+                        // },
+                        overlayTextBuilder: (context) =>
+                            const SizedBox.shrink(),
+                        controller: _controller,
+                        scannerDelay: 800,
+                        overlayOrientation: CardOrientation.landscape,
+                        cameraResolution: CameraResolution.max,
+                        oneShotScanning: true,
+                      ),
+
+                      //  AspectRatio(
+                      //     aspectRatio: 1,
+                      //     child: widget.controller.buildPreview()),
                     ),
                   ],
                 ),
@@ -116,32 +135,5 @@ class _AddACardCameraViewState extends State<AddACardCameraView>
         ],
       ),
     );
-  }
-
-  Future<void> _scanImage() async {
-    Timer.periodic(const Duration(seconds: 4), (timer) async {
-      try {
-        if (!mounted) {
-          timer.cancel();
-        } else {
-          final pictureFile = await widget.controller.takePicture();
-          final file = File(pictureFile.path);
-          final inputImage = InputImage.fromFile(file);
-          final recognizedText = await _textRecognizer.processImage(inputImage);
-          final creditCardTextBlock = recognizedText.blocks.firstWhereOrNull(
-            (element) => element.text.length >= 13,
-          );
-          if (creditCardTextBlock == null) {
-            await file.delete();
-          } else {
-            if (context.mounted) {
-              navigatorKey.currentState!.pop(creditCardTextBlock.text);
-            }
-          }
-        }
-      } catch (e) {
-        // showInfoToast(e.toString(), context: navigatorKey.currentContext);
-      }
-    });
   }
 }

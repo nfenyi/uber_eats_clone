@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import 'package:colorful_iconify_flutter/icons/logos.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -385,10 +386,14 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   }
                 },
                 iconFirst: true,
-                icon: Image.asset(
-                  AssetNames.googleLogo,
-                  height: 18,
+                icon: const Iconify(
+                  Logos.google_icon,
+                  size: 18,
                 ),
+                //  Image.asset(
+                //   AssetNames.googleLogo,
+                //   height: 18,
+                // ),
                 text: 'Continue with Google',
                 isSecondary: true,
               ),

@@ -3,9 +3,10 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/models/group_order/group_order_model.dart';
@@ -314,7 +315,7 @@ class _GroupOrderSettingsScreenState extends State<GroupOrderSettingsScreen> {
                       });
                     }
                   },
-                  leading: const Icon(FontAwesomeIcons.moneyBill, size: 20),
+                  leading: const Iconify(Ph.money_bold, size: 20),
                   title: AppText(
                     text: _whoPays,
                     size: AppSizes.bodySmall,

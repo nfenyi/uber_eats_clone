@@ -972,7 +972,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                                                           await BitmapDescriptor
                                                               .asset(
                                                         const ImageConfiguration(
-                                                            size: Size(15, 15)),
+                                                            size: Size(13, 13)),
                                                         AssetNames.mapMarker2,
                                                       );
                                                       navigatorKey.currentState!
@@ -1074,7 +1074,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                                   final BitmapDescriptor bitmapDescriptor =
                                       await BitmapDescriptor.asset(
                                     const ImageConfiguration(
-                                        size: Size(15, 15)),
+                                        size: Size(13, 13)),
                                     AssetNames.mapMarker2,
                                   );
 

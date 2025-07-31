@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:colorful_iconify_flutter/icons/logos.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -257,10 +258,9 @@ class _UberCashModalState extends State<UberCashModal> {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(50),
                                         color: Colors.white),
-                                    child: Image.asset(
-                                      AssetNames.masterCardLogo,
-                                      width: 50,
-                                      height: 50,
+                                    child: const Iconify(
+                                      Logos.mastercard,
+                                      size: 50,
                                     )),
                                 const Gap(15),
                                 const AppText(

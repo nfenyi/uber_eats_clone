@@ -2,8 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:uber_eats_clone/app_functions.dart';
 import 'package:uber_eats_clone/main.dart';
@@ -348,8 +349,8 @@ class _AislesScreenState extends ConsumerState<AislesScreen> {
                           });
                         },
                         child: Ink(
-                          child: const Icon(
-                            FontAwesomeIcons.arrowLeft,
+                          child: const Iconify(
+                            Ph.arrow_left,
                             size: 18,
                           ),
                         ),

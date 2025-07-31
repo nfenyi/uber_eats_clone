@@ -820,6 +820,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             final paymentOption = ref.read(paymentOptionProvider);
             if (paymentOption == null) {
               showInfoToast('Select a payment method', context: context);
+              return;
             }
             setState(() {
               _isLoading = true;
@@ -846,7 +847,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         .doc(_activatedPromoId),
                 payments: [
                   Payment(
-                      creditCardType: paymentOption!.creditCardType!,
+                      creditCardType: paymentOption.creditCardType!,
                       paymentMethodName: 'Debit or Credit Card',
                       amountPaid: total,
                       cardNumber:

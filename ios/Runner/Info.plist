@@ -48,6 +48,8 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSCameraUsageDescription</key>
+		<string>You need to grant access in order to scan your credit card</string>
 		<key>NSContactsUsageDescription</key>
 		<string>You need to grant access in order to retrieve contacts you want to add to your Uber family</string>
 	</dict>

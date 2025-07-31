@@ -36,22 +36,20 @@ class _WhatDeliveryPeopleSeeScreenState
     ImageProvider provider, {
     ImageConfiguration config = ImageConfiguration.empty,
   }) {
-    //new Completer
     Completer<ui.Image> completer = Completer<ui.Image>();
     ImageStreamListener? listener;
-    //获取图片流
+
     ImageStream stream = provider.resolve(config);
     listener = ImageStreamListener((ImageInfo frame, bool sync) {
-      //stream 流监听
       final ui.Image image = frame.image;
-      //完成事件
+
       completer.complete(image);
-      //移除监听
+
       stream.removeListener(listener!);
     });
-    //添加监听
+
     stream.addListener(listener);
-    //返回image
+
     return completer.future;
   }
 

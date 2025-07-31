@@ -1,8 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:iconify_flutter_plus/iconify_flutter_plus.dart';
+import 'package:iconify_flutter_plus/icons/ph.dart';
 import 'package:uber_eats_clone/presentation/constants/app_sizes.dart';
 import 'package:uber_eats_clone/presentation/constants/weblinks.dart';
 import 'package:uber_eats_clone/presentation/core/app_text.dart';
@@ -127,8 +128,8 @@ class _TermsNPrivacyNoticeScreenState
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20)),
                               ),
-                              child: const Icon(
-                                FontAwesomeIcons.arrowLeft,
+                              child: const Iconify(
+                                Ph.arrow_left,
                                 size: 15,
                               ),
                             ),
@@ -167,8 +168,8 @@ class _TermsNPrivacyNoticeScreenState
                                         : null,
                                   ),
                                   const Gap(5),
-                                  Icon(
-                                    FontAwesomeIcons.arrowRight,
+                                  Iconify(
+                                    Ph.arrow_right,
                                     color: _isChecked == true
                                         ? Colors.white
                                         : null,

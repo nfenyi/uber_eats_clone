@@ -21,7 +21,7 @@ class DealsScreen extends StatefulWidget {
 }
 
 class _DealsScreenState extends State<DealsScreen> {
-  final List<GlobalKey> _categoryKeys = [];
+  // final List<GlobalKey> _categoryKeys = [];
   final _scrollController = ScrollController();
   final Map<String, Set<Product>> _aislesAndProducts = {};
   //  void _animateToTab() {

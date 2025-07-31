@@ -860,8 +860,8 @@ class _GroupOrderScreenState extends ConsumerState<GroupOrderScreen> {
                                                                         .asset(
                                                                   const ImageConfiguration(
                                                                       size: Size(
-                                                                          30,
-                                                                          46)),
+                                                                          13,
+                                                                          13)),
                                                                   AssetNames
                                                                       .mapMarker2,
                                                                 );
